@@ -2,8 +2,6 @@
 
 Ett webbaserat beslutsstöd för sjukvårdspersonal för att underlätta och säkra handläggningen av receptförnyelser. Verktyget beräknar patientens läkemedelsförbrukning, upptäcker över- eller underkonsumtion och genererar färdiga svarsmallar för patientkontakt (t.ex. via 1177) och journalföring.
 
-[Verktyget skapades och underhålls av Gabriel Jungestrand](https://github.com/Vansinnet/Receptberakning).
-
 ---
 
 ## ✨ Funktioner
