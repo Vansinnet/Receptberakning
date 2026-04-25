@@ -1,0 +1,2190 @@
+<!DOCTYPE html>
+<!-- saved from url=(0034)https://receptberakning.pages.dev/ -->
+<html lang="sv" data-theme="rainbow"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors 'none';">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Receptförnyelse</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=&#39;http://www.w3.org/2000/svg&#39; viewBox=&#39;0 0 64 64&#39;%3E%3Crect width=&#39;64&#39; height=&#39;64&#39; rx=&#39;14&#39; fill=&#39;%231a56db&#39;/%3E%3Crect x=&#39;28&#39; y=&#39;10&#39; width=&#39;8&#39; height=&#39;44&#39; rx=&#39;4&#39; fill=&#39;white&#39;/%3E%3Crect x=&#39;10&#39; y=&#39;28&#39; width=&#39;44&#39; height=&#39;8&#39; rx=&#39;4&#39; fill=&#39;white&#39;/%3E%3C/svg%3E">
+<style>
+  /* ── Grundtema (Ljust) ── */
+  :root, [data-theme="light"] {
+    --primary: #1a56db;
+    --primary-light: #e8f0fe;
+    --primary-hover: #1447c0;
+    --bg: #f0f2f5;
+    --surface: #ffffff;
+    --surface2: #f7f8fa;
+    --text: #111827;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+    --border-strong: #d1d5db;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.09), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.11), 0 2px 6px rgba(0,0,0,0.07);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+
+    --green: #059669; --green-bg: #ecfdf5; --green-border: #a7f3d0;
+    --amber: #b45309; --amber-bg: #fffbeb; --amber-border: #fcd34d;
+    --red: #dc2626;   --red-bg: #fef2f2;   --red-border: #fecaca;
+    --blue: #1a56db;  --blue-bg: #eff6ff;  --blue-border: #bfdbfe;
+    --violet: #7c3aed; --violet-bg: #f5f3ff; --violet-border: #ddd6fe;
+
+    --input-bg: #ffffff;
+    --clear-btn: #f3f4f6; --clear-btn-hover: #e5e7eb; --clear-btn-text: #374151;
+    --refill-bg: #f0fdf4; --refill-border: #bbf7d0; --refill-text: #14532d;
+    --toast-bg: #1f2937; --toast-text: #ffffff;
+    --code-bg: #f9fafb;
+  }
+
+  /* ── Mörkt läge ── */
+  [data-theme="dark"] {
+    --primary: #60a5fa; --primary-light: #1e3a5f; --primary-hover: #93c5fd;
+    --bg: #0f1117; --surface: #1a1d27; --surface2: #13151e;
+    --text: #f3f4f6; --text-muted: #9ca3af;
+    --border: #2d3148; --border-strong: #3d4166;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3); --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+
+    --green: #34d399; --green-bg: #022c22; --green-border: #065f46;
+    --amber: #fbbf24; --amber-bg: #1c1400; --amber-border: #78350f;
+    --red: #f87171;   --red-bg: #200a0a;   --red-border: #7f1d1d;
+    --blue: #60a5fa;  --blue-bg: #0d2245; --blue-border: #1e3a8a;
+    --violet: #a78bfa; --violet-bg: #1c1a40; --violet-border: #3730a3;
+
+    --input-bg: #13151e; --code-bg: #13151e;
+    --clear-btn: #2d3148; --clear-btn-hover: #3d4166; --clear-btn-text: #d1d5db;
+    --refill-bg: #022c22; --refill-border: #065f46; --refill-text: #6ee7b7;
+    --toast-bg: #f3f4f6; --toast-text: #111827;
+  }
+
+  /* ── Tema: Körsbärsblom (Sakura) ── */
+  [data-theme="sakura"] {
+    --primary: #db2777; --primary-light: #fce7f3; --primary-hover: #be185d;
+    --bg: #fdf2f8; --surface: #ffffff; --surface2: #fce7f3;
+    --text: #500724; --text-muted: #9f4c6e;
+    --border: #fbcfe8; --border-strong: #f9a8d4;
+    --shadow-sm: 0 1px 3px rgba(219,39,119,0.09), 0 1px 2px rgba(219,39,119,0.06);
+    --shadow-md: 0 4px 16px rgba(219,39,119,0.12), 0 2px 6px rgba(219,39,119,0.07);
+
+    --green: #047857;  --green-bg: #f0fdf4;  --green-border: #bbf7d0;
+    --amber: #b45309;  --amber-bg: #fffbeb;  --amber-border: #fcd34d;
+    --red: #be123c;    --red-bg: #fff1f2;    --red-border: #fecdd3;
+    --blue: #7c3aed;   --blue-bg: #faf5ff;   --blue-border: #e9d5ff;
+    --violet: #be185d; --violet-bg: #fdf2f8; --violet-border: #fbcfe8;
+
+    --input-bg: #ffffff; --code-bg: #fdf9fb;
+    --clear-btn: #fce7f3; --clear-btn-hover: #fbcfe8; --clear-btn-text: #831843;
+    --refill-bg: #fdf2f8; --refill-border: #f9a8d4; --refill-text: #831843;
+    --toast-bg: #be185d; --toast-text: #fff1f2;
+  }
+
+  /* ── Tema: Regnbåge (Lavendel-pastell) ── */
+  [data-theme="rainbow"] {
+    --primary: #7c3aed;
+    --primary-light: #ede9fe;
+    --primary-hover: #6d28d9;
+    --bg: #f9f5ff;
+    --surface: #ffffff;
+    --surface2: #f3e8ff;
+    --text: #2e1065;
+    --text-muted: #9333ea;
+    --border: #e9d5ff;
+    --border-strong: #d8b4fe;
+    --shadow-sm: 0 1px 3px rgba(124,58,237,0.08), 0 1px 2px rgba(124,58,237,0.05);
+    --shadow-md: 0 4px 16px rgba(124,58,237,0.10), 0 2px 6px rgba(124,58,237,0.06);
+
+    --green: #059669;  --green-bg: #f0fdf4;  --green-border: #a7f3d0;
+    --amber: #b45309;  --amber-bg: #fffbeb;  --amber-border: #fcd34d;
+    --red: #dc2626;    --red-bg: #fef2f2;    --red-border: #fecaca;
+    --blue: #2563eb;   --blue-bg: #eff6ff;   --blue-border: #bfdbfe;
+    --violet: #7c3aed; --violet-bg: #f5f3ff; --violet-border: #ddd6fe;
+
+    --input-bg: #fefefe;
+    --code-bg: #f9f5ff;
+    --clear-btn: #ede9fe; --clear-btn-hover: #ddd6fe; --clear-btn-text: #4c1d95;
+    --refill-bg: #f0fdf4; --refill-border: #a7f3d0; --refill-text: #14532d;
+    --toast-bg: #7c3aed; --toast-text: #ffffff;
+  }
+
+  /* ── Tema: Lazerwave (Synthwave/Neon) ── */
+  [data-theme="lazerwave"] {
+    --primary: #ff2a6d; 
+    --primary-light: #3d0c2b;
+    --primary-hover: #ff4d85;
+    --bg: #100820; 
+    --surface: #1a0f30;
+    --surface2: #251445;
+    --text: #e5d9f2;
+    --text-muted: #b8a8cc;
+    --border: #3a2066;
+    --border-strong: #512c8f;
+    --shadow-sm: 0 1px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255,42,109,0.08);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.6), 0 0 28px rgba(255,42,109,0.12), 0 0 48px rgba(5,217,232,0.05);
+
+    --green: #01ffc3; 
+    --green-bg: #003326; 
+    --green-border: #008061;
+    --amber: #f9c80e; 
+    --amber-bg: #332800; 
+    --amber-border: #806400;
+    --red: #ff003c; 
+    --red-bg: #33000c;   
+    --red-border: #80001e;
+    --blue: #05d9e8; 
+    --blue-bg: #032b2e;  
+    --blue-border: #036c73;
+    --violet: #b537f2;
+    --violet-bg: #240a33;
+    --violet-border: #5b1b7a;
+
+    --input-bg: #100820;
+    --code-bg: #0b0514;
+    --clear-btn: #2a174d; 
+    --clear-btn-hover: #3a206b; 
+    --clear-btn-text: #05d9e8; 
+    --refill-bg: #08202b; 
+    --refill-border: #0a465c; 
+    --refill-text: #05d9e8;
+    --toast-bg: #05d9e8; 
+    --toast-text: #100820;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px 16px 48px;
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  .page-wrapper { max-width: 1100px; margin: 0 auto; }
+
+  /* ── Header ── */
+  .page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; margin-bottom: 20px; flex-wrap: wrap;
+  }
+  .header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .page-title h1 { font-size: 20px; font-weight: 700; color: var(--primary); margin-bottom: 2px; }
+  .page-title p { font-size: 13px; color: var(--text-muted); }
+
+  /* ── Flikar (Tabs) ── */
+  .main-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 5px;
+    width: fit-content;
+    box-shadow: var(--shadow-sm);
+    flex-wrap: wrap;
+  }
+  .main-tab {
+    padding: 8px 18px;
+    border-radius: var(--radius-md);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; border: none;
+    background: transparent;
+    color: var(--text-muted);
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .main-tab.active {
+    background: var(--surface);
+    color: var(--primary);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+  }
+  .main-tab:hover:not(.active) { color: var(--text); background: var(--clear-btn); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── Header-inställningar ── */
+  .header-setting { display: flex; align-items: center; gap: 6px; }
+  .header-setting-label {
+    font-size: 11px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;
+  }
+
+  /* ── Tooltip ── */
+  .has-tooltip { position: relative; cursor: help; }
+  .has-tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--toast-bg);
+    color: var(--toast-text);
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    line-height: 1.5;
+    padding: 7px 11px;
+    border-radius: var(--radius-md);
+    white-space: nowrap;
+    box-shadow: var(--shadow-md);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s, transform 0.15s;
+    transform: translateX(-50%) translateY(4px);
+    z-index: 100;
+  }
+  .has-tooltip:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ── Buttons & Selects ── */
+  .btn, select.theme-select {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: var(--radius-md);
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    border: 1px solid transparent; transition: all 0.15s;
+    white-space: nowrap; line-height: 1; font-family: inherit; height: 36px;
+  }
+  .btn-ghost, select.theme-select {
+    background: var(--clear-btn); color: var(--clear-btn-text); border-color: var(--border-strong);
+  }
+  .btn-ghost:hover, select.theme-select:hover { background: var(--clear-btn-hover); }
+  .btn-danger { background: var(--red-bg); color: var(--red); border-color: var(--red-border); }
+  .btn-danger:hover { background: var(--red-border); }
+  .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .btn-primary:hover { background: var(--primary-hover); }
+  select.theme-select { outline: none; flex-shrink: 0; font-size: 12px; height: 30px; padding: 4px 10px; }
+  select.theme-select option { background: var(--surface); color: var(--text); }
+
+  /* ── Banners ── */
+  .info-banner {
+    border-radius: var(--radius-md); padding: 10px 14px; margin-bottom: 16px;
+    font-size: 12px; display: flex; gap: 8px; align-items: flex-start;
+    background: var(--blue-bg); border: 1px solid var(--blue-border);
+    border-left: 4px solid var(--blue); color: var(--blue);
+  }
+  .info-banner strong { font-weight: 700; }
+
+  /* ── Summary Bar ── */
+  .summary-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  #panel-renew .cards-grid { grid-template-columns: 1fr; }
+  .summary-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 12px 16px;
+    box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 12px;
+  }
+  .summary-dot {
+    width: 10px; height: 10px; border-radius: 50%; background: var(--border-strong);
+    flex-shrink: 0; transition: background 0.3s;
+  }
+  .summary-dot.ok    { background: var(--green); }
+  .summary-dot.warn  { background: var(--red); }
+  .summary-info .label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .summary-info .value { font-size: 13px; font-weight: 600; color: var(--text); margin-top: 2px; }
+
+  /* ── Cards Grid ── */
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 16px; align-items: start; }
+
+  /* ── Card ── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; transition: box-shadow 0.2s; }
+  .card:hover { box-shadow: var(--shadow-md); }
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px 12px; border-bottom: 1px solid var(--border); background: var(--surface2);
+  }
+  .card-header-left { display: flex; align-items: center; gap: 10px; }
+  .card-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--primary-light); color: var(--primary);
+    font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .card-title { font-size: 15px; font-weight: 700; }
+  .card-status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--border-strong); transition: background 0.3s; flex-shrink: 0;
+  }
+  .card-status-dot.ok   { background: var(--green); box-shadow: 0 0 0 3px var(--green-bg); }
+  .card-status-dot.warn { background: var(--red);   box-shadow: 0 0 0 3px var(--red-bg); }
+  .card-body { padding: 16px; }
+
+  /* ── Långvarig förbrukning — stort kort ── */
+  .longterm-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    max-width: 680px;
+  }
+  .longterm-card .card-header { background: var(--surface2); }
+  .longterm-card .card-num {
+    background: var(--violet-bg, #f5f3ff);
+    color: var(--violet, #7c3aed);
+  }
+
+  /* ── Fields ── */
+  .field { margin-bottom: 10px; display: flex; flex-direction: column; }
+  .field label { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .field input {
+    width: 100%; height: 38px; padding: 8px 11px;
+    background: var(--input-bg); color: var(--text);
+    border: 1px solid var(--border-strong); border-radius: var(--radius-md);
+    font-size: 13px; font-family: inherit; box-sizing: border-box;
+    transition: border-color 0.15s, box-shadow 0.15s; outline: none; margin-top: auto;
+  }
+  .field input:focus {
+    border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light);
+  }
+  .field input.input-error, .field select.input-error { border-color: var(--red); box-shadow: 0 0 0 3px var(--red-bg); }
+  .field-hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+  .field-optional { border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 4px; }
+  .optional-tag {
+    font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--text-muted); background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 4px; padding: 1px 5px; margin-left: 5px; vertical-align: middle;
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: stretch; }
+  .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: stretch; }
+
+  /* ── Period-rad: datumfält i linje med varandra ── */
+  .period-form-row { align-items: end; }
+  .period-date-field label {
+    min-height: 2.6em;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 4px;
+  }
+  .period-date-field input {
+    margin-top: 0;
+  }
+  .action-row {
+    display: flex; gap: 8px; margin-top: 12px; padding-top: 12px;
+    border-top: 1px solid var(--border); flex-wrap: wrap; justify-content: space-between;
+  }
+
+  /* ── Resultat-panel ── */
+  .result-panel { margin-top: 14px; display: none; border-top: 1px solid var(--border); padding-top: 14px; }
+  .result-grid { display: grid; grid-template-columns: auto 1fr; gap: 5px 12px; font-size: 13px; margin-bottom: 10px; }
+  .result-grid .rk { color: var(--text-muted); font-weight: 500; white-space: nowrap; }
+  .result-grid .rv { font-weight: 600; text-align: right; }
+  .result-grid .divider { grid-column: 1 / -1; border: none; border-top: 1px solid var(--border); margin: 4px 0; }
+
+  /* ── Förbrukningsgraf ── */
+  .consumption-bar-wrap {
+    margin: 12px 0 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    height: 28px;
+    position: relative;
+  }
+  .consumption-bar {
+    height: 100%;
+    border-radius: 0;
+    transition: width 0.4s ease;
+    display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 8px;
+    font-size: 11px; font-weight: 700; color: #fff;
+    min-width: 36px;
+    position: relative;
+  }
+  .consumption-bar.ok    { background: var(--green); }
+  .consumption-bar.under { background: var(--amber); }
+  .consumption-bar.over  { background: var(--red); }
+
+  .bar-ticks {
+    display: flex; justify-content: space-between;
+    font-size: 10px; color: var(--text-muted); margin-top: 2px; padding: 0 2px;
+  }
+
+  /* ── Periodlista ── */
+  .period-list {
+    margin-top: 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    font-size: 12px;
+  }
+  .period-list-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 80px;
+    gap: 8px;
+    background: var(--surface2);
+    padding: 7px 12px;
+    font-size: 11px; font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border);
+  }
+  .period-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 80px;
+    gap: 8px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+  }
+  .period-row:last-child { border-bottom: none; }
+  .period-row:nth-child(even) { background: var(--surface2); }
+  .period-cell { font-weight: 500; }
+  .period-cell.mono { font-family: "SF Mono", Consolas, monospace; }
+
+  /* ── Badges & Alerts ── */
+  .badge {
+    display: inline-flex; align-items: center;
+    font-size: 11px; font-weight: 700; padding: 2px 7px;
+    border-radius: 99px; border: 1px solid transparent; white-space: nowrap; margin-left: 6px;
+  }
+  .badge-warn { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
+  .badge-ok   { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
+  .badge-over { background: var(--red-bg);   color: var(--red);   border-color: var(--red-border); }
+  .badge-under{ background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
+
+  .alert { padding: 10px 12px; border-left: 3px solid; border-radius: 0 var(--radius-md) var(--radius-md) 0; font-size: 12px; line-height: 1.6; margin-top: 8px; }
+  .alert strong { font-weight: 700; display: block; margin-bottom: 2px; }
+  .alert-danger { background: var(--red-bg);   border-color: var(--red);   color: var(--red); }
+  .alert-warn   { background: var(--amber-bg); border-color: var(--amber); color: var(--amber); }
+  .alert-info   { background: var(--blue-bg);  border-color: var(--blue);  color: var(--blue); }
+  .alert-ok     { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+
+  .copy-section { margin-top: 12px; display: none; border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
+  .copy-tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--surface2); }
+  .copy-tab { flex: 1; padding: 8px 12px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: var(--text-muted); border-bottom: 2px solid transparent; transition: all 0.15s; }
+  .copy-tab.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--primary-light); }
+  .copy-body { font-family: "SF Mono", "Fira Code", Consolas, monospace; font-size: 11px; line-height: 1.6; background: var(--code-bg); padding: 10px 12px; white-space: pre-wrap; max-height: 160px; overflow-y: auto; color: var(--text); }
+  .copy-footer { display: flex; justify-content: flex-end; padding: 6px 10px; background: var(--surface2); border-top: 1px solid var(--border); }
+
+  .fass-link { display: none; font-size: 12px; color: var(--blue); text-decoration: none; font-weight: 600; border: 1px solid var(--blue-border); background: var(--blue-bg); }
+
+  /* ── Toasts & Modals ── */
+  .toast { position: fixed; bottom: 20px; right: 20px; z-index: 9999; background: var(--toast-bg); color: var(--toast-text); padding: 14px 18px; border-radius: var(--radius-lg); box-shadow: 0 8px 24px rgba(0,0,0,0.25); font-size: 13px; max-width: 290px; display: none; }
+  .toast.visible { display: block; }
+  .toast .btn { margin-top: 10px; width: 100%; justify-content: center; background: rgba(128,128,128,0.1); color: inherit; border-color: rgba(128,128,128,0.2); }
+
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5); z-index: 10000;
+    display: none; align-items: center; justify-content: center;
+    backdrop-filter: blur(2px);
+  }
+  .modal-overlay.visible { display: flex; }
+  .modal-content {
+    background: var(--surface); padding: 20px; border-radius: var(--radius-lg);
+    max-width: 340px; width: 90%; box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+  }
+
+  .site-footer { text-align: center; margin-top: 40px; font-size: 11px; color: var(--text-muted); opacity: 0.6; }
+
+  /* ── Sektion-rubrik ── */
+  .section-label {
+    font-size: 11px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin: 16px 0 8px; padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── Horisontellt kort (Receptförnyelse) ── */
+  .card-horizontal > .card-body {
+    display: flex;
+    align-items: stretch;
+    padding: 0;
+    gap: 0;
+  }
+  .card-form-col {
+    flex: 0 0 360px;
+    padding: 16px;
+  }
+  .card-result-col {
+    flex: 1;
+    border-left: 1px solid var(--border);
+    padding: 16px;
+    background: var(--surface2);
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .card-result-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-style: italic;
+    opacity: 0.7;
+  }
+  .card-horizontal .result-panel {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+  }
+  .card-horizontal .action-row {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 900px) {
+    .card-horizontal > .card-body { flex-direction: column; }
+    .card-form-col { flex: none; }
+    .card-result-col { border-left: none; border-top: 1px solid var(--border); min-height: 0; }
+  }
+  @media (max-width: 768px) {
+    .page-header { flex-direction: column; align-items: flex-start; }
+    .header-actions { align-self: flex-end; flex-wrap: wrap; }
+    .form-row-3 { grid-template-columns: 1fr 1fr; }
+    .period-list-header, .period-row { grid-template-columns: 1fr 1fr 80px; }
+    .period-list-header .ph-avg, .period-row .pr-avg { display: none; }
+  }
+  @media (max-width: 640px) {
+    .summary-bar { grid-template-columns: 1fr; }
+    .form-row, .form-row-3 { grid-template-columns: 1fr; }
+    .main-tabs { width: 100%; }
+    .main-tab { flex: 1; text-align: center; }
+  }
+</style>
+</head>
+
+<body>
+<div class="page-wrapper">
+
+  <div class="info-banner" role="note">
+    <span>ℹ️</span>
+    <span><strong>Observera:</strong> Detta verktyg är endast ett beslutsstöd. Sjukvårdspersonal ska alltid använda sitt kliniska omdöme vid bedömning och handläggning av läkemedelsförskrivning. Genererade svar i 1177 och journal är endast förslag baserade på matematiska beräkningar. Förslagen kan behöva justeras utifrån patientens unika fall.</span>
+  </div>
+
+  <div class="page-header">
+    <div class="page-title">
+      <h1>Beräkna receptförnyelse</h1>
+      <p>Senast uppdaterad 00:34 2026-04-26</p>
+    </div>
+    <div class="header-actions">
+      <div class="header-setting">
+        <span class="header-setting-label">Tema</span>
+        <select id="themeSelect" class="theme-select" aria-label="Välj färgtema" onchange="applyTheme(this.value)">
+          <option value="light">☀️ Ljust</option>
+          <option value="dark">🌙 Mörkt</option>
+          <option value="sakura">🌸 Körsbärsblom</option>
+          <option value="rainbow">🌈 Regnbåge</option>
+          <option value="lazerwave">⚡ Lazerwave</option>
+        </select>
+      </div>
+      <button class="btn btn-danger" onclick="confirmClearAll()">🔄 Rensa alla data</button>
+    </div>
+  </div>
+
+  <div class="main-tabs" role="tablist">
+    <button class="main-tab active" role="tab" aria-selected="true" onclick="switchMainTab(&#39;renew&#39;)">💊 Receptförnyelse</button>
+    <button class="main-tab" role="tab" aria-selected="false" onclick="switchMainTab(&#39;longterm&#39;)">📊 Långvarig förbrukning</button>
+  </div>
+
+  <div id="panel-renew" class="tab-panel active">
+    <div class="summary-bar" id="summaryBar" aria-label="Statusöversikt"><div class="summary-card">
+            <div class="summary-dot ok" id="sumDot0"></div>
+            <div class="summary-info">
+              <div class="label">Läkemedel 1</div>
+              <div class="value ok" id="sumVal0">OK — t.o.m 2026-02-15</div>
+            </div>
+          </div></div>
+
+    <div class="cards-grid" id="cardsGrid">
+      <div class="card card-horizontal" id="card0">
+        <div class="card-header">
+          <div class="card-header-left">
+            <div class="card-num">1</div>
+            <span class="card-title">Läkemedel 1</span>
+          </div>
+          <div style="display:flex;align-items:center;">
+            <div class="card-status-dot ok" id="dot0"></div>
+            
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-form-col">
+            <div class="field">
+              <label for="med0">Läkemedel och styrka</label>
+              <input id="med0" type="text" placeholder="T.ex. Elvanse 50 mg" autocomplete="off">
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label for="date0">Senaste recept</label>
+                <input id="date0" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="d{4}-d{2}-d{2}" autocomplete="off" value="2026-04-24" oninput="autoFormatDate(this)">
+              </div>
+              <div class="field">
+                <label for="dose0">Antal per dag</label>
+                <input id="dose0" type="text" inputmode="decimal" placeholder="T.ex. 1.5">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label for="amt0">Mängd per uttag (st)</label>
+                <input id="amt0" type="number" placeholder="100" min="1" step="1">
+              </div>
+              <div class="field">
+                <label for="ref0">Antal uttag (heltal)</label>
+                <input id="ref0" type="number" placeholder="4" min="1" max="12" step="1">
+              </div>
+            </div>
+            <div class="field field-optional">
+              <label for="left0">Doser kvar <span class="optional-tag">valfritt</span></label>
+              <input id="left0" type="number" placeholder="Lämna tomt om medicinen är slut" min="0" step="1">
+              <span class="field-hint">Anges om patienten har kvarvarande doser — ger exakt snittberäkning</span>
+            </div>
+            <div class="action-row">
+              <a class="btn fass-link btn-ghost" id="fassBtn0" href="https://www.fass.se/LIF/result?query=Elvanse%2050%20mg&amp;userType=2" target="_blank" rel="noopener" style="display: inline-flex;">📘 FASS</a>
+              <button class="btn btn-ghost" onclick="clearCard(0)" style="margin-left:auto;">Rensa</button>
+            </div>
+          </div>
+          <div class="card-result-col">
+            <div class="card-result-empty" id="resPh0" style="display: none;">Fyll i formuläret för att se beräkning</div>
+            <div class="result-panel" id="res0" aria-live="polite" style="display: block;">
+              <div class="result-grid" id="resGrid0"><span class="rk">Totalt antal doser</span><span class="rv">90 st</span><span class="rk">Borde räcka i</span><span class="rv">90 dagar</span><span class="rk">Borde räcka t.o.m</span><span class="rv">2026-02-15</span><hr class="divider"><span class="rk">Doser kvar idag</span><span class="rv">0 st <span class="badge badge-ok">Tog slut för 68 dagar sedan</span></span><span class="rk">Snittförbrukning</span><span class="rv">0.57 st/dag (28.5 mg/dag)</span></div>
+              <div id="alerts0"><div class="alert alert-warn"><strong>⚠️ Låg förbrukning</strong> Snittförbrukning 0.57 st/dag är 43.0% under ordinerad dos (1 st/dag). Patienten verkar inte ta medicinen som ordinerat — överväg uppföljningssamtal.</div></div>
+              <div class="copy-section" id="copySection0" style="display: block;">
+                <div class="copy-tabs">
+                  <button class="copy-tab active" onclick="switchTab(0,&#39;patient&#39;)">📝 Svar till patient</button>
+                  <button class="copy-tab" onclick="switchTab(0,&#39;journal&#39;)">🏥 Journalanteckning</button>
+                </div>
+                <div class="copy-body" id="copyBody0">Hej,
+
+Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt recept inom 2-3 arbetsdagar. Du kan därefter hämta ut din medicin på valfritt apotek.</div>
+                <div class="copy-footer">
+                  <button class="btn btn-ghost" onclick="copyText(0)">📋 Kopiera text</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    <button class="btn btn-ghost" style="margin-top:12px; width:100%; max-width:400px;" onclick="addMedCard()">＋ Lägg till läkemedel</button>
+
+  </div>
+
+  <div id="panel-longterm" class="tab-panel">
+
+    <div class="info-banner" role="note" style="margin-bottom:16px;">
+      <span>📊</span>
+      <span>Beräknar förbrukningsmönster över flera receptperioder. Ange en eller flera perioder med startdatum, antal uttagna tabletter och ordinerad dos för att se om förbrukningen över tid är konsekvent.</span>
+    </div>
+
+    <div class="longterm-card card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-num" style="background:var(--violet-bg,#f5f3ff);color:var(--violet,#7c3aed);">📊</div>
+          <span class="card-title">Långvarig förbrukningsanalys</span>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="form-row">
+          <div class="field">
+            <label for="lt-med">Läkemedel och styrka</label>
+            <input id="lt-med" type="text" placeholder="T.ex. Elvanse 50 mg" oninput="calcLongtermDebounced()" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="lt-dose">Ordinerad dos (st/dag)</label>
+            <input id="lt-dose" type="text" inputmode="decimal" placeholder="T.ex. 1" oninput="calcLongtermDebounced()">
+          </div>
+        </div>
+
+        <div class="section-label">Receptperioder</div>
+        <div id="lt-periods-container"><div id="lt-period-wrap-0">
+      <div class="section-label" style="margin-top:0;">Period 1</div>
+      <div class="form-row-3 period-form-row" id="lt-period-0">
+        <div class="field period-date-field">
+          <label for="lt-start-0">Startdatum</label>
+          <input id="lt-start-0" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="d{4}-d{2}-d{2}" autocomplete="off" oninput="autoFormatDate(this); calcLongtermDebounced()" onchange="calcLongterm()">
+        </div>
+        <div class="field period-date-field">
+          <label for="lt-total-0">Antal uttagna tabletter</label>
+          <input id="lt-total-0" type="number" placeholder="100" min="1" oninput="calcLongtermDebounced()">
+        </div>
+        <div class="field period-date-field">
+          <label for="lt-end-0">Slutdatum</label>
+          <input id="lt-end-0" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="d{4}-d{2}-d{2}" autocomplete="off" value="2026-04-24" oninput="autoFormatDate(this); calcLongtermDebounced()" onchange="calcLongterm()" class="input-error" aria-invalid="true">
+        </div>
+      </div>
+      
+    </div></div>
+
+        <button class="btn btn-ghost" style="margin-top:8px; width:100%;" onclick="addPeriod()">＋ Lägg till period</button>
+
+        <div class="action-row">
+          <a class="btn fass-link btn-ghost" id="lt-fassBtn" href="https://receptberakning.pages.dev/#" target="_blank" rel="noopener" style="display:none;">📘 FASS</a>
+          <button class="btn btn-ghost" onclick="clearLongterm()" style="margin-left:auto;">Rensa</button>
+        </div>
+
+        <div class="result-panel" id="lt-result" aria-live="polite" style="display: none;">
+          <div class="result-grid" id="lt-resGrid"></div>
+          <div id="lt-alerts"></div>
+
+          <div id="lt-bar-section" style="display:none;">
+            <div class="section-label" style="margin-top:14px;">Förbrukning relativt ordination</div>
+            <div class="consumption-bar-wrap">
+              <div class="consumption-bar" id="lt-bar"></div>
+            </div>
+            <div class="bar-ticks">
+              <span>0%</span><span>50%</span><span>100% (ordinerat)</span><span>150%</span>
+            </div>
+          </div>
+
+          <div id="lt-period-table-section" style="display:none; margin-top:14px;">
+            <div class="section-label">Förbrukning per period</div>
+            <div class="period-list">
+              <div class="period-list-header">
+                <span>Period</span>
+                <span class="ph-avg">Snitt st/dag</span>
+                <span>Avvikelse</span>
+                <span>Status</span>
+              </div>
+              <div id="lt-period-rows"></div>
+            </div>
+          </div>
+
+          <div class="copy-section" id="lt-copySection">
+            <div class="copy-tabs">
+              <button class="copy-tab active">🏥 Journalanteckning</button>
+            </div>
+            <div class="copy-body" id="lt-copyBody"></div>
+            <div class="copy-footer">
+              <button class="btn btn-ghost" onclick="copyLtText()">📋 Kopiera text</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    Verktyget skapades och underhålls av Gabriel Jungestrand
+  </footer>
+</div>
+
+<div class="toast" id="toast" role="alert" aria-live="assertive">
+  <div class="toast-title">⏱ Inaktivitetstimer aktiv</div>
+  Sidan rensas om <span class="toast-countdown" id="toastCount">60</span> sekunder för att skydda patientdata.
+  <button class="btn" onclick="resetTimer()">Fortsätt sessionen</button>
+</div>
+
+<div class="modal-overlay" id="clearModal">
+  <div class="modal-content">
+    <h3 style="margin-bottom: 8px;">⚠️ Rensa data?</h3>
+    <p style="margin-bottom: 16px; font-size: 13px; color: var(--text-muted);">Är du säker på att du vill rensa all inmatad patientdata? Detta kan inte ångras.</p>
+    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+      <button class="btn btn-ghost" onclick="closeClearModal()">Avbryt</button>
+      <button class="btn btn-danger" onclick="executeClearAll()">Rensa data</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ════════════════════════════════════════════
+     STORAGE POLICY (GDPR)
+     localStorage: endast 'theme'
+     Klinisk data: endast i minnet (states[])
+  ════════════════════════════════════════════ */
+
+  const VALID_THEMES = new Set(['light','dark','sakura','rainbow','lazerwave']);
+  const SAFE_ALERT_TYPES = new Set(['danger','warn','info','ok']);
+
+  let states = [{}];
+  let medCardCount = 1;
+  let warnTimer, clearTimer, countdownInt;
+  let ltPeriodCount = 0;
+
+  /* ────────────────────────────────────────────
+     Prestanda: debounce (UX-säkert)
+  ─────────────────────────────────────────── */
+  function debounce(fn, wait = 120) {
+    let t;
+    return (...args) => {
+      clearTimeout(t);
+      t = setTimeout(() => fn(...args), wait);
+    };
+  }
+
+  const calcDebounced = [];
+  // FIX #3: Förbättrad ensureDebounce - förhindra race conditions genom guard
+  function ensureDebounce(i) {
+    if (calcDebounced[i]) return; // Guard: om redan initialiserad, returnera direkt
+    while (calcDebounced.length <= i) {
+      const idx = calcDebounced.length;
+      calcDebounced.push(debounce(() => calc(idx), 120));
+    }
+  }
+  const calcLongtermDebounced = debounce(() => calcLongterm(), 150);
+
+  /* ────────────────────────────────────────────
+     Datumformatering: auto YYYY-MM-DD
+  ─────────────────────────────────────────── */
+  function autoFormatDate(input) {
+    const val = input.value;
+    const sel = input.selectionStart;
+
+    let raw = val.replace(/\D/g, '').substring(0, 8);
+    let formatted = raw;
+    if (raw.length > 4) formatted = raw.substring(0, 4) + '-' + raw.substring(4);
+    if (raw.length > 6) formatted = raw.substring(0, 4) + '-' + raw.substring(4, 6) + '-' + raw.substring(6);
+
+    if (formatted === val) return; // Inget ändrat, hoppa över
+    input.value = formatted;
+
+    // Räkna siffror FÖRE markören i originalsträngen,
+    // placera sedan markören efter samma antal siffror i det formaterade resultatet.
+    // Detta hanterar backspace korrekt utan att markören hoppar.
+    const digitsBeforeCursor = val.substring(0, sel).replace(/\D/g, '').length;
+    let newPos = 0;
+    if (digitsBeforeCursor > 0) {
+      let count = 0;
+      for (let i = 0; i < formatted.length; i++) {
+        if (/\d/.test(formatted[i])) count++;
+        if (count === digitsBeforeCursor) { newPos = i + 1; break; }
+      }
+      if (count < digitsBeforeCursor) newPos = formatted.length;
+    }
+    try { input.setSelectionRange(newPos, newPos); } catch(e) {}
+  }
+
+  /* ────────────────────────────────────────────
+     Hjälpfunktioner
+  ─────────────────────────────────────────── */
+  function getEl(id) {
+    const el = document.getElementById(id);
+    if (!el) console.error(`Kritiskt fel: Elementet '${id}' saknas i DOM.`);
+    return el;
+  }
+
+  function toggleError(el, isInvalid) {
+    if (!el) return;
+    el.classList.toggle('input-error', isInvalid);
+    if (isInvalid) {
+      el.setAttribute('aria-invalid', 'true');
+    } else {
+      el.removeAttribute('aria-invalid');
+    }
+  }
+
+  function renderAlert(containerId, type, title, message) {
+    const container = getEl(containerId);
+    if (!container) return;
+    container.textContent = '';
+    const safeType = SAFE_ALERT_TYPES.has(type) ? type : 'info';
+    const div = document.createElement('div');
+    div.className = `alert alert-${safeType}`;
+    if (title) {
+      const strong = document.createElement('strong');
+      strong.textContent = title;
+      div.appendChild(strong);
+      div.appendChild(document.createTextNode(' '));
+    }
+    div.appendChild(document.createTextNode(message));
+    container.appendChild(div);
+  }
+
+  function setStatus(i, statusClass, text) {
+    const isMuted = statusClass === 'muted';
+    const sumDot = getEl('sumDot' + i);
+    const sumVal = getEl('sumVal' + i);
+    const dot = getEl('dot' + i);
+    if (sumDot) sumDot.className = 'summary-dot' + (isMuted ? '' : ' ' + statusClass);
+    if (sumVal) { sumVal.className = 'value ' + statusClass; sumVal.textContent = text; } 
+    if (dot) dot.className = 'card-status-dot' + (isMuted ? '' : ' ' + statusClass);
+  }
+
+  function todayStr() {
+    // Använd UTC konsekvent med getToday() för att undvika datumskift nära midnatt
+    const n = new Date();
+    return `${n.getUTCFullYear()}-${String(n.getUTCMonth()+1).padStart(2,'0')}-${String(n.getUTCDate()).padStart(2,'0')}`;
+  }
+
+  function oneYearAgoStr() {
+    const n = new Date();
+    return `${n.getUTCFullYear()-1}-${String(n.getUTCMonth()+1).padStart(2,'0')}-${String(n.getUTCDate()).padStart(2,'0')}`;
+  }
+
+  function fmtDate(d) {
+    return `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+  }
+
+  /* ── Delade hjälpfunktioner (cache + återanvändning) ── */
+  let _todayCache = null, _todayCacheKey = '';
+  function getToday() {
+    const n = new Date();
+    const key = `${n.getUTCFullYear()}-${n.getUTCMonth()}-${n.getUTCDate()}`;
+    if (_todayCache && _todayCacheKey === key) return _todayCache;
+    _todayCache = new Date(Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate()));
+    _todayCacheKey = key;
+    return _todayCache;
+  }
+
+  function getDaysDiff(d1, d2) {
+    return Math.round((d1 - d2) / 86400000);
+  }
+
+  function extractMg(medRaw) {
+    const m = medRaw.match(/(\d+(?:[.,]\d+)?)\s*mg/i);
+    return m ? parseFloat(m[1].replace(',', '.')) : 0;
+  }
+
+  function getFassUrl(medRaw) {
+    // FIX #1 & #7: Använd hela medicinernamnet och encode det korrekt för URL
+    return `https://www.fass.se/LIF/result?query=${encodeURIComponent(medRaw.trim())}&userType=2`;
+  }
+
+  // FIX #7: Hjälpfunktion för XSS-skydd vid dynamisk HTML-inmatning
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function buildResultRow(frag, label, valueText, badgeNode = null) {
+    const rk = document.createElement('span'); rk.className = 'rk'; rk.textContent = label;
+    const rv = document.createElement('span'); rv.className = 'rv'; rv.textContent = valueText;
+    if (badgeNode) { rv.appendChild(document.createTextNode(' ')); rv.appendChild(badgeNode); }
+    frag.appendChild(rk); frag.appendChild(rv);
+  }
+
+  function showEl(id, show, displayValue = 'block') {
+    const e = getEl(id);
+    if (e) e.style.display = show ? displayValue : 'none';
+  }
+
+  function resetResultPanel(i) {
+    const rg = getEl('resGrid' + i);
+    const al = getEl('alerts' + i);
+    if (rg) rg.textContent = '';
+    if (al) al.textContent = '';
+    showEl('copySection' + i, false);
+
+  }
+
+  /* ────────────────────────────────────────────
+     Flik-hantering (huvud)
+  ─────────────────────────────────────────── */
+  function switchMainTab(tab) {
+    ['renew','longterm'].forEach(t => {
+      const panel = getEl('panel-' + t);
+      if (panel) panel.classList.toggle('active', t === tab);
+    });
+    document.querySelectorAll('.main-tab').forEach((btn, idx) => {
+      btn.classList.toggle('active',
+        (idx === 0 && tab === 'renew') ||
+        (idx === 1 && tab === 'longterm')
+      );
+      btn.setAttribute('aria-selected', btn.classList.contains('active'));
+    });
+  }
+
+  /* ────────────────────────────────────────────
+     Inaktivitetstimer
+  ─────────────────────────────────────────── */
+  let lastActivityReset = 0;
+  function resetTimer(isUserEvent = false) {
+    const now = Date.now();
+    if (isUserEvent && now - lastActivityReset < 2000) return;
+    lastActivityReset = now;
+
+    clearTimeout(warnTimer);
+    clearTimeout(clearTimer);
+    clearInterval(countdownInt);
+
+    const toast = getEl('toast');
+    const toastCount = getEl('toastCount');
+
+    if (toast) toast.classList.remove('visible');
+
+    warnTimer = setTimeout(() => {
+      let s = 60;
+      if (!toast || !toastCount) return;
+
+      toastCount.textContent = String(s);
+      toast.classList.add('visible');
+
+      countdownInt = setInterval(() => {
+        s--;
+        if (toastCount) toastCount.textContent = String(s); 
+        if (s <= 0) clearInterval(countdownInt);
+      }, 1000);
+    }, 14 * 60 * 1000);
+
+    clearTimer = setTimeout(() => {
+      clearInterval(countdownInt);
+      if (toast) toast.classList.remove('visible');
+      confirmClearAll(true);
+    }, 15 * 60 * 1000);
+  }
+
+  /* ────────────────────────────────────────────
+     Tema
+  ─────────────────────────────────────────── */
+  function applyTheme(t) {
+    const safeTheme = VALID_THEMES.has(t) ? t : 'rainbow';
+    document.documentElement.setAttribute('data-theme', safeTheme);
+    const selectBox = getEl('themeSelect');
+    if (selectBox) selectBox.value = safeTheme;
+    
+    // FIX #14: Säker localStorage-lagring med error-handling
+    try {
+      localStorage.setItem('theme', safeTheme);
+    } catch (e) {
+      console.warn('Kunde inte spara tema till localStorage:', e);
+    }
+  }
+
+
+  /* ────────────────────────────────────────────
+     FLIK 1: RECEPTFÖRNYELSE
+  ─────────────────────────────────────────── */
+  function cardTemplate(i) {
+    const removeBtnHtml = i > 0
+      ? `<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;margin-left:8px;" onclick="removeMedCard(${i})">✕ Ta bort</button>`
+      : '';
+    return `
+      <div class="card card-horizontal" id="card${i}">
+        <div class="card-header">
+          <div class="card-header-left">
+            <div class="card-num">${i + 1}</div>
+            <span class="card-title">Läkemedel ${i + 1}</span>
+          </div>
+          <div style="display:flex;align-items:center;">
+            <div class="card-status-dot" id="dot${i}"></div>
+            ${removeBtnHtml}
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-form-col">
+            <div class="field">
+              <label for="med${i}">Läkemedel och styrka</label>
+              <input id="med${i}" type="text" placeholder="T.ex. Elvanse 50 mg" autocomplete="off">
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label for="date${i}">Senaste recept</label>
+                <input id="date${i}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" autocomplete="off" value="${todayStr()}" oninput="autoFormatDate(this)">
+              </div>
+              <div class="field">
+                <label for="dose${i}">Antal per dag</label>
+                <input id="dose${i}" type="text" inputmode="decimal" placeholder="T.ex. 1.5">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label for="amt${i}">Mängd per uttag (st)</label>
+                <input id="amt${i}" type="number" placeholder="100" min="1" step="1">
+              </div>
+              <div class="field">
+                <label for="ref${i}">Antal uttag (heltal)</label>
+                <input id="ref${i}" type="number" placeholder="4" min="1" max="12" step="1">
+              </div>
+            </div>
+            <div class="field field-optional">
+              <label for="left${i}">Doser kvar <span class="optional-tag">valfritt</span></label>
+              <input id="left${i}" type="number" placeholder="Lämna tomt om medicinen är slut" min="0" step="1">
+              <span class="field-hint">Anges om patienten har kvarvarande doser — ger exakt snittberäkning</span>
+            </div>
+            <div class="action-row">
+              <a class="btn fass-link btn-ghost" id="fassBtn${i}" href="#" target="_blank" rel="noopener">📘 FASS</a>
+              <button class="btn btn-ghost" onclick="clearCard(${i})" style="margin-left:auto;">Rensa</button>
+            </div>
+          </div>
+          <div class="card-result-col">
+            <div class="card-result-empty" id="resPh${i}">Fyll i formuläret för att se beräkning</div>
+            <div class="result-panel" id="res${i}" aria-live="polite">
+              <div class="result-grid" id="resGrid${i}"></div>
+              <div id="alerts${i}"></div>
+
+              <div class="copy-section" id="copySection${i}">
+                <div class="copy-tabs">
+                  <button class="copy-tab active" onclick="switchTab(${i},'patient')">📝 Svar till patient</button>
+                  <button class="copy-tab" onclick="switchTab(${i},'journal')">🏥 Journalanteckning</button>
+                </div>
+                <div class="copy-body" id="copyBody${i}"></div>
+                <div class="copy-footer">
+                  <button class="btn btn-ghost" onclick="copyText(${i})">📋 Kopiera text</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function buildCards() {
+    const grid = getEl('cardsGrid');
+    const bar  = getEl('summaryBar');
+    if (!grid) return;
+
+    // Bygg summary-bar dynamiskt
+    if (bar) {
+      bar.innerHTML = '';
+      for (let i = 0; i < medCardCount; i++) {
+        bar.insertAdjacentHTML('beforeend',
+          `<div class="summary-card">
+            <div class="summary-dot" id="sumDot${i}"></div>
+            <div class="summary-info">
+              <div class="label">Läkemedel ${i + 1}</div>
+              <div class="value muted" id="sumVal${i}">Ej ifyllt</div>
+            </div>
+          </div>`);
+      }
+    }
+
+    // Bygg alla kort i ett enda innerHTML-anrop (undviker N reflows)
+    let gridHtml = '';
+    for (let i = 0; i < medCardCount; i++) {
+      ensureDebounce(i);
+      gridHtml += cardTemplate(i);
+    }
+    grid.innerHTML = gridHtml;
+  }
+
+  function collectCardValues() {
+    const out = [];
+    for (let i = 0; i < medCardCount; i++) {
+      out.push({
+        med:  (getEl('med'  + i) || {}).value || '',
+        date: (getEl('date' + i) || {}).value || todayStr(),
+        dose: (getEl('dose' + i) || {}).value || '',
+        amt:  (getEl('amt'  + i) || {}).value || '',
+        ref:  (getEl('ref'  + i) || {}).value || '',
+        left: (getEl('left' + i) || {}).value || '',
+      });
+    }
+    return out;
+  }
+
+  function restoreCardValues(vals) {
+    vals.forEach((v, i) => {
+      const medEl  = getEl('med'  + i); if (medEl)  medEl.value  = v.med;
+      const dateEl = getEl('date' + i); if (dateEl) dateEl.value = v.date;
+      const doseEl = getEl('dose' + i); if (doseEl) doseEl.value = v.dose;
+      const amtEl  = getEl('amt'  + i); if (amtEl)  amtEl.value  = v.amt;
+      const refEl  = getEl('ref'  + i); if (refEl)  refEl.value  = v.ref;
+      const leftEl = getEl('left' + i); if (leftEl) leftEl.value = v.left;
+      if (v.med || v.dose || v.amt || v.ref) calc(i);
+    });
+  }
+
+  function addMedCard() {
+    if (medCardCount >= 8) return;
+    const vals = collectCardValues();
+    medCardCount++;
+    states.push({});
+    buildCards();
+    _suppressDistribute = true;
+    restoreCardValues(vals);
+    _suppressDistribute = false;
+    generateAndDistribute();
+  }
+
+  function removeMedCard(idx) {
+    if (medCardCount <= 1) return;
+    clearTimeout(copyFeedbackTimers[idx]);
+    delete copyFeedbackTimers[idx];
+    const vals = collectCardValues();
+    vals.splice(idx, 1);
+    states.splice(idx, 1);
+    // Rensa cached texter på alla kvarvarande states så gammal text inte återanvänds
+    states.forEach(s => { s.patientText = ''; s.journalText = ''; });
+    medCardCount--;
+    buildCards();
+    _suppressDistribute = true;
+    restoreCardValues(vals);
+    _suppressDistribute = false;
+    generateAndDistribute();
+  }
+
+  function switchTab(i, tab) {
+    states[i].activeTab = tab;
+    const tabs = document.querySelectorAll(`#card${i} .copy-tab`);
+    if (tabs[0]) tabs[0].classList.toggle('active', tab === 'patient');
+    if (tabs[1]) tabs[1].classList.toggle('active', tab === 'journal');
+    const body = getEl('copyBody' + i);
+    if (body) body.textContent = tab === 'patient' ? (states[i].patientText || '') : (states[i].journalText || '');
+  }
+
+  // ── Samlat svar — skrivs till alla korts copy-sektioner ──
+  let _suppressDistribute = false;
+  function generateAndDistribute() {
+    if (_suppressDistribute) return;
+const validCount = states.filter(s => s.valid).length;
+    if (validCount === 0) {
+      // Rensa alla korts copy-rutor
+      for (let i = 0; i < medCardCount; i++) {
+        const body = getEl('copyBody' + i);
+        if (body) body.textContent = '';
+      }
+      return;
+    }
+
+    const toRenew  = [];
+    const tooEarly = [];
+    const overuse  = [];
+
+    for (let i = 0; i < medCardCount; i++) {
+      const s = states[i];
+      if (!s.valid) continue;
+      const medEl = getEl('med' + i);
+      const name = (medEl && medEl.value.trim()) || `Läkemedel ${i + 1}`;
+      if (s.isOveruse)       overuse.push({ name, i });
+      else if (s.isTooEarly) tooEarly.push({ name, i });
+      else                   toRenew.push({ name, i });
+    }
+
+    // ── 1177-text ──
+    let patLines = ['Hej,', ''];
+    if (validCount === 1) {
+      // Ett läkemedel: bygg texten direkt utan läkemedelsprefixer
+      if (toRenew.length === 1) {
+        patLines.push(`Vi har tagit emot din begäran på ${toRenew[0].name} och kommer att förnya ditt recept inom 2–3 arbetsdagar. Du kan därefter hämta ut din medicin på valfritt apotek.`);
+      } else if (tooEarly.length === 1) {
+        const s = states[tooEarly[0].i];
+        patLines.push(`Vi har tagit emot din förfrågan om receptförnyelse för ${tooEarly[0].name}. Enligt din ordination (${s.dose} st/dag) beräknas medicinen räcka till den ${s.endDateStr}. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. Vänligen hör av dig igen runt den ${s.renewDateStr} så hjälper vi dig då med nytt recept.`);
+        patLines.push('');
+        patLines.push('Vid frågor är du välkommen att kontakta oss via 1177.');
+      } else if (overuse.length === 1) {
+        const s = states[overuse[0].i];
+        patLines.push(`Vi har tagit emot din förfrågan om receptförnyelse för ${overuse[0].name}. Enligt din ordination (${s.dose} st/dag) beräknas medicinen räcka till den ${s.prescribedEndDateStr}. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. Vänligen hör av dig igen runt den ${s.prescribedContactDateStr} så hjälper vi dig då med nytt recept.`);
+        patLines.push('');
+        patLines.push('Vid frågor är du välkommen att kontakta oss via 1177.');
+      }
+    } else {
+      patLines.push('Vi har tagit emot din förfrågan om receptförnyelse för följande läkemedel:');
+      patLines.push('');
+      toRenew.forEach(({ name }) => {
+        patLines.push(`${name}: Vi förnyar ditt recept inom 2–3 arbetsdagar. Du kan därefter hämta ut medicinen på valfritt apotek.`);
+      });
+      tooEarly.forEach(({ name, i }) => {
+        const s = states[i];
+        patLines.push(`${name}: Medicinen beräknas räcka till den ${s.endDateStr}. Vänligen hör av dig igen runt den ${s.renewDateStr} så hjälper vi dig då med nytt recept.`);
+      });
+      overuse.forEach(({ name, i }) => {
+        const s = states[i];
+        patLines.push(`${name}: Medicinen beräknas räcka till den ${s.prescribedEndDateStr}. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. Vänligen hör av dig igen runt den ${s.prescribedContactDateStr} så hjälper vi dig då med nytt recept.`);
+      });
+      patLines.push('');
+      patLines.push('Vid frågor är du välkommen att kontakta oss via 1177.');
+    }
+    const patientText = patLines.join('\n');
+
+    // ── Journaltext ──
+    let jLines = [];
+    if (validCount === 1) {
+      // Ett läkemedel: bygg journaltexten direkt
+      if (toRenew.length === 1) {
+        const s = states[toRenew[0].i];
+        jLines.push(`Kontaktorsak: Receptförnyelse via 1177.`);
+        jLines.push('');
+        jLines.push(`Bedömning: Patienten begär förnyelse av ${toRenew[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} doser, ordination ${s.dose} st/dag) och beräknas räcka till ${s.endDateStr}.`);
+        jLines.push(`Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${s.displayAvgStr} ${s.avgNote}).`);
+        jLines.push('');
+        jLines.push(`Åtgärd: Nytt recept utfärdat. Svar skickat till patient via 1177.`);
+      } else if (tooEarly.length === 1) {
+        const s = states[tooEarly[0].i];
+        jLines.push(`Kontaktorsak: Receptförnyelse via 1177.`);
+        jLines.push('');
+        jLines.push(`Bedömning: Patienten begär förnyelse av ${tooEarly[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} doser, ordination ${s.dose} st/dag) och beräknas räcka till ${s.endDateStr} (${s.daysRemaining} dagar kvar).`);
+        jLines.push(`Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${s.displayAvgStr} ${s.avgNote}).`);
+        jLines.push('');
+        jLines.push(`Åtgärd: Ej förnyat — för tidigt. Svar skickat till patient via 1177.`);
+      } else if (overuse.length === 1) {
+        const s = states[overuse[0].i];
+        const supplyNote = s.daysRemaining > 0 ? `Aktuell förskrivning beräknas räcka ytterligare ${s.daysRemaining} dagar.` : `Aktuell förskrivning är slut.`;
+        jLines.push(`Kontaktorsak: Receptförnyelse via 1177.`);
+        jLines.push('');
+        jLines.push(`Bedömning: Patienten begär förnyelse av ${overuse[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} doser, ordination ${s.dose} st/dag) och borde räcka till ${s.prescribedEndDateStr}. ${supplyNote} Beräknad snittförbrukning: ${s.displayAvgStr} ${s.avgNote}.`);
+        jLines.push(`Anledning till förhöjd förbrukning: [Fyll i]`);
+        jLines.push('');
+        jLines.push(`Åtgärd: [Nytt recept utfärdat / Ej utfärdat — motivering]`);
+      }
+
+    } else {
+      jLines.push('Kontaktorsak: Receptförnyelse via 1177 (flera läkemedel).', '');
+      toRenew.forEach(({ name, i }) => {
+        const s = states[i];
+        jLines.push(`${name}: Förnyat. Beräknas räcka t.o.m ${s.endDateStr}. Snittförbrukning: ${s.displayAvgStr}.`);
+      });
+      tooEarly.forEach(({ name, i }) => {
+        const s = states[i];
+        jLines.push(`${name}: Ej förnyat — för tidigt (${s.daysRemaining} dagar kvar, t.o.m ${s.endDateStr}). Beräknad snittförbrukning: ${s.displayAvgStr} ${s.avgNote}.`);
+      });
+      overuse.forEach(({ name, i }) => {
+        const s = states[i];
+        const supplyNote = s.daysRemaining > 0
+          ? `Aktuell förskrivning beräknas räcka ytterligare ${s.daysRemaining} dagar.`
+          : `Aktuell förskrivning är slut.`;
+        jLines.push(`${name}: Ej förnyat — överförbrukning detekterad.`);
+        jLines.push(`Bedömning: Patienten begär förnyelse av ${name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} doser, ordination ${s.dose} st/dag) och borde räcka till ${s.prescribedEndDateStr}. ${supplyNote} Beräknad snittförbrukning: ${s.displayAvgStr} ${s.avgNote}.`);
+        jLines.push(`Anledning till förhöjd förbrukning: [Fyll i]`);
+        jLines.push(`Åtgärd: [Nytt recept utfärdat / Ej utfärdat — motivering]`);
+        jLines.push('');
+      });
+      jLines.push('');
+      if (toRenew.length > 0) {
+        jLines.push(`Åtgärd: Recept utfärdat för ${toRenew.map(x => x.name).join(', ')}. Svar skickat till patient via 1177.`);
+      } else {
+        jLines.push('Åtgärd: Inga recept utfärdade. Svar skickat till patient via 1177.');
+      }
+    }
+    const journalText = jLines.join('\n');
+
+    // Skriv till alla giltiga korts copy-sektioner
+    for (let i = 0; i < medCardCount; i++) {
+      if (!states[i].valid) continue;
+      states[i].patientText = patientText;
+      states[i].journalText = journalText;
+      const body = getEl('copyBody' + i);
+      if (body) body.textContent = states[i].activeTab === 'journal' ? journalText : patientText;
+    }
+  }
+  // ─────────────────────────────────────────────────────────
+
+  const copyFeedbackTimers = {};
+  function copyText(i) {
+    const body = getEl('copyBody' + i);
+    const text = body ? body.textContent : '';
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector(`#card${i} .copy-footer .btn`);
+      if (!btn) return;
+      const orig = btn.dataset.origLabel || btn.textContent;
+      btn.dataset.origLabel = orig;
+      btn.textContent = '✅ Kopierat!';
+      clearTimeout(copyFeedbackTimers[i]);
+      copyFeedbackTimers[i] = setTimeout(() => {
+        btn.textContent = orig;
+        delete btn.dataset.origLabel;
+      }, 1800);
+    }).catch(() => alert('Kunde inte kopiera till urklipp. Vänligen markera texten och kopiera manuellt.'));
+  }
+
+  function clearCard(i) {
+    ['med','dose','amt','ref','left'].forEach(f => {
+      const el = getEl(f + i);
+      if (el) {
+        el.value = '';
+        toggleError(el, false);
+      }
+    });
+    const dateEl = getEl('date' + i);
+    if (dateEl) { dateEl.value = todayStr(); toggleError(dateEl, false); }
+    const res = getEl('res' + i);
+    if (res) res.style.display = 'none';
+    showEl('fassBtn' + i, false);
+    showEl('resPh' + i, true, 'flex');
+    resetResultPanel(i);
+    setStatus(i, 'muted', 'Ej ifyllt');
+    states[i] = {};
+    states.forEach(s => { s.patientText = ''; s.journalText = ''; });
+    generateAndDistribute();
+  }
+
+  function confirmClearAll(force = false) {
+    if (force) {
+      executeClearAll();
+    } else {
+      const m = getEl('clearModal');
+      if (m) m.classList.add('visible');
+    }
+  }
+
+  function closeClearModal() {
+    const m = getEl('clearModal');
+    if (m) m.classList.remove('visible');
+  }
+
+  function executeClearAll() {
+    for (let i = 0; i < medCardCount; i++) clearCard(i);
+    medCardCount = 1;
+    states = [{}];
+    buildCards();
+    clearLongterm();
+    closeClearModal();
+  }
+
+  function validateInputs(i) {
+    const medEl  = getEl('med' + i);
+    const dateEl = getEl('date' + i);
+    const amtEl  = getEl('amt' + i);
+    const doseEl = getEl('dose' + i);
+    const refEl  = getEl('ref' + i);
+    if (!medEl || !dateEl || !amtEl || !doseEl || !refEl) return { valid: false, reason: 'incomplete' };
+
+    const medRaw = medEl.value.trim();
+    const dateVal = dateEl.value;
+
+    const amtRaw = amtEl.value;
+    const amt = parseInt(amtRaw, 10);
+    // FIX #13: Validera antal doser (max 10000 är rimligt)
+    const amtIsInvalid = amtRaw !== '' && (isNaN(amt) || amt <= 0 || amt > 10000 || !Number.isInteger(Number(amtRaw)));
+    toggleError(amtEl, amtIsInvalid);
+
+    const doseRaw = doseEl.value;
+    const dose = parseFloat(doseRaw.replace(',','.'));
+    // FIX #13: Sätt mer realistisk gräns för dos (max 50 st/dag är mycket högt)
+    const doseIsInvalid = doseRaw !== '' && (isNaN(dose) || dose < 0.1 || dose > 50);
+    toggleError(doseEl, doseIsInvalid);
+
+    const refRaw = refEl.value.trim();
+    const refNum = Number(refRaw);
+    const refOutOfRange = Number.isFinite(refNum) && Number.isInteger(refNum) && refNum > 12;
+    const refIsInvalid = refRaw !== '' && (!Number.isFinite(refNum) || !Number.isInteger(refNum) || refNum < 1 || refNum > 12);
+    toggleError(refEl, refIsInvalid);
+
+    if (refOutOfRange) return { valid: false, reason: 'too_many_refs' };
+
+    if (!medRaw || !dateVal || isNaN(dose) || doseIsInvalid || isNaN(amt) || amtIsInvalid || refIsInvalid || !refNum || refNum < 1) {
+      return { valid: false, reason: 'incomplete' };
+    }
+    const ref = refNum;
+
+    const pDate = parseDateUTC(dateVal);
+    const dateIsInvalid = !!dateVal && !pDate;
+    toggleError(dateEl, dateIsInvalid);
+    if (!pDate) return { valid: false, reason: 'invalid_date' };
+
+    // FIX #4: Validera att datum inte är i framtiden (sanity check)
+    const today = getToday();
+    if (pDate > today) {
+      toggleError(dateEl, true);
+      return { valid: false, reason: 'invalid_date' };
+    }
+
+    // Valfritt: kvarvarande doser
+    const leftEl  = getEl('left' + i);
+    const leftRaw = leftEl ? leftEl.value.trim() : '';
+    const remaining = leftRaw !== '' ? parseInt(leftRaw, 10) : null;
+    const leftIsInvalid = leftRaw !== '' && (isNaN(remaining) || remaining < 0 || !Number.isInteger(Number(leftRaw)));
+    if (leftEl) toggleError(leftEl, leftIsInvalid);
+    if (leftIsInvalid) return { valid: false, reason: 'incomplete' };
+
+    return { valid: true, medRaw, dateVal, pDate, amt, dose, ref, remaining };
+  }
+
+  function buildResultGrid(i, data) {
+    const { daysRemaining, medRaw, avgNum, total, totalDays, endDate, prescribedEndDate, dose, daysSince, hasRemaining, remaining } = data;
+
+    const daysInfoNode = document.createElement('span');
+    if (daysRemaining < 0) {
+      const daysAgo = Math.abs(daysRemaining);
+      daysInfoNode.className = 'badge badge-ok';
+      daysInfoNode.textContent = `Tog slut för ${daysAgo} ${daysAgo === 1 ? 'dag' : 'dagar'} sedan`;
+    }
+
+    const mg = extractMg(medRaw);
+    let displayAvg = `${avgNum.toFixed(2)} st/dag`;
+    if (mg > 0) displayAvg += ` (${(avgNum * mg).toFixed(1)} mg/dag)`;
+
+    const resGridEl = getEl('resGrid' + i);
+    if (!resGridEl) return displayAvg;
+    resGridEl.textContent = '';
+
+    const frag = document.createDocumentFragment();
+    buildResultRow(frag, 'Totalt antal doser', `${total} st`);
+    buildResultRow(frag, 'Borde räcka i', `${Math.round(totalDays)} dagar`);
+    buildResultRow(frag, 'Borde räcka t.o.m', fmtDate(prescribedEndDate));
+    if (hasRemaining) buildResultRow(frag, 'Räcker t.o.m (kvar)', fmtDate(endDate));
+    const hr = document.createElement('hr'); hr.className = 'divider'; frag.appendChild(hr);
+    const dosesLeft = hasRemaining ? remaining : Math.max(0, Math.floor(total - (daysSince * dose)));
+    buildResultRow(frag, 'Doser kvar idag', `${dosesLeft} st`, daysInfoNode);
+    buildResultRow(frag, 'Snittförbrukning', displayAvg);
+
+    resGridEl.appendChild(frag);
+    return displayAvg;
+  }
+
+  function buildCopyTexts(i, data) {
+    const { isOveruse, isTooEarly, displayAvg, daysRemaining, medRaw, dose, endDate, prescribedEndDate, pDate, total, accessibleTotal, amt, ref, today, hasRemaining, remaining } = data;
+
+    const alerts = getEl('alerts' + i);
+    if (alerts) alerts.textContent = '';
+
+    // Notering om snittförbrukning — anpassas beroende på om kvarvarande doser angavs
+    const earlyPickupNote = data.earlyPickup
+      ? ' OBS: Kvarvarande doser överstiger normalt tillgänglig mängd — patienten kan ha hämtat ut uttag i förväg.'
+      : '';
+    const avgNote = hasRemaining
+      ? `(beräknat på faktisk förbrukning: ${data.calcBase - remaining} av ${data.calcBase} tillgängliga doser${earlyPickupNote})`
+      : `(beräknat under antagandet att alla hittills tillgängliga doser är förbrukade)`;
+
+    if (isOveruse) {
+      // SCENARIO 1: Förbrukning >10 % över ordinerad dos → klinisk bedömning krävs
+      const daysNote = daysRemaining > 0
+        ? ` — ${daysRemaining} ${daysRemaining === 1 ? 'dag' : 'dagar'} kvar av aktuell förskrivning`
+        : ` — aktuell förskrivning är slut`;
+      renderAlert('alerts' + i, 'danger', '🚨 Överförbrukning detekterad',
+        `Snitt ${displayAvg} ${avgNote}${daysNote}. Gör en individuell bedömning om patienten överförbrukar läkemedlet.`);
+      const supplyNote = daysRemaining > 0
+        ? `Aktuell förskrivning beräknas räcka ytterligare ${daysRemaining} ${daysRemaining === 1 ? 'dag' : 'dagar'}.`
+        : `Aktuell förskrivning är slut.`;
+      const contactDate = new Date(prescribedEndDate);
+      contactDate.setUTCDate(contactDate.getUTCDate() - 7);
+      states[i].endDateStr = fmtDate(prescribedEndDate);
+      states[i].prescribedEndDateStr = fmtDate(prescribedEndDate);
+      states[i].prescribedContactDateStr = fmtDate(contactDate);
+      states[i].daysRemaining = daysRemaining;
+      states[i].pDateStr = fmtDate(pDate);
+      states[i].total = total;
+      states[i].dose = dose;
+      states[i].avgNote = avgNote;
+      states[i].patientText =
+`Hej,
+
+Vi har tagit emot din förfrågan om receptförnyelse för ${medRaw}. Enligt din ordination (${dose} st/dag) beräknas medicinen räcka till den ${fmtDate(prescribedEndDate)}. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. Vänligen hör av dig igen närmre den ${fmtDate(contactDate)} så hjälper vi dig då.
+
+Vid frågor är du välkommen att kontakta oss via 1177.`;
+      states[i].journalText =
+`Kontaktorsak: Receptförnyelse via 1177.
+
+Bedömning: Patienten begär förnyelse av ${medRaw}. Senaste receptet utfärdades ${fmtDate(pDate)} (totalt ${total} doser, ordination ${dose} st/dag) och borde räcka till ${fmtDate(prescribedEndDate)}. ${supplyNote} Beräknad snittförbrukning: ${displayAvg} ${avgNote}.
+
+Anledning till förhöjd förbrukning: [Fyll i]
+
+Åtgärd: [Nytt recept utfärdat / Ej utfärdat — motivering]`;
+
+    } else if (isTooEarly) {
+      // SCENARIO 2: Förbrukning OK men för tidigt att förnya → be dem höra av sig senare
+      const renewDate = new Date(endDate);
+      renewDate.setUTCDate(renewDate.getUTCDate() - 7);
+      states[i].endDateStr = fmtDate(endDate);
+      states[i].renewDateStr = fmtDate(renewDate);
+      states[i].daysRemaining = daysRemaining;
+      states[i].pDateStr = fmtDate(pDate);
+      states[i].total = total;
+      states[i].dose = dose;
+      states[i].avgNote = avgNote;
+      renderAlert('alerts' + i, 'info', 'ℹ️ För tidigt att förnya',
+        `Medicinen beräknas räcka ytterligare ${daysRemaining} dagar (t.o.m ${fmtDate(endDate)}). Receptförnyelse rekommenderas närmre slutdatumet.`);
+      states[i].patientText =
+`Hej,
+
+Vi har tagit emot din förfrågan om receptförnyelse för ${medRaw}. Enligt din ordination (${dose} st/dag) beräknas medicinen räcka till den ${fmtDate(endDate)}. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. Vänligen hör av dig igen runt den ${fmtDate(renewDate)} så hjälper vi dig då med nytt recept.
+
+Vid frågor är du välkommen att kontakta oss via 1177.`;
+      states[i].journalText =
+`Kontaktorsak: Receptförnyelse via 1177.
+
+Bedömning: Patienten begär förnyelse av ${medRaw}. Senaste receptet utfärdades ${fmtDate(pDate)} (totalt ${total} doser, ordination ${dose} st/dag) och beräknas räcka till ${fmtDate(endDate)} (${daysRemaining} dagar kvar).
+Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${displayAvg} ${avgNote}).
+
+Åtgärd: Ej förnyat — för tidigt. Svar skickat till patient via 1177.`;
+
+    } else {
+      // SCENARIO 3: Förbrukning OK och inom förnyelsefönster → förskriv
+      states[i].endDateStr = fmtDate(endDate);
+      states[i].daysRemaining = daysRemaining;
+      states[i].pDateStr = fmtDate(pDate);
+      states[i].total = total;
+      states[i].dose = dose;
+      states[i].avgNote = avgNote;
+      states[i].patientText =
+`Hej,
+
+Vi har tagit emot din begäran på ${medRaw} och kommer att förnya ditt recept inom 2-3 arbetsdagar. Du kan därefter hämta ut din medicin på valfritt apotek.`;
+      states[i].journalText =
+`Kontaktorsak: Receptförnyelse via 1177.
+
+Bedömning: Patienten begär förnyelse av ${medRaw}. Senaste receptet utfärdades ${fmtDate(pDate)} (totalt ${total} doser, ordination ${dose} st/dag) och beräknas räcka till ${fmtDate(endDate)}.
+Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${displayAvg} ${avgNote}).
+
+Åtgärd: Nytt recept utfärdat. Svar skickat till patient via 1177.`;
+    }
+
+    showEl('copySection' + i, true);
+    switchTab(i, 'patient');
+
+  }
+
+  function showResult(i, show) {
+    const res = getEl('res' + i);
+    const ph  = getEl('resPh' + i);
+    if (res) res.style.display = show ? 'block' : 'none';
+    if (ph)  ph.style.display  = show ? 'none'  : 'flex';
+  }
+
+  function calc(i) {
+    resetTimer();
+    states[i].valid = false;
+
+    const inputData = validateInputs(i);
+
+    if (!inputData.valid) {
+      showResult(i, false);
+      resetResultPanel(i);
+      states[i].patientText = '';
+      states[i].journalText = '';
+      generateAndDistribute();
+
+      if (inputData.reason === 'too_many_refs') {
+        showResult(i, true);
+        renderAlert('alerts' + i, 'danger', '⚠️ Ogiltigt antal uttag', 'Max 12 uttag stöds.');
+        setStatus(i, 'warn', 'Ogiltigt antal');
+      } else if (inputData.reason === 'invalid_date') {
+        setStatus(i, 'warn', 'Ogiltigt datum');
+      } else {
+        setStatus(i, 'muted', 'Ej ifyllt');
+      }
+      return;
+    }
+
+    const today = getToday();
+    const daysSince = getDaysDiff(today, inputData.pDate);
+
+    if (daysSince < 0) {
+      resetResultPanel(i);
+      showResult(i, true);
+      renderAlert('alerts' + i, 'warn', '', '⚠️ Datumet för senaste receptet är satt i framtiden.');
+      setStatus(i, 'warn', 'Ogiltigt datum');
+      return;
+    } else if (daysSince === 0) {
+      resetResultPanel(i);
+      showResult(i, true);
+      renderAlert('alerts' + i, 'info', '', 'ℹ️ För att beräkna snittförbrukning krävs att receptet utfärdades minst en dag tidigare än dagens datum.');
+      setStatus(i, 'warn', 'Kan ej beräknas idag');
+      return;
+    }
+
+    const total = inputData.amt * inputData.ref;
+    const totalDays = total / inputData.dose;
+
+    if (totalDays > 3650) {
+      resetResultPanel(i);
+      showResult(i, true);
+      renderAlert('alerts' + i, 'danger', '⚠️ Orimlig tid', 'Beräknad tid överstiger 10 år. Kontrollera inmatade värden.');
+      setStatus(i, 'warn', 'Orimliga värden');
+      return;
+    }
+
+    const { remaining } = inputData;
+    const hasRemaining = remaining !== null && remaining !== undefined;
+
+    // Antal uttag som fysiskt hunnit lösas ut sedan receptdatumet.
+    // Patienten kan inte ha förbrukat tabletter från uttag som ännu inte är tillgängliga.
+    const batchDuration = inputData.amt / inputData.dose; // dagar per uttag vid ordinerad dos
+    const batchesDispensed = Math.min(inputData.ref, Math.floor(daysSince / batchDuration) + 1);
+    const accessibleTotal = Math.min(total, batchesDispensed * inputData.amt);
+
+    let endDate, daysRemaining, avgNum;
+    let earlyPickup = false;
+    let calcBase = accessibleTotal;
+
+    if (hasRemaining) {
+      // Exakt beräkning: faktisk förbrukning och faktiska kvarvarande dagar
+      if (remaining > total) {
+        // Kvarvarande kan aldrig överstiga totalt förskrivna doser
+        resetResultPanel(i);
+        showResult(i, true);
+        renderAlert('alerts' + i, 'warn', '⚠️ Orimligt värde', `Kvarvarande doser (${remaining}) kan inte överstiga totalt antal förskrivna doser (${total}).`);
+        setStatus(i, 'warn', 'Orimliga värden');
+        return;
+      }
+      // Om remaining > accessibleTotal har patienten hämtat ut fler uttag än modellen förväntar.
+      // Beräkna minsta möjliga antal uttag som krävs för att förklara remaining.
+      earlyPickup = remaining > accessibleTotal;
+      if (earlyPickup) {
+        const minBatchesNeeded = Math.ceil(remaining / inputData.amt);
+        const clampedBatches   = Math.min(minBatchesNeeded, inputData.ref);
+        calcBase = clampedBatches * inputData.amt;
+      } else {
+        // Nar remaining ar angivet vet vi exakt hur manga som forbrukats: total - remaining.
+        // Anvand total (alla forskrivna doser) som bas — inte accessibleTotal som ignorerar
+        // hur manga uttag patienten faktiskt gjort.
+        calcBase = total;
+      }
+      const consumed = calcBase - remaining;
+      if (consumed < 0) {
+        // Defensiv kontroll – ska inte kunna inträffa
+        resetResultPanel(i);
+        showResult(i, true);
+        renderAlert('alerts' + i, 'warn', '⚠️ Orimligt värde', `Kvarvarande doser (${remaining}) överstiger totalt antal förskrivna doser (${total}).`);
+        setStatus(i, 'warn', 'Orimliga värden');
+        return;
+      }
+      avgNum        = consumed / daysSince;
+      daysRemaining = Math.floor(remaining / inputData.dose);
+      endDate       = new Date(today);
+      endDate.setUTCDate(today.getUTCDate() + daysRemaining);
+    } else {
+      // Worst-case: antar att alla hittills tillgängliga tabletter är förbrukade
+      endDate = new Date(inputData.pDate);
+      endDate.setUTCDate(endDate.getUTCDate() + Math.round(totalDays));
+      daysRemaining = getDaysDiff(endDate, today);
+      avgNum        = accessibleTotal / daysSince;
+    }
+
+    // Överkonsumtion: snitt >10 % över ordinerad dos (tolerans för naturlig variation)
+    const isOveruse = avgNum > inputData.dose * 1.10;
+
+    // Det datum receptet borde ha räckt till enligt ordinationen (alltid pDate + totalDays)
+    const prescribedEndDate = new Date(inputData.pDate);
+    prescribedEndDate.setUTCDate(prescribedEndDate.getUTCDate() + Math.round(totalDays));
+
+    states[i].valid = true;
+    const isTooEarly = !isOveruse && daysRemaining > 14;
+    states[i].isOveruse  = isOveruse;
+    states[i].isTooEarly = isTooEarly;
+    const statusClass = isOveruse ? 'warn' : isTooEarly ? 'warn' : 'ok';
+    const statusText = isOveruse ? 'Överförbrukning' : isTooEarly ? `För tidigt — ${daysRemaining} dagar kvar` : `OK — t.o.m ${fmtDate(endDate)}`;
+    setStatus(i, statusClass, statusText);
+
+    const displayData = { ...inputData, total, accessibleTotal, calcBase, earlyPickup, totalDays, endDate, prescribedEndDate, daysRemaining, avgNum, isOveruse, isTooEarly, daysSince, today, hasRemaining };
+    const displayAvg = buildResultGrid(i, displayData);
+    displayData.displayAvg = displayAvg;
+    buildCopyTexts(i, displayData); // OBS: rensar alerts+i internt
+    states[i].displayAvgStr = displayAvg;
+    generateAndDistribute();
+
+    // Rendera alert EFTER buildCopyTexts (annars raderas den av alerts.textContent='')
+    const consumptionPct = (avgNum / inputData.dose) * 100;
+
+    if (avgNum === 0) {
+      renderAlert('alerts' + i, 'danger', '🚨 Ingen förbrukning registrerad',
+        `Beräknad snittförbrukning är 0 st/dag — patienten verkar inte ha tagit medicinen alls under perioden. ` +
+        `Klinisk bedömning krävs innan receptförnyelse.`);
+    } else if (consumptionPct < 80) {
+      renderAlert('alerts' + i, 'warn', '⚠️ Låg förbrukning',
+        `Snittförbrukning ${avgNum.toFixed(2)} st/dag är ${(100 - consumptionPct).toFixed(1)}% under ordinerad dos (${inputData.dose} st/dag). ` +
+        `Patienten verkar inte ta medicinen som ordinerat — överväg uppföljningssamtal.`);
+    } else if (avgNum > inputData.dose * 2.5) {
+      renderAlert('alerts' + i, 'warn', '⚠️ Datakontroll krävs',
+        `Beräknad snittförbrukning (${avgNum.toFixed(2)} st/dag) är mycket högre än ordinerad dos (${inputData.dose} st/dag). ` +
+        `Kontrollera att antal kvarvarande doser är korrekt inmatat.`);
+    }
+
+    if (displayData.earlyPickup) {
+      const alertsEl = getEl('alerts' + i);
+      if (alertsEl) {
+        const note = document.createElement('div');
+        note.className = 'alert alert-info';
+        note.textContent = 'ℹ️ Kvarvarande doser överstiger modellens förväntade tillgängliga mängd — patienten kan ha hämtat ut uttag i förväg eller haft överblivna tabletter från tidigare recept. Beräkningen utgår från minsta möjliga antal hämtade uttag.';
+        alertsEl.appendChild(note);
+      }
+    }
+
+    const fassBtn = getEl('fassBtn' + i);
+    if (fassBtn) {
+      fassBtn.href = getFassUrl(inputData.medRaw);
+      fassBtn.style.display = 'inline-flex';
+    }
+    showResult(i, true);
+  }
+
+  /* ────────────────────────────────────────────
+     FLIK 2: LÅNGVARIG FÖRBRUKNING
+  ─────────────────────────────────────────── */
+
+  function periodRowTemplate(idx) {
+    return `
+      <div class="section-label" style="margin-top:${idx === 0 ? '0' : '12px'};">Period ${idx + 1}</div>
+      <div class="form-row-3 period-form-row" id="lt-period-${idx}">
+        <div class="field period-date-field">
+          <label for="lt-start-${idx}">Startdatum</label>
+          <input id="lt-start-${idx}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" autocomplete="off" value="${oneYearAgoStr()}" oninput="autoFormatDate(this); calcLongtermDebounced()" onchange="calcLongterm()">
+        </div>
+        <div class="field period-date-field">
+          <label for="lt-total-${idx}">Antal uttagna tabletter</label>
+          <input id="lt-total-${idx}" type="number" placeholder="100" min="1" oninput="calcLongtermDebounced()">
+        </div>
+        <div class="field period-date-field">
+          <label for="lt-end-${idx}">Slutdatum</label>
+          <input id="lt-end-${idx}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" autocomplete="off" value="${todayStr()}" oninput="autoFormatDate(this); calcLongtermDebounced()" onchange="calcLongterm()">
+        </div>
+      </div>
+      ${idx > 0 ? `<button class="btn btn-ghost" style="margin-top:4px; font-size:11px;" onclick="removePeriod(${idx})">✕ Ta bort period ${idx + 1}</button>` : ''}
+    `;
+  }
+
+  function buildPeriodContainer() {
+    const container = getEl('lt-periods-container');
+    if (!container) return;
+    container.innerHTML = '';
+    for (let i = 0; i < ltPeriodCount; i++) {
+      const div = document.createElement('div');
+      div.id = `lt-period-wrap-${i}`;
+      div.innerHTML = periodRowTemplate(i);
+      container.appendChild(div);
+    }
+  }
+
+  function addPeriod() {
+    if (ltPeriodCount >= 10) return;
+    const periods = collectRawPeriods();
+    ltPeriodCount++;
+    buildPeriodContainer();
+    periods.forEach((p, i) => {
+      const s = getEl('lt-start-' + i); if (s && p.start) s.value = p.start;
+      const t = getEl('lt-total-' + i); if (t && p.total) t.value = p.total;
+      const e = getEl('lt-end-' + i);   if (e && p.end)   e.value = p.end;
+    });
+    calcLongterm();
+  }
+
+  function collectRawPeriods() {
+    const out = [];
+    for (let i = 0; i < ltPeriodCount; i++) {
+      out.push({
+        start: (getEl('lt-start-' + i) || {}).value || '',
+        total: (getEl('lt-total-' + i) || {}).value || '',
+        end:   (getEl('lt-end-' + i)   || {}).value || ''
+      });
+    }
+    return out;
+  }
+
+  function removePeriod(idx) {
+    const periods = collectRawPeriods();
+    periods.splice(idx, 1);
+    ltPeriodCount = Math.max(1, ltPeriodCount - 1);
+    buildPeriodContainer();
+    periods.forEach((p, i) => {
+      const s = getEl('lt-start-' + i); if (s) s.value = p.start;
+      const t = getEl('lt-total-' + i); if (t) t.value = p.total;
+      const e = getEl('lt-end-' + i);   if (e) e.value = p.end;
+    });
+    calcLongterm();
+  }
+
+  function parseDateUTC(str) {
+    if (!str) return null;
+    const parts = str.split('-');
+    if (parts.length !== 3) return null;
+    const y = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+    const day = parseInt(parts[2], 10);
+    // Grundvalidering av intervall innan Date.UTC — förhindrar tyst overflow
+    // (t.ex. månad 13 → januari nästa år, dag 31 i feb → mars)
+    if (isNaN(y) || isNaN(m) || isNaN(day) || m < 1 || m > 12 || day < 1 || day > 31) return null;
+    
+    // FIX #15: Verifiera att året är inom rimligt intervall (1950-2100)
+    if (y < 1950 || y > 2100) return null;
+    
+    const d = new Date(Date.UTC(y, m - 1, day));
+    if (isNaN(d.getTime())) return null;
+    // Kontrollera att ingen overflow skett (t.ex. 31 feb → 3 mars)
+    if (d.getUTCFullYear() !== y || d.getUTCMonth() !== m - 1 || d.getUTCDate() !== day) return null;
+    return d;
+  }
+
+  function clearLongterm() {
+    const m = getEl('lt-med'); if (m) m.value = '';
+    const d = getEl('lt-dose'); if (d) { d.value = ''; toggleError(d, false); }
+    ltPeriodCount = 1;
+    buildPeriodContainer();
+
+    const res = getEl('lt-result'); if (res) res.style.display = 'none';
+    const alerts = getEl('lt-alerts'); if (alerts) alerts.textContent = '';
+    const grid = getEl('lt-resGrid'); if (grid) grid.textContent = '';
+    const rows = getEl('lt-period-rows'); if (rows) rows.textContent = '';
+    const copy = getEl('lt-copySection'); if (copy) copy.style.display = 'none';
+    const fass = getEl('lt-fassBtn'); if (fass) fass.style.display = 'none';
+
+    showEl('lt-bar-section', false);
+    showEl('lt-period-table-section', false);
+  }
+
+  function calcLongterm() {
+    resetTimer();
+
+    const medEl = getEl('lt-med');
+    const doseEl = getEl('lt-dose');
+    if (!medEl || !doseEl) return;
+
+    const medRaw = medEl.value.trim();
+    const doseRaw = doseEl.value;
+    const ordDose = parseFloat(doseRaw.replace(',', '.'));
+    // FIX #13: Sätt gränsvärden för ordinerad dos
+    const doseIsInvalid = doseRaw !== '' && (isNaN(ordDose) || ordDose < 0.1 || ordDose > 50);
+    toggleError(doseEl, doseIsInvalid);
+
+    const today = getToday();
+
+    const periods = [];
+    for (let i = 0; i < ltPeriodCount; i++) {
+      const startEl = getEl('lt-start-' + i);
+      const totalEl = getEl('lt-total-' + i);
+      const endEl   = getEl('lt-end-' + i);
+
+      const startDate = parseDateUTC(startEl ? startEl.value : '');
+      const endDate   = parseDateUTC(endEl ? endEl.value : '');
+      const totalVal  = parseFloat(totalEl ? totalEl.value : '');
+
+      const startInvalid = startEl && startEl.value !== '' && (!startDate || startDate > today);
+      const endInvalid   = endEl   && endEl.value   !== '' && (!endDate || (startDate && endDate <= startDate));
+      const totalInvalid = totalEl && totalEl.value !== '' && (isNaN(totalVal) || totalVal <= 0);
+
+      toggleError(startEl, !!startInvalid);
+      toggleError(endEl, !!endInvalid);
+      toggleError(totalEl, !!totalInvalid);
+
+      if (startDate && endDate && !isNaN(totalVal) && totalVal > 0 && startDate < endDate) {
+        const days = getDaysDiff(endDate, startDate);
+        // FIX #12: Verifiera att dagen inte är 0
+        if (days === 0) {
+          console.warn(`Period ${i} har 0 dagar (samma start och slutdatum) - ignoreras`);
+          continue;
+        }
+        // FIX #16: Verifiera att perioden inte är större än 50 år (vilket är orimligt)
+        if (days > 365 * 50) {
+          console.warn(`Period ${i} är större än 50 år - ignoreras`);
+          continue;
+        }
+        const avgPerDay = totalVal / days;
+        periods.push({ startDate, endDate, total: totalVal, days, avgPerDay });
+      }
+    }
+
+    const ltRes = getEl('lt-result');
+    if (!medRaw || doseIsInvalid || isNaN(ordDose) || periods.length === 0) {
+      if (ltRes) ltRes.style.display = 'none';
+      return;
+    }
+
+    if (ltRes) ltRes.style.display = 'block';
+    const ltAlerts = getEl('lt-alerts'); if (ltAlerts) ltAlerts.textContent = '';
+
+    // FIX #9 (omplacerad): Overlap-varning måste renderas EFTER att ltAlerts rensats,
+    // annars raderas varningen direkt av textContent='' ovan.
+    if (periods.length > 1) {
+      for (let i = 0; i < periods.length - 1; i++) {
+        if (periods[i].endDate > periods[i + 1].startDate) {
+          renderAlert('lt-alerts', 'warn', '⚠️ Överlappande perioder',
+            'Tidsperioderna överlappar varandra. Se till att alla perioder är disjunkta för korrekt beräkning.');
+          break;
+        }
+      }
+    }
+
+    const totalTablets = periods.reduce((s, p) => s + p.total, 0);
+    const totalDays    = periods.reduce((s, p) => s + p.days, 0);
+    
+    // FIX #11: Division by zero - verifiera att totalDays inte är 0
+    if (totalDays === 0) {
+      renderAlert('lt-alerts', 'warn', '⚠️ Ogiltiga perioder', 
+        'Totala analyslängden är 0 dagar. Säkerställ att minst en period täcker ett helt dygn.');
+      if (ltRes) ltRes.style.display = 'none';
+      return;
+    }
+    
+    const overallAvg   = totalTablets / totalDays;
+    const consumptionPct = (overallAvg / ordDose) * 100;
+
+    const mg = extractMg(medRaw);
+    let avgStr = `${overallAvg.toFixed(2)} st/dag`;
+    if (mg > 0) avgStr += ` (${(overallAvg * mg).toFixed(1)} mg/dag)`;
+
+    const resGridEl = getEl('lt-resGrid');
+    if (resGridEl) {
+      resGridEl.textContent = '';
+      const frag = document.createDocumentFragment();
+      buildResultRow(frag, 'Analyserade perioder', `${periods.length} st`);
+      buildResultRow(frag, 'Total analyslängd', `${totalDays} dagar`);
+      buildResultRow(frag, 'Totalt uttagna tabletter', `${totalTablets} st`);
+      const hr = document.createElement('hr'); hr.className = 'divider'; frag.appendChild(hr);
+      buildResultRow(frag, 'Ordinerad dos', `${ordDose} st/dag`);
+      buildResultRow(frag, 'Beräknad snittförbrukning', avgStr);
+      buildResultRow(frag, 'Förbrukning relativt ordination', `${consumptionPct.toFixed(1)}%`);
+      resGridEl.appendChild(frag);
+    }
+
+    const OVER_THRESHOLD  = 1.10;
+    const UNDER_THRESHOLD = 0.80;
+
+    let overallStatus, alertType, alertTitle, alertMsg;
+    if (overallAvg > ordDose * OVER_THRESHOLD) {
+      overallStatus = 'over';
+      alertType = 'danger';
+      alertTitle = '🚨 Överförbrukning detekterad';
+      alertMsg = `Snittförbrukning ${avgStr} är ${(consumptionPct - 100).toFixed(1)}% över ordinerad dos (${ordDose} st/dag) sett över ${totalDays} dagar. Gör en individuell klinisk bedömning.`;
+    } else if (overallAvg < ordDose * UNDER_THRESHOLD) {
+      overallStatus = 'under';
+      alertType = 'warn';
+      alertTitle = '⚠️ Underförbrukning detekterad';
+      alertMsg = `Snittförbrukning ${avgStr} är ${(100 - consumptionPct).toFixed(1)}% under ordinerad dos (${ordDose} st/dag) sett över ${totalDays} dagar. Patienten kanske inte tar medicinen som ordinerat — överväg uppföljning.`;
+    } else {
+      overallStatus = 'ok';
+      alertType = 'ok';
+      alertTitle = '✅ Förbrukning enligt ordination';
+      alertMsg = `Snittförbrukning ${avgStr} bedöms vara i linje med ordinerad dos (${ordDose} st/dag) med en avvikelse på ${Math.abs(consumptionPct - 100).toFixed(1)}%.`;
+    }
+
+    renderAlert('lt-alerts', alertType, alertTitle, alertMsg);
+
+    const barPct = Math.min(150, Math.max(0, consumptionPct));
+    const barEl = getEl('lt-bar');
+    if (barEl) {
+      barEl.style.width = `${(barPct / 150) * 100}%`;
+      barEl.className = `consumption-bar ${overallStatus}`;
+      barEl.textContent = barPct > 20 ? `${consumptionPct.toFixed(0)}%` : '';
+    }
+    showEl('lt-bar-section', true);
+
+    const rowsContainer = getEl('lt-period-rows');
+    if (rowsContainer) {
+      rowsContainer.textContent = '';
+      const frag = document.createDocumentFragment();
+
+      periods.forEach((p) => {
+        const pPct = (p.avgPerDay / ordDose) * 100;
+        let badgeClass, badgeText;
+        if (p.avgPerDay > ordDose * OVER_THRESHOLD) {
+          badgeClass = 'badge-over'; badgeText = 'Över';
+        } else if (p.avgPerDay < ordDose * UNDER_THRESHOLD) {
+          badgeClass = 'badge-under'; badgeText = 'Under';
+        } else {
+          badgeClass = 'badge-ok'; badgeText = 'OK';
+        }
+
+        const row = document.createElement('div');
+        row.className = 'period-row';
+
+        const c1 = document.createElement('span'); c1.className = 'period-cell';
+        c1.textContent = `${fmtDate(p.startDate)} – ${fmtDate(p.endDate)} (${p.days}d)`;
+
+        const c2 = document.createElement('span'); c2.className = 'period-cell mono ph-avg';
+        c2.textContent = `${p.avgPerDay.toFixed(2)} st/dag`;
+
+        const c3 = document.createElement('span'); c3.className = 'period-cell mono';
+        c3.textContent = `${pPct >= 100 ? '+' : ''}${(pPct - 100).toFixed(1)}%`;
+
+        const c4 = document.createElement('span'); c4.className = 'period-cell';
+        const badge = document.createElement('span');
+        badge.className = `badge ${badgeClass}`;
+        badge.textContent = badgeText;
+        c4.appendChild(badge);
+
+        row.appendChild(c1); row.appendChild(c2); row.appendChild(c3); row.appendChild(c4);
+        frag.appendChild(row);
+      });
+
+      rowsContainer.appendChild(frag);
+    }
+    showEl('lt-period-table-section', true);
+
+    if (medRaw) {
+      const ltFassBtn = getEl('lt-fassBtn');
+      if (ltFassBtn) {
+        ltFassBtn.href = getFassUrl(medRaw);
+        ltFassBtn.style.display = 'inline-flex';
+      }
+    }
+
+    const periodSummary = periods.map((p, idx) =>
+      `  Period ${idx+1}: ${fmtDate(p.startDate)}–${fmtDate(p.endDate)} (${p.days} dagar, ${p.total} tabletter, snitt ${p.avgPerDay.toFixed(2)} st/dag)`
+    ).join('\n');
+
+    const journalText =
+`Kontaktorsak: Förbrukningsanalys av ${medRaw}.
+
+Ordinerad dos: ${ordDose} st/dag.
+Analysperiod: ${periods.length} period(er) totalt ${totalDays} dagar.
+
+Perioder:
+${periodSummary}
+
+Sammanlagd snittförbrukning: ${avgStr} (${consumptionPct.toFixed(1)}% av ordinerad dos).
+
+Bedömning: ${alertTitle.replace(/^\S+\s+/, '')} — ${alertMsg}`;
+
+    const copyBody = getEl('lt-copyBody');
+    if (copyBody) copyBody.textContent = journalText;
+    const copySection = getEl('lt-copySection');
+    if (copySection) copySection.style.display = 'block';
+  }
+
+  // FIX #10: Använd Map för att spara timer-referenser per knapp (undviker globala race conditions)
+  const ltCopyTimers = new Map();
+  function copyLtText() {
+    const body = getEl('lt-copyBody');
+    const text = body ? body.textContent : '';
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('#lt-copySection .copy-footer .btn');
+      if (!btn) return;
+      const orig = btn.dataset.origLabel || btn.textContent;
+      btn.dataset.origLabel = orig;
+      btn.textContent = '✅ Kopierat!';
+      // Töm tidigare timer för denna knapp
+      if (ltCopyTimers.has(btn)) clearTimeout(ltCopyTimers.get(btn));
+      const timer = setTimeout(() => {
+        btn.textContent = orig;
+        delete btn.dataset.origLabel;
+        ltCopyTimers.delete(btn);
+      }, 1800);
+      ltCopyTimers.set(btn, timer);
+    }).catch(() => alert('Kunde inte kopiera. Markera texten och kopiera manuellt.'));
+  }
+
+  /* ────────────────────────────────────────────
+     Initiering
+  ─────────────────────────────────────────── */
+  buildCards();
+  
+  // FIX #8: Hantera localStorage-fel (privat läge, etc)
+  try {
+    const savedTheme = localStorage.getItem('theme') || 'rainbow';
+    applyTheme(savedTheme);
+  } catch (e) {
+    console.warn('localStorage inte tillgängligt, använder standardtema');
+    applyTheme('rainbow');
+  }
+
+  ltPeriodCount = 1;
+  buildPeriodContainer();
+
+  // Event delegation för medicinkort — en lyssnare ersätter N×5 inline-handlers
+  const cardsGrid = getEl('cardsGrid');
+  if (cardsGrid) {
+    cardsGrid.addEventListener('input', e => {
+      const card = e.target.closest('.card-horizontal');
+      if (!card) return;
+      const i = parseInt(card.id.replace('card', ''), 10);
+      if (!isNaN(i)) { ensureDebounce(i); calcDebounced[i](); }
+    });
+    // Omedelbar omräkning vid change (blur) på datumfältet —
+    // input-delegationen täcker tangentbordsinmatning; change fångar klistring/autofyll
+    cardsGrid.addEventListener('change', e => {
+      if (!e.target.matches('input[id^="date"]')) return;
+      const card = e.target.closest('.card-horizontal');
+      if (!card) return;
+      const i = parseInt(card.id.replace('card', ''), 10);
+      if (!isNaN(i)) calc(i);
+    });
+  }
+
+  // Aktivitetslyssnare för inaktivitetstimer
+  ['click','keydown','touchstart'].forEach(e =>
+    document.addEventListener(e, () => resetTimer(true), { passive: true })
+  );
+
+  // Säkerställ att datumberoende beräkningar uppdateras vid fönsterfokus / synlighet
+  // (t.ex. om sessionen korsar midnatt så att getToday() hämtar korrekt dygn)
+  function recalcOnDateChange() {
+    _todayCache = null; _todayCacheKey = '';
+    for (let i = 0; i < medCardCount; i++) {
+      if (states[i] && states[i].valid) calc(i);
+    }
+    if (ltPeriodCount > 0) calcLongterm();
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) recalcOnDateChange();
+  });
+  window.addEventListener('focus', recalcOnDateChange);
+  // Sätt förvalt startdatum för Långvarig förbrukning till ett år sedan
+  const ltStart0 = getEl('lt-start-0');
+  if (ltStart0 && !ltStart0.value) ltStart0.value = oneYearAgoStr();
+
+  resetTimer();
+
+
+</script>
+
+</body></html>
