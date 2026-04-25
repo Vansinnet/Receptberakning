@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- saved from url=(0034)https://receptberakning.pages.dev/ -->
 <html lang="sv" data-theme="rainbow"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors 'none';">
 
@@ -483,6 +482,8 @@
   }
 
   .site-footer { text-align: center; margin-top: 40px; font-size: 11px; color: var(--text-muted); opacity: 0.6; }
+  .site-footer a { color: inherit; text-decoration: underline; transition: opacity 0.2s; }
+  .site-footer a:hover { opacity: 0.8; }
 
   /* ── Sektion-rubrik ── */
   .section-label {
@@ -584,8 +585,8 @@
   </div>
 
   <div class="main-tabs" role="tablist">
-    <button class="main-tab active" role="tab" aria-selected="true" onclick="switchMainTab(&#39;renew&#39;)">💊 Receptförnyelse</button>
-    <button class="main-tab" role="tab" aria-selected="false" onclick="switchMainTab(&#39;longterm&#39;)">📊 Långvarig förbrukning</button>
+    <button class="main-tab active" role="tab" aria-selected="true" onclick="switchMainTab('renew')">💊 Receptförnyelse</button>
+    <button class="main-tab" role="tab" aria-selected="false" onclick="switchMainTab('longterm')">📊 Långvarig förbrukning</button>
   </div>
 
   <div id="panel-renew" class="tab-panel active">
@@ -652,8 +653,8 @@
               <div id="alerts0"><div class="alert alert-warn"><strong>⚠️ Låg förbrukning</strong> Snittförbrukning 0.57 st/dag är 43.0% under ordinerad dos (1 st/dag). Patienten verkar inte ta medicinen som ordinerat — överväg uppföljningssamtal.</div></div>
               <div class="copy-section" id="copySection0" style="display: block;">
                 <div class="copy-tabs">
-                  <button class="copy-tab active" onclick="switchTab(0,&#39;patient&#39;)">📝 Svar till patient</button>
-                  <button class="copy-tab" onclick="switchTab(0,&#39;journal&#39;)">🏥 Journalanteckning</button>
+                  <button class="copy-tab active" onclick="switchTab(0,'patient')">📝 Svar till patient</button>
+                  <button class="copy-tab" onclick="switchTab(0,'journal')">🏥 Journalanteckning</button>
                 </div>
                 <div class="copy-body" id="copyBody0">Hej,
 
@@ -766,7 +767,7 @@ Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt rec
   </div>
 
   <footer class="site-footer">
-    Verktyget skapades och underhålls av Gabriel Jungestrand
+    <a href="https://github.com/Vansinnet/Receptberakning" target="_blank" rel="noopener">Verktyget skapades och underhålls av Gabriel Jungestrand</a>
   </footer>
 </div>
 
@@ -1071,7 +1072,7 @@ Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt rec
             <div class="form-row">
               <div class="field">
                 <label for="date${i}">Senaste recept</label>
-                <input id="date${i}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" autocomplete="off" value="${todayStr()}" oninput="autoFormatDate(this)">
+                <input id="date${i}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\\d{4}-\\d{2}-\\d{2}" autocomplete="off" value="${todayStr()}" oninput="autoFormatDate(this)">
               </div>
               <div class="field">
                 <label for="dose${i}">Antal per dag</label>
@@ -1237,7 +1238,7 @@ const validCount = states.filter(s => s.valid).length;
       if (!s.valid) continue;
       const medEl = getEl('med' + i);
       const name = (medEl && medEl.value.trim()) || `Läkemedel ${i + 1}`;
-      if (s.isOveruse)       overuse.push({ name, i });
+      if (s.isOveruse)        overuse.push({ name, i });
       else if (s.isTooEarly) tooEarly.push({ name, i });
       else                   toRenew.push({ name, i });
     }
@@ -1789,7 +1790,7 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
       <div class="form-row-3 period-form-row" id="lt-period-${idx}">
         <div class="field period-date-field">
           <label for="lt-start-${idx}">Startdatum</label>
-          <input id="lt-start-${idx}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" autocomplete="off" value="${oneYearAgoStr()}" oninput="autoFormatDate(this); calcLongtermDebounced()" onchange="calcLongterm()">
+          <input id="lt-start-${idx}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\\d{4}-\\d{2}-\\d{2}" autocomplete="off" value="${oneYearAgoStr()}" oninput="autoFormatDate(this); calcLongtermDebounced()" onchange="calcLongterm()">
         </div>
         <div class="field period-date-field">
           <label for="lt-total-${idx}">Antal uttagna tabletter</label>
@@ -1797,7 +1798,7 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
         </div>
         <div class="field period-date-field">
           <label for="lt-end-${idx}">Slutdatum</label>
-          <input id="lt-end-${idx}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" autocomplete="off" value="${todayStr()}" oninput="autoFormatDate(this); calcLongtermDebounced()" onchange="calcLongterm()">
+          <input id="lt-end-${idx}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\\d{4}-\\d{2}-\\d{2}" autocomplete="off" value="${todayStr()}" oninput="autoFormatDate(this); calcLongtermDebounced()" onchange="calcLongterm()">
         </div>
       </div>
       ${idx > 0 ? `<button class="btn btn-ghost" style="margin-top:4px; font-size:11px;" onclick="removePeriod(${idx})">✕ Ta bort period ${idx + 1}</button>` : ''}
