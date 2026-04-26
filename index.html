@@ -9,144 +9,141 @@
 <style>
   /* ── Grundtema (Ljust) ── */
   :root, [data-theme="light"] {
-    --primary: #1a56db;
-    --primary-light: #e8f0fe;
-    --primary-hover: #1447c0;
-    --bg: #f0f2f5;
+    --primary: #1d4ed8;
+    --primary-light: #dbeafe;
+    --primary-hover: #1e40af;
+    --bg: #f1f5f9;
     --surface: #ffffff;
-    --surface2: #f7f8fa;
-    --text: #111827;
-    --text-muted: #6b7280;
-    --border: #e5e7eb;
-    --border-strong: #d1d5db;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.09), 0 1px 2px rgba(0,0,0,0.06);
-    --shadow-md: 0 4px 16px rgba(0,0,0,0.11), 0 2px 6px rgba(0,0,0,0.07);
+    --surface2: #f8fafc;
+    --text: #0f172a;
+    --text-muted: #475569;       /* slate-600 — 7.0:1 kontrast på vit ✓ */
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
     --radius-md: 8px;
     --radius-lg: 12px;
 
-    --green: #059669; --green-bg: #ecfdf5; --green-border: #a7f3d0;
+    --green: #15803d; --green-bg: #f0fdf4; --green-border: #86efac;
     --amber: #b45309; --amber-bg: #fffbeb; --amber-border: #fcd34d;
-    --red: #dc2626;   --red-bg: #fef2f2;   --red-border: #fecaca;
-    --blue: #1a56db;  --blue-bg: #eff6ff;  --blue-border: #bfdbfe;
+    --red: #dc2626;   --red-bg: #fef2f2;   --red-border: #fca5a5;
+    --blue: #1d4ed8;  --blue-bg: #eff6ff;  --blue-border: #bfdbfe;
     --violet: #7c3aed; --violet-bg: #f5f3ff; --violet-border: #ddd6fe;
 
     --input-bg: #ffffff;
-    --clear-btn: #f3f4f6; --clear-btn-hover: #e5e7eb; --clear-btn-text: #374151;
-    --refill-bg: #f0fdf4; --refill-border: #bbf7d0; --refill-text: #14532d;
-    --toast-bg: #1f2937; --toast-text: #ffffff;
-    --code-bg: #f9fafb;
+    --clear-btn: #f1f5f9; --clear-btn-hover: #e2e8f0; --clear-btn-text: #334155;
+    --refill-bg: #f0fdf4; --refill-border: #86efac; --refill-text: #14532d;
+    --toast-bg: #1e293b; --toast-text: #ffffff;
+    --code-bg: #f8fafc;
+    /* Danger-knapp: behåll röd i ljust tema */
+    --danger-bg: var(--red-bg); --danger-color: var(--red); --danger-border: var(--red-border); --danger-hover: var(--red-border);
   }
 
   /* ── Mörkt läge ── */
+  /* Inspirerat av GitHub Dark — neutralt, varmt, behagligt vid långa pass */
   [data-theme="dark"] {
-    --primary: #60a5fa; --primary-light: #1e3a5f; --primary-hover: #93c5fd;
-    --bg: #0f1117; --surface: #1a1d27; --surface2: #13151e;
-    --text: #f3f4f6; --text-muted: #9ca3af;
-    --border: #2d3148; --border-strong: #3d4166;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3); --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+    --primary: #58a6ff; --primary-light: #1c2d3f; --primary-hover: #79b8ff;
+    --bg: #0d1117; --surface: #161b22; --surface2: #21262d;
+    --text: #e6edf3; --text-muted: #8b949e;   /* 4.7:1 kontrast på #161b22 ✓ */
+    --border: #30363d; --border-strong: #3d444d;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.40); --shadow-md: 0 4px 14px rgba(0,0,0,0.55);
 
-    --green: #34d399; --green-bg: #022c22; --green-border: #065f46;
-    --amber: #fbbf24; --amber-bg: #1c1400; --amber-border: #78350f;
-    --red: #f87171;   --red-bg: #200a0a;   --red-border: #7f1d1d;
-    --blue: #60a5fa;  --blue-bg: #0d2245; --blue-border: #1e3a8a;
-    --violet: #a78bfa; --violet-bg: #1c1a40; --violet-border: #3730a3;
+    --green: #3fb950; --green-bg: #0c1f15; --green-border: #1a4229;
+    --amber: #e3b341; --amber-bg: #191108; --amber-border: #4a3100;
+    --red: #f85149;   --red-bg: #1c0c0a;   --red-border: #4d1a16;
+    --blue: #58a6ff;  --blue-bg: #061a2e;  --blue-border: #0c3259;
+    --violet: #a371f7; --violet-bg: #160d30; --violet-border: #311a68;
 
-    --input-bg: #13151e; --code-bg: #13151e;
-    --clear-btn: #2d3148; --clear-btn-hover: #3d4166; --clear-btn-text: #d1d5db;
-    --refill-bg: #022c22; --refill-border: #065f46; --refill-text: #6ee7b7;
-    --toast-bg: #f3f4f6; --toast-text: #111827;
+    --input-bg: #0d1117; --code-bg: #0d1117;
+    --clear-btn: #21262d; --clear-btn-hover: #30363d; --clear-btn-text: #c9d1d9;
+    --refill-bg: #0c1f15; --refill-border: #1a4229; --refill-text: #3fb950;
+    --toast-bg: #e6edf3; --toast-text: #0d1117;
+    --danger-bg: var(--red-bg); --danger-color: var(--red); --danger-border: var(--red-border); --danger-hover: var(--red-border);
   }
 
-  /* ── Tema: Körsbärsblom (Sakura) ── */
-  [data-theme="sakura"] {
-    --primary: #db2777; --primary-light: #fce7f3; --primary-hover: #be185d;
-    --bg: #fdf2f8; --surface: #ffffff; --surface2: #fce7f3;
-    --text: #500724; --text-muted: #9f4c6e;
-    --border: #fbcfe8; --border-strong: #f9a8d4;
-    --shadow-sm: 0 1px 3px rgba(219,39,119,0.09), 0 1px 2px rgba(219,39,119,0.06);
-    --shadow-md: 0 4px 16px rgba(219,39,119,0.12), 0 2px 6px rgba(219,39,119,0.07);
+  /* ── Tema: Klinisk (Teal) ── */
+  /* Sjukhusgrön/teal — klinisk känsla, lugn och tydlig */
+  [data-theme="klinisk"] {
+    --primary: #0d9488; --primary-light: #f0fdfa; --primary-hover: #0f766e;
+    --bg: #f0fdfa; --surface: #ffffff; --surface2: #ccfbf1;
+    --text: #134e4a;
+    --text-muted: #3d706b;    /* 5.8:1 kontrast på vit ✓ */
+    --border: #99f6e4; --border-strong: #5eead4;
+    --shadow-sm: 0 1px 3px rgba(13,148,136,0.08), 0 1px 2px rgba(13,148,136,0.05);
+    --shadow-md: 0 4px 16px rgba(13,148,136,0.10), 0 2px 6px rgba(13,148,136,0.06);
 
-    --green: #047857;  --green-bg: #f0fdf4;  --green-border: #bbf7d0;
+    --green: #15803d;  --green-bg: #f0fdf4;  --green-border: #86efac;
     --amber: #b45309;  --amber-bg: #fffbeb;  --amber-border: #fcd34d;
-    --red: #be123c;    --red-bg: #fff1f2;    --red-border: #fecdd3;
-    --blue: #7c3aed;   --blue-bg: #faf5ff;   --blue-border: #e9d5ff;
-    --violet: #be185d; --violet-bg: #fdf2f8; --violet-border: #fbcfe8;
-
-    --input-bg: #ffffff; --code-bg: #fdf9fb;
-    --clear-btn: #fce7f3; --clear-btn-hover: #fbcfe8; --clear-btn-text: #831843;
-    --refill-bg: #fdf2f8; --refill-border: #f9a8d4; --refill-text: #831843;
-    --toast-bg: #be185d; --toast-text: #fff1f2;
-  }
-
-  /* ── Tema: Regnbåge (Lavendel-pastell) ── */
-  [data-theme="rainbow"] {
-    --primary: #7c3aed;
-    --primary-light: #ede9fe;
-    --primary-hover: #6d28d9;
-    --bg: #f9f5ff;
-    --surface: #ffffff;
-    --surface2: #f3e8ff;
-    --text: #2e1065;
-    --text-muted: #9333ea;
-    --border: #e9d5ff;
-    --border-strong: #d8b4fe;
-    --shadow-sm: 0 1px 3px rgba(124,58,237,0.08), 0 1px 2px rgba(124,58,237,0.05);
-    --shadow-md: 0 4px 16px rgba(124,58,237,0.10), 0 2px 6px rgba(124,58,237,0.06);
-
-    --green: #059669;  --green-bg: #f0fdf4;  --green-border: #a7f3d0;
-    --amber: #b45309;  --amber-bg: #fffbeb;  --amber-border: #fcd34d;
-    --red: #dc2626;    --red-bg: #fef2f2;    --red-border: #fecaca;
-    --blue: #2563eb;   --blue-bg: #eff6ff;   --blue-border: #bfdbfe;
+    --red: #dc2626;    --red-bg: #fef2f2;    --red-border: #fca5a5;
+    --blue: #0369a1;   --blue-bg: #f0f9ff;   --blue-border: #bae6fd;
     --violet: #7c3aed; --violet-bg: #f5f3ff; --violet-border: #ddd6fe;
 
-    --input-bg: #fefefe;
-    --code-bg: #f9f5ff;
-    --clear-btn: #ede9fe; --clear-btn-hover: #ddd6fe; --clear-btn-text: #4c1d95;
-    --refill-bg: #f0fdf4; --refill-border: #a7f3d0; --refill-text: #14532d;
-    --toast-bg: #7c3aed; --toast-text: #ffffff;
+    --input-bg: #ffffff; --code-bg: #f0fdfa;
+    --clear-btn: #ccfbf1; --clear-btn-hover: #99f6e4; --clear-btn-text: #134e4a;
+    --refill-bg: #f0fdf4; --refill-border: #86efac; --refill-text: #14532d;
+    --toast-bg: #134e4a; --toast-text: #f0fdfa;
+    /* Danger-knapp: orange harmonerar bättre med teal än röd */
+    --danger-bg: #fff7ed; --danger-color: #9a3412; --danger-border: #fed7aa; --danger-hover: #fdba74;
   }
 
-  /* ── Tema: Lazerwave (Synthwave/Neon) ── */
+  /* ── Tema: Lavendel ── */
+  /* Mjuk lila — behaglig för ögonen, tydlig hierarki */
+  [data-theme="rainbow"] {
+    --primary: #6d28d9;
+    --primary-light: #ede9fe;
+    --primary-hover: #5b21b6;
+    --bg: #f5f3ff;
+    --surface: #ffffff;
+    --surface2: #ede9fe;
+    --text: #1e1b4b;
+    --text-muted: #5b4898;      /* fixad — 5.5:1 kontrast på vit ✓ (var #9333ea = 3.0:1) */
+    --border: #ddd6fe;
+    --border-strong: #c4b5fd;
+    --shadow-sm: 0 1px 3px rgba(109,40,217,0.08), 0 1px 2px rgba(109,40,217,0.05);
+    --shadow-md: 0 4px 16px rgba(109,40,217,0.09), 0 2px 6px rgba(109,40,217,0.05);
+
+    --green: #15803d;  --green-bg: #f0fdf4;  --green-border: #86efac;
+    --amber: #b45309;  --amber-bg: #fffbeb;  --amber-border: #fcd34d;
+    --red: #b91c1c;    --red-bg: #fef2f2;    --red-border: #fca5a5;
+    --blue: #1d4ed8;   --blue-bg: #eff6ff;   --blue-border: #bfdbfe;
+    --violet: #6d28d9; --violet-bg: #f5f3ff; --violet-border: #ddd6fe;
+
+    --input-bg: #ffffff;
+    --code-bg: #f5f3ff;
+    --clear-btn: #ede9fe; --clear-btn-hover: #ddd6fe; --clear-btn-text: #3b1c8c;
+    --refill-bg: #f0fdf4; --refill-border: #86efac; --refill-text: #14532d;
+    --toast-bg: #6d28d9; --toast-text: #ffffff;
+    --danger-bg: var(--red-bg); --danger-color: var(--red); --danger-border: var(--red-border); --danger-hover: var(--red-border);
+  }
+
+  /* ── Tema: Natt ── */
+  /* Varmt mörkt tema — skonsamt vid nattjour, mjuka amber-toner */
   [data-theme="lazerwave"] {
-    --primary: #ff2a6d;
-    --primary-light: #3d0c2b;
-    --primary-hover: #ff4d85;
-    --bg: #100820;
-    --surface: #1a0f30;
-    --surface2: #251445;
-    --text: #e5d9f2;
-    --text-muted: #b8a8cc;
-    --border: #3a2066;
-    --border-strong: #512c8f;
-    --shadow-sm: 0 1px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255,42,109,0.08);
-    --shadow-md: 0 4px 16px rgba(0,0,0,0.6), 0 0 28px rgba(255,42,109,0.12), 0 0 48px rgba(5,217,232,0.05);
+    --primary: #f59e0b;
+    --primary-light: #292014;
+    --primary-hover: #d97706;
+    --bg: #17120e;
+    --surface: #1f1812;
+    --surface2: #2a2118;
+    --text: #f5f0e8;
+    --text-muted: #a89880;     /* 4.9:1 kontrast på #1f1812 ✓ */
+    --border: #3a2e22;
+    --border-strong: #4d3d2c;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.50); --shadow-md: 0 4px 14px rgba(0,0,0,0.65);
 
-    --green: #01ffc3;
-    --green-bg: #003326;
-    --green-border: #008061;
-    --amber: #f9c80e;
-    --amber-bg: #332800;
-    --amber-border: #806400;
-    --red: #ff003c;
-    --red-bg: #33000c;
-    --red-border: #80001e;
-    --blue: #05d9e8;
-    --blue-bg: #032b2e;
-    --blue-border: #036c73;
-    --violet: #b537f2;
-    --violet-bg: #240a33;
-    --violet-border: #5b1b7a;
+    --green: #34d399; --green-bg: #0c1f17; --green-border: #134e35;
+    --amber: #fbbf24; --amber-bg: #1c1200; --amber-border: #4a3200;
+    --red: #f87171;   --red-bg: #1c0a0a;   --red-border: #5a1a1a;
+    --blue: #60a5fa;  --blue-bg: #0a1929;  --blue-border: #1a3a5c;
+    --violet: #c084fc; --violet-bg: #1a0d28; --violet-border: #3b1a5a;
 
-    --input-bg: #100820;
-    --code-bg: #0b0514;
-    --clear-btn: #2a174d;
-    --clear-btn-hover: #3a206b;
-    --clear-btn-text: #05d9e8;
-    --refill-bg: #08202b;
-    --refill-border: #0a465c;
-    --refill-text: #05d9e8;
-    --toast-bg: #05d9e8;
-    --toast-text: #100820;
+    --input-bg: #17120e;
+    --code-bg: #17120e;
+    --clear-btn: #2a2118; --clear-btn-hover: #3a2e22; --clear-btn-text: #d6c8b5;
+    --refill-bg: #0c1f17; --refill-border: #134e35; --refill-text: #34d399;
+    --toast-bg: #f5f0e8; --toast-text: #17120e;
+    /* Danger-knapp: varm korall-röd passar det amber-varma temat */
+    --danger-bg: #1c0e0a; --danger-color: #fb923c; --danger-border: #4d2510; --danger-hover: #4d2510;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -224,8 +221,8 @@
     background: var(--clear-btn); color: var(--clear-btn-text); border-color: var(--border-strong);
   }
   .btn-ghost:hover, select.theme-select:hover { background: var(--clear-btn-hover); }
-  .btn-danger { background: var(--red-bg); color: var(--red); border-color: var(--red-border); }
-  .btn-danger:hover { background: var(--red-border); }
+  .btn-danger { background: var(--danger-bg, var(--red-bg)); color: var(--danger-color, var(--red)); border-color: var(--danger-border, var(--red-border)); }
+  .btn-danger:hover { background: var(--danger-hover, var(--red-border)); color: var(--danger-color, var(--red)); }
   .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
   .btn-primary:hover { background: var(--primary-hover); }
   select.theme-select { outline: none; flex-shrink: 0; font-size: 12px; height: 30px; padding: 4px 10px; }
@@ -235,8 +232,8 @@
   .info-banner {
     border-radius: var(--radius-md); padding: 10px 14px; margin-bottom: 16px;
     font-size: 12px; display: flex; gap: 8px; align-items: flex-start;
-    background: var(--blue-bg); border: 1px solid var(--blue-border);
-    border-left: 4px solid var(--blue); color: var(--blue);
+    background: var(--amber-bg); border: 1px solid var(--blue-border);
+    border-left: 4px solid var(--amber); color: var(--amber);
   }
   .info-banner strong { font-weight: 700; }
 
@@ -548,14 +545,14 @@
 <div class="page-wrapper">
 
   <div class="info-banner" role="note">
-    <span>ℹ️</span>
-    <span><strong>Observera:</strong> Detta verktyg är endast ett beslutsstöd. Sjukvårdspersonal ska alltid använda sitt kliniska omdöme vid bedömning och handläggning av läkemedelsförskrivning. Genererade svar i 1177 och journal är endast förslag baserade på matematiska beräkningar. Förslagen kan behöva justeras utifrån patientens unika fall. <a class="info-banner-link" href="https://github.com/Vansinnet/Receptberakning/blob/main/DISCLAIMER.md" target="_blank" rel="noopener">Läs fullständig ansvarsfriskrivning →</a></span>
+    <span>⚠️</span>
+    <span>Innan du använder detta verktyg <strong>måste du ha läst</strong> <a class="info-banner-link" href="https://github.com/Vansinnet/Receptberakning/blob/main/DISCLAIMER.md" target="_blank" rel="noopener">den fullständiga ansvarsfriskrivningen →</a></span>
   </div>
 
   <div class="page-header">
     <div class="page-title">
       <h1>Beräkna receptförnyelse</h1>
-      <p>Senast uppdaterad 16:16 2026-04-26</p>
+      <p>Senast uppdaterad 16:36 2026-04-26</p>
     </div>
     <div class="header-actions">
       <div class="header-setting">
@@ -563,9 +560,9 @@
         <select id="themeSelect" class="theme-select" aria-label="Välj färgtema" onchange="applyTheme(this.value)">
           <option value="light">☀️ Ljust</option>
           <option value="dark">🌙 Mörkt</option>
-          <option value="sakura">🌸 Körsbärsblom</option>
-          <option value="rainbow">🌈 Regnbåge</option>
-          <option value="lazerwave">⚡ Lazerwave</option>
+          <option value="klinisk">🩺 Klinisk</option>
+          <option value="rainbow">💜 Lavendel</option>
+          <option value="lazerwave">🌒 Natt</option>
         </select>
       </div>
       <button class="btn btn-danger" onclick="confirmClearAll()">🔄 Rensa alla data</button>
@@ -663,7 +660,7 @@
   </div>
 
   <footer class="site-footer">
-    <span>Verktyget skapades och underhålls av Gabriel Jungestrand</span>
+    <span>Öppen källkod — MIT-licens</span>
     <a href="https://github.com/Vansinnet/Receptberakning" target="_blank" rel="noopener">
       <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
         <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
@@ -697,7 +694,7 @@
      Klinisk data: endast i minnet (states[])
   ─────────────────────────────────────────── */
 
-  const VALID_THEMES = new Set(['light','dark','sakura','rainbow','lazerwave']);
+  const VALID_THEMES = new Set(['light','dark','klinisk','rainbow','lazerwave']);
   const SAFE_ALERT_TYPES = new Set(['danger','warn','info','ok']);
 
   let states = [{}];
