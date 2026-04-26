@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="sv" data-theme="rainbow"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<html lang="sv" data-theme="rainbow"><head>
+<meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors 'none';">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -107,10 +108,10 @@
 
   /* ── Tema: Lazerwave (Synthwave/Neon) ── */
   [data-theme="lazerwave"] {
-    --primary: #ff2a6d; 
+    --primary: #ff2a6d;
     --primary-light: #3d0c2b;
     --primary-hover: #ff4d85;
-    --bg: #100820; 
+    --bg: #100820;
     --surface: #1a0f30;
     --surface2: #251445;
     --text: #e5d9f2;
@@ -120,17 +121,17 @@
     --shadow-sm: 0 1px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255,42,109,0.08);
     --shadow-md: 0 4px 16px rgba(0,0,0,0.6), 0 0 28px rgba(255,42,109,0.12), 0 0 48px rgba(5,217,232,0.05);
 
-    --green: #01ffc3; 
-    --green-bg: #003326; 
+    --green: #01ffc3;
+    --green-bg: #003326;
     --green-border: #008061;
-    --amber: #f9c80e; 
-    --amber-bg: #332800; 
+    --amber: #f9c80e;
+    --amber-bg: #332800;
     --amber-border: #806400;
-    --red: #ff003c; 
-    --red-bg: #33000c;   
+    --red: #ff003c;
+    --red-bg: #33000c;
     --red-border: #80001e;
-    --blue: #05d9e8; 
-    --blue-bg: #032b2e;  
+    --blue: #05d9e8;
+    --blue-bg: #032b2e;
     --blue-border: #036c73;
     --violet: #b537f2;
     --violet-bg: #240a33;
@@ -138,13 +139,13 @@
 
     --input-bg: #100820;
     --code-bg: #0b0514;
-    --clear-btn: #2a174d; 
-    --clear-btn-hover: #3a206b; 
-    --clear-btn-text: #05d9e8; 
-    --refill-bg: #08202b; 
-    --refill-border: #0a465c; 
+    --clear-btn: #2a174d;
+    --clear-btn-hover: #3a206b;
+    --clear-btn-text: #05d9e8;
+    --refill-bg: #08202b;
+    --refill-border: #0a465c;
     --refill-text: #05d9e8;
-    --toast-bg: #05d9e8; 
+    --toast-bg: #05d9e8;
     --toast-text: #100820;
   }
 
@@ -209,36 +210,6 @@
   .header-setting-label {
     font-size: 11px; font-weight: 700; color: var(--text-muted);
     text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;
-  }
-
-  /* ── Tooltip ── */
-  .has-tooltip { position: relative; cursor: help; }
-  .has-tooltip::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--toast-bg);
-    color: var(--toast-text);
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: none;
-    letter-spacing: 0;
-    line-height: 1.5;
-    padding: 7px 11px;
-    border-radius: var(--radius-md);
-    white-space: nowrap;
-    box-shadow: var(--shadow-md);
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.15s, transform 0.15s;
-    transform: translateX(-50%) translateY(4px);
-    z-index: 100;
-  }
-  .has-tooltip:hover::after {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
   }
 
   /* ── Buttons & Selects ── */
@@ -312,16 +283,9 @@
   .card-status-dot.warn { background: var(--red);   box-shadow: 0 0 0 3px var(--red-bg); }
   .card-body { padding: 16px; }
 
-  /* ── Långvarig förbrukning — stort kort ── */
-  .longterm-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    overflow: hidden;
-    max-width: 680px;
-  }
-  .longterm-card .card-header { background: var(--surface2); }
+  /* ── Långvarig förbrukning — stort kort ──
+     Ärver basstil från .card; endast unika tillägg här. */
+  .longterm-card { max-width: 680px; }
   .longterm-card .card-num {
     background: var(--violet-bg, #f5f3ff);
     color: var(--violet, #7c3aed);
@@ -466,6 +430,8 @@
   /* ── Toasts & Modals ── */
   .toast { position: fixed; bottom: 20px; right: 20px; z-index: 9999; background: var(--toast-bg); color: var(--toast-text); padding: 14px 18px; border-radius: var(--radius-lg); box-shadow: 0 8px 24px rgba(0,0,0,0.25); font-size: 13px; max-width: 290px; display: none; }
   .toast.visible { display: block; }
+  .toast-title { font-weight: 700; margin-bottom: 4px; }
+  .toast-countdown { font-weight: 700; }
   .toast .btn { margin-top: 10px; width: 100%; justify-content: center; background: rgba(128,128,128,0.1); color: inherit; border-color: rgba(128,128,128,0.2); }
 
   .modal-overlay {
@@ -480,6 +446,27 @@
     max-width: 340px; width: 90%; box-shadow: var(--shadow-md);
     border: 1px solid var(--border);
   }
+
+  /* ── Hjälpklasser ── */
+  /* OBS: .is-hidden saknar !important — JS sätter style.display direkt när elementet ska visas */
+  .is-hidden { display: none; }
+  .row-inline-center { display: flex; align-items: center; }
+  .ml-auto { margin-left: auto; }
+
+  .btn-add-block { margin-top: 12px; width: 100%; max-width: 400px; }
+  .btn-add-period { margin-top: 8px; width: 100%; }
+  .btn-remove-inline { font-size: 11px; padding: 4px 10px; margin-left: 8px; }
+  .btn-remove-period { margin-top: 4px; font-size: 11px; }
+
+  .info-banner-spaced { margin-bottom: 16px; }
+  .info-banner-link { color: inherit; font-weight: 700; text-decoration: underline; }
+  .section-label-spaced { margin-top: 14px; }
+  .section-label-first { margin-top: 0; }
+
+  /* ── Modal-innehåll ── */
+  .modal-title { margin-bottom: 8px; }
+  .modal-text { margin-bottom: 16px; font-size: 13px; color: var(--text-muted); }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
 
   .site-footer { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 40px; font-size: 11px; color: var(--text-muted); opacity: 0.8; }
   .site-footer a { color: inherit; text-decoration: none; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 6px 10px; border-radius: var(--radius-md); background: var(--surface2); border: 1px solid var(--border); }
@@ -561,13 +548,13 @@
 
   <div class="info-banner" role="note">
     <span>ℹ️</span>
-    <span><strong>Observera:</strong> Detta verktyg är endast ett beslutsstöd. Sjukvårdspersonal ska alltid använda sitt kliniska omdöme vid bedömning och handläggning av läkemedelsförskrivning. Genererade svar i 1177 och journal är endast förslag baserade på matematiska beräkningar. Förslagen kan behöva justeras utifrån patientens unika fall. <a href="https://github.com/Vansinnet/Receptberakning/blob/main/DISCLAIMER.md" target="_blank" rel="noopener" style="color:inherit;font-weight:700;text-decoration:underline;">Läs fullständig ansvarsfriskrivning →</a></span>
+    <span><strong>Observera:</strong> Detta verktyg är endast ett beslutsstöd. Sjukvårdspersonal ska alltid använda sitt kliniska omdöme vid bedömning och handläggning av läkemedelsförskrivning. Genererade svar i 1177 och journal är endast förslag baserade på matematiska beräkningar. Förslagen kan behöva justeras utifrån patientens unika fall. <a class="info-banner-link" href="https://github.com/Vansinnet/Receptberakning/blob/main/DISCLAIMER.md" target="_blank" rel="noopener">Läs fullständig ansvarsfriskrivning →</a></span>
   </div>
 
   <div class="page-header">
     <div class="page-title">
       <h1>Beräkna receptförnyelse</h1>
-      <p>Senast uppdaterad 10:38 2026-04-26</p>
+      <p>Senast uppdaterad 11:09 2026-04-26</p>
     </div>
     <div class="header-actions">
       <div class="header-setting">
@@ -590,90 +577,14 @@
   </div>
 
   <div id="panel-renew" class="tab-panel active">
-    <div class="summary-bar" id="summaryBar" aria-label="Statusöversikt"><div class="summary-card">
-            <div class="summary-dot ok" id="sumDot0"></div>
-            <div class="summary-info">
-              <div class="label">Läkemedel 1</div>
-              <div class="value ok" id="sumVal0">OK — t.o.m 2026-02-15</div>
-            </div>
-          </div></div>
-
-    <div class="cards-grid" id="cardsGrid">
-      <div class="card card-horizontal" id="card0">
-        <div class="card-header">
-          <div class="card-header-left">
-            <div class="card-num">1</div>
-            <span class="card-title">Läkemedel 1</span>
-          </div>
-          <div style="display:flex;align-items:center;">
-            <div class="card-status-dot ok" id="dot0"></div>
-            
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="card-form-col">
-            <div class="field">
-              <label for="med0">Läkemedel och styrka</label>
-              <input id="med0" type="text" placeholder="T.ex. Elvanse 50 mg" autocomplete="off">
-            </div>
-            <div class="form-row">
-              <div class="field">
-                <label for="date0">Senaste recept</label>
-                <input id="date0" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" autocomplete="off" value="2026-04-24" oninput="autoFormatDate(this)">
-              </div>
-              <div class="field">
-                <label for="dose0">Antal per dag</label>
-                <input id="dose0" type="text" inputmode="decimal" placeholder="T.ex. 1.5">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="field">
-                <label for="amt0">Mängd per uttag (st)</label>
-                <input id="amt0" type="number" placeholder="100" min="1" step="1">
-              </div>
-              <div class="field">
-                <label for="ref0">Antal uttag (heltal)</label>
-                <input id="ref0" type="number" placeholder="4" min="1" max="12" step="1">
-              </div>
-            </div>
-            <div class="field field-optional">
-              <label for="left0">Doser kvar <span class="optional-tag">valfritt</span></label>
-              <input id="left0" type="number" placeholder="Lämna tomt om medicinen är slut" min="0" step="1">
-              <span class="field-hint">Anges om patienten har kvarvarande doser — ger exakt snittberäkning</span>
-            </div>
-            <div class="action-row">
-              <a class="btn fass-link btn-ghost" id="fassBtn0" href="https://www.fass.se/LIF/result?query=Elvanse%2050%20mg&amp;userType=2" target="_blank" rel="noopener" style="display: inline-flex;">📘 FASS</a>
-              <button class="btn btn-ghost" onclick="clearCard(0)" style="margin-left:auto;">Rensa</button>
-            </div>
-          </div>
-          <div class="card-result-col">
-            <div class="card-result-empty" id="resPh0" style="display: none;">Fyll i formuläret för att se beräkning</div>
-            <div class="result-panel" id="res0" aria-live="polite" style="display: block;">
-              <div class="result-grid" id="resGrid0"><span class="rk">Totalt antal doser</span><span class="rv">90 st</span><span class="rk">Borde räcka i</span><span class="rv">90 dagar</span><span class="rk">Borde räcka t.o.m</span><span class="rv">2026-02-15</span><hr class="divider"><span class="rk">Doser kvar idag</span><span class="rv">0 st <span class="badge badge-ok">Tog slut för 68 dagar sedan</span></span><span class="rk">Snittförbrukning</span><span class="rv">0.57 st/dag (28.5 mg/dag)</span></div>
-              <div id="alerts0"><div class="alert alert-warn"><strong>⚠️ Låg förbrukning</strong> Snittförbrukning 0.57 st/dag är 43.0% under ordinerad dos (1 st/dag). Patienten verkar inte ta medicinen som ordinerat — överväg uppföljningssamtal.</div></div>
-              <div class="copy-section" id="copySection0" style="display: block;">
-                <div class="copy-tabs">
-                  <button class="copy-tab active" onclick="switchTab(0,'patient')">📝 Svar till patient</button>
-                  <button class="copy-tab" onclick="switchTab(0,'journal')">🏥 Journalanteckning</button>
-                </div>
-                <div class="copy-body" id="copyBody0">Hej,
-
-Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt recept inom 2-3 arbetsdagar. Du kan därefter hämta ut din medicin på valfritt apotek.</div>
-                <div class="copy-footer">
-                  <button class="btn btn-ghost" onclick="copyText(0)">📋 Kopiera text</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div></div>
-    <button class="btn btn-ghost" style="margin-top:12px; width:100%; max-width:400px;" onclick="addMedCard()">＋ Lägg till läkemedel</button>
-
+    <!-- summary-bar och cards-grid byggs av buildCards() vid sidladdning -->
+    <div class="summary-bar" id="summaryBar" aria-label="Statusöversikt"></div>
+    <div class="cards-grid" id="cardsGrid"></div>
+    <button class="btn btn-ghost btn-add-block" onclick="addMedCard()">＋ Lägg till läkemedel</button>
   </div>
 
   <div id="panel-longterm" class="tab-panel">
-
-    <div class="info-banner" role="note" style="margin-bottom:16px;">
+    <div class="info-banner info-banner-spaced" role="note">
       <span>📊</span>
       <span>Beräknar förbrukningsmönster över flera receptperioder. Ange en eller flera perioder med startdatum, antal uttagna tabletter och ordinerad dos för att se om förbrukningen över tid är konsekvent.</span>
     </div>
@@ -681,7 +592,7 @@ Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt rec
     <div class="longterm-card card">
       <div class="card-header">
         <div class="card-header-left">
-          <div class="card-num" style="background:var(--violet-bg,#f5f3ff);color:var(--violet,#7c3aed);">📊</div>
+          <div class="card-num">📊</div>
           <span class="card-title">Långvarig förbrukningsanalys</span>
         </div>
       </div>
@@ -699,38 +610,22 @@ Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt rec
         </div>
 
         <div class="section-label">Receptperioder</div>
-        <div id="lt-periods-container"><div id="lt-period-wrap-0">
-      <div class="section-label" style="margin-top:0;">Period 1</div>
-      <div class="form-row-3 period-form-row" id="lt-period-0">
-        <div class="field period-date-field">
-          <label for="lt-start-0">Startdatum</label>
-          <input id="lt-start-0" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" autocomplete="off" oninput="autoFormatDate(this); calcLongtermDebounced()" onchange="calcLongterm()">
-        </div>
-        <div class="field period-date-field">
-          <label for="lt-total-0">Antal uttagna tabletter</label>
-          <input id="lt-total-0" type="number" placeholder="100" min="1" oninput="calcLongtermDebounced()">
-        </div>
-        <div class="field period-date-field">
-          <label for="lt-end-0">Slutdatum</label>
-          <input id="lt-end-0" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" autocomplete="off" value="2026-04-24" oninput="autoFormatDate(this); calcLongtermDebounced()" onchange="calcLongterm()" class="input-error" aria-invalid="true">
-        </div>
-      </div>
-      
-    </div></div>
+        <!-- Periodfälten byggs av buildPeriodContainer() vid sidladdning -->
+        <div id="lt-periods-container"></div>
 
-        <button class="btn btn-ghost" style="margin-top:8px; width:100%;" onclick="addPeriod()">＋ Lägg till period</button>
+        <button class="btn btn-ghost btn-add-period" onclick="addPeriod()">＋ Lägg till period</button>
 
         <div class="action-row">
-          <a class="btn fass-link btn-ghost" id="lt-fassBtn" href="https://receptberakning.pages.dev/#" target="_blank" rel="noopener" style="display:none;">📘 FASS</a>
-          <button class="btn btn-ghost" onclick="clearLongterm()" style="margin-left:auto;">Rensa</button>
+          <a class="btn fass-link btn-ghost is-hidden" id="lt-fassBtn" href="#" target="_blank" rel="noopener">📘 FASS</a>
+          <button class="btn btn-ghost ml-auto" onclick="clearLongterm()">Rensa</button>
         </div>
 
-        <div class="result-panel" id="lt-result" aria-live="polite" style="display: none;">
+        <div class="result-panel is-hidden" id="lt-result" aria-live="polite">
           <div class="result-grid" id="lt-resGrid"></div>
           <div id="lt-alerts"></div>
 
-          <div id="lt-bar-section" style="display:none;">
-            <div class="section-label" style="margin-top:14px;">Förbrukning relativt ordination</div>
+          <div class="is-hidden" id="lt-bar-section">
+            <div class="section-label section-label-spaced">Förbrukning relativt ordination</div>
             <div class="consumption-bar-wrap">
               <div class="consumption-bar" id="lt-bar"></div>
             </div>
@@ -739,7 +634,7 @@ Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt rec
             </div>
           </div>
 
-          <div id="lt-period-table-section" style="display:none; margin-top:14px;">
+          <div class="is-hidden section-label-spaced" id="lt-period-table-section">
             <div class="section-label">Förbrukning per period</div>
             <div class="period-list">
               <div class="period-list-header">
@@ -785,9 +680,9 @@ Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt rec
 
 <div class="modal-overlay" id="clearModal">
   <div class="modal-content">
-    <h3 style="margin-bottom: 8px;">⚠️ Rensa data?</h3>
-    <p style="margin-bottom: 16px; font-size: 13px; color: var(--text-muted);">Är du säker på att du vill rensa all inmatad patientdata? Detta kan inte ångras.</p>
-    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+    <h3 class="modal-title">⚠️ Rensa data?</h3>
+    <p class="modal-text">Är du säker på att du vill rensa all inmatad patientdata? Detta kan inte ångras.</p>
+    <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeClearModal()">Avbryt</button>
       <button class="btn btn-danger" onclick="executeClearAll()">Rensa data</button>
     </div>
@@ -795,11 +690,11 @@ Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt rec
 </div>
 
 <script>
-  /* ════════════════════════════════════════════
+  /* ────────────────────────────────────────────
      STORAGE POLICY (GDPR)
      localStorage: endast 'theme'
      Klinisk data: endast i minnet (states[])
-  ════════════════════════════════════════════ */
+  ─────────────────────────────────────────── */
 
   const VALID_THEMES = new Set(['light','dark','sakura','rainbow','lazerwave']);
   const SAFE_ALERT_TYPES = new Set(['danger','warn','info','ok']);
@@ -821,9 +716,10 @@ Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt rec
   }
 
   const calcDebounced = [];
-  // FIX #3: Förbättrad ensureDebounce - förhindra race conditions genom guard
+  // Säkerställ att debounce-funktionen är initialiserad för kort-index i.
+  // Guard mot race conditions: returnera direkt om redan initialiserad.
   function ensureDebounce(i) {
-    if (calcDebounced[i]) return; // Guard: om redan initialiserad, returnera direkt
+    if (calcDebounced[i]) return;
     while (calcDebounced.length <= i) {
       const idx = calcDebounced.length;
       calcDebounced.push(debounce(() => calc(idx), 120));
@@ -904,7 +800,7 @@ Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt rec
     const sumVal = getEl('sumVal' + i);
     const dot = getEl('dot' + i);
     if (sumDot) sumDot.className = 'summary-dot' + (isMuted ? '' : ' ' + statusClass);
-    if (sumVal) { sumVal.className = 'value ' + statusClass; sumVal.textContent = text; } 
+    if (sumVal) { sumVal.className = 'value ' + statusClass; sumVal.textContent = text; }
     if (dot) dot.className = 'card-status-dot' + (isMuted ? '' : ' ' + statusClass);
   }
 
@@ -944,15 +840,7 @@ Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt rec
   }
 
   function getFassUrl(medRaw) {
-    // FIX #1 & #7: Använd hela medicinernamnet och encode det korrekt för URL
     return `https://www.fass.se/LIF/result?query=${encodeURIComponent(medRaw.trim())}&userType=2`;
-  }
-
-  // FIX #7: Hjälpfunktion för XSS-skydd vid dynamisk HTML-inmatning
-  function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
   }
 
   function buildResultRow(frag, label, valueText, badgeNode = null) {
@@ -973,7 +861,6 @@ Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt rec
     if (rg) rg.textContent = '';
     if (al) al.textContent = '';
     showEl('copySection' + i, false);
-
   }
 
   /* ────────────────────────────────────────────
@@ -1020,7 +907,7 @@ Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt rec
 
       countdownInt = setInterval(() => {
         s--;
-        if (toastCount) toastCount.textContent = String(s); 
+        if (toastCount) toastCount.textContent = String(s);
         if (s <= 0) clearInterval(countdownInt);
       }, 1000);
     }, 14 * 60 * 1000);
@@ -1040,8 +927,8 @@ Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt rec
     document.documentElement.setAttribute('data-theme', safeTheme);
     const selectBox = getEl('themeSelect');
     if (selectBox) selectBox.value = safeTheme;
-    
-    // FIX #14: Säker localStorage-lagring med error-handling
+
+    // Säker localStorage-lagring (kan vara blockerat i privat läge / vissa policys)
     try {
       localStorage.setItem('theme', safeTheme);
     } catch (e) {
@@ -1049,13 +936,12 @@ Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt rec
     }
   }
 
-
   /* ────────────────────────────────────────────
      FLIK 1: RECEPTFÖRNYELSE
   ─────────────────────────────────────────── */
   function cardTemplate(i) {
     const removeBtnHtml = i > 0
-      ? `<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;margin-left:8px;" onclick="removeMedCard(${i})">✕ Ta bort</button>`
+      ? `<button class="btn btn-ghost btn-remove-inline" onclick="removeMedCard(${i})">✕ Ta bort</button>`
       : '';
     return `
       <div class="card card-horizontal" id="card${i}">
@@ -1064,7 +950,7 @@ Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt rec
             <div class="card-num">${i + 1}</div>
             <span class="card-title">Läkemedel ${i + 1}</span>
           </div>
-          <div style="display:flex;align-items:center;">
+          <div class="row-inline-center">
             <div class="card-status-dot" id="dot${i}"></div>
             ${removeBtnHtml}
           </div>
@@ -1102,7 +988,7 @@ Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt rec
             </div>
             <div class="action-row">
               <a class="btn fass-link btn-ghost" id="fassBtn${i}" href="#" target="_blank" rel="noopener">📘 FASS</a>
-              <button class="btn btn-ghost" onclick="clearCard(${i})" style="margin-left:auto;">Rensa</button>
+              <button class="btn btn-ghost ml-auto" onclick="clearCard(${i})">Rensa</button>
             </div>
           </div>
           <div class="card-result-col">
@@ -1225,7 +1111,7 @@ Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt rec
   let _suppressDistribute = false;
   function generateAndDistribute() {
     if (_suppressDistribute) return;
-const validCount = states.filter(s => s.valid).length;
+    const validCount = states.filter(s => s.valid).length;
     if (validCount === 0) {
       // Rensa alla korts copy-rutor
       for (let i = 0; i < medCardCount; i++) {
@@ -1385,8 +1271,7 @@ const validCount = states.filter(s => s.valid).length;
     });
     const dateEl = getEl('date' + i);
     if (dateEl) { dateEl.value = todayStr(); toggleError(dateEl, false); }
-    const res = getEl('res' + i);
-    if (res) res.style.display = 'none';
+    showEl('res' + i, false);
     showEl('fassBtn' + i, false);
     showEl('resPh' + i, true, 'flex');
     resetResultPanel(i);
@@ -1432,13 +1317,13 @@ const validCount = states.filter(s => s.valid).length;
 
     const amtRaw = amtEl.value;
     const amt = parseInt(amtRaw, 10);
-    // FIX #13: Validera antal doser (max 10000 är rimligt)
+    // Övre gräns 10000 — sanity check mot tryckfel
     const amtIsInvalid = amtRaw !== '' && (isNaN(amt) || amt <= 0 || amt > 10000 || !Number.isInteger(Number(amtRaw)));
     toggleError(amtEl, amtIsInvalid);
 
     const doseRaw = doseEl.value;
     const dose = parseFloat(doseRaw.replace(',','.'));
-    // FIX #13: Sätt mer realistisk gräns för dos (max 50 st/dag är mycket högt)
+    // Övre gräns 50 st/dag — extremt högt men teoretiskt möjligt; sanity check mot tryckfel
     const doseIsInvalid = doseRaw !== '' && (isNaN(dose) || dose < 0.1 || dose > 50);
     toggleError(doseEl, doseIsInvalid);
 
@@ -1460,7 +1345,7 @@ const validCount = states.filter(s => s.valid).length;
     toggleError(dateEl, dateIsInvalid);
     if (!pDate) return { valid: false, reason: 'invalid_date' };
 
-    // FIX #4: Validera att datum inte är i framtiden (sanity check)
+    // Sanity check: datum får inte vara i framtiden
     const today = getToday();
     if (pDate > today) {
       toggleError(dateEl, true);
@@ -1609,7 +1494,6 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
 
     showEl('copySection' + i, true);
     switchTab(i, 'patient');
-
   }
 
   function showResult(i, show) {
@@ -1703,9 +1587,9 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
         const clampedBatches   = Math.min(minBatchesNeeded, inputData.ref);
         calcBase = clampedBatches * inputData.amt;
       } else {
-        // Nar remaining ar angivet vet vi exakt hur manga som forbrukats: total - remaining.
-        // Anvand total (alla forskrivna doser) som bas — inte accessibleTotal som ignorerar
-        // hur manga uttag patienten faktiskt gjort.
+        // När remaining är angivet vet vi exakt hur många som förbrukats: total − remaining.
+        // Använd total (alla förskrivna doser) som bas — inte accessibleTotal, som ignorerar
+        // hur många uttag patienten faktiskt gjort.
         calcBase = total;
       }
       const consumed = calcBase - remaining;
@@ -1782,7 +1666,7 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
     const fassBtn = getEl('fassBtn' + i);
     if (fassBtn) {
       fassBtn.href = getFassUrl(inputData.medRaw);
-      fassBtn.style.display = 'inline-flex';
+      showEl('fassBtn' + i, true, 'inline-flex');
     }
     showResult(i, true);
   }
@@ -1792,8 +1676,9 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
   ─────────────────────────────────────────── */
 
   function periodRowTemplate(idx) {
+    const labelClass = idx === 0 ? 'section-label section-label-first' : 'section-label';
     return `
-      <div class="section-label" style="margin-top:${idx === 0 ? '0' : '12px'};">Period ${idx + 1}</div>
+      <div class="${labelClass}">Period ${idx + 1}</div>
       <div class="form-row-3 period-form-row" id="lt-period-${idx}">
         <div class="field period-date-field">
           <label for="lt-start-${idx}">Startdatum</label>
@@ -1808,7 +1693,7 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
           <input id="lt-end-${idx}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\\d{4}-\\d{2}-\\d{2}" autocomplete="off" value="${todayStr()}" oninput="autoFormatDate(this); calcLongtermDebounced()" onchange="calcLongterm()">
         </div>
       </div>
-      ${idx > 0 ? `<button class="btn btn-ghost" style="margin-top:4px; font-size:11px;" onclick="removePeriod(${idx})">✕ Ta bort period ${idx + 1}</button>` : ''}
+      ${idx > 0 ? `<button class="btn btn-ghost btn-remove-period" onclick="removePeriod(${idx})">✕ Ta bort period ${idx + 1}</button>` : ''}
     `;
   }
 
@@ -1872,10 +1757,10 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
     // Grundvalidering av intervall innan Date.UTC — förhindrar tyst overflow
     // (t.ex. månad 13 → januari nästa år, dag 31 i feb → mars)
     if (isNaN(y) || isNaN(m) || isNaN(day) || m < 1 || m > 12 || day < 1 || day > 31) return null;
-    
-    // FIX #15: Verifiera att året är inom rimligt intervall (1950-2100)
+
+    // Året måste ligga inom rimligt klinisk-relevant intervall
     if (y < 1950 || y > 2100) return null;
-    
+
     const d = new Date(Date.UTC(y, m - 1, day));
     if (isNaN(d.getTime())) return null;
     // Kontrollera att ingen overflow skett (t.ex. 31 feb → 3 mars)
@@ -1889,13 +1774,13 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
     ltPeriodCount = 1;
     buildPeriodContainer();
 
-    const res = getEl('lt-result'); if (res) res.style.display = 'none';
     const alerts = getEl('lt-alerts'); if (alerts) alerts.textContent = '';
-    const grid = getEl('lt-resGrid'); if (grid) grid.textContent = '';
-    const rows = getEl('lt-period-rows'); if (rows) rows.textContent = '';
-    const copy = getEl('lt-copySection'); if (copy) copy.style.display = 'none';
-    const fass = getEl('lt-fassBtn'); if (fass) fass.style.display = 'none';
+    const grid   = getEl('lt-resGrid'); if (grid)   grid.textContent = '';
+    const rows   = getEl('lt-period-rows'); if (rows) rows.textContent = '';
 
+    showEl('lt-result', false);
+    showEl('lt-copySection', false);
+    showEl('lt-fassBtn', false);
     showEl('lt-bar-section', false);
     showEl('lt-period-table-section', false);
   }
@@ -1910,7 +1795,7 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
     const medRaw = medEl.value.trim();
     const doseRaw = doseEl.value;
     const ordDose = parseFloat(doseRaw.replace(',', '.'));
-    // FIX #13: Sätt gränsvärden för ordinerad dos
+    // Sanity check: ordinerad dos inom rimligt intervall (0.1–50 st/dag)
     const doseIsInvalid = doseRaw !== '' && (isNaN(ordDose) || ordDose < 0.1 || ordDose > 50);
     toggleError(doseEl, doseIsInvalid);
 
@@ -1936,12 +1821,12 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
 
       if (startDate && endDate && !isNaN(totalVal) && totalVal > 0 && startDate < endDate) {
         const days = getDaysDiff(endDate, startDate);
-        // FIX #12: Verifiera att dagen inte är 0
+        // Skydd mot division med noll
         if (days === 0) {
           console.warn(`Period ${i} har 0 dagar (samma start och slutdatum) - ignoreras`);
           continue;
         }
-        // FIX #16: Verifiera att perioden inte är större än 50 år (vilket är orimligt)
+        // Sanity check: ingen period bör vara längre än 50 år
         if (days > 365 * 50) {
           console.warn(`Period ${i} är större än 50 år - ignoreras`);
           continue;
@@ -1951,16 +1836,15 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
       }
     }
 
-    const ltRes = getEl('lt-result');
     if (!medRaw || doseIsInvalid || isNaN(ordDose) || periods.length === 0) {
-      if (ltRes) ltRes.style.display = 'none';
+      showEl('lt-result', false);
       return;
     }
 
-    if (ltRes) ltRes.style.display = 'block';
+    showEl('lt-result', true);
     const ltAlerts = getEl('lt-alerts'); if (ltAlerts) ltAlerts.textContent = '';
 
-    // FIX #9 (omplacerad): Overlap-varning måste renderas EFTER att ltAlerts rensats,
+    // OBS: Overlap-varningen måste renderas EFTER att ltAlerts rensats,
     // annars raderas varningen direkt av textContent='' ovan.
     if (periods.length > 1) {
       for (let i = 0; i < periods.length - 1; i++) {
@@ -1974,15 +1858,15 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
 
     const totalTablets = periods.reduce((s, p) => s + p.total, 0);
     const totalDays    = periods.reduce((s, p) => s + p.days, 0);
-    
-    // FIX #11: Division by zero - verifiera att totalDays inte är 0
+
+    // Skydd mot division med noll
     if (totalDays === 0) {
-      renderAlert('lt-alerts', 'warn', '⚠️ Ogiltiga perioder', 
+      renderAlert('lt-alerts', 'warn', '⚠️ Ogiltiga perioder',
         'Totala analyslängden är 0 dagar. Säkerställ att minst en period täcker ett helt dygn.');
-      if (ltRes) ltRes.style.display = 'none';
+      showEl('lt-result', false);
       return;
     }
-    
+
     const overallAvg   = totalTablets / totalDays;
     const consumptionPct = (overallAvg / ordDose) * 100;
 
@@ -2082,7 +1966,7 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
       const ltFassBtn = getEl('lt-fassBtn');
       if (ltFassBtn) {
         ltFassBtn.href = getFassUrl(medRaw);
-        ltFassBtn.style.display = 'inline-flex';
+        showEl('lt-fassBtn', true, 'inline-flex');
       }
     }
 
@@ -2105,11 +1989,10 @@ Bedömning: ${alertTitle.replace(/^\S+\s+/, '')} — ${alertMsg}`;
 
     const copyBody = getEl('lt-copyBody');
     if (copyBody) copyBody.textContent = journalText;
-    const copySection = getEl('lt-copySection');
-    if (copySection) copySection.style.display = 'block';
+    showEl('lt-copySection', true);
   }
 
-  // FIX #10: Använd Map för att spara timer-referenser per knapp (undviker globala race conditions)
+  // Map med timer-referenser per knapp — undviker race conditions vid snabba klick
   const ltCopyTimers = new Map();
   function copyLtText() {
     const body = getEl('lt-copyBody');
@@ -2135,8 +2018,8 @@ Bedömning: ${alertTitle.replace(/^\S+\s+/, '')} — ${alertMsg}`;
      Initiering
   ─────────────────────────────────────────── */
   buildCards();
-  
-  // FIX #8: Hantera localStorage-fel (privat läge, etc)
+
+  // Hämta sparat tema; fallback till standard om localStorage är blockerat (privat läge etc)
   try {
     const savedTheme = localStorage.getItem('theme') || 'rainbow';
     applyTheme(savedTheme);
@@ -2191,8 +2074,6 @@ Bedömning: ${alertTitle.replace(/^\S+\s+/, '')} — ${alertMsg}`;
   if (ltStart0 && !ltStart0.value) ltStart0.value = oneYearAgoStr();
 
   resetTimer();
-
-
 </script>
 
-</body></html>
+</body></html>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
