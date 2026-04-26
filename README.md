@@ -110,5 +110,3 @@ Ladda upp `index.html` till valfri statisk webbserver, t.ex. GitHub Pages eller 
 MIT — fri att använda, modifiera och distribuera.
 
 ---
-
-*Skapad och underhållen av Gabriel Jungestrand.*
