@@ -35,6 +35,21 @@ För varje utfall genereras direkt ett färdigt **svar till patient via 1177** o
 - Samlat 1177-svar och journalanteckning för alla läkemedel genereras automatiskt
 - Kopieringsknapp för snabb inklistring i journalsystem
 
+### 🌐 Svar till patient på engelska
+
+- Knapp för att översätta patientmeddelandet till engelska med ett knapptryck
+- Fungerar **helt offline** — färdiga engelska mallar är inbyggda, inga externa anrop
+- Täcker alla tre utfall (OK att förnya, för tidigt, överförbrukning) samt flerdrugsscenarier
+- Kopieringsknappen kopierar alltid den version som visas (svenska eller engelska)
+
+### 🔒 Varning för narkotikaklassade preparat
+
+- Automatisk kontroll mot inbyggd lista över narkotikaklassade substanser i Sverige (LVFS 2011:10)
+- Diskret varningsbadge visas direkt under läkemedelsfältet om preparatet är narkotikaklassat
+- Täcker opioider, bensodiazepiner, Z-läkemedel, centralstimulantia, pregabalin, ketamin m.fl.
+- Datumstämpel i koden anger när listan senast stämdes av mot tillgängliga preparat på svenska marknaden
+- Kräver ingen nätverksuppkoppling
+
 ### 📊 Långvarig förbrukning
 
 - Analys av förbrukningsmönster över **flera receptperioder**
