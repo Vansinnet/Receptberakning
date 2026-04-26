@@ -556,7 +556,7 @@
   <div class="page-header">
     <div class="page-title">
       <h1>Beräkna receptförnyelse</h1>
-      <p>Senast uppdaterad 23:09 2026-04-26</p>
+      <p>Senast uppdaterad 23:26 2026-04-26</p>
     </div>
     <div class="header-actions">
       <div class="header-setting">
@@ -1075,7 +1075,7 @@
                 <div class="copy-body" id="copyBody${i}"></div>
                 <div class="copy-footer">
                   <button class="btn btn-ghost" id="langBtn${i}" style="display:none" onclick="togglePatientLang(${i})">🌐 English</button>
-                  <button class="btn btn-ghost" onclick="copyText(${i})">📋 Kopiera text</button>
+                  <button class="btn btn-ghost" id="copyBtn${i}" onclick="copyText(${i})">📋 Kopiera text</button>
                 </div>
               </div>
             </div>
@@ -1387,7 +1387,7 @@
     const body = getEl('copyBody' + i);
     const text = body ? body.textContent : '';
     navigator.clipboard.writeText(text).then(() => {
-      const btn = document.querySelector(`#card${i} .copy-footer .btn`);
+      const btn = getEl('copyBtn' + i);
       if (!btn) return;
       const orig = btn.dataset.origLabel || btn.textContent;
       btn.dataset.origLabel = orig;
@@ -2162,11 +2162,11 @@ Bedömning: ${alertTitle.replace(/^\S+\s+/, '')} — ${alertMsg}`;
 
   // Hämta sparat tema; fallback till standard om localStorage är blockerat (privat läge etc)
   try {
-    const savedTheme = localStorage.getItem('theme') || 'rainbow';
+    const savedTheme = localStorage.getItem('theme') || 'klinisk';
     applyTheme(savedTheme);
   } catch (e) {
     console.warn('localStorage inte tillgängligt, använder standardtema');
-    applyTheme('rainbow');
+    applyTheme('klinisk');
   }
 
   ltPeriodCount = 1;
