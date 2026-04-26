@@ -567,7 +567,7 @@
   <div class="page-header">
     <div class="page-title">
       <h1>Beräkna receptförnyelse</h1>
-      <p>Senast uppdaterad 00:34 2026-04-26</p>
+      <p>Senast uppdaterad 10:23 2026-04-26</p>
     </div>
     <div class="header-actions">
       <div class="header-setting">
@@ -1722,11 +1722,12 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
       endDate       = new Date(today);
       endDate.setUTCDate(today.getUTCDate() + daysRemaining);
     } else {
-      // Worst-case: antar att alla hittills tillgängliga tabletter är förbrukade
+      // Antar att alla uttag är hämtade och förbrukade när kvarvarande doser inte anges.
+      // Patienten hör av sig för förnyelse — rimligt antagande är full förbrukning av total.
       endDate = new Date(inputData.pDate);
       endDate.setUTCDate(endDate.getUTCDate() + Math.round(totalDays));
       daysRemaining = getDaysDiff(endDate, today);
-      avgNum        = accessibleTotal / daysSince;
+      avgNum        = total / daysSince;
     }
 
     // Överkonsumtion: snitt >10 % över ordinerad dos (tolerans för naturlig variation)
