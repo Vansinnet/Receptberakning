@@ -410,6 +410,7 @@
   .badge-ok   { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
   .badge-over { background: var(--red-bg);   color: var(--red);   border-color: var(--red-border); }
   .badge-under{ background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
+  .narc-badge { display: block; margin-top: 5px; margin-left: 0; }
 
   .alert { padding: 10px 12px; border-left: 3px solid; border-radius: 0 var(--radius-md) var(--radius-md) 0; font-size: 12px; line-height: 1.6; margin-top: 8px; }
   .alert strong { font-weight: 700; display: block; margin-bottom: 2px; }
@@ -554,7 +555,7 @@
   <div class="page-header">
     <div class="page-title">
       <h1>Beräkna receptförnyelse</h1>
-      <p>Senast uppdaterad 11:28 2026-04-26</p>
+      <p>Senast uppdaterad 16:16 2026-04-26</p>
     </div>
     <div class="header-actions">
       <div class="header-setting">
@@ -843,6 +844,75 @@
     return `https://www.fass.se/LIF/result?query=${encodeURIComponent(medRaw.trim())}&userType=2`;
   }
 
+  // ── Narkotikaklassade läkemedel (LVFS 2011:10 med ändringar) ──────────────
+  // Senast kontrollerad mot Läkemedelsverkets förteckningar: 2026-04-26
+  const NARCOTICS_LIST_DATE = '2026-04-26';
+  const NARCOTICS = [
+    // Opioider
+    'morfin','dolcontin','depolan','mst continus',
+    'oxikodon','oxycodon','oxycontin','oxynorm','targiniq','zomestine','reltebon',
+    'kodein','citodon','panocod','kodipront',
+    'fentanyl','durogesic','matrifen','instanyl','abstral','pecfent','breakyl','recivit','vellofent',
+    'buprenorfin','buprenorphine','temgesic','norspan','subutex','suboxone','buvidal','espranor','sublocade',
+    'metadon','methadone',
+    'tramadol','tiparol','tradolan',
+    'hydromorfon','hydromorphone','palladon',
+    'tapentadol','palexia',
+    'ketobemidon','ketogan',
+    'petidin','pethidine',
+    'alfentanil','rapifen',
+    'sufentanil','sufenta','dzuveo',
+    'remifentanil','ultiva',
+    'dihydrokodein',
+    // Bensodiazepiner
+    'diazepam','stesolid','valium','apozepam',
+    'alprazolam','xanax','xanor',
+    'klonazepam','clonazepam','rivotril','iktorivil',
+    'lorazepam','temesta',
+    'oxazepam','oxascand','sobril',
+    'nitrazepam','mogadon','apodorm',
+    'flunitrazepam','rohypnol',
+    'temazepam','normison',
+    'midazolam','dormicum','buccolam','epistatus',
+    'triazolam','halcion',
+    'klorazepat','tranxilium',
+    'bromazepam','lexotan',
+    // Z-läkemedel
+    'zolpidem','stilnoct','zolpinox',
+    'zopiklon','imovane','zoplida',
+    'zaleplon','sonata',
+    // Centralstimulantia
+    'metylfenidat','methylphenidate','ritalin','concerta','medikinet','equasym','rubifen','inspiral','kinecteen',
+    'lisdexamfetamin','lisdexamphetamine','elvanse','vyvanse',
+    'amfetamin','amphetamine','attentin',
+    'dexamfetamin','dexamphetamine','dexedrin',
+    'modafinil','modiodal',
+    // Gabapentinoider — OBS: endast pregabalin är narkotikaklassat i Sverige (LVFS, gällande fr.o.m. 2018-07-24)
+    // Gabapentin är INTE narkotikaklassat i Sverige (trots klassificering i UK och vissa US-stater)
+    'pregabalin','lyrica','brigatox',
+    // Ketamin
+    'ketamin','ketamine','ketalar',
+    // GHB / natriumoxybat
+    'natriumoxybat','xyrem',
+    // Cannabis-baserat
+    'nabilon','cesamet',
+    'dronabinol','marinol',
+    'sativex','nabiximols',
+    // Barbiturater
+    'fenobarbital','phenobarbital','fenemal',
+    'pentobarbital',
+    'amobarbital',
+  ];
+
+  function checkNarcotic(i) {
+    const medEl = getEl('med' + i);
+    const badge = getEl('narcBadge' + i);
+    if (!medEl || !badge) return;
+    const val = medEl.value.toLowerCase();
+    const hit = val.length >= 3 && NARCOTICS.some(n => val.includes(n));
+    badge.style.display = hit ? 'block' : 'none';
+  }
+
   function buildResultRow(frag, label, valueText, badgeNode = null) {
     const rk = document.createElement('span'); rk.className = 'rk'; rk.textContent = label;
     const rv = document.createElement('span'); rv.className = 'rv'; rv.textContent = valueText;
@@ -959,7 +1029,8 @@
           <div class="card-form-col">
             <div class="field">
               <label for="med${i}">Läkemedel och styrka</label>
-              <input id="med${i}" type="text" placeholder="T.ex. Elvanse 50 mg" autocomplete="off">
+              <input id="med${i}" type="text" placeholder="T.ex. Elvanse 50 mg" autocomplete="off" oninput="checkNarcotic(${i})">
+              <span id="narcBadge${i}" class="badge badge-warn narc-badge" style="display:none" title="Narkotikaklassat preparat (LVFS 2011:10). Listan kontrollerades senast ${NARCOTICS_LIST_DATE}.">🔒 Narkotikaklassat</span>
             </div>
             <div class="form-row">
               <div class="field">
@@ -1004,6 +1075,7 @@
                 </div>
                 <div class="copy-body" id="copyBody${i}"></div>
                 <div class="copy-footer">
+                  <button class="btn btn-ghost" id="langBtn${i}" style="display:none" onclick="togglePatientLang(${i})">🌐 English</button>
                   <button class="btn btn-ghost" onclick="copyText(${i})">📋 Kopiera text</button>
                 </div>
               </div>
@@ -1065,6 +1137,7 @@
       const amtEl  = getEl('amt'  + i); if (amtEl)  amtEl.value  = v.amt;
       const refEl  = getEl('ref'  + i); if (refEl)  refEl.value  = v.ref;
       const leftEl = getEl('left' + i); if (leftEl) leftEl.value = v.left;
+      checkNarcotic(i);
       if (v.med || v.dose || v.amt || v.ref) calc(i);
     });
   }
@@ -1089,7 +1162,7 @@
     vals.splice(idx, 1);
     states.splice(idx, 1);
     // Rensa cached texter på alla kvarvarande states så gammal text inte återanvänds
-    states.forEach(s => { s.patientText = ''; s.journalText = ''; });
+    states.forEach(s => { s.patientText = ''; s.patientTextEn = ''; s.patientLang = 'sv'; s.journalText = ''; });
     medCardCount--;
     buildCards();
     _suppressDistribute = true;
@@ -1103,8 +1176,33 @@
     const tabs = document.querySelectorAll(`#card${i} .copy-tab`);
     if (tabs[0]) tabs[0].classList.toggle('active', tab === 'patient');
     if (tabs[1]) tabs[1].classList.toggle('active', tab === 'journal');
-    const body = getEl('copyBody' + i);
-    if (body) body.textContent = tab === 'patient' ? (states[i].patientText || '') : (states[i].journalText || '');
+    const body    = getEl('copyBody' + i);
+    const langBtn = getEl('langBtn' + i);
+    if (tab === 'patient') {
+      const isEn = states[i].patientLang === 'en';
+      if (body) body.textContent = isEn
+        ? (states[i].patientTextEn || states[i].patientText || '')
+        : (states[i].patientText || '');
+      if (langBtn) {
+        langBtn.style.display = 'inline-flex';
+        langBtn.textContent = isEn ? '🇸🇪 Svenska' : '🌐 English';
+      }
+    } else {
+      if (body) body.textContent = states[i].journalText || '';
+      if (langBtn) langBtn.style.display = 'none';
+    }
+  }
+
+  function togglePatientLang(i) {
+    if (!states[i].patientTextEn) return;
+    states[i].patientLang = states[i].patientLang === 'en' ? 'sv' : 'en';
+    const isEn    = states[i].patientLang === 'en';
+    const body    = getEl('copyBody' + i);
+    const langBtn = getEl('langBtn' + i);
+    if (body) body.textContent = isEn
+      ? (states[i].patientTextEn || '')
+      : (states[i].patientText || '');
+    if (langBtn) langBtn.textContent = isEn ? '🇸🇪 Svenska' : '🌐 English';
   }
 
   // ── Samlat svar — skrivs till alla korts copy-sektioner ──
@@ -1135,7 +1233,7 @@
       else                   toRenew.push({ name, i });
     }
 
-    // ── 1177-text ──
+    // ── 1177-text (svenska) ──
     let patLines = ['Hej,', ''];
     if (validCount === 1) {
       // Ett läkemedel: bygg texten direkt utan läkemedelsprefixer
@@ -1170,6 +1268,41 @@
       patLines.push('Vid frågor är du välkommen att kontakta oss via 1177.');
     }
     const patientText = patLines.join('\n');
+
+    // ── 1177-text (engelska, offline-översättning) ──
+    let patLinesEn = ['Hello,', ''];
+    if (validCount === 1) {
+      if (toRenew.length === 1) {
+        patLinesEn.push(`We have received your request for ${toRenew[0].name} and will renew your prescription within 2–3 working days. You can then collect your medication at any pharmacy.`);
+      } else if (tooEarly.length === 1) {
+        const s = states[tooEarly[0].i];
+        patLinesEn.push(`We have received your prescription renewal request for ${tooEarly[0].name}. According to your prescription (${s.dose} tablets/day), your medication is estimated to last until ${s.endDateStr}. Since that date has not yet passed, we are unable to renew your prescription at this time. Please contact us again around ${s.renewDateStr} and we will help you with a new prescription then.`);
+        patLinesEn.push('');
+        patLinesEn.push('If you have any questions, please contact us through 1177.');
+      } else if (overuse.length === 1) {
+        const s = states[overuse[0].i];
+        patLinesEn.push(`We have received your prescription renewal request for ${overuse[0].name}. According to your prescription (${s.dose} tablets/day), your medication is estimated to last until ${s.prescribedEndDateStr}. Since that date has not yet passed, we are unable to renew your prescription at this time. Please contact us again closer to ${s.prescribedContactDateStr} and we will assist you then.`);
+        patLinesEn.push('');
+        patLinesEn.push('If you have any questions, please contact us through 1177.');
+      }
+    } else {
+      patLinesEn.push('We have received your prescription renewal request for the following medications:');
+      patLinesEn.push('');
+      toRenew.forEach(({ name }) => {
+        patLinesEn.push(`${name}: We will renew your prescription within 2–3 working days. You can then collect your medication at any pharmacy.`);
+      });
+      tooEarly.forEach(({ name, i }) => {
+        const s = states[i];
+        patLinesEn.push(`${name}: Your medication is estimated to last until ${s.endDateStr}. Please contact us again around ${s.renewDateStr} and we will help you with a new prescription then.`);
+      });
+      overuse.forEach(({ name, i }) => {
+        const s = states[i];
+        patLinesEn.push(`${name}: Your medication is estimated to last until ${s.prescribedEndDateStr}. Since that date has not yet passed, we are unable to renew your prescription at this time. Please contact us again closer to ${s.prescribedContactDateStr} and we will assist you then.`);
+      });
+      patLinesEn.push('');
+      patLinesEn.push('If you have any questions, please contact us through 1177.');
+    }
+    const patientTextEn = patLinesEn.join('\n');
 
     // ── Journaltext ──
     let jLines = [];
@@ -1235,9 +1368,16 @@
     // Skriv till alla giltiga korts copy-sektioner
     for (let i = 0; i < medCardCount; i++) {
       if (!states[i].valid) continue;
-      states[i].patientText = patientText;
-      states[i].journalText = journalText;
-      const body = getEl('copyBody' + i);
+      states[i].patientText   = patientText;
+      states[i].patientTextEn = patientTextEn;
+      states[i].patientLang   = 'sv';
+      states[i].journalText   = journalText;
+      const body    = getEl('copyBody' + i);
+      const langBtn = getEl('langBtn' + i);
+      if (langBtn && states[i].activeTab !== 'journal') {
+        langBtn.style.display = 'inline-flex';
+        langBtn.textContent   = '🌐 English';
+      }
       if (body) body.textContent = states[i].activeTab === 'journal' ? journalText : patientText;
     }
   }
@@ -1277,7 +1417,7 @@
     resetResultPanel(i);
     setStatus(i, 'muted', 'Ej ifyllt');
     states[i] = {};
-    states.forEach(s => { s.patientText = ''; s.journalText = ''; });
+    states.forEach(s => { s.patientText = ''; s.patientTextEn = ''; s.patientLang = 'sv'; s.journalText = ''; });
     generateAndDistribute();
   }
 
@@ -1512,8 +1652,10 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
     if (!inputData.valid) {
       showResult(i, false);
       resetResultPanel(i);
-      states[i].patientText = '';
-      states[i].journalText = '';
+      states[i].patientText   = '';
+      states[i].patientTextEn = '';
+      states[i].patientLang   = 'sv';
+      states[i].journalText   = '';
       generateAndDistribute();
 
       if (inputData.reason === 'too_many_refs') {
