@@ -556,7 +556,7 @@
   <div class="page-header">
     <div class="page-title">
       <h1>Beräkna receptförnyelse</h1>
-      <p>Senast uppdaterad 23:26 2026-04-26</p>
+      <p>Senast uppdaterad 20:47 2026-04-27</p>
     </div>
     <div class="header-actions">
       <div class="header-setting">
@@ -1981,6 +1981,10 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
       showEl('lt-result', false);
       return;
     }
+
+    // Sortera perioder kronologiskt oavsett inmatningsordning,
+    // så att överlappskontroll och tabellrendering alltid är korrekta.
+    periods.sort((a, b) => a.startDate - b.startDate);
 
     showEl('lt-result', true);
     const ltAlerts = getEl('lt-alerts'); if (ltAlerts) ltAlerts.textContent = '';
