@@ -556,7 +556,7 @@
   <div class="page-header">
     <div class="page-title">
       <h1>Beräkna receptförnyelse</h1>
-      <p>Senast uppdaterad 20:58 2026-04-27</p>
+      <p>Senast uppdaterad 21:10 2026-04-27</p>
     </div>
     <div class="header-actions">
       <div class="header-setting">
@@ -622,6 +622,7 @@
 
         <div class="result-panel is-hidden" id="lt-result" aria-live="polite">
           <div class="result-grid" id="lt-resGrid"></div>
+          <div id="lt-overlap-alert"></div>
           <div id="lt-alerts"></div>
 
           <div class="is-hidden" id="lt-bar-section">
@@ -812,7 +813,9 @@
 
   function oneYearAgoStr() {
     const n = new Date();
-    return `${n.getUTCFullYear()-1}-${String(n.getUTCMonth()+1).padStart(2,'0')}-${String(n.getUTCDate()).padStart(2,'0')}`;
+    // Använd Date.UTC för korrekt hantering av skottdagar (t.ex. 29 feb → 1 mars föregående år)
+    const d = new Date(Date.UTC(n.getUTCFullYear() - 1, n.getUTCMonth(), n.getUTCDate()));
+    return fmtDate(d);
   }
 
   function fmtDate(d) {
@@ -1917,8 +1920,9 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
     ltPeriodCount = 1;
     buildPeriodContainer();
 
-    const alerts = getEl('lt-alerts'); if (alerts) alerts.textContent = '';
-    const grid   = getEl('lt-resGrid'); if (grid)   grid.textContent = '';
+    const alerts  = getEl('lt-alerts');        if (alerts)  alerts.textContent = '';
+    const overlap = getEl('lt-overlap-alert'); if (overlap) overlap.textContent = '';
+    const grid    = getEl('lt-resGrid');       if (grid)    grid.textContent = '';
     const rows   = getEl('lt-period-rows'); if (rows) rows.textContent = '';
 
     showEl('lt-result', false);
@@ -1990,13 +1994,13 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
 
     showEl('lt-result', true);
     const ltAlerts = getEl('lt-alerts'); if (ltAlerts) ltAlerts.textContent = '';
+    const ltOverlap = getEl('lt-overlap-alert'); if (ltOverlap) ltOverlap.textContent = '';
 
-    // OBS: Overlap-varningen måste renderas EFTER att ltAlerts rensats,
-    // annars raderas varningen direkt av textContent='' ovan.
+    // Överlappningsvarning renderas i egen div så att den inte skrivs över av huvudresultatet.
     if (periods.length > 1) {
       for (let i = 0; i < periods.length - 1; i++) {
         if (periods[i].endDate > periods[i + 1].startDate) {
-          renderAlert('lt-alerts', 'warn', '⚠️ Överlappande perioder',
+          renderAlert('lt-overlap-alert', 'warn', '⚠️ Överlappande perioder',
             'Tidsperioderna överlappar varandra. Se till att alla perioder är disjunkta för korrekt beräkning.');
           break;
         }
@@ -2226,6 +2230,15 @@ Bedömning: ${alertTitle.replace(/^\S+\s+/, '')} — ${alertMsg}`;
   // pagehide täcker bfcache-scenariot där sidan fryses istället för att laddas om.
   window.addEventListener('pagehide', () => {
     states = states.map(() => ({}));
+  });
+
+  // Vid återkomst från bfcache (pageshow med persisted=true) kan DOM:en visa gammal data
+  // medan states är rensat. Återberäkna alla kort så att UI och state är i synk.
+  window.addEventListener('pageshow', e => {
+    if (!e.persisted) return;
+    _todayCache = null;
+    for (let i = 0; i < medCardCount; i++) calc(i);
+    if (ltPeriodCount > 0) calcLongterm();
   });
 </script>
 
