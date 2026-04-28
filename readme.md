@@ -6,7 +6,7 @@
 
 ---
 
-> **Observera:** Detta verktyg är endast ett beslutsstöd. Sjukvårdspersonal ska alltid använda sitt kliniska omdöme. Genererade texter är förslag baserade på matematiska beräkningar och kan behöva justeras utifrån patientens unika situation.
+> **Observera:** Detta verktyg är endast ett beslutsstöd. Verktyget genererar ett underlag — **det kliniska ställningstagandet fattas alltid av läkaren**, oavsett vad beräkningen visar. Genererade patient- och journaltexter är förslag som kan behöva justeras utifrån patientens unika situation.
 
 ---
 
