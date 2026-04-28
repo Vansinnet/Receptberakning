@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="sv" data-theme="klinisk"><head>
+<html lang="sv" data-theme="klinisk">
+<head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors 'none';">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Receptberäkning – Verktyg för läkare | Receptförnyelse &amp; läkemedelsdosering</title>
 <meta name="description" content="Digitalt hjälpmedel för läkare vid receptförnyelse och läkemedelsberäkning. Beräkna dosering, förpackningsstorlek och antal uttag snabbt och korrekt.">
@@ -10,16 +10,11 @@
 <meta name="author" content="Vansinnet">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://receptberakning.pages.dev/">
-
-<!-- Open Graph (visas när länken delas i sociala medier / Messenger etc.) -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="Receptberäkning – Verktyg för läkare">
 <meta property="og:description" content="Digitalt hjälpmedel för läkare vid receptförnyelse och läkemedelsberäkning. Beräkna dosering, förpackningsstorlek och antal uttag snabbt och korrekt.">
 <meta property="og:url" content="https://receptberakning.pages.dev/">
 <meta property="og:locale" content="sv_SE">
-
-<!-- Strukturerad data – hjälper Google förstå vad sidan är -->
-<!-- type="application/ld+json" är ett datablock, inte exekverbart skript — undantaget från script-src -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -29,154 +24,288 @@
   "url": "https://receptberakning.pages.dev/",
   "applicationCategory": "MedicalApplication",
   "inLanguage": "sv",
-  "author": {
-    "@type": "Organization",
-    "name": "Vansinnet"
-  },
-  "audience": {
-    "@type": "Audience",
-    "audienceType": "Läkare, förskrivare"
-  }
+  "author": { "@type": "Organization", "name": "Vansinnet" },
+  "audience": { "@type": "Audience", "audienceType": "Läkare, förskrivare" }
 }
 </script>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=&#39;http://www.w3.org/2000/svg&#39; viewBox=&#39;0 0 64 64&#39;%3E%3Crect width=&#39;64&#39; height=&#39;64&#39; rx=&#39;14&#39; fill=&#39;%231a56db&#39;/%3E%3Crect x=&#39;28&#39; y=&#39;10&#39; width=&#39;8&#39; height=&#39;44&#39; rx=&#39;4&#39; fill=&#39;white&#39;/%3E%3Crect x=&#39;10&#39; y=&#39;28&#39; width=&#39;44&#39; height=&#39;8&#39; rx=&#39;4&#39; fill=&#39;white&#39;/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231a56db'/%3E%3Crect x='28' y='10' width='8' height='44' rx='4' fill='white'/%3E%3Crect x='10' y='28' width='44' height='8' rx='4' fill='white'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="app.css">
 </head>
 
 <body>
-<div class="page-wrapper">
 
-  <div class="info-banner" role="note">
-    <span>⚠️</span>
-    <span>Innan du använder detta verktyg <strong>måste du ha läst</strong> <a class="info-banner-link" href="https://github.com/Vansinnet/Receptberakning/blob/main/DISCLAIMER.md" target="_blank" rel="noopener">den fullständiga ansvarsfriskrivningen →</a></span>
-  </div>
+<!-- ── APP SHELL ── -->
+<div class="app-shell">
 
-  <div class="page-header">
-    <div class="page-title">
-      <h1>Beräkna receptförnyelse</h1>
-      <p>Senast uppdaterad 2026-04-28</p>
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="app-brand">
+        <span class="app-brand-icon">＋</span>
+        <span class="app-brand-name">Receptberäkning</span>
+        <span class="app-brand-date">uppdaterad 2026-04-28</span>
+      </div>
+      <nav class="main-tabs" role="tablist">
+        <button class="main-tab active" role="tab" aria-selected="true" data-tab="renew">💊 Receptförnyelse</button>
+        <button class="main-tab" role="tab" aria-selected="false" data-tab="longterm">📊 Långvarig förbrukning</button>
+      </nav>
     </div>
-    <div class="header-actions">
-      <div class="header-setting">
-        <span class="header-setting-label">Tema</span>
+    <div class="topbar-right">
+      <div class="topbar-setting">
+        <label for="themeSelect" class="topbar-setting-label">Tema</label>
         <select id="themeSelect" class="theme-select" aria-label="Välj färgtema">
           <option value="dark">🌙 Mörkt</option>
           <option value="klinisk">🩺 Klinisk</option>
           <option value="lazerwave">🌒 Natt</option>
         </select>
       </div>
-      <button id="clearAllBtn" class="btn btn-danger">🔄 Rensa alla data</button>
+      <button id="clearAllBtn" class="btn btn-danger">🔄 Rensa</button>
     </div>
   </div>
 
-  <div class="main-tabs" role="tablist">
-    <button class="main-tab active" role="tab" aria-selected="true" data-tab="renew">💊 Receptförnyelse</button>
-    <button class="main-tab" role="tab" aria-selected="false" data-tab="longterm">📊 Långvarig förbrukning</button>
+  <!-- DISCLAIMER BANNER -->
+  <div class="disclaimer-banner" role="note">
+    <span class="disclaimer-icon">⚠️</span>
+    <span>Läs <a class="disclaimer-link" href="https://github.com/Vansinnet/Receptberakning/blob/main/DISCLAIMER.md" target="_blank" rel="noopener">ansvarsfriskrivningen</a> innan användning</span>
   </div>
 
+  <!-- ── FLIK: RECEPTFÖRNYELSE ── -->
   <div id="panel-renew" class="tab-panel active">
-    <!-- summary-bar och cards-grid byggs av buildCards() vid sidladdning -->
-    <div class="summary-bar" id="summaryBar" aria-label="Statusöversikt"></div>
-    <div class="cards-grid" id="cardsGrid"></div>
-    <button id="addMedBtn" class="btn btn-ghost btn-add-block">＋ Lägg till läkemedel</button>
-  </div>
+    <div class="renew-layout">
 
-  <div id="panel-longterm" class="tab-panel">
-    <div class="info-banner info-banner-spaced" role="note">
-      <span>📊</span>
-      <span>Beräknar förbrukningsmönster över flera receptperioder. Ange en eller flera perioder med startdatum, antal uttagna tabletter och ordinerad dos för att se om förbrukningen över tid är konsekvent.</span>
-    </div>
-
-    <div class="longterm-card card">
-      <div class="card-header">
-        <div class="card-header-left">
-          <div class="card-num">📊</div>
-          <span class="card-title">Långvarig förbrukningsanalys</span>
+      <!-- VÄNSTER: LÄKEMEDELSLISTA -->
+      <aside class="med-sidebar" aria-label="Läkemedelslista">
+        <div class="sidebar-header">
+          <span class="sidebar-label">Läkemedel</span>
         </div>
-      </div>
+        <div class="med-list" id="medList" role="list"></div>
+        <button id="addMedBtn" class="btn-add-med" aria-label="Lägg till läkemedel">
+          <span>＋</span> Lägg till
+        </button>
+      </aside>
 
-      <div class="card-body">
-        <div class="form-row">
-          <div class="field">
-            <label for="lt-med">Läkemedel och styrka</label>
-            <input id="lt-med" type="text" placeholder="T.ex. Elvanse 50 mg" maxlength="200" autocomplete="off">
-          </div>
-          <div class="field">
-            <label for="lt-dose">Ordinerad dos (st/dag)</label>
-            <input id="lt-dose" type="text" inputmode="decimal" placeholder="T.ex. 1" maxlength="10" autocomplete="off">
-          </div>
+      <!-- MITTEN: FORMULÄR -->
+      <section class="form-panel" id="formPanel" aria-label="Receptformulär">
+        <!-- Byggs dynamiskt av JS per valt läkemedel -->
+        <div class="form-empty-state" id="formEmptyState">
+          <div class="empty-icon">💊</div>
+          <div>Välj ett läkemedel i listan</div>
         </div>
-
-        <div class="section-label">Receptperioder</div>
-        <!-- Periodfälten byggs av buildPeriodContainer() vid sidladdning -->
-        <div id="lt-periods-container"></div>
-
-        <button id="addPeriodBtn" class="btn btn-ghost btn-add-period">＋ Lägg till period</button>
-
-        <div class="action-row">
-          <a class="btn fass-link btn-ghost is-hidden" id="lt-fassBtn" href="#" target="_blank" rel="noopener">📘 FASS</a>
-          <button id="clearLongtermBtn" class="btn btn-ghost ml-auto">Rensa</button>
-        </div>
-
-        <div class="result-panel is-hidden" id="lt-result" aria-live="polite">
-          <div class="result-grid" id="lt-resGrid"></div>
-          <div id="lt-overlap-alert"></div>
-          <div id="lt-alerts"></div>
-
-          <div class="is-hidden" id="lt-bar-section">
-            <div class="section-label section-label-spaced">Förbrukning relativt ordination</div>
-            <div class="consumption-bar-wrap">
-              <div class="consumption-bar" id="lt-bar"></div>
+        <div id="formContent" class="is-hidden">
+          <div class="form-panel-header">
+            <div>
+              <div class="form-med-name" id="formMedName">—</div>
+              <span id="narcBadge" class="badge badge-warn narc-badge is-hidden" data-tooltip="Narkotikaklassat läkemedel (LVFS 2011:10). Förteckning II–V anger klass. Kräver kontroll av förbrukningshastighet och adekvat dokumentation."> </span>
             </div>
-            <div class="bar-ticks">
-              <span>0%</span><span>50%</span><span>100% (ordinerat)</span><span>150%</span>
+            <div class="form-panel-actions">
+              <a class="btn btn-ghost fass-link is-hidden" id="fassBtnForm" href="#" target="_blank" rel="noopener" data-tooltip="Öppnar FASS produktresumé för detta läkemedel i ny flik.">📘 FASS</a>
+              <button class="btn btn-ghost" id="clearCardBtn">Rensa</button>
             </div>
           </div>
 
-          <div class="is-hidden section-label-spaced" id="lt-period-table-section">
-            <div class="section-label">Förbrukning per period</div>
-            <div class="period-list">
-              <div class="period-list-header">
-                <span>Period</span>
-                <span class="ph-avg">Snitt st/dag</span>
-                <span>Avvikelse</span>
-                <span>Status</span>
+          <div class="field">
+            <label for="medInput" data-tooltip="Ange läkemedelsnamn och styrka exakt som på receptet, t.ex. 'Elvanse 50 mg'. Styr narkotikaklassning och FASS-sökning.">Läkemedel och styrka</label>
+            <input id="medInput" type="text" placeholder="T.ex. Elvanse 50 mg" maxlength="100" autocomplete="off">
+          </div>
+
+          <div class="field">
+            <label for="dateInput" data-tooltip="Förskrivningsdatum för det senaste receptet. Används som startpunkt för receptperiodberäkningen.">Senaste recept</label>
+            <input id="dateInput" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" maxlength="10" autocomplete="off">
+          </div>
+
+          <div class="form-row-2">
+            <div class="field">
+              <label for="doseInput" data-tooltip="Patientens ordinerade dygnsdos i antal tabletter/kapslar. Referensvärde för bedömning av förbrukningshastighet.">Dos per dag</label>
+              <input id="doseInput" type="text" inputmode="decimal" placeholder="T.ex. 1" maxlength="10">
+            </div>
+            <div class="field">
+              <label for="amtInput" data-tooltip="Antal tabletter eller kapslar per uthämtning (expediering). Totalt förskrivet = mängd per uttag × antal uttag.">Mängd per uttag (st)</label>
+              <input id="amtInput" type="number" placeholder="100" min="1" step="1">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="refInput" data-tooltip="Antal tillåtna uthämtningar på receptet. Totalt förskrivet = mängd per uttag × antal uttag. Max 12 uttag stöds.">Antal uttag</label>
+            <input id="refInput" type="number" placeholder="T.ex. 3" min="1" max="12" step="1">
+          </div>
+
+          <div class="field field-optional">
+            <label for="leftInput" data-tooltip="Patientens egna uppgifter om kvarvarande doser. Ger exaktare beräkning av faktisk förbrukning jämfört med enbart receptdatum. Lämna tomt om medicinen är slut.">Doser kvar <span class="optional-tag">valfritt</span></label>
+            <input id="leftInput" type="number" placeholder="Lämna tomt om medicinen är slut" min="0" step="1">
+            <span class="field-hint">Ger exakt snittberäkning om patienten har kvarvarande doser</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- HÖGER: RESULTAT -->
+      <section class="result-panel" id="resultPanel" aria-label="Beräkningsresultat" aria-live="polite">
+        <div class="result-empty-state" id="resultEmptyState">
+          <div class="empty-icon">📋</div>
+          <div>Resultatet visas här</div>
+        </div>
+        <div id="resultContent" class="is-hidden result-content">
+          <!-- Verdict -->
+          <div class="verdict" id="verdictBox">
+            <div class="verdict-icon" id="verdictIcon"></div>
+            <div class="verdict-text">
+              <div class="verdict-title" id="verdictTitle">—</div>
+              <div class="verdict-sub" id="verdictSub"></div>
+            </div>
+          </div>
+
+          <!-- Tidslinje -->
+          <div class="tl-wrap" id="tlWrap">
+            <div class="tl-label" data-tooltip="Visar hur stor andel av receptperioden som förflutit sedan förskrivningsdatumet. Det vertikala strecket markerar dagens datum.">Receptperiod</div>
+            <div class="tl-bar-bg">
+              <div class="tl-fill" id="tlFill" style="width:0%">
+                <div class="tl-today-marker"></div>
               </div>
-              <div id="lt-period-rows"></div>
+            </div>
+            <div class="tl-labels">
+              <span id="tlStart">—</span>
+              <span class="tl-today-label">Idag</span>
+              <span id="tlEnd">—</span>
             </div>
           </div>
 
-          <div class="copy-section" id="lt-copySection">
-            <div class="copy-tabs">
-              <button class="copy-tab active">🏥 Journalanteckning (förslag)</button>
-            </div>
-            <div class="copy-body" id="lt-copyBody"></div>
-            <div class="copy-footer">
-              <button id="ltCopyBtn" class="btn btn-ghost">📋 Kopiera text</button>
+          <!-- Mätvärden -->
+          <div class="metrics" id="metricsGrid"></div>
+
+          <!-- Alerts -->
+          <div id="resultAlerts"></div>
+
+          <!-- Beslutsfråga: för tidig förnyelse -->
+          <div id="earlyDecisionBox" class="early-decision-box is-hidden">
+            <div class="early-decision-q">Mot bakgrund av ovanstående — bedömer du att receptet ska förnyas?</div>
+            <div class="early-decision-actions">
+              <button id="earlyDecisionYes" class="btn early-btn early-btn-yes">✓ Ja, förnya</button>
+              <button id="earlyDecisionNo"  class="btn early-btn early-btn-no">✕ Nej, avslå</button>
             </div>
           </div>
+
+          <!-- Copy-sektion -->
+          <div class="copy-section" id="copySection">
+            <div class="copy-tabs-row">
+              <button class="copy-tab active" data-tab="patient">Svar till patient (förslag)</button>
+              <button class="copy-tab" data-tab="journal">Journalanteckning (förslag)</button>
+            </div>
+            <div class="copy-body" id="copyBodyResult"></div>
+            <div class="copy-footer">
+              <button class="btn btn-ghost is-hidden" id="langBtnResult">🌐 English</button>
+              <button class="btn btn-ghost" id="copyBtnResult">📋 Kopiera text</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ── FLIK: LÅNGVARIG FÖRBRUKNING ── -->
+  <div id="panel-longterm" class="tab-panel">
+    <div class="longterm-layout">
+      <div class="longterm-card card">
+
+        <div class="card-header">
+          <div class="card-header-left">
+            <div class="card-num" style="background:var(--violet-bg);color:var(--violet)">📊</div>
+            <span class="card-title">Långvarig förbrukningsanalys</span>
+          </div>
+        </div>
+
+        <div class="longterm-body">
+
+          <!-- VÄNSTER: indata -->
+          <div class="longterm-form-col">
+            <div class="info-banner-lt" role="note">
+              Beräknar förbrukningsmönster över flera receptperioder. Ange en eller flera perioder med startdatum, antal uttagna tabletter och slutdatum.
+            </div>
+
+            <div class="form-row-2">
+              <div class="field">
+                <label for="lt-med" data-tooltip="Ange läkemedelsnamn och styrka exakt som på receptet, t.ex. 'Elvanse 50 mg'. Möjliggör FASS-sökning.">Läkemedel och styrka</label>
+                <input id="lt-med" type="text" placeholder="T.ex. Elvanse 50 mg" maxlength="100" autocomplete="off">
+              </div>
+              <div class="field">
+                <label for="lt-dose" data-tooltip="Patientens ordinerade dygnsdos. Används som referensvärde för att beräkna avvikelse i faktisk förbrukning per period.">Ordinerad dos (st/dag)</label>
+                <input id="lt-dose" type="text" inputmode="decimal" placeholder="T.ex. 1" maxlength="10" autocomplete="off">
+              </div>
+            </div>
+
+            <div class="section-label">Receptperioder</div>
+            <div id="lt-periods-container"></div>
+            <button id="addPeriodBtn" class="btn btn-ghost btn-add-period">＋ Lägg till period</button>
+
+            <div class="lt-form-actions">
+              <a class="btn fass-link btn-ghost is-hidden" id="lt-fassBtn" href="#" target="_blank" rel="noopener">📘 FASS</a>
+              <button id="clearLongtermBtn" class="btn btn-ghost ml-auto">Rensa</button>
+            </div>
+          </div>
+
+          <!-- HÖGER: resultat -->
+          <div class="longterm-result-col" id="lt-result" style="display:none">
+            <div class="result-grid" id="lt-resGrid"></div>
+            <div id="lt-overlap-alert"></div>
+            <div id="lt-alerts"></div>
+
+            <div class="is-hidden" id="lt-bar-section">
+              <div class="section-label section-label-spaced">Förbrukning relativt ordination</div>
+              <div class="consumption-bar-wrap">
+                <div class="consumption-bar" id="lt-bar"></div>
+              </div>
+              <div class="bar-ticks">
+                <span>0%</span><span>50%</span><span>100%</span><span>150%</span>
+              </div>
+            </div>
+
+            <div class="is-hidden" id="lt-period-table-section">
+              <div class="section-label section-label-spaced">Förbrukning per period</div>
+              <div class="period-list">
+                <div class="period-list-header">
+                  <span>Period</span>
+                  <span class="ph-avg">Snitt st/dag</span>
+                  <span>Avvikelse</span>
+                  <span>Status</span>
+                </div>
+                <div id="lt-period-rows"></div>
+              </div>
+            </div>
+
+            <div class="copy-section" id="lt-copySection" style="display:none">
+              <div class="copy-tabs-row">
+                <button class="copy-tab active">Journalanteckning (förslag)</button>
+              </div>
+              <div class="copy-body" id="lt-copyBody"></div>
+              <div class="copy-footer">
+                <button id="ltCopyBtn" class="btn btn-ghost">📋 Kopiera text</button>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
   </div>
 
+  <!-- FOOTER -->
   <footer class="site-footer">
     <span>Öppen källkod — <a class="license-link" href="https://github.com/Vansinnet/Receptberakning/blob/main/LICENSE" target="_blank" rel="noopener">MIT-licens</a></span>
     <a href="https://github.com/Vansinnet/Receptberakning" target="_blank" rel="noopener">
-      <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
-        <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
-      </svg>
+      <svg height="14" width="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>
       GitHub
     </a>
   </footer>
-</div>
 
+</div><!-- /app-shell -->
+
+<!-- TOAST: inaktivitetstimer -->
 <div class="toast" id="toast" role="alert" aria-live="assertive">
   <div class="toast-title">⏱ Inaktivitetstimer aktiv</div>
-  Sidan rensas om <span class="toast-countdown" id="toastCount">60</span> sekunder för att skydda patientdata.
+  Sidan rensas om <span class="toast-countdown" id="toastCount">60</span> sekunder.
   <button id="continueSessionBtn" class="btn">Fortsätt sessionen</button>
 </div>
 
+<!-- MODAL: rensa bekräftelse -->
 <div class="modal-overlay" id="clearModal">
   <div class="modal-content">
     <h3 class="modal-title">⚠️ Rensa data?</h3>
@@ -189,4 +318,5 @@
 </div>
 
 <script src="app.js" defer></script>
-</body></html>
+</body>
+</html>
