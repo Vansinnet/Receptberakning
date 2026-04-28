@@ -105,8 +105,18 @@ Ladda upp `index.html` till valfri statisk webbserver, t.ex. GitHub Pages eller 
 
 ---
 
-## Licens
+# Licens och Användning
 
-MIT — fri att använda, modifiera och distribuera.
+Detta projekt är licensierat under **Creative Commons Erkännande-Ickekommersiell 4.0 Internationell (CC BY-NC 4.0)**.
+
+Kortfattat innebär detta att:
+* ✅ **Du får** läsa koden, granska den och lämna förslag via Issues/Pull Requests.
+* ✅ **Du får** använda och anpassa koden för personliga, akademiska eller icke-kommersiella syften.
+* ❌ **Du får INTE** använda koden i kommersiella, vinstdrivande syften eller integrera den i kommersiella journalsystem utan mitt uttryckliga tillstånd.
+
+Är du intresserad av att använda verktyget kommersiellt? Vänligen kontakta mig!
+
+## Friskrivning (Disclaimer)
+Programvaran tillhandahålls "I BEFINTLIGT SKICK" (AS IS), utan några som helst garantier. Skaparen tar inget medicinskt, juridiskt eller ekonomiskt ansvar för hur verktyget används. Det kliniska beslutet och ansvaret vilar alltid till 100 % på den förskrivande läkaren.
 
 ---
