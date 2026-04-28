@@ -155,9 +155,16 @@
     return Math.round((d1 - d2) / 86400000);
   }
 
-  function extractMg(medRaw) {
-    const m = medRaw.match(/(\d+(?:[.,]\d+)?)\s*mg/i);
-    return m ? parseFloat(m[1].replace(',', '.')) : 0;
+  // Extraherar styrka och enhet ur läkemedelsnamnet.
+  // Hanterar mg, µg/mikrogram och ml — returnerar { amount, unit } eller null.
+  function extractDoseUnit(medRaw) {
+    const m = medRaw.match(/(\d+(?:[.,]\d+)?)\s*(mg|ml|µg|mikrogram)/i);
+    if (!m) return null;
+    const amount = parseFloat(m[1].replace(',', '.'));
+    const rawUnit = m[2].toLowerCase();
+    // Normalisera "mikrogram" → "µg" för enhetlig visning
+    const unit = rawUnit === 'mikrogram' ? '\u00b5g' : rawUnit;
+    return { amount, unit };
   }
 
   function getFassUrl(medRaw) {
@@ -165,14 +172,16 @@
   }
 
   // ── Narkotikaklassade läkemedel (LVFS 2011:10 med ändringar) ──────────────
-  // Senast kontrollerad mot Läkemedelsverkets förteckningar: 2026-04-26
-  const NARCOTICS_LIST_DATE = '2026-04-26';
+  // Senast kontrollerad mot Läkemedelsverkets förteckningar: 2026-04-28
+  const NARCOTICS_LIST_DATE = '2026-04-28';
   const NARCOTICS = [
     // Opioider
     'morfin','dolcontin','depolan','mst continus',
     'oxikodon','oxycodon','oxycontin','oxynorm','targiniq','zomestine','reltebon',
     'kodein','citodon','panocod','kodipront',
+    'etylmorfin','cocillana',
     'fentanyl','durogesic','matrifen','instanyl','abstral','pecfent','breakyl','recivit','vellofent',
+    'actiq','effentora','ionsys',
     'buprenorfin','buprenorphine','temgesic','norspan','subutex','suboxone','buvidal','espranor','sublocade',
     'metadon','methadone',
     'tramadol','tiparol','tradolan',
@@ -197,6 +206,7 @@
     'triazolam','halcion',
     'klorazepat','tranxilium',
     'bromazepam','lexotan',
+    'klobazam','clobazam','frisium','epaclob',
     // Z-läkemedel
     'zolpidem','stilnoct','zolpinox',
     'zopiklon','imovane','zoplida',
@@ -210,8 +220,9 @@
     // Gabapentinoider — OBS: endast pregabalin är narkotikaklassat i Sverige (LVFS, gällande fr.o.m. 2018-07-24)
     // Gabapentin är INTE narkotikaklassat i Sverige (trots klassificering i UK och vissa US-stater)
     'pregabalin','lyrica','brigatox',
-    // Ketamin
+    // Ketamin och esketamin (klass II resp. IV)
     'ketamin','ketamine','ketalar',
+    'esketamin','esketamine','spravato',
     // GHB / natriumoxybat
     'natriumoxybat','xyrem',
     // Cannabis-baserat
@@ -222,6 +233,8 @@
     'fenobarbital','phenobarbital','fenemal',
     'pentobarbital',
     'amobarbital',
+    // Klometiazol (förteckning V — nationellt narkotikaförklarat)
+    'klometiazol','clomethiazole','heminevrin',
   ];
 
   // Förkompilerade regex med ordgräns (\b) — undviker falska positiver som
@@ -233,7 +246,11 @@
     const badge = getEl('narcBadge' + i);
     if (!medEl || !badge) return;
     const val = medEl.value;
-    const hit = val.length >= 3 && NARCOTICS_RE.some(re => re.test(val));
+    // Normalisera: ersätt siffror och decimaltecken med mellanslag så att
+    // "Elvanse50mg" behandlas som "Elvanse mg" och matchar \bElvanse\b korrekt.
+    // Utan detta missar \b matchning när preparat skrivs ihop med styrka utan mellanslag.
+    const normalized = val.replace(/[\d.,]+/g, ' ');
+    const hit = val.length >= 3 && NARCOTICS_RE.some(re => re.test(normalized));
     badge.style.display = hit ? 'block' : 'none';
   }
 
@@ -863,9 +880,9 @@
       daysInfoNode.textContent = `Tog slut för ${daysAgo} ${daysAgo === 1 ? 'dag' : 'dagar'} sedan`;
     }
 
-    const mg = extractMg(medRaw);
+    const doseUnit = extractDoseUnit(medRaw);
     let displayAvg = `${avgNum.toFixed(2)} st/dag`;
-    if (mg > 0) displayAvg += ` (${(avgNum * mg).toFixed(1)} mg/dag)`;
+    if (doseUnit) displayAvg += ` (${(avgNum * doseUnit.amount).toFixed(1)} ${doseUnit.unit}/dag)`;
 
     const resGridEl = getEl('resGrid' + i);
     if (!resGridEl) return displayAvg;
@@ -1365,9 +1382,9 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
     const overallAvg   = totalTablets / totalDays;
     const consumptionPct = (overallAvg / ordDose) * 100;
 
-    const mg = extractMg(medRaw);
+    const doseUnit = extractDoseUnit(medRaw);
     let avgStr = `${overallAvg.toFixed(2)} st/dag`;
-    if (mg > 0) avgStr += ` (${(overallAvg * mg).toFixed(1)} mg/dag)`;
+    if (doseUnit) avgStr += ` (${(overallAvg * doseUnit.amount).toFixed(1)} ${doseUnit.unit}/dag)`;
 
     const resGridEl = getEl('lt-resGrid');
     if (resGridEl) {
