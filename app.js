@@ -479,8 +479,7 @@
     states.push({});
     buildCards();
     _suppressDistribute = true;
-    restoreCardValues(vals);
-    _suppressDistribute = false;
+    try { restoreCardValues(vals); } finally { _suppressDistribute = false; }
     generateAndDistribute();
   }
 
@@ -496,8 +495,7 @@
     medCardCount--;
     buildCards();
     _suppressDistribute = true;
-    restoreCardValues(vals);
-    _suppressDistribute = false;
+    try { restoreCardValues(vals); } finally { _suppressDistribute = false; }
     generateAndDistribute();
   }
 
@@ -1580,7 +1578,10 @@ Bedömning: ${alertTitle.replace(/^\S+\s+/, '')} — ${alertMsg}`;
     });
     periodsContainer.addEventListener('click', e => {
       const btn = e.target.closest('[data-action="remove-period"]');
-      if (btn) removePeriod(parseInt(btn.dataset.idx, 10));
+      if (btn) {
+        const idx = parseInt(btn.dataset.idx, 10);
+        if (!isNaN(idx)) removePeriod(idx);
+      }
     });
   }
 
