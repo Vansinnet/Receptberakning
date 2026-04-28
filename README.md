@@ -105,18 +105,16 @@ Ladda upp `index.html` till valfri statisk webbserver, t.ex. GitHub Pages eller 
 
 ---
 
-# Licens och Användning
+## Licens och användningsvillkor
 
-Detta projekt är licensierat under **Creative Commons Erkännande-Ickekommersiell 4.0 Internationell (CC BY-NC 4.0)**.
+Copyright (C) 2026 Vansinnet. Alla rättigheter förbehållna.
 
-Kortfattat innebär detta att:
-* ✅ **Du får** läsa koden, granska den och lämna förslag via Issues/Pull Requests.
-* ✅ **Du får** använda och anpassa koden för personliga, akademiska eller icke-kommersiella syften.
-* ❌ **Du får INTE** använda koden i kommersiella, vinstdrivande syften eller integrera den i kommersiella journalsystem utan mitt uttryckliga tillstånd.
+Detta verktyg är publicerat med öppen källkod för att möjliggöra transparens, klinisk granskning och bidrag från communityt. För användning gäller följande:
 
-Är du intresserad av att använda verktyget kommersiellt? Vänligen kontakta mig!
+* **Privatpersoner/Enskilda läkare:** Du får använda verktyget fritt för personligt bruk och enskild klinisk handläggning.
+* **Vårdföretag och kommersiella aktörer:** Det är **inte tillåtet** att implementera, distribuera eller använda detta verktyg systematiskt inom vinstdrivande verksamhet eller kommersiella system utan uttryckligt skriftligt medgivande från upphovsmannen.
+
+För tillstånd eller frågor om kommersiell licensiering, vänligen kontakta mig via GitHub.
 
 ## Friskrivning (Disclaimer)
-Programvaran tillhandahålls "I BEFINTLIGT SKICK" (AS IS), utan några som helst garantier. Skaparen tar inget medicinskt, juridiskt eller ekonomiskt ansvar för hur verktyget används. Det kliniska beslutet och ansvaret vilar alltid till 100 % på den förskrivande läkaren.
-
----
+Verktyget tillhandahålls "i befintligt skick" utan garantier. Skaparen tar inget ansvar för medicinska beslut eller tekniska fel. Det kliniska ansvaret vilar alltid på den förskrivande läkaren.
