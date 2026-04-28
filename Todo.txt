@@ -1,1 +1,1 @@
-Kör 100 simuleringar av verktyget med hjälp av AI. Identifiera edge-cases och beräkningsfel. Förtydliga svar till patienten om något är oklart.
+Kör 100 simuleringar av verktyget med hjälp av AI. Identifiera om det finns edge-cases som i teorin skulle kunna orsaka beräkningsfel. Förtydliga svar till patienten om något är oklart.
