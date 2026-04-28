@@ -173,73 +173,102 @@
 
   // ── Narkotikaklassade läkemedel (LVFS 2011:10 med ändringar) ──────────────
   // Senast kontrollerad mot Läkemedelsverkets förteckningar: 2026-04-28
+  // Förteckning II  = Högt missbrukspotential, godkänd medicinsk användning
+  // Förteckning III = Kombinations- och lågdospreparat (t.ex. kodein, buprenorfin)
+  // Förteckning IV  = Lägre missbrukspotential (bensodiazepin, z-läkemedel, tramadol, pregabalin …)
+  // Förteckning V   = Lägst potential (klometiazol)
   const NARCOTICS_LIST_DATE = '2026-04-28';
-  const NARCOTICS = [
-    // Opioider
-    'morfin','dolcontin','depolan','mst continus',
-    'oxikodon','oxycodon','oxycontin','oxynorm','targiniq','zomestine','reltebon',
-    'kodein','citodon','panocod','kodipront',
-    'etylmorfin','cocillana',
-    'fentanyl','durogesic','matrifen','instanyl','abstral','pecfent','breakyl','recivit','vellofent',
-    'actiq','effentora','ionsys',
-    'buprenorfin','buprenorphine','temgesic','norspan','subutex','suboxone','buvidal','espranor','sublocade',
-    'metadon','methadone',
-    'tramadol','tiparol','tradolan',
-    'hydromorfon','hydromorphone','palladon',
-    'tapentadol','palexia',
-    'ketobemidon','ketogan',
-    'petidin','pethidine',
-    'alfentanil','rapifen',
-    'sufentanil','sufenta','dzuveo',
-    'remifentanil','ultiva',
-    'dihydrokodein',
-    // Bensodiazepiner
-    'diazepam','stesolid','valium','apozepam',
-    'alprazolam','xanax','xanor',
-    'klonazepam','clonazepam','rivotril','iktorivil',
-    'lorazepam','temesta',
-    'oxazepam','oxascand','sobril',
-    'nitrazepam','mogadon','apodorm',
-    'flunitrazepam','rohypnol',
-    'temazepam','normison',
-    'midazolam','dormicum','buccolam','epistatus',
-    'triazolam','halcion',
-    'klorazepat','tranxilium',
-    'bromazepam','lexotan',
-    'klobazam','clobazam','frisium','epaclob',
-    // Z-läkemedel
-    'zolpidem','stilnoct','zolpinox',
-    'zopiklon','imovane','zoplida',
-    'zaleplon','sonata',
-    // Centralstimulantia
-    'metylfenidat','methylphenidate','ritalin','concerta','medikinet','equasym','rubifen','inspiral','kinecteen',
-    'lisdexamfetamin','lisdexamphetamine','elvanse','vyvanse',
-    'amfetamin','amphetamine','attentin',
-    'dexamfetamin','dexamphetamine','dexedrin',
-    'modafinil','modiodal',
-    // Gabapentinoider — OBS: endast pregabalin är narkotikaklassat i Sverige (LVFS, gällande fr.o.m. 2018-07-24)
-    // Gabapentin är INTE narkotikaklassat i Sverige (trots klassificering i UK och vissa US-stater)
-    'pregabalin','lyrica','brigatox',
-    // Ketamin och esketamin (klass II resp. IV)
-    'ketamin','ketamine','ketalar',
-    'esketamin','esketamine','spravato',
-    // GHB / natriumoxybat
-    'natriumoxybat','xyrem',
-    // Cannabis-baserat
-    'nabilon','cesamet',
-    'dronabinol','marinol',
-    'sativex','nabiximols',
-    // Barbiturater
-    'fenobarbital','phenobarbital','fenemal',
-    'pentobarbital',
-    'amobarbital',
-    // Klometiazol (förteckning V — nationellt narkotikaförklarat)
-    'klometiazol','clomethiazole','heminevrin',
+  const NARCOTICS_SCHEDULES = [
+    // ── Förteckning II ─────────────────────────────────────────────────────
+    { schedule: 'II', terms: [
+      // Starka opioider
+      'morfin','dolcontin','depolan','mst continus',
+      'oxikodon','oxycodon','oxycontin','oxynorm','targiniq','zomestine','reltebon',
+      'fentanyl','durogesic','matrifen','instanyl','abstral','pecfent','breakyl','recivit','vellofent',
+      'actiq','effentora','ionsys',
+      'metadon','methadone',
+      'hydromorfon','hydromorphone','palladon',
+      'tapentadol','palexia',
+      'ketobemidon','ketogan',
+      'petidin','pethidine',
+      'alfentanil','rapifen',
+      'sufentanil','sufenta','dzuveo',
+      'remifentanil','ultiva',
+      // Centralstimulantia
+      'metylfenidat','methylphenidate','ritalin','concerta','medikinet','equasym','rubifen','inspiral','kinecteen',
+      'lisdexamfetamin','lisdexamphetamine','elvanse','vyvanse',
+      'amfetamin','amphetamine','attentin',
+      'dexamfetamin','dexamphetamine','dexedrin',
+      // Ketamin
+      'ketamin','ketamine','ketalar',
+      // GHB / natriumoxybat
+      'natriumoxybat','xyrem',
+      // Cannabis-baserat
+      'nabilon','cesamet',
+      'dronabinol','marinol',
+      'sativex','nabiximols',
+      // Barbiturater (hög risk)
+      'pentobarbital',
+      'amobarbital',
+      // Flunitrazepam — förteckning II p.g.a. hög missbruksrisk (särskilt i Sverige)
+      'flunitrazepam','rohypnol',
+    ]},
+    // ── Förteckning III ────────────────────────────────────────────────────
+    { schedule: 'III', terms: [
+      // Svagare opioider och kombinationspreparat
+      'kodein','citodon','panocod','kodipront',
+      'etylmorfin','cocillana',
+      'dihydrokodein',
+      // Buprenorfin (agonist/antagonist — förteckning III i Sverige)
+      'buprenorfin','buprenorphine','temgesic','norspan','subutex','suboxone','buvidal','espranor','sublocade',
+    ]},
+    // ── Förteckning IV ─────────────────────────────────────────────────────
+    { schedule: 'IV', terms: [
+      // Bensodiazepiner
+      'diazepam','stesolid','valium','apozepam',
+      'alprazolam','xanax','xanor',
+      'klonazepam','clonazepam','rivotril','iktorivil',
+      'lorazepam','temesta',
+      'oxazepam','oxascand','sobril',
+      'nitrazepam','mogadon','apodorm',
+      'temazepam','normison',
+      'midazolam','dormicum','buccolam','epistatus',
+      'triazolam','halcion',
+      'klorazepat','tranxilium',
+      'bromazepam','lexotan',
+      'klobazam','clobazam','frisium','epaclob',
+      // Z-läkemedel
+      'zolpidem','stilnoct','zolpinox',
+      'zopiklon','imovane','zoplida',
+      'zaleplon','sonata',
+      // Tramadol (narkotikaklassat sedan 2008)
+      'tramadol','tiparol','tradolan',
+      // Pregabalin (narkotikaklassat i Sverige fr.o.m. 2018-07-24)
+      // OBS: Gabapentin är INTE narkotikaklassat i Sverige
+      'pregabalin','lyrica','brigatox',
+      // Modafinil
+      'modafinil','modiodal',
+      // Esketamin (Spravato — godkänt för behandlingsresistent depression)
+      'esketamin','esketamine','spravato',
+      // Fenobarbital (barbiturat med lägre missbrukspotential, används vid epilepsi)
+      'fenobarbital','phenobarbital','fenemal',
+    ]},
+    // ── Förteckning V ──────────────────────────────────────────────────────
+    { schedule: 'V', terms: [
+      // Klometiazol — nationellt narkotikaförklarat
+      'klometiazol','clomethiazole','heminevrin',
+    ]},
   ];
 
+  // Bygg en platt söktabell: { re: RegExp, schedule: string }[]
   // Förkompilerade regex med ordgräns (\b) — undviker falska positiver som
   // "morfinantagonist" → morfin, eller "deksamfetamin" → amfetamin.
-  const NARCOTICS_RE = NARCOTICS.map(n => new RegExp(`\\b${n}\\b`, 'i'));
+  const NARCOTICS_RE = [];
+  for (const { schedule, terms } of NARCOTICS_SCHEDULES) {
+    for (const term of terms) {
+      NARCOTICS_RE.push({ re: new RegExp(`\\b${term}\\b`, 'i'), schedule });
+    }
+  }
 
   function checkNarcotic(i) {
     const medEl = getEl('med' + i);
@@ -250,8 +279,14 @@
     // "Elvanse50mg" behandlas som "Elvanse mg" och matchar \bElvanse\b korrekt.
     // Utan detta missar \b matchning när preparat skrivs ihop med styrka utan mellanslag.
     const normalized = val.replace(/[\d.,]+/g, ' ');
-    const hit = val.length >= 3 && NARCOTICS_RE.some(re => re.test(normalized));
-    badge.style.display = hit ? 'block' : 'none';
+    if (val.length < 3) { badge.style.display = 'none'; return; }
+    const match = NARCOTICS_RE.find(({ re }) => re.test(normalized));
+    if (match) {
+      badge.textContent = `🔒 Narkotikaklassat – Förteckning ${match.schedule}`;
+      badge.style.display = 'block';
+    } else {
+      badge.style.display = 'none';
+    }
   }
 
   function buildResultRow(frag, label, valueText, badgeNode = null) {
@@ -377,7 +412,7 @@
             <div class="field">
               <label for="med${ei}">Läkemedel och styrka</label>
               <input id="med${ei}" type="text" placeholder="T.ex. Elvanse 50 mg" maxlength="200" autocomplete="off">
-              <span id="narcBadge${ei}" class="badge badge-warn narc-badge is-hidden" title="Narkotikaklassat preparat (LVFS 2011:10). Listan kontrollerades senast ${eNarcDate}.">🔒 Narkotikaklassat</span>
+              <span id="narcBadge${ei}" class="badge badge-warn narc-badge is-hidden" title="Narkotikaklassat preparat (LVFS 2011:10). Listan kontrollerades senast ${eNarcDate}."></span>
             </div>
             <div class="form-row">
               <div class="field">
@@ -591,7 +626,10 @@
         patLines.push('Vid frågor är du välkommen att kontakta oss via 1177.');
       } else if (overuse.length === 1) {
         const s = states[overuse[0].i];
-        patLines.push(`Vi har tagit emot din förfrågan om receptförnyelse för ${overuse[0].name}. Enligt din ordination (${s.dose} st/dag) beräknas medicinen räcka till den ${s.prescribedEndDateStr}. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. Vänligen hör av dig igen runt den ${s.prescribedContactDateStr} så hjälper vi dig då med nytt recept.`);
+        const closingSv1 = s.prescribedContactIsPast
+          ? `Medicinen beräknas ta slut snart — därför förnyas recept från och med ${s.prescribedEndDateStr}.`
+          : `Vänligen hör av dig igen runt den ${s.prescribedContactDateStr} så hjälper vi dig då med nytt recept.`;
+        patLines.push(`Vi har tagit emot din förfrågan om receptförnyelse för ${overuse[0].name}. Enligt din ordination (${s.dose} st/dag) beräknas medicinen räcka till den ${s.prescribedEndDateStr}. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. ${closingSv1}`);
         patLines.push('');
         patLines.push('Vid frågor är du välkommen att kontakta oss via 1177.');
       }
@@ -607,7 +645,10 @@
       });
       overuse.forEach(({ name, i }) => {
         const s = states[i];
-        patLines.push(`${name}: Medicinen beräknas räcka till den ${s.prescribedEndDateStr}. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. Vänligen hör av dig igen runt den ${s.prescribedContactDateStr} så hjälper vi dig då med nytt recept.`);
+        const closingSvM = s.prescribedContactIsPast
+          ? `Medicinen beräknas ta slut snart — därför förnyas recept från och med ${s.prescribedEndDateStr}.`
+          : `Vänligen hör av dig igen runt den ${s.prescribedContactDateStr} så hjälper vi dig då med nytt recept.`;
+        patLines.push(`${name}: Medicinen beräknas räcka till den ${s.prescribedEndDateStr}. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. ${closingSvM}`);
       });
       patLines.push('');
       patLines.push('Vid frågor är du välkommen att kontakta oss via 1177.');
@@ -626,7 +667,10 @@
         patLinesEn.push('If you have any questions, please contact us through 1177.');
       } else if (overuse.length === 1) {
         const s = states[overuse[0].i];
-        patLinesEn.push(`We have received your prescription renewal request for ${overuse[0].name}. According to your prescription (${s.dose} tablets/day), your medication is estimated to last until ${s.prescribedEndDateStr}. Since that date has not yet passed, we are unable to renew your prescription at this time. Please contact us again closer to ${s.prescribedContactDateStr} and we will assist you then.`);
+        const closingEn1 = s.prescribedContactIsPast
+          ? `Your medication is expected to run out soon — a new prescription will therefore be issued from ${s.prescribedEndDateStr}.`
+          : `Please contact us again closer to ${s.prescribedContactDateStr} and we will assist you then.`;
+        patLinesEn.push(`We have received your prescription renewal request for ${overuse[0].name}. According to your prescription (${s.dose} tablets/day), your medication is estimated to last until ${s.prescribedEndDateStr}. Since that date has not yet passed, we are unable to renew your prescription at this time. ${closingEn1}`);
         patLinesEn.push('');
         patLinesEn.push('If you have any questions, please contact us through 1177.');
       }
@@ -642,7 +686,10 @@
       });
       overuse.forEach(({ name, i }) => {
         const s = states[i];
-        patLinesEn.push(`${name}: Your medication is estimated to last until ${s.prescribedEndDateStr}. Since that date has not yet passed, we are unable to renew your prescription at this time. Please contact us again closer to ${s.prescribedContactDateStr} and we will assist you then.`);
+        const closingEnM = s.prescribedContactIsPast
+          ? `Your medication is expected to run out soon — a new prescription will therefore be issued from ${s.prescribedEndDateStr}.`
+          : `Please contact us again closer to ${s.prescribedContactDateStr} and we will assist you then.`;
+        patLinesEn.push(`${name}: Your medication is estimated to last until ${s.prescribedEndDateStr}. Since that date has not yet passed, we are unable to renew your prescription at this time. ${closingEnM}`);
       });
       patLinesEn.push('');
       patLinesEn.push('If you have any questions, please contact us through 1177.');
@@ -928,18 +975,26 @@
         : `Aktuell förskrivning är slut.`;
       const contactDate = new Date(prescribedEndDate);
       contactDate.setUTCDate(contactDate.getUTCDate() - 7);
+      const todayContact = getToday();
+      const contactIsPast = contactDate < todayContact;
+      const effectiveContactDate = contactIsPast ? todayContact : contactDate;
       states[i].endDateStr = fmtDate(prescribedEndDate);
       states[i].prescribedEndDateStr = fmtDate(prescribedEndDate);
-      states[i].prescribedContactDateStr = fmtDate(contactDate);
+      states[i].prescribedContactDateStr = fmtDate(effectiveContactDate);
+      states[i].prescribedContactIsPast = contactIsPast;
       states[i].daysRemaining = daysRemaining;
       states[i].pDateStr = fmtDate(pDate);
       states[i].total = total;
       states[i].dose = dose;
       states[i].avgNote = avgNote;
+      const renewFromStr = fmtDate(prescribedEndDate);
+      const overuseClosingLine = contactIsPast
+        ? `Medicinen beräknas ta slut snart — därför förnyas recept från och med ${renewFromStr}.`
+        : `Vänligen hör av dig igen närmre den ${fmtDate(effectiveContactDate)} så hjälper vi dig då.`;
       states[i].patientText =
 `Hej,
 
-Vi har tagit emot din förfrågan om receptförnyelse för ${medRaw}. Enligt din ordination (${dose} st/dag) beräknas medicinen räcka till den ${fmtDate(prescribedEndDate)}. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. Vänligen hör av dig igen närmre den ${fmtDate(contactDate)} så hjälper vi dig då.
+Vi har tagit emot din förfrågan om receptförnyelse för ${medRaw}. Enligt din ordination (${dose} st/dag) beräknas medicinen räcka till den ${fmtDate(prescribedEndDate)}. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. ${overuseClosingLine}
 
 Vid frågor är du välkommen att kontakta oss via 1177.`;
       states[i].journalText =
