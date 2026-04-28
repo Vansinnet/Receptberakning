@@ -452,8 +452,8 @@
 
               <div class="copy-section" id="copySection${ei}">
                 <div class="copy-tabs">
-                  <button class="copy-tab active" data-action="switch-tab" data-tab="patient">📝 Svar till patient</button>
-                  <button class="copy-tab" data-action="switch-tab" data-tab="journal">🏥 Journalanteckning</button>
+                  <button class="copy-tab active" data-action="switch-tab" data-tab="patient">📝 Svar till patient (förslag)</button>
+                  <button class="copy-tab" data-action="switch-tab" data-tab="journal">🏥 Journalanteckning (förslag)</button>
                 </div>
                 <div class="copy-body" id="copyBody${ei}"></div>
                 <div class="copy-footer">
@@ -731,11 +731,15 @@
       jLines.push('Kontaktorsak: Receptförnyelse via 1177 (flera läkemedel).', '');
       toRenew.forEach(({ name, i }) => {
         const s = states[i];
-        jLines.push(`${name}: Förnyat. Beräknas räcka t.o.m ${s.endDateStr}. Snittförbrukning: ${s.displayAvgStr}.`);
+        jLines.push(`${name}: Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} doser, ordination ${s.dose} st/dag) och beräknas räcka till ${s.endDateStr}. Förbrukningen bedöms vara enligt ordination (snittförbrukning: ${s.displayAvgStr} ${s.avgNote}).`);
+        jLines.push(`Åtgärd: Förnyat.`);
+        jLines.push('');
       });
       tooEarly.forEach(({ name, i }) => {
         const s = states[i];
-        jLines.push(`${name}: Ej förnyat — för tidigt (${s.daysRemaining} dagar kvar, t.o.m ${s.endDateStr}). Beräknad snittförbrukning: ${s.displayAvgStr} ${s.avgNote}.`);
+        jLines.push(`${name}: Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} doser, ordination ${s.dose} st/dag) och beräknas räcka till ${s.endDateStr} (${s.daysRemaining} dagar kvar). Förbrukningen bedöms vara enligt ordination (snittförbrukning: ${s.displayAvgStr} ${s.avgNote}).`);
+        jLines.push(`Åtgärd: Ej förnyat — för tidigt.`);
+        jLines.push('');
       });
       overuse.forEach(({ name, i }) => {
         const s = states[i];
@@ -748,7 +752,6 @@
         jLines.push(`Åtgärd: [Nytt recept utfärdat / Ej utfärdat — motivering]`);
         jLines.push('');
       });
-      jLines.push('');
       if (toRenew.length > 0) {
         jLines.push(`Åtgärd: Recept utfärdat för ${toRenew.map(x => x.name).join(', ')}. Svar skickat till patient via 1177.`);
       } else {
@@ -1099,7 +1102,7 @@ Förbrukningen bedöms vara enligt ordination (beräknad snittförbrukning: ${di
       resetResultPanel(i);
       showResult(i, true);
       renderAlert('alerts' + i, 'info', '', 'ℹ️ För att beräkna snittförbrukning krävs att receptet utfärdades minst en dag tidigare än dagens datum.');
-      setStatus(i, 'warn', 'Kan ej beräknas idag');
+      setStatus(i, 'muted', 'Kan ej beräknas idag');
       return;
     }
 
