@@ -1,4 +1,6 @@
-100 simuleringar med hjälp av AI har funnit följande scenarios som beror på att användaren gör fel, men som behöver beaktas framöver. Den enda kritiska buggen är #2, men vid manuell testning verkar allt fungera som det ska.
+100 simuleringar med hjälp av AI har funnit följande scenarios som beror på att användaren gör fel, men som behöver beaktas framöver. Sammanställt i 1-5. Den enda kritiska buggen är #2, men vid manuell testning verkar allt fungera som det ska.
+
+Punkt 6 handlar om att narkotikanotisen när man skriver in läkemedel också ska ange vilken narkotikaklass preparatet har. Detta för att uppmärksamma läkaren kring hur potent läkemedlet är och därmed vilken försiktighet som behöver vidtas vid receptförnyelse.
 
 
 1. "Division med noll"-kraschen (Oändlighetsbuggen)
@@ -39,3 +41,5 @@ Simulering: I fältet "Doser kvar (valfritt)" skriver läkaren "En halv karta" i
 Vad som händer: Om din kod hämtar detta värde och adderar det till totala mängden utan att kolla isNaN(), blir hela ekvationen t.ex. 100 + NaN = NaN.
 
 Resultat: Hela beräkningen i resultat-kortet går sönder och visar ingenting.
+
+6. Ange vilken narkotikaklassning varje narkotika här när man får upp notisen när man skriver in läkemedlet. kolla av listan med narkotikapreparat för att se vilka preparat som behöver klassificeras.
