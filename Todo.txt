@@ -1,4 +1,4 @@
-Simuleringar med hjälp av AI har funnit följande synpunkter:
+100 simuleringar med hjälp av AI har funnit följande scenarios som beror på att användaren gör fel, men som behöver beaktas framöver. Den enda kritiska buggen är #2.
 
 
 1. "Division med noll"-kraschen (Oändlighetsbuggen)
