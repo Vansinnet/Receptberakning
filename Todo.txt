@@ -33,7 +33,7 @@ Vad som händer: Din checkNarcotic-funktion använder \b (ordgränser) och en sp
 
 Resultat: Den röda säkerhetsvarningen för narkotika triggas inte.
 
-Lösning: Byt ut alla icke-alfabetiska tecken mot mellanslag i normaliseringen: const normalized = val.replace(/[^a-zA-ZåäöÅÄÖ]+/g, ' ');. Lägg även till vanligt felstavade varianter i NARCOTICS-arrayen.
+Lösning: Byt ut alla icke-alfabetiska tecken mot mellanslag i normaliseringen: const normalized = val.replace(/[^a-zA-ZåäöÅÄÖ]+/g, ' ');. Lägg även till vanligt felstavade varianter i NARCOTICS-arrayen. "Fuzzy Search"-algoritm (t.ex. Levenshtein-distans)?
 
 5. NaN i "Doser kvar"-fältet (Textsträngar)
 Simulering: I fältet "Doser kvar (valfritt)" skriver läkaren "En halv karta" istället för en siffra, trots att det är en <input type="number">. (Ibland tillåter äldre webbläsare text i number-fält, eller så klistrar användaren in text).
