@@ -1,0 +1,505 @@
+  /* ── CSS-variabel-bas (ärvs av alla teman) ── */
+  :root {
+    --primary: #1d4ed8;
+    --primary-light: #dbeafe;
+    --primary-hover: #1e40af;
+    --bg: #f1f5f9;
+    --surface: #ffffff;
+    --surface2: #f8fafc;
+    --text: #0f172a;
+    --text-muted: #475569;       /* slate-600 — 7.0:1 kontrast på vit ✓ */
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+
+    --green: #15803d; --green-bg: #f0fdf4; --green-border: #86efac;
+    --amber: #b45309; --amber-bg: #fffbeb; --amber-border: #fcd34d;
+    --red: #dc2626;   --red-bg: #fef2f2;   --red-border: #fca5a5;
+    --blue: #1d4ed8;  --blue-bg: #eff6ff;  --blue-border: #bfdbfe;
+    --violet: #7c3aed; --violet-bg: #f5f3ff; --violet-border: #ddd6fe;
+
+    --input-bg: #ffffff;
+    --clear-btn: #f1f5f9; --clear-btn-hover: #e2e8f0; --clear-btn-text: #334155;
+    --refill-bg: #f0fdf4; --refill-border: #86efac; --refill-text: #14532d;
+    --toast-bg: #1e293b; --toast-text: #ffffff;
+    --code-bg: #f8fafc;
+    /* Danger-knapp: behåll röd i ljust tema */
+    --danger-bg: var(--red-bg); --danger-color: var(--red); --danger-border: var(--red-border); --danger-hover: var(--red-border);
+  }
+
+  /* ── Mörkt läge ── */
+  /* Inspirerat av GitHub Dark — neutralt, varmt, behagligt vid långa pass */
+  [data-theme="dark"] {
+    --primary: #58a6ff; --primary-light: #1c2d3f; --primary-hover: #79b8ff;
+    --bg: #0d1117; --surface: #161b22; --surface2: #21262d;
+    --text: #e6edf3; --text-muted: #8b949e;   /* 4.7:1 kontrast på #161b22 ✓ */
+    --border: #30363d; --border-strong: #3d444d;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.40); --shadow-md: 0 4px 14px rgba(0,0,0,0.55);
+
+    --green: #3fb950; --green-bg: #0c1f15; --green-border: #1a4229;
+    --amber: #e3b341; --amber-bg: #191108; --amber-border: #4a3100;
+    --red: #f85149;   --red-bg: #1c0c0a;   --red-border: #4d1a16;
+    --blue: #58a6ff;  --blue-bg: #061a2e;  --blue-border: #0c3259;
+    --violet: #a371f7; --violet-bg: #160d30; --violet-border: #311a68;
+
+    --input-bg: #0d1117; --code-bg: #0d1117;
+    --clear-btn: #21262d; --clear-btn-hover: #30363d; --clear-btn-text: #c9d1d9;
+    --refill-bg: #0c1f15; --refill-border: #1a4229; --refill-text: #3fb950;
+    --toast-bg: #e6edf3; --toast-text: #0d1117;
+    --danger-bg: var(--red-bg); --danger-color: var(--red); --danger-border: var(--red-border); --danger-hover: var(--red-border);
+  }
+
+  /* ── Tema: Klinisk (Teal) ── */
+  /* Sjukhusgrön/teal — klinisk känsla, lugn och tydlig */
+  [data-theme="klinisk"] {
+    --primary: #0d9488; --primary-light: #f0fdfa; --primary-hover: #0f766e;
+    --bg: #f0fdfa; --surface: #ffffff; --surface2: #ccfbf1;
+    --text: #134e4a;
+    --text-muted: #3d706b;    /* 5.8:1 kontrast på vit ✓ */
+    --border: #99f6e4; --border-strong: #5eead4;
+    --shadow-sm: 0 1px 3px rgba(13,148,136,0.08), 0 1px 2px rgba(13,148,136,0.05);
+    --shadow-md: 0 4px 16px rgba(13,148,136,0.10), 0 2px 6px rgba(13,148,136,0.06);
+
+    --green: #15803d;  --green-bg: #f0fdf4;  --green-border: #86efac;
+    --amber: #b45309;  --amber-bg: #fffbeb;  --amber-border: #fcd34d;
+    --red: #dc2626;    --red-bg: #fef2f2;    --red-border: #fca5a5;
+    --blue: #0369a1;   --blue-bg: #f0f9ff;   --blue-border: #bae6fd;
+    --violet: #7c3aed; --violet-bg: #f5f3ff; --violet-border: #ddd6fe;
+
+    --input-bg: #ffffff; --code-bg: #f0fdfa;
+    --clear-btn: #ccfbf1; --clear-btn-hover: #99f6e4; --clear-btn-text: #134e4a;
+    --refill-bg: #f0fdf4; --refill-border: #86efac; --refill-text: #14532d;
+    --toast-bg: #134e4a; --toast-text: #f0fdfa;
+    /* Danger-knapp: orange harmonerar bättre med teal än röd */
+    --danger-bg: #fff7ed; --danger-color: #9a3412; --danger-border: #fed7aa; --danger-hover: #fdba74;
+  }
+
+
+  /* ── Tema: Natt ── */
+  /* Varmt mörkt tema — skonsamt vid nattjour, mjuka amber-toner */
+  [data-theme="lazerwave"] {
+    --primary: #f59e0b;
+    --primary-light: #292014;
+    --primary-hover: #d97706;
+    --bg: #17120e;
+    --surface: #1f1812;
+    --surface2: #2a2118;
+    --text: #f5f0e8;
+    --text-muted: #a89880;     /* 4.9:1 kontrast på #1f1812 ✓ */
+    --border: #3a2e22;
+    --border-strong: #4d3d2c;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.50); --shadow-md: 0 4px 14px rgba(0,0,0,0.65);
+
+    --green: #34d399; --green-bg: #0c1f17; --green-border: #134e35;
+    --amber: #fbbf24; --amber-bg: #1c1200; --amber-border: #4a3200;
+    --red: #f87171;   --red-bg: #1c0a0a;   --red-border: #5a1a1a;
+    --blue: #60a5fa;  --blue-bg: #0a1929;  --blue-border: #1a3a5c;
+    --violet: #c084fc; --violet-bg: #1a0d28; --violet-border: #3b1a5a;
+
+    --input-bg: #17120e;
+    --code-bg: #17120e;
+    --clear-btn: #2a2118; --clear-btn-hover: #3a2e22; --clear-btn-text: #d6c8b5;
+    --refill-bg: #0c1f17; --refill-border: #134e35; --refill-text: #34d399;
+    --toast-bg: #f5f0e8; --toast-text: #17120e;
+    /* Danger-knapp: varm korall-röd passar det amber-varma temat */
+    --danger-bg: #1c0e0a; --danger-color: #fb923c; --danger-border: #4d2510; --danger-hover: #4d2510;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px 16px 48px;
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  .page-wrapper { max-width: 1100px; margin: 0 auto; }
+
+  /* ── Header ── */
+  .page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; margin-bottom: 20px; flex-wrap: wrap;
+  }
+  .header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .page-title h1 { font-size: 20px; font-weight: 700; color: var(--primary); margin-bottom: 2px; }
+  .page-title p { font-size: 13px; color: var(--text-muted); }
+
+  /* ── Flikar (Tabs) ── */
+  .main-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 5px;
+    width: fit-content;
+    box-shadow: var(--shadow-sm);
+    flex-wrap: wrap;
+  }
+  .main-tab {
+    padding: 8px 18px;
+    border-radius: var(--radius-md);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; border: none;
+    background: transparent;
+    color: var(--text-muted);
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .main-tab.active {
+    background: var(--surface);
+    color: var(--primary);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+  }
+  .main-tab:hover:not(.active) { color: var(--text); background: var(--clear-btn); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── Header-inställningar ── */
+  .header-setting { display: flex; align-items: center; gap: 6px; }
+  .header-setting-label {
+    font-size: 11px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;
+  }
+
+  /* ── Buttons & Selects ── */
+  .btn, select.theme-select {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: var(--radius-md);
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    border: 1px solid transparent; transition: all 0.15s;
+    white-space: nowrap; line-height: 1; font-family: inherit; height: 36px;
+  }
+  .btn-ghost, select.theme-select {
+    background: var(--clear-btn); color: var(--clear-btn-text); border-color: var(--border-strong);
+  }
+  .btn-ghost:hover, select.theme-select:hover { background: var(--clear-btn-hover); }
+  .btn-danger { background: var(--danger-bg, var(--red-bg)); color: var(--danger-color, var(--red)); border-color: var(--danger-border, var(--red-border)); }
+  .btn-danger:hover { background: var(--danger-hover, var(--red-border)); color: var(--danger-color, var(--red)); }
+  .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .btn-primary:hover { background: var(--primary-hover); }
+  select.theme-select { outline: none; flex-shrink: 0; font-size: 12px; height: 30px; padding: 4px 10px; }
+  select.theme-select option { background: var(--surface); color: var(--text); }
+
+  /* ── Banners ── */
+  .info-banner {
+    border-radius: var(--radius-md); padding: 10px 14px; margin-bottom: 16px;
+    font-size: 12px; display: flex; gap: 8px; align-items: flex-start;
+    background: var(--amber-bg); border: 1px solid var(--blue-border);
+    border-left: 4px solid var(--amber); color: var(--amber);
+  }
+  .info-banner strong { font-weight: 700; }
+
+  /* ── Summary Bar ── */
+  .summary-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  #panel-renew .cards-grid { grid-template-columns: 1fr; }
+  .summary-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 12px 16px;
+    box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 12px;
+  }
+  .summary-dot {
+    width: 10px; height: 10px; border-radius: 50%; background: var(--border-strong);
+    flex-shrink: 0; transition: background 0.3s;
+  }
+  .summary-dot.ok    { background: var(--green); }
+  .summary-dot.warn  { background: var(--red); }
+  .summary-info .label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .summary-info .value { font-size: 13px; font-weight: 600; color: var(--text); margin-top: 2px; }
+
+  /* ── Cards Grid ── */
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 16px; align-items: start; }
+
+  /* ── Card ── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; transition: box-shadow 0.2s; }
+  .card:hover { box-shadow: var(--shadow-md); }
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px 12px; border-bottom: 1px solid var(--border); background: var(--surface2);
+  }
+  .card-header-left { display: flex; align-items: center; gap: 10px; }
+  .card-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--primary-light); color: var(--primary);
+    font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .card-title { font-size: 15px; font-weight: 700; }
+  .card-status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--border-strong); transition: background 0.3s; flex-shrink: 0;
+  }
+  .card-status-dot.ok   { background: var(--green); box-shadow: 0 0 0 3px var(--green-bg); }
+  .card-status-dot.warn { background: var(--red);   box-shadow: 0 0 0 3px var(--red-bg); }
+  .card-body { padding: 16px; }
+
+  /* ── Långvarig förbrukning — stort kort ──
+     Ärver basstil från .card; endast unika tillägg här. */
+  .longterm-card { max-width: 680px; }
+  .longterm-card .card-num {
+    background: var(--violet-bg, #f5f3ff);
+    color: var(--violet, #7c3aed);
+  }
+
+  /* ── Fields ── */
+  .field { margin-bottom: 10px; display: flex; flex-direction: column; }
+  .field label { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .field input {
+    width: 100%; height: 38px; padding: 8px 11px;
+    background: var(--input-bg); color: var(--text);
+    border: 1px solid var(--border-strong); border-radius: var(--radius-md);
+    font-size: 13px; font-family: inherit; box-sizing: border-box;
+    transition: border-color 0.15s, box-shadow 0.15s; outline: none; margin-top: auto;
+  }
+  .field input:focus {
+    border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light);
+  }
+  .field input.input-error, .field select.input-error { border-color: var(--red); box-shadow: 0 0 0 3px var(--red-bg); }
+  .field-hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+  .field-optional { border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 4px; }
+  .optional-tag {
+    font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--text-muted); background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 4px; padding: 1px 5px; margin-left: 5px; vertical-align: middle;
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: stretch; }
+  .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: stretch; }
+
+  /* ── Period-rad: datumfält i linje med varandra ── */
+  .period-form-row { align-items: end; }
+  .period-date-field label {
+    min-height: 2.6em;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 4px;
+  }
+  .period-date-field input {
+    margin-top: 0;
+  }
+  .action-row {
+    display: flex; gap: 8px; margin-top: 12px; padding-top: 12px;
+    border-top: 1px solid var(--border); flex-wrap: wrap; justify-content: space-between;
+  }
+
+  /* ── Resultat-panel ── */
+  .result-panel { margin-top: 14px; display: none; border-top: 1px solid var(--border); padding-top: 14px; }
+  .result-grid { display: grid; grid-template-columns: auto 1fr; gap: 5px 12px; font-size: 13px; margin-bottom: 10px; }
+  .result-grid .rk { color: var(--text-muted); font-weight: 500; white-space: nowrap; }
+  .result-grid .rv { font-weight: 600; text-align: right; }
+  .result-grid .divider { grid-column: 1 / -1; border: none; border-top: 1px solid var(--border); margin: 4px 0; }
+
+  /* ── Förbrukningsgraf ── */
+  .consumption-bar-wrap {
+    margin: 12px 0 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    height: 28px;
+    position: relative;
+  }
+  .consumption-bar {
+    height: 100%;
+    border-radius: 0;
+    transition: width 0.4s ease;
+    display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 8px;
+    font-size: 11px; font-weight: 700; color: #fff;
+    min-width: 36px;
+    position: relative;
+  }
+  .consumption-bar.ok    { background: var(--green); }
+  .consumption-bar.under { background: var(--amber); }
+  .consumption-bar.over  { background: var(--red); }
+
+  .bar-ticks {
+    display: flex; justify-content: space-between;
+    font-size: 10px; color: var(--text-muted); margin-top: 2px; padding: 0 2px;
+  }
+
+  /* ── Periodlista ── */
+  .period-list {
+    margin-top: 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    font-size: 12px;
+  }
+  .period-list-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 80px;
+    gap: 8px;
+    background: var(--surface2);
+    padding: 7px 12px;
+    font-size: 11px; font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border);
+  }
+  .period-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 80px;
+    gap: 8px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+  }
+  .period-row:last-child { border-bottom: none; }
+  .period-row:nth-child(even) { background: var(--surface2); }
+  .period-cell { font-weight: 500; }
+  .period-cell.mono { font-family: "SF Mono", Consolas, monospace; }
+
+  /* ── Badges & Alerts ── */
+  .badge {
+    display: inline-flex; align-items: center;
+    font-size: 11px; font-weight: 700; padding: 2px 7px;
+    border-radius: 99px; border: 1px solid transparent; white-space: nowrap; margin-left: 6px;
+  }
+  .badge-warn { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
+  .badge-ok   { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
+  .badge-over { background: var(--red-bg);   color: var(--red);   border-color: var(--red-border); }
+  .badge-under{ background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
+  .narc-badge { display: block; margin-top: 5px; margin-left: 0; }
+
+  .alert { padding: 10px 12px; border-left: 3px solid; border-radius: 0 var(--radius-md) var(--radius-md) 0; font-size: 12px; line-height: 1.6; margin-top: 8px; }
+  .alert strong { font-weight: 700; display: block; margin-bottom: 2px; }
+  .alert-danger { background: var(--red-bg);   border-color: var(--red);   color: var(--red); }
+  .alert-warn   { background: var(--amber-bg); border-color: var(--amber); color: var(--amber); }
+  .alert-info   { background: var(--blue-bg);  border-color: var(--blue);  color: var(--blue); }
+  .alert-ok     { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+
+  .copy-section { margin-top: 12px; display: none; border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
+  .copy-tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--surface2); }
+  .copy-tab { flex: 1; padding: 8px 12px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: var(--text-muted); border-bottom: 2px solid transparent; transition: all 0.15s; }
+  .copy-tab.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--primary-light); }
+  .copy-body { font-family: "SF Mono", "Fira Code", Consolas, monospace; font-size: 11px; line-height: 1.6; background: var(--code-bg); padding: 10px 12px; white-space: pre-wrap; max-height: 160px; overflow-y: auto; color: var(--text); }
+  .copy-footer { display: flex; justify-content: flex-end; padding: 6px 10px; background: var(--surface2); border-top: 1px solid var(--border); }
+
+  .fass-link { display: none; font-size: 12px; color: var(--blue); text-decoration: none; font-weight: 600; border: 1px solid var(--blue-border); background: var(--blue-bg); }
+
+  /* ── Toasts & Modals ── */
+  .toast { position: fixed; bottom: 20px; right: 20px; z-index: 9999; background: var(--toast-bg); color: var(--toast-text); padding: 14px 18px; border-radius: var(--radius-lg); box-shadow: 0 8px 24px rgba(0,0,0,0.25); font-size: 13px; max-width: 290px; display: none; }
+  .toast.visible { display: block; }
+  .toast-title { font-weight: 700; margin-bottom: 4px; }
+  .toast-countdown { font-weight: 700; }
+  .toast .btn { margin-top: 10px; width: 100%; justify-content: center; background: rgba(128,128,128,0.1); color: inherit; border-color: rgba(128,128,128,0.2); }
+
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5); z-index: 10000;
+    display: none; align-items: center; justify-content: center;
+    backdrop-filter: blur(2px);
+  }
+  .modal-overlay.visible { display: flex; }
+  .modal-content {
+    background: var(--surface); padding: 20px; border-radius: var(--radius-lg);
+    max-width: 340px; width: 90%; box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+  }
+
+  /* ── Hjälpklasser ── */
+  /* OBS: .is-hidden saknar !important — JS sätter style.display direkt när elementet ska visas */
+  .is-hidden { display: none; }
+  .row-inline-center { display: flex; align-items: center; }
+  .ml-auto { margin-left: auto; }
+
+  .btn-add-block { margin-top: 12px; width: 100%; max-width: 400px; }
+  .btn-add-period { margin-top: 8px; width: 100%; }
+  .btn-remove-inline { font-size: 11px; padding: 4px 10px; margin-left: 8px; }
+  .btn-remove-period { margin-top: 4px; font-size: 11px; }
+
+  .info-banner-spaced { margin-bottom: 16px; }
+  .info-banner-link { color: inherit; font-weight: 700; text-decoration: underline; }
+  .section-label-spaced { margin-top: 14px; }
+  .section-label-first { margin-top: 0; }
+
+  /* ── Modal-innehåll ── */
+  .modal-title { margin-bottom: 8px; }
+  .modal-text { margin-bottom: 16px; font-size: 13px; color: var(--text-muted); }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+  .site-footer { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 40px; font-size: 11px; color: var(--text-muted); opacity: 0.8; }
+  .site-footer a { color: inherit; text-decoration: none; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 6px 10px; border-radius: var(--radius-md); background: var(--surface2); border: 1px solid var(--border); }
+  .site-footer a:hover { color: var(--text); background: var(--border); }
+
+  /* ── Sektion-rubrik ── */
+  .section-label {
+    font-size: 11px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin: 16px 0 8px; padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── Horisontellt kort (Receptförnyelse) ── */
+  .card-horizontal > .card-body {
+    display: flex;
+    align-items: stretch;
+    padding: 0;
+    gap: 0;
+  }
+  .card-form-col {
+    flex: 0 0 360px;
+    padding: 16px;
+  }
+  .card-result-col {
+    flex: 1;
+    border-left: 1px solid var(--border);
+    padding: 16px;
+    background: var(--surface2);
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .card-result-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-style: italic;
+    opacity: 0.7;
+  }
+  .card-horizontal .result-panel {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+  }
+  .card-horizontal .action-row {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 900px) {
+    .card-horizontal > .card-body { flex-direction: column; }
+    .card-form-col { flex: none; }
+    .card-result-col { border-left: none; border-top: 1px solid var(--border); min-height: 0; }
+  }
+  @media (max-width: 768px) {
+    .page-header { flex-direction: column; align-items: flex-start; }
+    .header-actions { align-self: flex-end; flex-wrap: wrap; }
+    .form-row-3 { grid-template-columns: 1fr 1fr; }
+    .period-list-header, .period-row { grid-template-columns: 1fr 1fr 80px; }
+    .period-list-header .ph-avg, .period-row .pr-avg { display: none; }
+  }
+  @media (max-width: 640px) {
+    .summary-bar { grid-template-columns: 1fr; }
+    .form-row, .form-row-3 { grid-template-columns: 1fr; }
+    .main-tabs { width: 100%; }
+    .main-tab { flex: 1; text-align: center; }
+  }
+
+  /* Länkstil för ansvarsfriskrivning i footer */
+  .license-link { color: inherit; text-decoration: underline; }
