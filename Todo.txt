@@ -1,0 +1,41 @@
+Simuleringar med hjälp av AI har funnit följande synpunkter:
+
+
+1. "Division med noll"-kraschen (Oändlighetsbuggen)
+Simulering: Läkaren fyller i Mängd: 100, Antal uttag: 4, men råkar skriva 0 i fältet "Antal per dag" (eller lämnar det tomt medan hen fyller i resten).
+
+Vad som händer: Om doseringen utvärderas till 0, och din beräkning gör något i stil med (amt * ref) / dose, kommer JavaScript att returnera Infinity (oändligheten).
+
+Resultat: När du sedan försöker addera Infinity dagar till ett Date-objekt kommer datumet att bli Invalid Date. Detta gör att gränssnittet antingen visar "NaN-NaN-NaN" eller kraschar tyst så att resultatrutan inte uppdateras.
+
+Lösning: Lägg till en validering: if (dose <= 0 || isNaN(dose)) return; tidigt i din calc()-funktion.
+
+2. Hantering av kommatecken i doseringsfältet
+Simulering: Läkaren skriver in doseringen 1,5 (med svenskt kommatecken) istället för 1.5 (med punkt) i fältet <input id="dose...">.
+
+Vad som händer: Beroende på hur din parseFloat() i calc() ser ut riskerar koden att trunkera värdet. Om man kör parseFloat("1,5") i standard-JavaScript blir resultatet 1.
+
+Resultat: En patient som ska ha 1,5 tabletter om dagen beräknas istället som att den tar 1 tablett om dagen. Medicinen kommer ta slut mycket snabbare i verkligheten än vad verktyget säger. (Du har hanterat detta snyggt i extractDoseUnit med .replace(',', '.'), men se till att det görs för alla sifferfält!).
+
+3. Skottdagar under icke-skottår (Rollover-buggen)
+Simulering: Läkaren använder "Senaste recept" och skriver manuellt in 2025-02-29 (2025 är inte ett skottår).
+
+Vad som händer: JavaScripts Date-objekt kraschar inte när man ger den ett ogiltigt datum, den rullar istället tyst över till nästa giltiga dag. new Date("2025-02-29") utvärderas som 2025-03-01.
+
+Resultat: Även om skillnaden bara är en dag, sker en "tyst mutation" av användarens data. I medicinska system bör felaktiga datum istället markeras med rött (ogiltig inmatning) så att förskrivaren kan rätta till det.
+
+4. Narkotikavarningen missar stavfel och sammansättningar
+Simulering: Läkaren är stressad och skriver Oxy kontin 10mg (särskrivet) eller Elvanse/Attentin (två läkemedel i samma fält).
+
+Vad som händer: Din checkNarcotic-funktion använder \b (ordgränser) och en specifik lista (NARCOTICS_RE). "Oxy kontin" finns inte i listan (men "Oxycontin" gör det). "Elvanse/Attentin" kommer trigga om din normaliseringsfunktion (replace(/[\d.,]+/g, ' ')) inte hanterar snedstreck. Om strängen är "Elvanse/Attentin" bedömer regexen det som ett enda ord om snedstrecket inte byts mot ett mellanslag.
+
+Resultat: Den röda säkerhetsvarningen för narkotika triggas inte.
+
+Lösning: Byt ut alla icke-alfabetiska tecken mot mellanslag i normaliseringen: const normalized = val.replace(/[^a-zA-ZåäöÅÄÖ]+/g, ' ');. Lägg även till vanligt felstavade varianter i NARCOTICS-arrayen.
+
+5. NaN i "Doser kvar"-fältet (Textsträngar)
+Simulering: I fältet "Doser kvar (valfritt)" skriver läkaren "En halv karta" istället för en siffra, trots att det är en <input type="number">. (Ibland tillåter äldre webbläsare text i number-fält, eller så klistrar användaren in text).
+
+Vad som händer: Om din kod hämtar detta värde och adderar det till totala mängden utan att kolla isNaN(), blir hela ekvationen t.ex. 100 + NaN = NaN.
+
+Resultat: Hela beräkningen i resultat-kortet går sönder och visar ingenting.
