@@ -1,4 +1,4 @@
-100 simuleringar med hjälp av AI har funnit följande scenarios som beror på att användaren gör fel, men som behöver beaktas framöver. Sammanställt i 1-5. Den enda kritiska buggen är #2, men vid manuell testning verkar allt fungera som det ska.
+100 simuleringar med hjälp av AI har funnit följande scenarios som beror på att användaren gör fel, men som behöver beaktas framöver. Sammanställt i #1-5. Den enda kritiska buggen är #2, men vid manuell testning verkar allt fungera som det ska.
 
 Punkt 6 handlar om att narkotikanotisen när man skriver in läkemedel också ska ange vilken narkotikaklass preparatet har. Detta för att uppmärksamma läkaren kring hur potent läkemedlet är och därmed vilken försiktighet som behöver vidtas vid receptförnyelse.
 
