@@ -809,11 +809,11 @@ function generateAndDistribute() {
           : '';
         jLines=['Kontaktorsak: Receptförnyelse via 1177.','',
           `Bedömning: Patienten begär förnyelse av ${toRenew[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} doser, ordination ${s.dose} st/dag) och borde räcka till ${s.prescribedEndDateStr}.${overuseRemNote}`,
-          `Beräknad snittförbrukning: ${s.displayAvgStr} ${s.avgNote} — överstiger ordination. Receptet förnyas på klinisk indikation.`,
+          `Beräknad snittförbrukning: ${s.displayAvgStr} ${s.avgNote} — överstiger ordination. Receptet förnyas på klinisk indikation efter individuell bedömning.`,
           '','Åtgärd: Nytt recept utfärdat. Svar skickat till patient via 1177.'];
       } else {
         const earlyNote = toRenew[0].earlyRenewal === 'tooEarly'
-          ? ` Receptet förnyas på klinisk indikation trots att receptperioden löper ut ${s.prescribedEndDateStr} (${s.daysToPrescribedEnd} dagar kvar).`
+          ? ` Receptet förnyas på klinisk indikation efter individuell bedömning trots att receptperioden löper ut ${s.prescribedEndDateStr} (${s.daysToPrescribedEnd} dagar kvar).`
           : '';
         const remainingNote = s.remainingDoses!=null
           ? (s.daysRemaining>0 ? ` Vid förnyelse framkommer att patienten har ${s.remainingDoses} doser (${s.daysRemaining} dagar) kvar.` : ` Vid förnyelse framkommer att patienten uppger att medicinen är slut.`)
@@ -878,8 +878,14 @@ function calcPrescribeResult(i) {
 
   let endDate = null, totalDays = 0;
   if (ps.mode === 'months' && ps.months > 0) {
-    endDate   = new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth() + ps.months, startDate.getUTCDate()));
-    totalDays = getDaysDiff(endDate, startDate);
+    // Målдatum = idag + önskade månader (befintligt recept räknas in)
+    const targetEnd = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + ps.months, today.getUTCDate()));
+    totalDays = getDaysDiff(targetEnd, startDate);
+    if (totalDays <= 0) {
+      // Befintligt recept täcker redan hela perioden — inget nytt behövs
+      return { startDate, startDateStr, daysAlreadyCovered, endDate: null, totalDays: 0, totalTablets: 0, packages: 0 };
+    }
+    endDate = targetEnd;
   } else if (ps.mode === 'date' && ps.endDate) {
     const ed = parseDateUTC(ps.endDate);
     if (ed && ed > startDate) { endDate = ed; totalDays = getDaysDiff(ed, startDate); }
@@ -978,7 +984,7 @@ function buildPrescribeInner(i) {
   // Varaktighet — månader eller slutdatum
   const durDiv = document.createElement('div'); durDiv.className = 'field';
   if (ps.mode === 'months') {
-    const durLbl = document.createElement('label'); durLbl.textContent = 'Antal månader'; durLbl.setAttribute('for', 'ps-months-' + i);
+    const durLbl = document.createElement('label'); durLbl.textContent = 'Förskriva i antal månader'; durLbl.setAttribute('for', 'ps-months-' + i);
     const durSel = document.createElement('select'); durSel.id = 'ps-months-' + i; durSel.className = 'prescribe-select';
     [1,2,3,4,5,6,7,8,9,10,11,12].forEach(m => {
       const opt = document.createElement('option'); opt.value = String(m);
