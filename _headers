@@ -6,12 +6,26 @@
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
 
   # Skickar ingen Referer-header till externa sidor (t.ex. FASS-länkar)
-  # Förhindrar att besökarens ursprungsdomän läcks till tredje part
   Referrer-Policy: no-referrer
 
   # Stänger av webbläsarfunktioner som verktyget inte behöver
-  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  # Inkluderar moderna fingerprinting- och spårnings-APIs
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=(), interest-cohort=(), browsing-topics=(), attribution-reporting=(), identity-credentials-get=()
 
   # Förhindrar att sidan bäddas in i en iframe (clickjacking-skydd)
   # frame-ancestors i <meta>-CSP ignoreras av webbläsare per spec — denna header krävs
   X-Frame-Options: DENY
+
+  # Content Security Policy som HTTP-header (starkare än <meta>-taggen i HTML)
+  # Tillåter enbart resurser från samma ursprung — inga externa skript, stilar eller nätverksanrop
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+
+  # Isolerar fönstret från cross-origin-kontexter — skyddar mot Spectre-liknande sidokanalsattacker
+  Cross-Origin-Opener-Policy: same-origin
+
+  # Förhindrar att resurser på sidan laddas in av externa ursprung utan explicit tillstånd
+  Cross-Origin-Resource-Policy: same-origin
+
+  # Kräver att alla inladdade resurser explicit tillåter cross-origin-delning (CORP-header)
+  # Säkert här eftersom appen inte laddar några externa resurser
+  Cross-Origin-Embedder-Policy: require-corp
