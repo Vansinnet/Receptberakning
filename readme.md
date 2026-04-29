@@ -1,142 +1,280 @@
-# Receptberäkning
+\# Receptberäkning
 
-> Kliniskt beslutsstöd för läkare vid handläggning av receptförnyelser via 1177.
 
-**Live:** [receptberakning.pages.dev](https://receptberakning.pages.dev/)
 
----
+> Kliniskt beslutsstöd för läkare vid handläggning av receptförnyelser via 1177 samt analys av långvarig förbrukning.
 
-> **Observera:** Detta verktyg är endast ett beslutsstöd. Verktyget genererar ett underlag — **det kliniska ställningstagandet fattas alltid av läkaren**, oavsett vad beräkningen visar. Genererade patient- och journaltexter är förslag som kan behöva justeras utifrån patientens unika situation.
 
----
 
-## Vad gör verktyget?
+\*\*Live:\*\* \[receptberakning.pages.dev](https://receptberakning.pages.dev/)
 
-Läkaren matar in ordinationsinformation — läkemedel, senaste receptdatum, mängd per uttag, antal uttag och ordinerad dygnsdos. Verktyget beräknar automatiskt patientens förbrukningstakt och avgör utfall:
 
-| Utfall | Villkor | Statusfärg |
-|---|---|---|
-| ✅ OK att förnya | Normal förbrukning och ≤ 20 % av receptperioden kvar | 🟢 Grön |
-| ⚠ Bedömning krävs | Snitt > 10 % över ordination (med > 7 dagar kvar) | 🔴 Röd |
-| ⏳ För tidigt | Normal förbrukning men > 20 % av receptperioden kvar | 🟡 Gul |
-| ✓ OK efter beslut | Läkare godkänt förnyelse trots avvikelse | 🟢 Grön |
 
-Vid avvikelse ställs en klinisk beslutsfråga: **"Bedömer du att receptet ska förnyas?"** Läkarens svar (Ja/Nej) styr journaltext, patienttext och sidebarsindikator.
+\---
 
-För varje utfall genereras ett färdigt **svar till patient via 1177** och en **journalanteckning** — redo att kopiera och klistra in.
 
----
 
-## Funktioner
+> \*\*Observera:\*\* Verktyget är endast ett beslutsstöd. Sjukvårdspersonal ska alltid använda sitt kliniska omdöme. Genererade texter är förslag baserade på matematiska beräkningar och kan behöva justeras utifrån patientens unika situation.
 
-### 💊 Receptförnyelse
 
-- Stöd för upp till **8 läkemedel** i samma session med individuell beräkning per kort
-- Beräknar snittförbrukning baserat på förskrivningsdatum, mängd och antal uttag
-- Valfritt fält **Doser kvar** — ger exakt förbrukningsberäkning mot faktiskt kvarvarande antal i stället för worst-case-antagande
-- Tar hänsyn till vilka uttag som rimligen hunnit hämtas ut vid beräkningstillfället
-- Tidslinje som visar hur stor andel av receptperioden som förflutit
-- Direktlänk till **FASS** för varje läkemedel
-- Samlat 1177-svar och journalanteckning för alla läkemedel genereras automatiskt och fördelas till samtliga kort
 
-### 🩺 Klinisk beslutsfunktion
+\---
 
-- Vid överförbrukning eller för tidig förfrågan visas frågan: *"Mot bakgrund av ovanstående — bedömer du att receptet ska förnyas?"*
-- Läkaren svarar **Ja, förnya** eller **Nej, avslå**
-- Beslutet reflekteras direkt i verdict-rutan (färg och rubrik), sidebarsindikator, patienttext och journalanteckning
-- Beslutet återställs automatiskt om kliniska flaggor ändras vid omberäkning
 
-### 🌐 Svar till patient på engelska
 
-- Knapp för att växla patientmeddelandet till engelska
-- Fungerar **helt offline** — färdiga engelska mallar är inbyggda, inga externa anrop
-- Täcker alla utfall och flermedicinscenarier
-- Kopieringsknappen kopierar alltid den version som visas
+\## Vad gör verktyget?
 
-### 🔒 Varning för narkotikaklassade preparat
 
-- Automatisk kontroll mot inbyggd lista över narkotikaklassade substanser i Sverige (LVFS 2011:10)
-- Varningsbadge visas direkt under läkemedelsfältet om preparatet är narkotikaklassat (förteckning II–V)
-- Täcker opioider, bensodiazepiner, Z-läkemedel, centralstimulantia, pregabalin, ketamin m.fl.
-- Datumstämpel i koden anger när listan senast stämdes av
-- Kräver ingen nätverksuppkoppling
 
-### 📊 Långvarig förbrukningsanalys
+Verktyget består av två huvudflikar:
 
-- Analys av förbrukningsmönster över **upp till 10 receptperioder**
-- Startdatum förvalt till ett år bakåt, slutdatum till idag
-- Individuell snittberäkning och procentuell jämförelse mot ordinerad dos per period
-- Varning vid överlappande perioder
-- Journaltext med sammanfattning av samtliga perioder och plats för klinisk bedömning
 
-### 🔐 Integritet och säkerhet
 
-- All patientdata stannar **i webbläsarens minne** — ingenting skickas till någon server
-- Automatisk datarensning efter **5 minuters inaktivitet** (varning med nedräkning visas vid 4 min)
-- Sidan rensas vid navigering bort (`pagehide`) för att minimera exponering i webbläsarens cache
-- Content Security Policy blockerar alla externa nätverksanrop och inline-skript
-- `innerHTML` används inte för användardata — alla DOM-uppdateringar sker via säkra DOM-metoder
-- Inmatningsfält begränsade till rimliga maxlängder för att motverka ReDoS-risker
-- Endast temainställningen sparas i `localStorage`
+\### 1. 💊 Receptförnyelse
 
-### 🎨 Teman
+Läkaren matar in ordinationsinformation (läkemedel + styrka, senaste receptdatum, mängd per uttag, antal uttag och ordinerad dygnsdos). Verktyget beräknar patientens förbrukningstakt och bedömer om förnyelse är lämplig.
 
-Tre inbyggda färgteman: **Mörkt**, **Kliniskt** (standard), **Lazerwave**
 
----
 
-## Beräkningslogik
+Baserat på beräkningen visas ett \*\*utlåtande\*\* med:
 
-| Parameter | Värde |
-|---|---|
-| Överförbrukningströskel | Snitt > 10 % av ordinerad dos |
-| 7-dagarsundantag | Ingen överförbrukningsflagga om ≤ 7 dagar kvar |
-| Tidig förnyelse-tröskel | > 20 % av receptets totala längd kvar |
-| Rekommenderat återkontaktdatum | Slutdatum − 20 % av receptlängden |
-| Uttag | Modellen tar hänsyn till vilka uttag som rimligen hunnit hämtas ut vid beräkningstillfället |
+\- \*\*OK att förnya\*\* – förbrukning inom ±10 % av ordination. Förhöjd förbrukning suppressas till en notering (ej blockering) om medicinen beräknas ta slut inom 7 dagar \*\*och\*\* receptperioden har mindre än 14 dagar kvar.
 
----
+\- \*\*För tidigt att förnya\*\* – normal förbrukning men mer än 14 dagar kvar av receptperioden (standardgräns).
 
-## Teknisk information
+\- \*\*Överförbrukning\*\* – snittförbrukning >10 % över ordinerad dos, och antingen mer än 7 dosdagar återstår eller receptperioden har mer än 14 dagar kvar. Det senare fångar fall där patienten fyllt i kvarvarande doser och tagit slut för tidigt.
 
-- Ren **HTML / CSS / JavaScript** — inga ramverk, inga externa beroenden
-- Tre filer: `index.html`, `app.css`, `app.js` samt `_headers` för Cloudflare Pages-konfiguration
-- Ingen server, ingen databas, inga API-anrop
-- Fungerar helt offline — öppna bara `index.html` i en webbläsare
 
----
 
-## Kom igång
+För överförbrukning eller för tidig förnyelse kan läkaren \*\*aktivt överstyra\*\* via knapparna \*\*Ja, förnya\*\* / \*\*Nej, avslå\*\*. Detta påverkar både statusfärg, sidomeny och de genererade texterna.
 
-**Lokalt:**
-```
-Öppna index.html i valfri webbläsare — ingen installation behövs.
-```
 
-**Driftsätt online:**
-Ladda upp filerna till valfri statisk webbserver, t.ex. GitHub Pages eller Cloudflare Pages.
 
----
+För varje läkemedel genereras direkt:
 
-## Genererade texter — exempel
+\- \*\*Svar till patient (svenska)\*\* – redo att skickas via 1177.
 
-**OK att förnya — svar till patient:**
-> Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt recept inom 2–3 arbetsdagar. Du kan därefter hämta ut din medicin på valfritt apotek.
+\- \*\*Svar till patient (engelska)\*\* – växla med en knapp.
 
-**För tidigt — svar till patient:**
-> Vi har tagit emot din förfrågan om receptförnyelse för Sertralin 50 mg. Enligt din ordination (1 st/dag) beräknas medicinen räcka till den 2026-06-14. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. Vänligen hör av dig igen runt den 2026-06-08 så hjälper vi dig då med nytt recept.
+\- \*\*Journalanteckning (förslag)\*\* – anpassad efter bedömningen.
 
-**Överförbrukning, läkare väljer Ja — journalanteckning:**
-> Beräknad snittförbrukning: 1.72 st/dag (86.0 mg/dag) (beräknat under antagandet att alla hittills tillgängliga doser är förbrukade) — överstiger ordination. Receptet förnyas på klinisk indikation.
+
+
+Stöd för upp till \*\*8 läkemedel\*\* i samma session – en sammanhållen patienttext och journalanteckning skapas för alla.
+
+
+
+\### 2. 📊 Långvarig förbrukning
+
+Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder). För varje period anges startdatum, antal uttagna tabletter och slutdatum. Verktyget beräknar:
+
+\- Snittförbrukning per dag i varje period.
+
+\- Avvikelse i procent mot ordinerad dos.
+
+\- Total snittförbrukning över alla perioder.
+
+\- Visuell stapel och status (Över / OK / Under).
+
+\- Genererad journalanteckning med sammanfattning.
+
+
+
+\---
+
+
+
+\## Funktioner i detalj
+
+
+
+\### ✅ Receptförnyelse
+
+\- Stöd för upp till \*\*8 läkemedel\*\*.
+
+\- \*\*Automatisk datumformatering\*\* (ÅÅÅÅ-MM-DD).
+
+\- \*\*Valfritt fält för kvarvarande doser\*\* – används enbart för att beräkna faktisk snittförbrukning. "Räcker t.o.m." visar alltid när receptet tar slut vid ordinerad dos, oavsett om fältet är ifyllt.
+
+\- \*\*Direktlänk till FASS\*\* för aktuellt läkemedel.
+
+\- \*\*Narkotikavarning\*\* – identifierar narkotikaklassade preparat enligt LVFS 2011:10 och visar en badge (Förteckning II–V).
+
+\- \*\*Tidslinje\*\* – visar hur stor del av receptperioden som förflutit.
+
+\- \*\*Mätvärden\*\* med verktygstips (totalt förskrivet, slutdatum, snittförbrukning).
+
+\- \*\*Alerter\*\* – varning vid låg/överförbrukning, tidig uthämtning, avvikande data.
+
+\- \*\*Kliniskt överstyrande\*\* – vid överförbrukning eller för tidig begäran kan läkaren manuellt godkänna förnyelse (knapparna Ja/Nej).
+
+\- \*\*Svar till patient på svenska och engelska\*\* – växla med en knapp, ingen översättningstjänst krävs.
+
+\- \*\*Journalanteckning\*\* – anpassas efter om förnyelse beviljats eller ej.
+
+\- \*\*Kopieringsknappar\*\* – för snabb inklistring i journalsystem/1177.
+
+
+
+\### 📊 Långvarig förbrukning
+
+\- \*\*Upp till 10 perioder\*\* – lägg till/ta bort efter behov.
+
+\- Förvalda datum: start = ett år tillbaka, slut = idag.
+
+\- Validering av datum (start < slut, inga framtida datum).
+
+\- Varning vid överlappande perioder.
+
+\- \*\*Stapeldiagram\*\* – relativ förbrukning (0–150 % av ordination).
+
+\- \*\*Periodtabell\*\* – visar snitt/dag, avvikelse % och badge.
+
+\- \*\*Journalanteckning\*\* – sammanfattar alla perioder och total snittförbrukning.
+
+
+
+\### 🔒 Integritet och säkerhet
+
+\- All patientdata stannar \*\*enbart i webbläsarens minne\*\* – skickas aldrig till någon server.
+
+\- \*\*Automatisk rensning\*\* efter 5 minuters inaktivitet (varning efter 4 min).
+
+\- Endast temainställningen sparas i `localStorage`.
+
+\- \*\*Content Security Policy\*\* blockerar alla externa nätverksanrop.
+
+\- \*\*Inga externa bibliotek\*\* – ren HTML/CSS/JavaScript.
+
+
+
+\### 🎨 Utseende
+
+Tre inbyggda teman som växlas direkt:
+
+\- \*\*🩺 Klinisk\*\* (standard) – lugn grön/teal-bas.
+
+\- \*\*🌙 Mörkt\*\* – hög kontrast, mörk bakgrund.
+
+\- \*\*🌒 Natt\*\* – varmt mörkt tema med orange accenter.
+
+
+
+\### 🧰 Övrigt
+
+\- \*\*Verktygstips\*\* (`data-tooltip`) för nästan alla inmatningsfält och mätvärden.
+
+\- \*\*Toastmeddelande\*\* vid inaktivitet.
+
+\- \*\*Modal\*\* för bekräftelse vid rensning av all data.
+
+\- \*\*Responsiv design\*\* – anpassar sig för smalare skärmar (staplad vy).
+
+
+
+\---
+
+
+
+\## Teknisk information
+
+
+
+\- \*\*Ren HTML/CSS/JavaScript\*\* – inga ramverk, inga externa beroenden.
+
+\- \*\*En enda HTML-fil\*\* med inbäddad CSS och JS (dock i utvecklingsversionen separata filer, men produktionsbygge kan vara sammanfogat).
+
+\- Fungerar \*\*helt offline\*\* – öppna bara filen i en webbläsare.
+
+\- \*\*Standardiserad datumhantering\*\* – alla datum hanteras som UTC för att undvika tidszonsproblem.
+
+
+
+\---
+
+
+
+\## Kom igång
+
+
+
+\*\*Lokalt:\*\*
+
+Öppna index.html i valfri webbläsare – ingen installation behövs.
+
+
+
+\*\*Driftsätt online:\*\*
+
+Ladda upp samtliga filer (`index.html`, `app.css`, `app.js`) till valfri statisk webbserver, t.ex. GitHub Pages eller Cloudflare Pages.
+
+
+
+\---
+
+
+
+\## Genererade texter – exempel
+
+
+
+\*\*OK att förnya – svar till patient (sv)\*\*
+
+> Vi har tagit emot din förfrågan om receptförnyelse för Elvanse 50 mg och kommer att förnya ditt recept inom 2–3 arbetsdagar. Du kan därefter hämta ut din medicin på valfritt apotek.
+
+
+
+\*\*För tidigt – svar till patient (sv)\*\*
+
+> Vi har tagit emot din förfrågan om receptförnyelse för Elvanse 50 mg. Enligt din ordination (1 st/dag) beräknas medicinen räcka till den 2025-06-14. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. Vänligen hör av dig igen runt den 2025-06-07 så hjälper vi dig då med nytt recept.
+
+
+
+\*\*Överförbrukning – journalanteckning (efter klinisk bedömning)\*\*
+
+> Kontaktorsak: Receptförnyelse via 1177.
+
+>
+
+> Bedömning: Patienten begär förnyelse av Elvanse 50 mg. Senaste receptet utfärdades 2025-01-15 (totalt 300 doser, ordination 1 st/dag) och borde räcka till 2025-11-12. Beräknad snittförbrukning: 1,72 st/dag (beräknat på faktisk förbrukning…) – överstiger ordination. Receptet förnyas på klinisk indikation.
+
+>
+
 > Åtgärd: Nytt recept utfärdat. Svar skickat till patient via 1177.
 
-**Överförbrukning, läkare väljer Nej — journalanteckning:**
-> Åtgärd: Ej förnyat efter klinisk, individuell bedömning.
 
----
 
-## Licens
+\---
 
-MIT — fri att använda, modifiera och distribuera.
 
----
+
+\## Licens och användningsvillkor
+
+
+
+Copyright (C) 2026 Vansinnet. Alla rättigheter förbehållna.
+
+
+
+Detta verktyg är publicerat med öppen källkod för att möjliggöra transparens, klinisk granskning och bidrag från communityt. För användning gäller följande:
+
+
+
+\* \*\*Privatpersoner/Enskilda läkare:\*\* Du får använda verktyget fritt för personligt bruk och enskild klinisk handläggning.
+
+\* \*\*Vårdföretag och kommersiella aktörer:\*\* Det är \*\*inte tillåtet\*\* att implementera, distribuera eller använda detta verktyg systematiskt inom vinstdrivande verksamhet eller kommersiella system utan uttryckligt skriftligt medgivande från upphovsmannen.
+
+
+
+För tillstånd eller frågor om kommersiell licensiering, vänligen kontakta mig via GitHub.
+
+
+
+\---
+
+
+
+\## Friskrivning (Disclaimer)
+
+Verktyget tillhandahålls "i befintligt skick" utan garantier. Skaparen tar inget ansvar för medicinska beslut eller tekniska fel. Det kliniska ansvaret vilar alltid på den förskrivande läkaren.
+
