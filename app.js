@@ -115,7 +115,9 @@ function extractDoseUnit(medRaw) {
   return { amount, unit };
 }
 function getFassUrl(medRaw) {
-  return `https://www.fass.se/LIF/result?query=${encodeURIComponent(medRaw.trim())}&userType=2`;
+  const url = `https://www.fass.se/LIF/result?query=${encodeURIComponent(medRaw.trim())}&userType=2`;
+  // Ursprungsvalidering: säkerställ att URL:en alltid pekar på fass.se (defense-in-depth)
+  return url.startsWith('https://www.fass.se/') ? url : '#';
 }
 function parseDateUTC(str) {
   if (!str) return null;
@@ -586,9 +588,12 @@ function calc() {
     avgNum = total/daysSince;
   }
 
-  const isOveruse  = daysRemaining > 7 && avgNum > inputData.dose * 1.10;
   const prescribedEndDate = new Date(inputData.pDate);
   prescribedEndDate.setUTCDate(prescribedEndDate.getUTCDate()+Math.round(totalDays));
+  const daysToPrescribedEnd = getDaysDiff(prescribedEndDate, today);
+  // Överförbrukning om >10% över ordination OCH antingen mer än 7 dosdagar återstår
+  // ELLER receptperioden har mer än 14 dagar kvar (patienten har tagit slut för tidigt).
+  const isOveruse  = avgNum > inputData.dose * 1.10 && (daysRemaining > 7 || daysToPrescribedEnd > 14);
   const isTooEarly = !isOveruse && daysRemaining > Math.round(totalDays * 0.20);
 
   // Avgöranden-texter
@@ -624,11 +629,14 @@ function calc() {
   // Mätvärden
   const earlyThreshold = Math.round(totalDays * 0.20);
   states[i].earlyThreshold = earlyThreshold;
-  const endCls = daysRemaining < 0 ? 'danger' : daysRemaining <= earlyThreshold ? 'warn' : 'ok';
+  // endCls och "Räcker t.o.m." baseras alltid på prescribedEndDate (ordinerad takt),
+  // oavsett om läkaren fyllt i faktiska kvarvarande doser. Doser kvar används enbart
+  // för snittberäkning — inte för att bestämma hur länge receptet "räcker".
+  const endCls = daysToPrescribedEnd < 0 ? 'danger' : daysToPrescribedEnd <= earlyThreshold ? 'warn' : 'ok';
   states[i].metrics = [
     {label:'Totalt förskrivet', value:`${total} st`, cls:'',     tooltip:'Mängd per uttag × antal uttag. Det totala antalet doser som förskrevs på receptet.'},
-    {label:'Räcker t.o.m.',    value: (() => { const d = hasRemaining ? fmtDate(endDate) : fmtDate(prescribedEndDate); const note = daysRemaining > 0 ? ` (${daysRemaining} dagar kvar)` : daysRemaining === 0 ? ' (tar slut idag)' : ` (slut sedan ${Math.abs(daysRemaining)} dagar)`; return d + note; })(), cls: endCls, tooltip:'Beräknat datum då medicinen tar slut vid ordinerad dos. Underlag för att bedöma om förnyelse är befogad.'},
-    {label:'Snittförbrukning', value:displayAvg,    cls: isOveruse?'danger':'', tooltip:'Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning (gäller om mer än 7 dagar återstår av receptperioden).'},
+    {label:'Räcker t.o.m.',    value: (() => { const note = daysToPrescribedEnd > 0 ? ` (${daysToPrescribedEnd} dagar kvar)` : daysToPrescribedEnd === 0 ? ' (tar slut idag)' : ` (slut sedan ${Math.abs(daysToPrescribedEnd)} dagar)`; return fmtDate(prescribedEndDate) + note; })(), cls: endCls, tooltip:'Beräknat datum då receptet tar slut vid ordinerad dos. Doser kvar används enbart för att beräkna snittförbrukning.'},
+    {label:'Snittförbrukning', value:displayAvg,    cls: isOveruse?'danger':'', tooltip:'Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dosdagar återstår eller receptperioden har mer än 14 dagar kvar.'},
   ];
 
   // Verdict
