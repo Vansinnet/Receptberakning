@@ -727,7 +727,8 @@ function generateAndDistribute() {
   let patLines=['Hej,',''];
   if (validCount===1) {
     if (toRenew.length===1) {
-      patLines.push(`Vi har tagit emot din begäran på ${toRenew[0].name} och kommer att förnya ditt recept inom 2–3 arbetsdagar. Du kan därefter hämta ut din medicin på valfritt apotek.`);
+      patLines.push(`Vi har tagit emot din förfrågan om receptförnyelse för ${toRenew[0].name} och kommer att förnya ditt recept inom 2–3 arbetsdagar. Du kan därefter hämta ut din medicin på valfritt apotek.`);
+      patLines.push(''); patLines.push('Vid frågor är du välkommen att kontakta oss via 1177.');
     } else if (tooEarly.length===1) {
       const s=states[tooEarly[0].i];
       patLines.push(`Vi har tagit emot din förfrågan om receptförnyelse för ${tooEarly[0].name}. Enligt din ordination (${s.dose} st/dag) beräknas medicinen räcka till den ${s.endDateStr}. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. Vänligen hör av dig igen runt den ${s.renewDateStr} så hjälper vi dig då med nytt recept.`);
@@ -740,14 +741,14 @@ function generateAndDistribute() {
         : s.prescribedContactIsPast
           ? `Medicinen beräknas ta slut inom kort — vänligen hör av dig igen så hjälper vi dig.`
           : `Vänligen hör av dig igen närmre den ${s.prescribedContactDateStr} så hjälper vi dig då.`;
-      patLines.push(`Vi har tagit emot din förfrågan om receptförnyelse för ${overuse[0].name}. Vi har granskat förfrågan och kan tyvärr inte förnya receptet vid detta tillfälle. ${closing}`);
+      patLines.push(`Vi har tagit emot din förfrågan om receptförnyelse för ${overuse[0].name}. Utifrån föregående recept beräknades medicinen räcka till den ${s.prescribedEndDateStr}. Vi har granskat förfrågan och kan tyvärr inte förnya receptet vid detta tillfälle. ${closing}`);
       patLines.push(''); patLines.push('Vid frågor är du välkommen att kontakta oss via 1177.');
     }
   } else {
     patLines.push('Vi har tagit emot din förfrågan om receptförnyelse för följande läkemedel:','');
     toRenew.forEach(({name})=>patLines.push(`${name}: Vi förnyar ditt recept inom 2–3 arbetsdagar.`));
-    tooEarly.forEach(({name,i})=>{ const s=states[i]; patLines.push(`${name}: Räcker till ${s.endDateStr}. Hör av dig runt ${s.renewDateStr}.`); });
-    overuse.forEach(({name,i})=>{ const s=states[i]; const epast=new Date(s.prescribedEndDateStr)<getToday(); const c=epast?`Receptet kan nu förnyas — kontakta oss igen.`:s.prescribedContactIsPast?`Medicinen beräknas ta slut inom kort — hör av dig igen.`:`Hör av dig närmre ${s.prescribedContactDateStr}.`; patLines.push(`${name}: ${c}`); });
+    tooEarly.forEach(({name,i})=>{ const s=states[i]; patLines.push(`${name}: Enligt din ordination beräknas medicinen räcka till ${s.endDateStr} — vi kan därför inte förnya receptet ännu. Hör av dig runt ${s.renewDateStr}.`); });
+    overuse.forEach(({name,i})=>{ const s=states[i]; const epast=new Date(s.prescribedEndDateStr)<getToday(); if(epast){ patLines.push(`${name}: Beräknades räcka till ${s.prescribedEndDateStr}. Receptet kan nu förnyas — kontakta oss igen.`); } else { const c=s.prescribedContactIsPast?`Medicinen beräknas ta slut inom kort — hör av dig igen.`:`Hör av dig närmre ${s.prescribedContactDateStr}.`; patLines.push(`${name}: Beräknades räcka till ${s.prescribedEndDateStr} — kan tyvärr inte förnyas vid detta tillfälle. ${c}`); } });
     patLines.push('','Vid frågor är du välkommen att kontakta oss via 1177.');
   }
   const patientText = patLines.join('\n');
@@ -756,7 +757,8 @@ function generateAndDistribute() {
   let patLinesEn=['Hello,',''];
   if (validCount===1) {
     if (toRenew.length===1) {
-      patLinesEn.push(`We have received your request for ${toRenew[0].name} and will renew your prescription within 2–3 working days.`);
+      patLinesEn.push(`We have received your prescription renewal request for ${toRenew[0].name} and will renew your prescription within 2–3 working days. You can then collect your medication at any pharmacy.`);
+      patLinesEn.push(''); patLinesEn.push('If you have questions, please contact us through 1177.');
     } else if (tooEarly.length===1) {
       const s=states[tooEarly[0].i];
       patLinesEn.push(`We have received your prescription renewal request for ${tooEarly[0].name}. Your medication is estimated to last until ${s.endDateStr}. Please contact us again around ${s.renewDateStr} and we will help you then.`);
@@ -769,14 +771,14 @@ function generateAndDistribute() {
         : s.prescribedContactIsPast
           ? `Your medication is expected to run out shortly — please contact us again and we will help you.`
           : `Please contact us again closer to ${s.prescribedContactDateStr}.`;
-      patLinesEn.push(`We have received your prescription renewal request for ${overuse[0].name}. We have reviewed your request and are unfortunately unable to renew the prescription at this time. ${c}`);
+      patLinesEn.push(`We have received your prescription renewal request for ${overuse[0].name}. Based on the previous prescription, the medication was estimated to last until ${s.prescribedEndDateStr}. We have reviewed your request and are unfortunately unable to renew the prescription at this time. ${c}`);
       patLinesEn.push(''); patLinesEn.push('If you have questions, please contact us through 1177.');
     }
   } else {
-    patLinesEn.push('We received your renewal request for the following medications:','');
+    patLinesEn.push('We have received your prescription renewal request for the following medications:','');
     toRenew.forEach(({name})=>patLinesEn.push(`${name}: We will renew your prescription within 2–3 working days.`));
-    tooEarly.forEach(({name,i})=>{ const s=states[i]; patLinesEn.push(`${name}: Estimated to last until ${s.endDateStr}. Please contact us around ${s.renewDateStr}.`); });
-    overuse.forEach(({name,i})=>{ const s=states[i]; const c=s.prescribedContactIsPast?`Prescription will be issued from ${s.prescribedEndDateStr}.`:`Please contact us closer to ${s.prescribedContactDateStr}.`; patLinesEn.push(`${name}: Estimated to last until ${s.prescribedEndDateStr}. ${c}`); });
+    tooEarly.forEach(({name,i})=>{ const s=states[i]; patLinesEn.push(`${name}: Based on your prescription, the medication is estimated to last until ${s.endDateStr} — it is therefore too early to renew. Please contact us around ${s.renewDateStr}.`); });
+    overuse.forEach(({name,i})=>{ const s=states[i]; const epast=new Date(s.prescribedEndDateStr)<getToday(); if(epast){ patLinesEn.push(`${name}: Based on the previous prescription, the medication was estimated to last until ${s.prescribedEndDateStr}. The prescription can now be renewed — please contact us again.`); } else { const c=s.prescribedContactIsPast?`The medication is expected to run out shortly — please contact us again.`:`Please contact us again closer to ${s.prescribedContactDateStr}.`; patLinesEn.push(`${name}: Based on the previous prescription, the medication was estimated to last until ${s.prescribedEndDateStr} — we are unfortunately unable to renew it at this time. ${c}`); } });
     patLinesEn.push('','If you have questions, please contact us through 1177.');
   }
   const patientTextEn = patLinesEn.join('\n');
@@ -811,7 +813,7 @@ function generateAndDistribute() {
     }
   } else {
     jLines=['Kontaktorsak: Receptförnyelse via 1177 (flera läkemedel).',''];
-    toRenew.forEach(({name,i,earlyRenewal})=>{ const s=states[i]; const atgardText=earlyRenewal==='overuse'?'Åtgärd: Förnyat efter klinisk, individuell bedömning.':earlyRenewal==='tooEarly'?`Åtgärd: Förnyat efter klinisk, individuell bedömning (${s.daysRemaining}d kvar).`:'Åtgärd: Förnyat.'; jLines.push(`${name}: Utfärdat ${s.pDateStr} (${s.total} doser, ${s.dose} st/dag). Räcker t.o.m. ${s.endDateStr}. Snitt: ${s.displayAvgStr}. ${atgardText}`,'')});
+    toRenew.forEach(({name,i,earlyRenewal})=>{ const s=states[i]; const atgardText=earlyRenewal==='overuse'?'Åtgärd: Förnyat efter klinisk, individuell bedömning.':earlyRenewal==='tooEarly'?`Åtgärd: Förnyat efter klinisk, individuell bedömning (${s.daysRemaining}d kvar).`:'Åtgärd: Förnyat.'; const endInfo=earlyRenewal==='overuse'?`Borde räcka t.o.m. ${s.prescribedEndDateStr}. Snitt: ${s.displayAvgStr} — överstiger ordination.`:`Räcker t.o.m. ${s.endDateStr}. Snitt: ${s.displayAvgStr}.`; jLines.push(`${name}: Utfärdat ${s.pDateStr} (${s.total} doser, ${s.dose} st/dag). ${endInfo} ${atgardText}`,'')});
     tooEarly.forEach(({name,i})=>{ const s=states[i]; jLines.push(`${name}: Utfärdat ${s.pDateStr} (${s.total} doser, ${s.dose} st/dag). Räcker t.o.m. ${s.endDateStr} (${s.daysRemaining} dagar kvar). Snitt: ${s.displayAvgStr}. Åtgärd: Ej förnyat — för tidigt.`,''); });
     overuse.forEach(({name,i})=>{ const s=states[i]; const sn=s.daysRemaining>0?`Räcker ytterligare ${s.daysRemaining} dagar.`:`Förskrivningen är slut.`; const atgard=s.earlyRenewalDecision==='no'?'Åtgärd: Ej förnyat efter klinisk, individuell bedömning.':'Åtgärd: [Nytt recept utfärdat / Ej utfärdat — motivering]'; jLines.push(`${name}: Utfärdat ${s.pDateStr} (${s.total} doser, ${s.dose} st/dag). Borde räcka t.o.m. ${s.prescribedEndDateStr}. ${sn} Snitt: ${s.displayAvgStr}. ${atgard}`,''); });
     if (toRenew.length>0) jLines.push(`Recept utfärdat för: ${toRenew.map(x=>x.name).join(', ')}. Svar skickat via 1177.`);

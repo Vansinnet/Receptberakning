@@ -397,17 +397,27 @@ html, body {
 
 /* Beslutsfråga – för tidig förnyelse */
 .early-decision-box {
-  border: 1px solid var(--amber-border);
+  border: 2px solid var(--amber);
+  border-left: 5px solid var(--amber);
   background: var(--amber-bg);
   border-radius: var(--radius-md);
-  padding: 12px 14px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  box-shadow: 0 2px 10px rgba(180, 83, 9, 0.15);
+}
+.early-decision-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--amber);
+  opacity: 0.75;
 }
 .early-decision-q {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   color: var(--amber);
 }
 .early-decision-actions { display: flex; gap: 8px; }
