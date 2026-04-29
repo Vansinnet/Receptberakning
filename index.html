@@ -58,7 +58,7 @@
             <option value="lazerwave">🌒 Natt</option>
           </select>
         </div>
-        <button id="clearAllBtn" class="btn btn-danger">🔄 Rensa</button>
+        <button id="clearAllBtn" class="btn btn-ghost">🔄 Återställ allt</button>
       </div>
     </div>
   </div>
@@ -318,11 +318,11 @@
 <!-- MODAL: rensa bekräftelse -->
 <div class="modal-overlay" id="clearModal">
   <div class="modal-content">
-    <h3 class="modal-title">⚠️ Rensa data?</h3>
-    <p class="modal-text">Är du säker på att du vill rensa all inmatad patientdata? Detta kan inte ångras.</p>
+    <h3 class="modal-title">⚠️ Återställ allt?</h3>
+    <p class="modal-text">Är du säker på att du vill rensa all inmatad data? Detta kan inte ångras.</p>
     <div class="modal-actions">
+      <button id="executeClearAllBtn" class="btn btn-danger">Återställ allt</button>
       <button id="closeClearModalBtn" class="btn btn-ghost">Avbryt</button>
-      <button id="executeClearAllBtn" class="btn btn-danger">Rensa data</button>
     </div>
   </div>
 </div>
