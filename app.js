@@ -924,6 +924,17 @@ function updatePrescribeResult(i) {
   if (!box) return;
   const res = calcPrescribeResult(i);
   box.textContent = '';
+
+  // Befintligt recept täcker redan hela perioden — inget nytt behöver förskrivas
+  if (res && res.packages === 0 && res.totalDays === 0 && res.daysAlreadyCovered > 0) {
+    const msg = document.createElement('div');
+    msg.className = 'prescribe-result-covered';
+    msg.textContent = 'Nuvarande recept täcker redan hela perioden.';
+    box.appendChild(msg);
+    renderPrescribeSummary();
+    return;
+  }
+
   if (!res || !res.packages) return;
 
   const wrap   = document.createElement('div'); wrap.className = 'prescribe-result';
@@ -1104,6 +1115,10 @@ function renderPrescribeSummary() {
 }
 
 /* Visa/dölj och initiera panelen för givet läkemedelsindex */
+// Håller koll på vilket index panelen senast byggdes för, så att vi
+// slipper riva och återbygga DOM:en (och tappa fokus) vid varje debounce-cykel.
+let _prescribePanelBuiltFor = null;
+
 function renderPrescribePanel(i) {
   const panel = getEl('prescribePanel');
   if (!panel) return;
@@ -1113,7 +1128,11 @@ function renderPrescribePanel(i) {
     ((!s.isOveruse && !s.isTooEarly) ||
      ((s.isOveruse || s.isTooEarly) && s.earlyRenewalDecision === 'yes'));
 
-  if (!canRenew) { panel.classList.add('is-hidden'); return; }
+  if (!canRenew) {
+    panel.classList.add('is-hidden');
+    _prescribePanelBuiltFor = null;
+    return;
+  }
   panel.classList.remove('is-hidden');
 
   // Initialt state för detta läkemedel
@@ -1126,8 +1145,14 @@ function renderPrescribePanel(i) {
     }
   }
 
-  buildPrescribeInner(i);
-  renderPrescribeSummary();
+  // Bygg bara om DOM:en om vi byter läkemedel. Annars räcker det att
+  // uppdatera resultatsiffran, så att fokus i datuminmatningen bevaras.
+  if (_prescribePanelBuiltFor !== i) {
+    buildPrescribeInner(i);
+    _prescribePanelBuiltFor = i;
+  } else {
+    updatePrescribeResult(i);
+  }
 }
 
 /* Lägg till / ta bort läkemedel */
@@ -1146,6 +1171,7 @@ function clearCurrentCard() {
   const i = activeMedIdx;
   states[i] = { activeTab:'patient', patientLang:'sv' };
   prescribeState[i] = null;
+  _prescribePanelBuiltFor = null;
   buildMedList();
   renderFormForMed(i);
   renderResultForMed(i);
@@ -1193,8 +1219,7 @@ function executeClearAll() {
   prescribeState = {};
   buildMedList();
   renderFormForMed(0);
-  renderResultForMed(0);
-  renderPrescribePanel(0);
+  renderResultForMed(0); // anropar renderPrescribePanel(0) internt
   clearLongterm();
   closeClearModal();
 }
