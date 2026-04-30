@@ -1,2 +1,5 @@
 Kör 100 simuleringar av verktyget med hjälp av AI. Identifiera om det finns edge-cases eller totalt orimliga recept som i teorin skulle kunna orsaka beräkningsfel. I dagsläget kört 50 simuleringar utan beräkningsfel. Förtydliga svar till patienten om något är oklart.
 Standardutförande är läkarvyn - skapa en  sjuksköterskevy som hanterar receptförfrågningar initialt eller vid ett besök hos ssk som förbereder vad läkaren bör göra. Oklart ännu vad det ska innehålla exakt.
+
+skapa en testsvit för projektet
+logik och DOM separation (gör gradvis)
