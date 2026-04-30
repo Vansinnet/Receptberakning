@@ -915,7 +915,8 @@ function updatePrescribeResult(i) {
   const lbl    = document.createElement('div'); lbl.className  = 'prescribe-result-label'; lbl.textContent = 'Antal förpackningar att förskriva';
   const numRow = document.createElement('div'); numRow.className = 'prescribe-result-num-row';
   const numEl  = document.createElement('div'); numEl.className  = 'prescribe-result-packages'; numEl.textContent = String(res.packages);
-  const unitEl = document.createElement('div'); unitEl.className = 'prescribe-result-unit'; unitEl.textContent = 'förp.';
+  const unitEl = document.createElement('div'); unitEl.className = 'prescribe-result-unit';
+  unitEl.textContent = res.packageSize > 0 ? `förp.  à ${res.packageSize} st` : 'förp.';
   numRow.appendChild(numEl); numRow.appendChild(unitEl);
 
   const det    = document.createElement('div'); det.className  = 'prescribe-result-details';
@@ -930,6 +931,7 @@ function updatePrescribeResult(i) {
   wrap.appendChild(lbl); wrap.appendChild(numRow); wrap.appendChild(det);
   wrap.appendChild(period); wrap.appendChild(days);
   box.appendChild(wrap);
+  renderPrescribeSummary();
 }
 
 /* Bygg hela panelens innehåll (anropas vid initiering och lägesbyte) */
@@ -1015,6 +1017,77 @@ function buildPrescribeInner(i) {
   updatePrescribeResult(i);
 }
 
+/* Uppdatera sammanfattningslistan högst upp i panelen */
+function renderPrescribeSummary() {
+  const box = getEl('prescribeSummary');
+  if (!box) return;
+
+  // Samla alla läkemedel som kan förnyas och har prescribeState
+  const items = [];
+  for (let i = 0; i < medCardCount; i++) {
+    const s = states[i] || {};
+    const ps = prescribeState[i];
+    if (!ps) continue;
+    const canRenew = s.valid && s.calculable !== false &&
+      ((!s.isOveruse && !s.isTooEarly) ||
+       ((s.isOveruse || s.isTooEarly) && s.earlyRenewalDecision === 'yes'));
+    if (!canRenew) continue;
+    const res = calcPrescribeResult(i);
+    const pkgSize = parseFloat(ps.packageSize) || 0;
+    items.push({ i, name: s.medRaw || `Läkemedel ${i + 1}`, packages: res ? res.packages : 0, pkgSize });
+  }
+
+  box.textContent = '';
+  if (items.length < 2) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'prescribe-summary-wrap';
+
+  const hdr = document.createElement('div');
+  hdr.className = 'prescribe-summary-header';
+  hdr.textContent = 'Sammanställning av läkemedel att förskriva';
+  wrap.appendChild(hdr);
+
+  const list = document.createElement('div');
+  list.className = 'prescribe-summary-list';
+
+  items.forEach(({ i, name, packages, pkgSize }) => {
+    const row = document.createElement('button');
+    row.type = 'button';
+    row.className = 'prescribe-summary-row' + (i === activeMedIdx ? ' active' : '');
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'prescribe-summary-name';
+    nameEl.textContent = name;
+
+    const rightEl = document.createElement('span');
+    rightEl.className = 'prescribe-summary-right';
+
+    const pkgEl = document.createElement('span');
+    pkgEl.className = 'prescribe-summary-pkg';
+    pkgEl.textContent = packages ? `${packages} förp.` : '—';
+
+    if (pkgSize > 0) {
+      const sizeEl = document.createElement('span');
+      sizeEl.className = 'prescribe-summary-size';
+      sizeEl.textContent = `à ${pkgSize} st`;
+      rightEl.appendChild(pkgEl);
+      rightEl.appendChild(sizeEl);
+    } else {
+      rightEl.appendChild(pkgEl);
+    }
+
+    row.appendChild(nameEl);
+    row.appendChild(rightEl);
+    row.addEventListener('click', () => selectMed(i));
+    list.appendChild(row);
+  });
+
+  wrap.appendChild(list);
+  box.appendChild(wrap);
+}
+
 /* Visa/dölj och initiera panelen för givet läkemedelsindex */
 function renderPrescribePanel(i) {
   const panel = getEl('prescribePanel');
@@ -1036,6 +1109,7 @@ function renderPrescribePanel(i) {
   }
 
   buildPrescribeInner(i);
+  renderPrescribeSummary();
 }
 
 /* ── Lägg till / ta bort läkemedel ── */
