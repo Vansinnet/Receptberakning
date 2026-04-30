@@ -112,33 +112,39 @@
 
           <div class="field">
             <label for="medInput" data-tooltip="Ange läkemedelsnamn och styrka exakt som på receptet, t.ex. 'Elvanse 50 mg'. Styr narkotikaklassning och FASS-sökning.">Läkemedel och styrka</label>
-            <input id="medInput" type="text" placeholder="T.ex. Elvanse 50 mg" maxlength="100" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <input id="medInput" type="text" placeholder="T.ex. Elvanse 50 mg" maxlength="100" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-describedby="medInput-err">
+            <span class="field-error-msg" id="medInput-err" aria-live="polite"></span>
           </div>
 
           <div class="field">
             <label for="dateInput" data-tooltip="Förskrivningsdatum för det senaste receptet. Används som startpunkt för receptperiodberäkningen.">Senaste recept</label>
-            <input id="dateInput" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <input id="dateInput" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-describedby="dateInput-err">
+            <span class="field-error-msg" id="dateInput-err" aria-live="polite"></span>
           </div>
 
           <div class="form-row-2 form-row-2-uneven">
             <div class="field">
               <label for="doseInput" data-tooltip="Patientens ordinerade dygnsdos i antal tabletter/kapslar. Referensvärde för bedömning av förbrukningshastighet.">Dos per dag</label>
-              <input id="doseInput" type="text" inputmode="decimal" placeholder="T.ex. 1" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+              <input id="doseInput" type="text" inputmode="decimal" placeholder="T.ex. 1" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-describedby="doseInput-err">
+              <span class="field-error-msg" id="doseInput-err" aria-live="polite"></span>
             </div>
             <div class="field">
               <label for="amtInput" data-tooltip="Antal tabletter eller kapslar per förpackning (expediering). Totalt förskrivet = förpackningsstorlek × antal uttag.">Förpackningsstorlek (st)</label>
-              <input id="amtInput" type="number" placeholder="100" min="1" step="1">
+              <input id="amtInput" type="number" placeholder="100" min="1" step="1" aria-describedby="amtInput-err">
+              <span class="field-error-msg" id="amtInput-err" aria-live="polite"></span>
             </div>
           </div>
 
           <div class="field">
             <label for="refInput" data-tooltip="Antal tillåtna uthämtningar på receptet. Totalt förskrivet = mängd per uttag × antal uttag. Max 12 uttag stöds.">Antal uttag</label>
-            <input id="refInput" type="number" placeholder="T.ex. 3" min="1" max="12" step="1">
+            <input id="refInput" type="number" placeholder="T.ex. 3" min="1" max="12" step="1" aria-describedby="refInput-err">
+            <span class="field-error-msg" id="refInput-err" aria-live="polite"></span>
           </div>
 
           <div class="field field-optional">
             <label for="leftInput" data-tooltip="Patientens egna uppgifter om kvarvarande doser. Ger exaktare beräkning av faktisk förbrukning jämfört med enbart receptdatum. Lämna tomt om medicinen är slut.">Doser kvar <span class="optional-tag">valfritt</span></label>
-            <input id="leftInput" type="number" placeholder="Lämna tomt om medicinen är slut" min="0" step="1">
+            <input id="leftInput" type="number" placeholder="Lämna tomt om medicinen är slut" min="0" step="1" aria-describedby="leftInput-err">
+            <span class="field-error-msg" id="leftInput-err" aria-live="polite"></span>
             <span class="field-hint">Ger exakt snittberäkning om patienten har kvarvarande doser</span>
           </div>
         </div>

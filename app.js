@@ -66,6 +66,18 @@ function toggleError(el, isInvalid) {
   el.classList.toggle('input-error', isInvalid);
   isInvalid ? el.setAttribute('aria-invalid','true') : el.removeAttribute('aria-invalid');
 }
+// Sätter eller rensar fel på ett namngivet fält plus dess felmeddelande-span.
+// message='' rensar felet; annars visas texten under fältet och läses av skärmläsare.
+function setFieldError(inputId, message) {
+  const input  = getEl(inputId);
+  const errEl  = getEl(inputId + '-err');
+  const isInvalid = message !== '';
+  toggleError(input, isInvalid);
+  if (errEl) {
+    errEl.textContent = message;
+    errEl.classList.toggle('visible', isInvalid);
+  }
+}
 function buildAlertEl(type, title, message) {
   const safeType = SAFE_ALERT_TYPES.has(type) ? type : 'info';
   const div = document.createElement('div'); div.className = `alert alert-${safeType}`;
@@ -264,9 +276,9 @@ function renderFormForMed(i) {
     else fassBtn.classList.add('is-hidden');
   }
 
-  // Rensa feltillstånd
+  // Rensa feltillstånd och felmeddelanden
   ['medInput','dateInput','doseInput','amtInput','refInput','leftInput'].forEach(id => {
-    const el = getEl(id); if (el) toggleError(el, false);
+    setFieldError(id, '');
   });
 }
 
@@ -435,18 +447,18 @@ function validateInputs() {
   const amtRaw = amtInput.value;
   const amt = parseInt(amtRaw,10);
   const amtIsInvalid = amtRaw!==''&&(isNaN(amt)||amt<=0||amt>10000||!Number.isInteger(Number(amtRaw)));
-  toggleError(amtInput, amtIsInvalid);
+  setFieldError('amtInput', amtIsInvalid ? 'Ange ett heltal mellan 1 och 10 000.' : '');
 
   const doseRaw = doseInput.value;
   const dose = parseFloat(doseRaw.replace(',','.'));
   const doseIsInvalid = doseRaw!==''&&(isNaN(dose)||dose<0.1||dose>50);
-  toggleError(doseInput, doseIsInvalid);
+  setFieldError('doseInput', doseIsInvalid ? 'Ange ett tal mellan 0,1 och 50.' : '');
 
   const refRaw = refInput.value.trim();
   const refNum = Number(refRaw);
   const refIsInvalid = refRaw!==''&&(!Number.isFinite(refNum)||!Number.isInteger(refNum)||refNum<1||refNum>12);
   const refOutOfRange = Number.isFinite(refNum)&&Number.isInteger(refNum)&&refNum>12;
-  toggleError(refInput, refIsInvalid);
+  setFieldError('refInput', refOutOfRange ? 'Max 12 uttag stöds.' : refIsInvalid ? 'Ange ett heltal mellan 1 och 12.' : '');
 
   if (refOutOfRange) return {valid:false,reason:'too_many_refs'};
   if (!medRaw||!dateVal||isNaN(dose)||doseIsInvalid||isNaN(amt)||amtIsInvalid||refIsInvalid||!refNum||refNum<1)
@@ -455,16 +467,16 @@ function validateInputs() {
   const ref = refNum;
   const pDate = parseDateUTC(dateVal);
   const dateIsInvalid = !!dateVal&&!pDate;
-  toggleError(dateInput, dateIsInvalid);
+  setFieldError('dateInput', dateIsInvalid ? 'Ogiltigt datum.' : '');
   if (!pDate) return {valid:false,reason:'invalid_date'};
   const today = getToday();
-  if (pDate>today) { toggleError(dateInput,true); return {valid:false,reason:'invalid_date'}; }
+  if (pDate>today) { setFieldError('dateInput','Datumet är satt i framtiden.'); return {valid:false,reason:'invalid_date'}; }
 
   const leftInput = getEl('leftInput');
   const leftRaw = leftInput ? leftInput.value.trim() : '';
   const remaining = leftRaw!=='' ? parseInt(leftRaw,10) : null;
   const leftIsInvalid = leftRaw!==''&&(isNaN(remaining)||remaining<0||!Number.isInteger(Number(leftRaw)));
-  if (leftInput) toggleError(leftInput, leftIsInvalid);
+  setFieldError('leftInput', leftIsInvalid ? 'Ange ett heltal (0 eller fler), eller lämna tomt.' : '');
   if (leftIsInvalid) return {valid:false,reason:'incomplete'};
 
   return {valid:true,medRaw,dateVal,pDate,amt,dose,ref,remaining,doseRaw,amtRaw,refRaw,leftRaw};
@@ -1131,10 +1143,13 @@ function clearCurrentCard() {
   buildMedList();
   renderFormForMed(i);
   renderResultForMed(i);
-  // Återställ formulärfält
-  const fields = ['medInput','doseInput','amtInput','refInput','leftInput'];
-  fields.forEach(id => { const el=getEl(id); if (el) { el.value=''; toggleError(el,false); } });
-  const dateEl = getEl('dateInput'); if (dateEl) { dateEl.value=todayStr(); toggleError(dateEl,false); }
+  // Återställ formulärfält och felmeddelanden
+  ['medInput','doseInput','amtInput','refInput','leftInput'].forEach(id => {
+    const el=getEl(id); if (el) el.value='';
+    setFieldError(id, '');
+  });
+  const dateEl = getEl('dateInput'); if (dateEl) dateEl.value=todayStr();
+  setFieldError('dateInput', '');
   generateAndDistribute();
 }
 
@@ -1374,6 +1389,37 @@ if (formPanel) {
     saveFormValues(activeMedIdx);
     ensureDebounce(activeMedIdx); calcDebounced[activeMedIdx]();
   });
+  formPanel.addEventListener('blur', e => {
+    // Sanera dygnsdos vid fältutträde: byt komma mot punkt så att värdet
+    // matchar det som beräkningarna faktiskt använder (parseFloat ersätter redan,
+    // men utan detta ser användaren "1,5" medan verktyget räknar på "1.5").
+    if (e.target.id === 'doseInput') {
+      const sanitized = e.target.value.replace(',', '.');
+      if (sanitized !== e.target.value) {
+        e.target.value = sanitized;
+        saveFormValues(activeMedIdx);
+      }
+    }
+    // Datumfältet valideras direkt vid blur, till skillnad från övriga fält som
+    // väntar på debounce + fullständigt formulär. Motivet: datumet är det enda
+    // fältet där ett felaktigt värde (t.ex. "260229") ser korrekt ut visuellt
+    // men inte ger något fel förrän hela calc()-cykeln kört klart. Tidig feedback
+    // minskar risken att läkaren fortsätter fylla i resten av formuläret på
+    // felaktig grund. parseDateUTC och getToday arbetar enbart med lokala värden
+    // och rör varken DOM eller nätverk — ingen säkerhetsrisk.
+    if (e.target.id === 'dateInput') {
+      const val = e.target.value;
+      if (!val) { setFieldError('dateInput', ''); return; }
+      const pDate = parseDateUTC(val);
+      if (!pDate) {
+        setFieldError('dateInput', 'Ogiltigt datum.');
+      } else if (pDate > getToday()) {
+        setFieldError('dateInput', 'Datumet är satt i framtiden.');
+      } else {
+        setFieldError('dateInput', '');
+      }
+    }
+  }, true); // capture=true eftersom blur inte bubblar
   formPanel.addEventListener('change', e => {
     if (e.target.id==='dateInput') calc();
   });
