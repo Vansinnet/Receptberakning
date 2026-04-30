@@ -1,8 +1,8 @@
-/* ────────────────────────────────────────────
+/*
    STORAGE POLICY (GDPR)
    localStorage: endast 'theme'
    Klinisk data: endast i minnet (states[])
-   ─────────────────────────────────────────── */
+ */
 
 const VALID_THEMES     = new Set(['dark','klinisk','sakura']);
 const SAFE_ALERT_TYPES = new Set(['danger','warn','info','ok']);
@@ -13,7 +13,7 @@ function escapeHtml(s) {
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-/* ── State ── */
+/* State */
 let states        = [{}];   // ett objekt per läkemedel
 let medCardCount  = 1;
 let activeMedIdx  = 0;      // vilket läkemedel som visas i mitten/höger
@@ -21,7 +21,7 @@ let warnTimer, clearTimer, countdownInt;
 let ltPeriodCount = 0;
 let prescribeState = {}; // per-läkemedelsindex: { mode, months, endDate, packageSize }
 
-/* ── Debounce ── */
+/* Debounce */
 function debounce(fn, wait = 120) {
   let t;
   return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
@@ -36,7 +36,7 @@ function ensureDebounce(i) {
 }
 const calcLongtermDebounced = debounce(() => calcLongterm(), 150);
 
-/* ── Datumformatering ── */
+/* Datumformatering */
 function autoFormatDate(input) {
   const val = input.value;
   const sel = input.selectionStart;
@@ -59,7 +59,7 @@ function autoFormatDate(input) {
   try { input.setSelectionRange(newPos, newPos); } catch(e) {}
 }
 
-/* ── Hjälpfunktioner ── */
+/* Hjälpfunktioner */
 function getEl(id) { return document.getElementById(id); }
 function toggleError(el, isInvalid) {
   if (!el) return;
@@ -133,7 +133,7 @@ function parseDateUTC(str) {
   return d;
 }
 
-/* ── Narkotikaklassade läkemedel (LVFS 2011:10) ── */
+/* Narkotikaklassade läkemedel (LVFS 2011:10) */
 const NARCOTICS_LIST_DATE = '2026-04-29'; // Datum då förteckningen senast kontrollerades mot LVFS 2011:10 (inkl. HSLF-FS 2025:8)
 const NARCOTICS_SCHEDULES = [
   { schedule:'II', terms:['morfin','dolcontin','depolan','mst continus','oxikodon','oxycodon','oxycontin','oxynorm','targiniq','fentanyl','durogesic','matrifen','instanyl','abstral','pecfent','breakyl','recivit','vellofent','actiq','effentora','metadon','methadone','hydromorfon','hydromorphone','palladon','tapentadol','palexia','ketobemidon','ketogan','petidin','pethidine','alfentanil','rapifen','sufentanil','sufenta','dzuveo','remifentanil','ultiva','metylfenidat','methylphenidate','ritalin','concerta','medikinet','equasym','lisdexamfetamin','lisdexamphetamine','elvanse','amfetamin','amphetamine','attentin','dexamfetamin','dexamphetamine','dexedrin','natriumoxybat','xyrem','nabilon','cesamet','dronabinol','marinol','sativex','nabiximols','flunitrazepam','rohypnol']},
@@ -154,9 +154,7 @@ function getNarcSchedule(medRaw) {
   return match ? match.schedule : null;
 }
 
-/* ════════════════════════════════════════════
-   TEMA
-   ════════════════════════════════════════════ */
+// === TEMA ===
 function applyTheme(t) {
   const safeTheme = VALID_THEMES.has(t) ? t : 'klinisk';
   document.documentElement.setAttribute('data-theme', safeTheme);
@@ -164,9 +162,7 @@ function applyTheme(t) {
   try { localStorage.setItem('theme', safeTheme); } catch(e) {}
 }
 
-/* ════════════════════════════════════════════
-   FLIK-HANTERING (huvud)
-   ════════════════════════════════════════════ */
+// === FLIK-HANTERING (huvud) ===
 function switchMainTab(tab) {
   ['renew','longterm'].forEach(t => {
     const panel = getEl('panel-'+t);
@@ -179,9 +175,7 @@ function switchMainTab(tab) {
   });
 }
 
-/* ════════════════════════════════════════════
-   INAKTIVITETSTIMER
-   ════════════════════════════════════════════ */
+// === INAKTIVITETSTIMER ===
 let lastActivityReset = 0;
 function resetTimer(isUserEvent=false) {
   const now = Date.now();
@@ -205,9 +199,7 @@ function resetTimer(isUserEvent=false) {
   }, 5*60*1000);
 }
 
-/* ════════════════════════════════════════════
-   LÄKEMEDELSLISTA — sidebar
-   ════════════════════════════════════════════ */
+// === LÄKEMEDELSLISTA — sidebar ===
 function buildMedList() {
   const list = getEl('medList'); if (!list) return;
   list.textContent = '';
@@ -242,9 +234,7 @@ function selectMed(i) {
   renderResultForMed(i);
 }
 
-/* ════════════════════════════════════════════
-   FORMULÄR — mittenkolumn
-   ════════════════════════════════════════════ */
+// === FORMULÄR — mittenkolumn ===
 function renderFormForMed(i) {
   const s = states[i] || {};
   const emptyState = getEl('formEmptyState');
@@ -304,9 +294,7 @@ function saveFormValues(i) {
   s.medName = s.medRaw || `Läkemedel ${i+1}`;
 }
 
-/* ════════════════════════════════════════════
-   RESULTAT — högerkolumn
-   ════════════════════════════════════════════ */
+// === RESULTAT — högerkolumn ===
 function renderResultForMed(i) {
   const s = states[i] || {};
   const emptyState   = getEl('resultEmptyState');
@@ -430,9 +418,7 @@ function togglePatientLangResult() {
   switchResultTab('patient');
 }
 
-/* ════════════════════════════════════════════
-   VALIDERING + BERÄKNING
-   ════════════════════════════════════════════ */
+// === VALIDERING + BERÄKNING ===
 function validateInputs() {
   const medInput  = getEl('medInput');
   const dateInput = getEl('dateInput');
@@ -726,7 +712,7 @@ function calc() {
   renderResultForMed(i);
 }
 
-/* ── Samlad text för alla läkemedel ── */
+/* Samlad text för alla läkemedel */
 function generateAndDistribute() {
   const validCount = states.filter(s=>s.valid && s.calculable !== false).length;
   if (validCount===0) {
@@ -864,9 +850,7 @@ function generateAndDistribute() {
   renderResultForMed(activeMedIdx);
 }
 
-/* ════════════════════════════════════════════
-   NY FÖRSKRIVNING
-   ════════════════════════════════════════════ */
+// === NY FÖRSKRIVNING ===
 
 /* Beräkna resultat utan att röra DOM */
 function calcPrescribeResult(i) {
@@ -884,8 +868,15 @@ function calcPrescribeResult(i) {
 
   let endDate = null, totalDays = 0;
   if (ps.mode === 'months' && ps.months > 0) {
-    // Målдatum = idag + önskade månader (befintligt recept räknas in)
-    const targetEnd = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + ps.months, today.getUTCDate()));
+    // Måldatum = idag + önskade månader (befintligt recept räknas in).
+    // Clampa dagen till sista dagen i målmånaden för att undvika rullover:
+    // t.ex. 31 jan + 1 mån ska ge 28 feb, inte 3 mars.
+    // Date.UTC(år, månad+1, 0) returnerar sista dagen i den aktuella månaden.
+    const tYear  = today.getUTCFullYear();
+    const tMonth = today.getUTCMonth() + ps.months;
+    const tDay   = today.getUTCDate();
+    const lastDayOfTargetMonth = new Date(Date.UTC(tYear, tMonth + 1, 0)).getUTCDate();
+    const targetEnd = new Date(Date.UTC(tYear, tMonth, Math.min(tDay, lastDayOfTargetMonth)));
     totalDays = getDaysDiff(targetEnd, startDate);
     if (totalDays <= 0) {
       // Befintligt recept täcker redan hela perioden — inget nytt behövs
@@ -1121,7 +1112,7 @@ function renderPrescribePanel(i) {
   renderPrescribeSummary();
 }
 
-/* ── Lägg till / ta bort läkemedel ── */
+/* Lägg till / ta bort läkemedel */
 function addMedCard() {
   if (medCardCount>=8) return;
   states.push({});
@@ -1147,7 +1138,7 @@ function clearCurrentCard() {
   generateAndDistribute();
 }
 
-/* ── Beslut: tidig förnyelse / överförbrukning ── */
+/* Beslut: tidig förnyelse / överförbrukning */
 function setEarlyDecision(decision) {
   const i = activeMedIdx;
   const s = states[i];
@@ -1170,7 +1161,7 @@ function setEarlyDecision(decision) {
   generateAndDistribute();
 }
 
-/* ── Rensa allt ── */
+/* Rensa allt */
 function confirmClearAll(force=false) {
   if (force) executeClearAll();
   else { const m=getEl('clearModal'); if (m) m.classList.add('visible'); }
@@ -1186,7 +1177,7 @@ function executeClearAll() {
   closeClearModal();
 }
 
-/* ── Kopiering ── */
+/* Kopiering */
 const copyFeedbackTimers = {};
 function copyResultText() {
   const body = getEl('copyBodyResult');
@@ -1200,9 +1191,7 @@ function copyResultText() {
   }).catch(()=>{ if(btn) btn.textContent='⚠️ Kopiera manuellt'; });
 }
 
-/* ════════════════════════════════════════════
-   FLIK 2: LÅNGVARIG FÖRBRUKNING
-   ════════════════════════════════════════════ */
+// === FLIK 2: LÅNGVARIG FÖRBRUKNING ===
 function periodRowTemplate(idx) {
   const labelClass = 'section-label';
   const eidx=escapeHtml(idx), eidx1=escapeHtml(idx+1);
@@ -1364,9 +1353,7 @@ function copyLtText() {
   }).catch(()=>{if(btn)btn.textContent='⚠️ Kopiera manuellt';});
 }
 
-/* ════════════════════════════════════════════
-   INITIERING
-   ════════════════════════════════════════════ */
+// === INITIERING ===
 // Tema
 try { applyTheme(localStorage.getItem('theme')||'klinisk'); }
 catch(e) { applyTheme('klinisk'); }
@@ -1378,7 +1365,7 @@ renderResultForMed(0);
 ltPeriodCount=1;
 buildPeriodContainer();
 
-// ── Event delegation: formulärinput ──
+// Event delegation: formulärinput
 const formPanel = getEl('formPanel');
 if (formPanel) {
   formPanel.addEventListener('input', e => {
@@ -1392,21 +1379,21 @@ if (formPanel) {
   });
 }
 
-// ── Sidebar: knappar ──
+// Sidebar: knappar
 const clearCardBtn = getEl('clearCardBtn'); if (clearCardBtn) clearCardBtn.addEventListener('click', clearCurrentCard);
 const addMedBtn = getEl('addMedBtn'); if (addMedBtn) addMedBtn.addEventListener('click', addMedCard);
 
-// ── Topbar ──
+// Topbar
 const themeSelect = getEl('themeSelect'); if (themeSelect) themeSelect.addEventListener('change', e => applyTheme(e.target.value));
 const clearAllBtn = getEl('clearAllBtn'); if (clearAllBtn) clearAllBtn.addEventListener('click', () => confirmClearAll());
 document.querySelectorAll('.main-tab').forEach(btn => btn.addEventListener('click', () => switchMainTab(btn.dataset.tab)));
 
-// ── Resultat-knappar ──
+// Resultat-knappar
 const copyBtnResult = getEl('copyBtnResult'); if (copyBtnResult) copyBtnResult.addEventListener('click', copyResultText);
 const langBtnResult = getEl('langBtnResult'); if (langBtnResult) langBtnResult.addEventListener('click', togglePatientLangResult);
 document.querySelectorAll('#copySection .copy-tab').forEach(btn => btn.addEventListener('click', () => switchResultTab(btn.dataset.tab)));
 
-// ── Långvarig förbrukning ──
+// Långvarig förbrukning
 const periodsContainer = getEl('lt-periods-container');
 if (periodsContainer) {
   periodsContainer.addEventListener('input', e => { if (e.target.matches('input[type="text"]')) autoFormatDate(e.target); calcLongtermDebounced(); });
@@ -1419,19 +1406,19 @@ const addPeriodBtn=getEl('addPeriodBtn'); if(addPeriodBtn) addPeriodBtn.addEvent
 const clearLongtermBtn=getEl('clearLongtermBtn'); if(clearLongtermBtn) clearLongtermBtn.addEventListener('click',clearLongterm);
 const ltCopyBtn=getEl('ltCopyBtn'); if(ltCopyBtn) ltCopyBtn.addEventListener('click',copyLtText);
 
-// ── Beslutsknappar: tidig förnyelse ──
+// Beslutsknappar: tidig förnyelse
 const earlyYesBtn = getEl('earlyDecisionYes'); if (earlyYesBtn) earlyYesBtn.addEventListener('click', () => setEarlyDecision('yes'));
 const earlyNoBtn  = getEl('earlyDecisionNo');  if (earlyNoBtn)  earlyNoBtn.addEventListener('click',  () => setEarlyDecision('no'));
 
-// ── Modal ──
+// Modal
 const closeClearModalBtn=getEl('closeClearModalBtn'); if(closeClearModalBtn) closeClearModalBtn.addEventListener('click',closeClearModal);
 const executeClearAllBtn=getEl('executeClearAllBtn'); if(executeClearAllBtn) executeClearAllBtn.addEventListener('click',executeClearAll);
 
-// ── Inaktivitetstimer ──
+// Inaktivitetstimer
 const continueSessionBtn=getEl('continueSessionBtn'); if(continueSessionBtn) continueSessionBtn.addEventListener('click',resetTimer);
 ['click','keydown','touchstart'].forEach(e => document.addEventListener(e,()=>resetTimer(true),{passive:true}));
 
-// ── Datum-cache och omräkning vid fönsterfokus ──
+// Datum-cache och omräkning vid fönsterfokus
 function recalcOnDateChange() {
   _todayCache=null; _todayCacheKey='';
   if (states[activeMedIdx]&&states[activeMedIdx].valid) calc();
@@ -1440,7 +1427,7 @@ function recalcOnDateChange() {
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden) recalcOnDateChange(); });
 window.addEventListener('focus',recalcOnDateChange);
 
-// ── Rensa vid pagehide (bfcache-säkerhet) ──
+// Rensa vid pagehide (bfcache-säkerhet)
 window.addEventListener('pagehide',()=>{
   states=states.map(()=>({}));
   ['medInput','doseInput','amtInput','refInput','leftInput'].forEach(id=>{ const e=getEl(id);if(e)e.value=''; });
@@ -1459,11 +1446,11 @@ window.addEventListener('pageshow',e=>{ if(!e.persisted)return; _todayCache=null
 
 resetTimer();
 
-/* ════════════════════════════════════════════
+/*
    TOOLTIP-SYSTEM
    Fixed-positionerat så att det aldrig klipps
    av overflow:auto på form- eller result-panel.
-   ════════════════════════════════════════════ */
+ */
 (function () {
   const bubble = document.createElement('div');
   bubble.className = 'tooltip-bubble';
