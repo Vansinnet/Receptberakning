@@ -655,8 +655,14 @@ function calc() {
     states[i].verdictTitle = `För tidigt – ${daysToPrescribedEnd} dagar kvar`;
     states[i].verdictSub   = 'Förbrukning OK. Kontakta vården närmre slutdatumet.';
   } else {
+    const consumptionPctOK = (avgNum/inputData.dose)*100;
+    const consumptionNote = `Snittförbrukning ${avgNum.toFixed(2)} st/dag (${consumptionPctOK.toFixed(1)}% av ordinerad dos, inom ±10%-gränsen).`;
+    const remainingPct = (daysToPrescribedEnd / totalDays * 100).toFixed(1);
+    const daysNote = daysToPrescribedEnd <= 0
+      ? 'Receptperioden är slut.'
+      : `${daysToPrescribedEnd} dagar kvar av receptperioden (<20%-gränsen, ${remainingPct}% återstår).`;
     states[i].verdictTitle = 'OK – Förnya recept';
-    states[i].verdictSub   = 'Förbrukning enligt ordination. Recept kan utfärdas.';
+    states[i].verdictSub   = `${consumptionNote} ${daysNote}`;
   }
 
   // Alerts — byggs som strukturerade objekt, renderas via DOM (ingen innerHTML med användardata)
