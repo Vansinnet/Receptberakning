@@ -4,7 +4,7 @@
    Klinisk data: endast i minnet (states[])
    ─────────────────────────────────────────── */
 
-const VALID_THEMES     = new Set(['dark','klinisk','lazerwave']);
+const VALID_THEMES     = new Set(['dark','klinisk','sakura']);
 const SAFE_ALERT_TYPES = new Set(['danger','warn','info','ok']);
 
 function escapeHtml(s) {

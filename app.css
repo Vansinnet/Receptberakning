@@ -67,21 +67,21 @@
   --danger-bg: var(--red-bg); --danger-color: var(--red); --danger-border: var(--red-border); --danger-hover: var(--red-border);
 }
 
-[data-theme="lazerwave"] {
-  /* Synthwave-palett: djup rymd + cyan primary + violett accenter */
-  --primary: #22d3ee; --primary-light: #081d26; --primary-hover: #06b6d4;
-  --bg: #07061a; --surface: #0d0b24; --surface2: #14102e;
-  --text: #dde4f0; --text-muted: #8b9ab8;
-  --border: #1c1640; --border-strong: #2a1e5c;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.60); --shadow-md: 0 4px 14px rgba(0,0,0,0.75);
-  /* Semantiska färger — röd behålls röd för patientsäkerhet */
-  --green: #34d399; --green-bg: #041a10; --green-border: #0a3d22;
-  --amber: #fbbf24; --amber-bg: #180e00; --amber-border: #3d2800;
-  --red: #f87171;   --red-bg: #1a0808;   --red-border: #4d1616;
-  --blue: #60a5fa;  --blue-bg: #060f22;  --blue-border: #0f2448;
-  --violet: #c084fc; --violet-bg: #110b26; --violet-border: #2a1652;
-  --input-bg: #07061a; --code-bg: #07061a;
-  --clear-btn: #14102e; --clear-btn-hover: #1c1640; --clear-btn-text: #bbc6d8;
+
+[data-theme="sakura"] {
+  --primary: #db2777; --primary-light: #fce7f3; --primary-hover: #be185d;
+  --bg: #fdf2f8; --surface: #ffffff; --surface2: #fce7f3;
+  --text: #831843; --text-muted: #9d174d;
+  --border: #fbcfe8; --border-strong: #f9a8d4;
+  --shadow-sm: 0 1px 3px rgba(219,39,119,0.08), 0 1px 2px rgba(219,39,119,0.05);
+  --shadow-md: 0 4px 16px rgba(219,39,119,0.10), 0 2px 6px rgba(219,39,119,0.06);
+  --green: #15803d;  --green-bg: #f0fdf4;  --green-border: #86efac;
+  --amber: #b45309;  --amber-bg: #fffbeb;  --amber-border: #fcd34d;
+  --red: #dc2626;    --red-bg: #fef2f2;    --red-border: #fca5a5;
+  --blue: #0369a1;   --blue-bg: #f0f9ff;   --blue-border: #bae6fd;
+  --violet: #7c3aed; --violet-bg: #f5f3ff; --violet-border: #ddd6fe;
+  --input-bg: #ffffff; --code-bg: #fdf2f8;
+  --clear-btn: #fce7f3; --clear-btn-hover: #fbcfe8; --clear-btn-text: #831843;
   --danger-bg: var(--red-bg); --danger-color: var(--red); --danger-border: var(--red-border); --danger-hover: var(--red-border);
 }
 
@@ -154,7 +154,7 @@ html, body {
   display: flex; align-items: center; justify-content: center;
   font-size: 17px; font-weight: 700; line-height: 1; flex-shrink: 0;
 }
-.app-brand-name { font-size: 20px; font-weight: 800; color: var(--primary); white-space: nowrap; letter-spacing: -0.02em; }
+.app-brand-name { font-size: 20px; font-weight: 500; color: var(--primary); white-space: nowrap; letter-spacing: -0.02em; }
 .app-brand-date { font-size: 11px; color: var(--text-muted); white-space: nowrap; margin-left: 2px; }
 
 /* Tabs i topbar */
