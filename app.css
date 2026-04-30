@@ -294,7 +294,7 @@ html, body {
   margin-bottom: 12px; gap: 8px;
 }
 .form-med-name { font-size: 14px; font-weight: 700; color: var(--primary); min-height: 1.3em; }
-.form-panel-header > div {
+.form-panel-header > div:not(.form-panel-actions) {
   min-height: 34px;
   display: flex;
   flex-direction: column;
@@ -529,8 +529,7 @@ select.theme-select {
 select.theme-select option { background: var(--surface); color: var(--text); }
 
 .fass-link {
-  font-size: 12px; color: var(--blue); text-decoration: none;
-  font-weight: 600; border: 1px solid var(--blue-border); background: var(--blue-bg);
+  text-decoration: none;
 }
 
 /* Badges */
