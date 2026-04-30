@@ -587,6 +587,12 @@ function calc() {
   } else {
     endDate = new Date(inputData.pDate); endDate.setUTCDate(endDate.getUTCDate()+Math.round(totalDays));
     daysRemaining = getDaysDiff(endDate,today);
+    // Avsiktligt konservativt antagande: utan uppgift om kvarvarande doser antas
+    // att samtliga förskrivna tabletter (total) är förbrukade. Detta inkluderar
+    // uttag som ännu inte hunnit dispenseras enligt batchmodellen (accessibleTotal).
+    // Syftet är att tvinga fram en klinisk bedömning vid förnyelse — läkaren ser
+    // en potentiellt hög snittförbrukning och avgör själv om recept ska utfärdas.
+    // Se även tooltip på "Snittförbrukning" i resultatsektionen.
     avgNum = total/daysSince;
   }
 
@@ -1105,7 +1111,10 @@ function renderPrescribePanel(i) {
   if (!prescribeState[i]) {
     prescribeState[i] = { mode: 'months', months: 7, endDate: '', packageSize: String(s.amt || '') };
   } else {
-    prescribeState[i].packageSize = String(s.amt || '');
+    // Uppdatera bara om fältet är tomt — bevara manuell inmatning från läkaren
+    if (!prescribeState[i].packageSize) {
+      prescribeState[i].packageSize = String(s.amt || '');
+    }
   }
 
   buildPrescribeInner(i);
@@ -1151,10 +1160,10 @@ function setEarlyDecision(decision) {
       ? 'Klinisk bedömning: förnyelse trots förhöjd förbrukning.'
       : `Snitt ${s.displayAvgStr} överstiger ordination med >10%.`;
   } else {
-    s.statusText   = decision === 'yes' ? 'OK – förnyas tidigt' : `För tidigt — ${s.daysRemaining}d kvar`;
-    s.verdictTitle = decision === 'yes' ? 'OK – Förnya recept' : `För tidigt – ${s.daysRemaining} dagar kvar`;
+    s.statusText   = decision === 'yes' ? 'OK – förnyas tidigt' : `För tidigt — ${s.daysToPrescribedEnd}d kvar`;
+    s.verdictTitle = decision === 'yes' ? 'OK – Förnya recept' : `För tidigt – ${s.daysToPrescribedEnd} dagar kvar`;
     s.verdictSub   = decision === 'yes'
-      ? `Klinisk bedömning: förnyelse trots ${s.daysRemaining} dagar kvar.`
+      ? `Klinisk bedömning: förnyelse trots ${s.daysToPrescribedEnd} dagar kvar av receptperioden.`
       : 'Förbrukning OK. Kontakta vården närmre slutdatumet.';
   }
   buildMedList();
@@ -1271,8 +1280,7 @@ function calcLongterm() {
   }
   if (!medRaw||doseIsInvalid||isNaN(ordDose)||periods.length===0) { showEl('lt-result',false); return; }
   periods.sort((a,b)=>a.startDate-b.startDate);
-  const ltResult=getEl('lt-result'); if(ltResult) ltResult.style.display='flex'; ltResult.style.flexDirection='column'; ltResult.style.gap='12px';
-  showEl('lt-result',true);
+  showEl('lt-result', true, 'flex');
   const ltAlerts=getEl('lt-alerts');if(ltAlerts)ltAlerts.textContent='';
   const ltOverlap=getEl('lt-overlap-alert');if(ltOverlap)ltOverlap.textContent='';
   if (periods.length>1) {
