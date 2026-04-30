@@ -1194,6 +1194,7 @@ function executeClearAll() {
   buildMedList();
   renderFormForMed(0);
   renderResultForMed(0);
+  renderPrescribePanel(0);
   clearLongterm();
   closeClearModal();
 }
