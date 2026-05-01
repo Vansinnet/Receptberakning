@@ -1,5 +1,13 @@
-Kör 100 simuleringar av verktyget med hjälp av AI. Identifiera om det finns edge-cases eller totalt orimliga recept som i teorin skulle kunna orsaka beräkningsfel. I dagsläget kört 50 simuleringar utan beräkningsfel. Förtydliga svar till patienten om något är oklart.
-Standardutförande är läkarvyn - skapa en  sjuksköterskevy som hanterar receptförfrågningar initialt eller vid ett besök hos ssk som förbereder vad läkaren bör göra. Oklart ännu vad det ska innehålla exakt.
+Roadmap
+1)
 ta bort narkotikafunktionen - varje läkare borde veta vila preparat som är narkotikaklassade. minskar koden risken för fel.
-skapa en testsvit för projektet
 logik och DOM separation (gör gradvis)
+optimera övrig kod och minska alla adhoc-lösningar jag gjort under utvecklingen. koden ska vara snygg och minimeras, men ändå bibehålla samma funktion.
+
+2)
+När allt är på plats i verktyget och optimerat enligt state of the art:
+Kör 100 simuleringar av verktyget med hjälp av AI - mål 0% anmärkningar
+
+3)
+Standardutförande är läkarvyn - skapa en  sjuksköterskevy som hanterar receptförfrågningar initialt eller vid ett besök hos ssk som förbereder vad läkaren bör göra. Oklart ännu vad det ska innehålla exakt.
+
