@@ -1239,28 +1239,35 @@ function copyResultText() {
 }
 
 // === FLIK 2: LÅNGVARIG FÖRBRUKNING ===
-function periodRowTemplate(idx) {
-  const labelClass = 'section-label';
-  const eidx=escapeHtml(idx), eidx1=escapeHtml(idx+1);
-  const eStart=escapeHtml(oneYearAgoStr()), eEnd=escapeHtml(todayStr());
-  return `
-    <div class="${labelClass}">Period ${eidx1}</div>
-    <div class="form-row-3" id="lt-period-${eidx}">
-      <div class="field"><label for="lt-start-${eidx}" data-tooltip="Startdatum för perioden — vanligen förskrivnings- eller uthämtningsdatum.">Startdatum</label>
-        <input id="lt-start-${eidx}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\\d{4}-\\d{2}-\\d{2}" maxlength="10" autocomplete="off" value="${eStart}"></div>
-      <div class="field"><label for="lt-total-${eidx}" data-tooltip="Totalt antal tabletter eller kapslar uttagna under perioden. Hämtas från apotekskvitto eller journaldokumentation.">Antal uttagna tabletter</label>
-        <input id="lt-total-${eidx}" type="number" placeholder="100" min="1"></div>
-      <div class="field"><label for="lt-end-${eidx}" data-tooltip="Slutdatum för perioden — när medicinen tog slut eller nästa recept utfärdades.">Slutdatum</label>
-        <input id="lt-end-${eidx}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\\d{4}-\\d{2}-\\d{2}" maxlength="10" autocomplete="off" value="${eEnd}"></div>
-    </div>
-    ${idx>0?`<button class="btn btn-ghost" style="font-size:11px;margin-bottom:8px" data-action="remove-period" data-idx="${eidx}">✕ Ta bort period ${eidx1}</button>`:''}`;
-}
 function buildPeriodContainer() {
   const container = getEl('lt-periods-container'); if (!container) return;
   container.textContent='';
   for (let i=0;i<ltPeriodCount;i++) {
-    const div=document.createElement('div'); div.id=`lt-period-wrap-${i}`;
-    div.innerHTML=periodRowTemplate(i); container.appendChild(div);
+    const wrap=document.createElement('div'); wrap.id=`lt-period-wrap-${i}`;
+    // Period-etikett
+    const lbl=document.createElement('div'); lbl.className='section-label';
+    lbl.textContent=`Period ${i+1}`; wrap.appendChild(lbl);
+    // Rad med tre fält
+    const row=document.createElement('div'); row.className='form-row-3'; row.id=`lt-period-${i}`;
+    function makeField(forId,labelText,tooltip,attrs) {
+      const field=document.createElement('div'); field.className='field';
+      const label=document.createElement('label'); label.setAttribute('for',forId);
+      label.setAttribute('data-tooltip',tooltip); label.textContent=labelText; field.appendChild(label);
+      const input=document.createElement('input'); input.id=forId;
+      for (const [k,v] of Object.entries(attrs)) { if(v!==null&&v!==undefined) input.setAttribute(k,String(v)); }
+      field.appendChild(input); return field;
+    }
+    row.appendChild(makeField(`lt-start-${i}`,'Startdatum','Startdatum för perioden — vanligen förskrivnings- eller uthämtningsdatum.',{type:'text',inputmode:'numeric',placeholder:'ÅÅÅÅ-MM-DD',pattern:'\\d{4}-\\d{2}-\\d{2}',maxlength:'10',autocomplete:'off',value:oneYearAgoStr()}));
+    row.appendChild(makeField(`lt-total-${i}`,'Antal uttagna tabletter','Totalt antal tabletter eller kapslar uttagna under perioden. Hämtas från apotekskvitto eller journaldokumentation.',{type:'number',placeholder:'100',min:'1'}));
+    row.appendChild(makeField(`lt-end-${i}`,'Slutdatum','Slutdatum för perioden — när medicinen tog slut eller nästa recept utfärdades.',{type:'text',inputmode:'numeric',placeholder:'ÅÅÅÅ-MM-DD',pattern:'\\d{4}-\\d{2}-\\d{2}',maxlength:'10',autocomplete:'off',value:todayStr()}));
+    wrap.appendChild(row);
+    if (i>0) {
+      const btn=document.createElement('button'); btn.className='btn btn-ghost';
+      btn.style.cssText='font-size:11px;margin-bottom:8px';
+      btn.setAttribute('data-action','remove-period'); btn.setAttribute('data-idx',String(i));
+      btn.textContent=`✕ Ta bort period ${i+1}`; wrap.appendChild(btn);
+    }
+    container.appendChild(wrap);
   }
 }
 function collectRawPeriods() {
