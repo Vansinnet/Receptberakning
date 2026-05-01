@@ -18,7 +18,8 @@
 
   # Content Security Policy som HTTP-header (starkare än <meta>-taggen i HTML)
   # require-trusted-types-for blockerar DOM-baserad XSS på webbläsarnivå
-  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; require-trusted-types-for 'script'; upgrade-insecure-requests
+  # connect-src 'self' tillåter fetch() av lokala JSON-filer (narcotics.json)
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; require-trusted-types-for 'script'; upgrade-insecure-requests
 
   # Isolerar fönstret från cross-origin-kontexter — skyddar mot Spectre-liknande sidokanalsattacker
   Cross-Origin-Opener-Policy: same-origin
@@ -42,3 +43,7 @@
   Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0
   Pragma: no-cache
   Expires: 0
+
+/narcotics.json
+  Cache-Control: public, max-age=604800
+  Content-Type: application/json
