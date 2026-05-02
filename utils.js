@@ -1,0 +1,162 @@
+const VALID_THEMES     = new Set(['dark','klinisk','sakura']);
+const SAFE_ALERT_TYPES = new Set(['danger','warn','info','ok']);
+
+
+function debounce(fn, wait = 120) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
+}
+
+/* Datumformatering */
+function autoFormatDate(input) {
+  const val = input.value;
+  const sel = input.selectionStart;
+  let raw = val.replace(/\D/g,'').substring(0,8);
+  let formatted = raw;
+  if (raw.length > 4) formatted = raw.substring(0,4) + '-' + raw.substring(4);
+  if (raw.length > 6) formatted = raw.substring(0,4) + '-' + raw.substring(4,6) + '-' + raw.substring(6);
+  if (formatted === val) return;
+  input.value = formatted;
+  const digitsBeforeCursor = val.substring(0,sel).replace(/\D/g,'').length;
+  let newPos = 0;
+  if (digitsBeforeCursor > 0) {
+    let count = 0;
+    for (let i = 0; i < formatted.length; i++) {
+      if (/\d/.test(formatted[i])) count++;
+      if (count === digitsBeforeCursor) { newPos = i + 1; break; }
+    }
+    if (count < digitsBeforeCursor) newPos = formatted.length;
+  }
+  try { input.setSelectionRange(newPos, newPos); } catch(e) {}
+}
+
+/* DOM-hjälpfunktioner */
+function getEl(id) { return document.getElementById(id); }
+
+// Skapar ett DOM-element med valfria egenskaper.
+// cls: className-sträng, text: textContent, value: node.value (input/select/option),
+// style: cssText-sträng, attrs: objekt med setAttribute-par, dataset: objekt med dataset-par.
+function el(tag, { cls, text, value, style, attrs, dataset } = {}) {
+  const node = document.createElement(tag);
+  if (cls   !== undefined) node.className    = cls;
+  if (text  !== undefined) node.textContent  = text;
+  if (value !== undefined) node.value        = value;
+  if (style !== undefined) node.style.cssText = style;
+  if (attrs)   for (const [k, v] of Object.entries(attrs))   node.setAttribute(k, String(v));
+  if (dataset) for (const [k, v] of Object.entries(dataset)) node.dataset[k] = String(v);
+  return node;
+}
+
+function toggleError(el, isInvalid) {
+  if (!el) return;
+  el.classList.toggle('input-error', isInvalid);
+  isInvalid ? el.setAttribute('aria-invalid','true') : el.removeAttribute('aria-invalid');
+}
+
+// Sätter eller rensar fel på ett namngivet fält plus dess felmeddelande-span.
+// message='' rensar felet; annars visas texten under fältet och läses av skärmläsare.
+function setFieldError(inputId, message) {
+  const input  = getEl(inputId);
+  const errEl  = getEl(inputId + '-err');
+  const isInvalid = message !== '';
+  toggleError(input, isInvalid);
+  if (errEl) {
+    errEl.textContent = message;
+    errEl.classList.toggle('visible', isInvalid);
+  }
+}
+
+function buildAlertEl(type, title, message) {
+  const safeType = SAFE_ALERT_TYPES.has(type) ? type : 'info';
+  const div = el('div', { cls: `alert alert-${safeType}` });
+  if (title) {
+    div.appendChild(el('strong', { text: title }));
+    div.appendChild(document.createTextNode(' '));
+  }
+  div.appendChild(document.createTextNode(message));
+  return div;
+}
+
+function renderAlert(containerId, type, title, message) {
+  const container = getEl(containerId); if (!container) return;
+  container.textContent = '';
+  container.appendChild(buildAlertEl(type, title, message));
+}
+
+function showEl(id, show, displayValue = 'block') {
+  const e = getEl(id); if (e) e.style.display = show ? displayValue : 'none';
+}
+
+function showToast(msg, durationMs = 3000) {
+  const div = el('div', { cls: 'toast-flash', text: msg, attrs: { role: 'status', 'aria-live': 'polite' } });
+  document.body.appendChild(div);
+  requestAnimationFrame(() => div.classList.add('visible'));
+  setTimeout(() => {
+    div.classList.remove('visible');
+    setTimeout(() => div.remove(), 200); // vänta ut fade-out-transition
+  }, durationMs);
+}
+
+/* Datumverktyg */
+function todayStr() {
+  const n = new Date();
+  return `${n.getUTCFullYear()}-${String(n.getUTCMonth()+1).padStart(2,'0')}-${String(n.getUTCDate()).padStart(2,'0')}`;
+}
+
+function oneYearAgoStr() {
+  const n = new Date();
+  const d = new Date(Date.UTC(n.getUTCFullYear()-1, n.getUTCMonth(), n.getUTCDate()));
+  return fmtDate(d);
+}
+
+function fmtDate(d) {
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+}
+
+let _todayCache = null, _todayCacheKey = '';
+function getToday() {
+  const n = new Date();
+  const key = `${n.getUTCFullYear()}-${n.getUTCMonth()}-${n.getUTCDate()}`;
+  if (_todayCache && _todayCacheKey === key) return _todayCache;
+  _todayCache = new Date(Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate()));
+  _todayCacheKey = key;
+  return _todayCache;
+}
+
+function getDaysDiff(d1,d2) { return Math.round((d1-d2)/86400000); }
+
+function extractDoseUnit(medRaw) {
+  const m = medRaw.match(/(\d+(?:[.,]\d+)?)\s*(mg|ml|µg|mikrogram)/i);
+  if (!m) return null;
+  const amount = parseFloat(m[1].replace(',','.'));
+  const rawUnit = m[2].toLowerCase();
+  const unit = rawUnit === 'mikrogram' ? 'µg' : rawUnit;
+  return { amount, unit };
+}
+
+function getFassUrl(medRaw) {
+  const url = `https://www.fass.se/LIF/result?query=${encodeURIComponent(medRaw.trim())}&userType=2`;
+  // Ursprungsvalidering: säkerställ att URL:en alltid pekar på fass.se (defense-in-depth)
+  return url.startsWith('https://www.fass.se/') ? url : '#';
+}
+
+function parseDateUTC(str) {
+  if (!str) return null;
+  const parts = str.split('-');
+  if (parts.length !== 3) return null;
+  const y = parseInt(parts[0],10), m = parseInt(parts[1],10), day = parseInt(parts[2],10);
+  if (isNaN(y)||isNaN(m)||isNaN(day)||m<1||m>12||day<1||day>31) return null;
+  if (y<1950||y>2100) return null;
+  const d = new Date(Date.UTC(y,m-1,day));
+  if (isNaN(d.getTime())) return null;
+  if (d.getUTCFullYear()!==y||d.getUTCMonth()!==m-1||d.getUTCDate()!==day) return null;
+  return d;
+}
+
+/* Resultattabell-rad */
+function buildResultRow(frag, label, valueText, badgeNode=null) {
+  const rk = el('span', { cls: 'rk', text: label });
+  const rv = el('span', { cls: 'rv', text: valueText });
+  if (badgeNode) { rv.appendChild(document.createTextNode(' ')); rv.appendChild(badgeNode); }
+  frag.appendChild(rk); frag.appendChild(rv);
+}

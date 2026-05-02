@@ -98,7 +98,7 @@ Tre inbyggda teman som växlas direkt:
 
 - **🩺 Klinisk** (standard) – lugn grön/teal-bas.
 - **🌙 Mörkt** – hög kontrast, mörk bakgrund.
-- **🌒 Natt** – varmt mörkt tema med orange accenter.
+- **🌸 Körsbär** – ljust rosa tema.
 
 ### 🧰 Övrigt
 
@@ -112,7 +112,7 @@ Tre inbyggda teman som växlas direkt:
 ## Teknisk information
 
 - **Ren HTML/CSS/JavaScript** – inga ramverk, inga externa beroenden.
-- Tre separata filer: `index.html`, `app.css`, `app.js`.
+- Modulär filstruktur: `index.html`, `app.css`, `app.js`, `calc-renew.js`, `ui-renew.js`, `prescribe.js`, `longterm.js`, `utils.js`.
 - Fungerar **helt offline** – öppna bara filen i en webbläsare.
 - **Standardiserad datumhantering** – alla datum hanteras som UTC för att undvika tidszonsproblem.
 
@@ -124,7 +124,7 @@ Tre inbyggda teman som växlas direkt:
 Öppna `index.html` i valfri webbläsare – ingen installation behövs.
 
 **Driftsätt online:**
-Ladda upp samtliga filer (`index.html`, `app.css`, `app.js`) till valfri statisk webbserver, t.ex. GitHub Pages eller Cloudflare Pages.
+Ladda upp samtliga filer (`index.html`, `app.css`, `app.js`, `calc-renew.js`, `ui-renew.js`, `prescribe.js`, `longterm.js`, `utils.js`) till valfri statisk webbserver, t.ex. GitHub Pages eller Cloudflare Pages.
 
 ---
 

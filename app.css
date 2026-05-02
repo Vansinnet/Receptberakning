@@ -727,6 +727,16 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 .toast-countdown { font-weight: 700; }
 .toast .btn { margin-top: 10px; width: 100%; justify-content: center; background: var(--surface2); }
 
+/* Kort auto-avvisande toast (t.ex. gränsbegränsningar) */
+.toast-flash {
+  position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+  background: var(--surface); color: var(--text); border: 1px solid var(--border);
+  padding: 12px 16px; border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md); font-size: 13px; max-width: 280px;
+  opacity: 0; transition: opacity 0.2s ease; pointer-events: none;
+}
+.toast-flash.visible { opacity: 1; }
+
 /* Modal */
 .modal-overlay {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -1041,4 +1051,202 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 @media (max-width: 560px) {
   .form-row-2, .form-row-3 { grid-template-columns: 1fr; }
   .metrics { grid-template-columns: 1fr 1fr; }
+}
+
+/* ════════════════════════════════════════════
+   UTSKRIFT
+   Visar utlåtande, mätvärden, kliniska alerter
+   och genererad text. Döljer all UI-chrome.
+   ════════════════════════════════════════════ */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 15mm 20mm 20mm;
+  }
+
+  *, *::before, *::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  body {
+    background: white;
+    color: #0f172a;
+    font-size: 10pt;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Säkerställ kontrast för färgade element på vitt papper */
+  :root {
+    --bg: white; --surface: white; --surface2: #f8fafc;
+    --text: #0f172a; --text-muted: #475569;
+    --border: #cbd5e1; --border-strong: #94a3b8;
+    --green: #15803d; --green-bg: #f0fdf4; --green-border: #86efac;
+    --amber: #92400e; --amber-bg: #fffbeb; --amber-border: #fcd34d;
+    --red:   #991b1b; --red-bg:   #fef2f2; --red-border:   #fca5a5;
+    --blue:  #1e40af; --blue-bg:  #eff6ff; --blue-border:  #bfdbfe;
+    --primary: #1d4ed8; --primary-light: #dbeafe;
+    --code-bg: #f8fafc;
+  }
+
+  /* ── App-shell: ta bort höjdbegränsning och overflow ── */
+  .app-shell {
+    display: block;
+    max-width: 100%;
+    min-height: 0;
+    background: white;
+  }
+
+  /* ── Topbar: förenklas till tryckt sidhuvud ── */
+  .topbar {
+    position: static;
+    display: block;
+    border-bottom: 1.5pt solid #0f172a;
+    box-shadow: none;
+    padding: 0 0 5pt;
+    margin-bottom: 10pt;
+  }
+  .topbar-nav-row,
+  .topbar-right { display: none !important; }
+  .topbar-brand-row {
+    justify-content: flex-start;
+    border-bottom: none;
+    padding: 0;
+    gap: 8pt;
+  }
+  .app-brand-icon { display: none; }
+  .app-brand-name { font-size: 13pt; font-weight: 700; color: #0f172a; }
+  .app-brand-date { font-size: 8pt; }
+
+  /* ── Flikpanel: bryt ur scroll-containern ── */
+  .tab-panel.active {
+    display: block;
+    height: auto;
+    overflow: visible;
+    flex: none;
+  }
+
+  /* ── Receptförnyelse: dölj allt utom resultatkolumnen ── */
+  .renew-layout {
+    display: block;
+    height: auto;
+    overflow: visible;
+  }
+  .med-sidebar,
+  .form-panel,
+  .prescribe-panel { display: none !important; }
+
+  .result-panel {
+    display: block;
+    width: 100%;
+    overflow: visible;
+    background: white;
+  }
+  #resultEmptyState { display: none !important; }
+  .result-content {
+    max-width: 100%;
+    padding: 0;
+    gap: 8pt;
+  }
+
+  /* ── Verdict ── */
+  .verdict {
+    border-width: 1.5pt;
+    padding: 7pt 10pt;
+    page-break-inside: avoid;
+  }
+  /* Ikonen är dekorativ och aria-hidden — dölj den även visuellt */
+  .verdict-icon { display: none !important; }
+  .verdict-title { font-size: 11pt; }
+  .verdict-sub   { font-size: 9pt; }
+
+  /* ── Tidslinje: dölj (informationen finns i mätvärden) ── */
+  .tl-wrap { display: none !important; }
+
+  /* ── Mätvärden ── */
+  .metric {
+    background: white;
+    border: 1pt solid var(--border);
+    padding: 5pt 8pt;
+    page-break-inside: avoid;
+  }
+  .metric-lbl { font-size: 7pt; }
+  .metric-val { font-size: 11pt; }
+
+  /* ── Alerter ── */
+  .alert {
+    border-left-width: 3pt;
+    padding: 5pt 8pt;
+    font-size: 9pt;
+    page-break-inside: avoid;
+  }
+
+  /* ── Beslutsfråga: visa bedömningstext, dölj knappar ── */
+  .early-decision-actions { display: none !important; }
+  .early-decision-box { page-break-inside: avoid; }
+
+  /* ── Kopieringssektionen: visa enbart textkroppen ── */
+  .copy-tabs-row,
+  .copy-footer { display: none !important; }
+  .copy-section {
+    border: 1pt solid var(--border);
+    border-radius: 3pt;
+    overflow: visible;
+    page-break-inside: avoid;
+  }
+  .copy-body {
+    font-size: 9pt;
+    line-height: 1.65;
+    background: white;
+    overflow: visible;
+    min-height: 0;
+    padding: 7pt 10pt;
+    white-space: pre-wrap;
+  }
+
+  /* ── Långvarig förbrukning ── */
+  .longterm-layout {
+    display: block;
+    padding: 0;
+  }
+  .longterm-layout > .card {
+    max-width: 100%;
+    border: none;
+    overflow: visible;
+  }
+  .card { overflow: visible; }
+  .longterm-body {
+    display: block;
+    min-height: 0;
+    overflow: visible;
+  }
+  .longterm-form-col { display: none !important; }
+  .longterm-result-col {
+    display: block !important; /* override inline display:flex från showEl */
+    overflow: visible;
+    padding: 0;
+    background: white;
+    gap: 0;
+  }
+  /* Ge gap tillbaka med margin istället (gap fungerar ej på block) */
+  .longterm-result-col > * { margin-bottom: 8pt; }
+
+  .consumption-bar-wrap {
+    overflow: visible;
+    height: 16pt;
+  }
+
+  .period-list {
+    overflow: visible;
+    page-break-inside: avoid;
+  }
+
+  /* ── Dölj resterande chrome ── */
+  .site-footer,
+  .toast,
+  .modal-overlay,
+  .tooltip-bubble { display: none !important; }
 }

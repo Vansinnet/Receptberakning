@@ -54,7 +54,7 @@
         </svg>
       </span>
       <span class="app-brand-name">Receptberäkning</span>
-      <span class="app-brand-date">uppdaterad 2026-05-01</span>
+      <span class="app-brand-date">uppdaterad 2026-05-02</span>
     </div>
     <div class="topbar-nav-row">
       <nav class="main-tabs" role="tablist">
@@ -102,7 +102,6 @@
           <div class="form-panel-header">
             <div>
               <div class="form-med-name" id="formMedName">—</div>
-              <span id="narcBadge" class="badge badge-warn narc-badge is-hidden" data-tooltip="Narkotikaklassat läkemedel (LVFS 2011:10). Förteckning II–V anger klass. Kräver kontroll av förbrukningshastighet och adekvat dokumentation."> </span>
             </div>
             <div class="form-panel-actions">
               <button class="btn btn-ghost" id="clearCardBtn">Rensa</button>
@@ -111,7 +110,7 @@
           </div>
 
           <div class="field">
-            <label for="medInput" data-tooltip="Ange läkemedelsnamn och styrka exakt som på receptet, t.ex. 'Elvanse 50 mg'. Styr narkotikaklassning och FASS-sökning.">Läkemedel och styrka</label>
+            <label for="medInput" data-tooltip="Ange läkemedelsnamn och styrka exakt som på receptet, t.ex. 'Elvanse 50 mg'. Styr FASS-sökning.">Läkemedel och styrka</label>
             <input id="medInput" type="text" placeholder="T.ex. Elvanse 50 mg" maxlength="100" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-describedby="medInput-err">
             <span class="field-error-msg" id="medInput-err" aria-live="polite"></span>
           </div>
@@ -151,15 +150,15 @@
       </section>
 
       <!-- HÖGER: RESULTAT -->
-      <section class="result-panel" id="resultPanel" aria-label="Beräkningsresultat" aria-live="polite" style="min-width:0">
+      <section class="result-panel" id="resultPanel" aria-label="Beräkningsresultat" style="min-width:0">
         <div class="result-empty-state" id="resultEmptyState">
           <div class="empty-icon">📋</div>
           <div>Resultatet visas här</div>
         </div>
         <div id="resultContent" class="is-hidden result-content">
           <!-- Verdict -->
-          <div class="verdict" id="verdictBox">
-            <div class="verdict-icon" id="verdictIcon"></div>
+          <div class="verdict" id="verdictBox" aria-live="polite" aria-atomic="true">
+            <div class="verdict-icon" id="verdictIcon" aria-hidden="true"></div>
             <div class="verdict-text">
               <div class="verdict-title" id="verdictTitle">—</div>
               <div class="verdict-sub" id="verdictSub"></div>
@@ -185,7 +184,7 @@
           <div class="metrics" id="metricsGrid"></div>
 
           <!-- Alerts -->
-          <div id="resultAlerts"></div>
+          <div id="resultAlerts" aria-live="polite" aria-atomic="true"></div>
 
           <!-- Beslutsfråga: för tidig förnyelse -->
           <div id="earlyDecisionBox" class="early-decision-box is-hidden">
@@ -266,8 +265,8 @@
           <!-- HÖGER: resultat -->
           <div class="longterm-result-col" id="lt-result" style="display:none">
             <div class="result-grid" id="lt-resGrid"></div>
-            <div id="lt-overlap-alert"></div>
-            <div id="lt-alerts"></div>
+            <div id="lt-overlap-alert" aria-live="polite" aria-atomic="true"></div>
+            <div id="lt-alerts" aria-live="polite" aria-atomic="true"></div>
 
             <div class="is-hidden" id="lt-bar-section">
               <div class="section-label section-label-spaced">Förbrukning relativt ordination</div>
@@ -346,6 +345,11 @@
   </div>
 </div>
 
+<script src="utils.js" defer></script>
+<script src="ui-renew.js" defer></script>
+<script src="calc-renew.js" defer></script>
+<script src="prescribe.js" defer></script>
+<script src="longterm.js" defer></script>
 <script src="app.js" defer></script>
 </body>
 </html>
