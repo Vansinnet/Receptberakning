@@ -3,7 +3,7 @@ Roadmap
 
 #SE ÖVER PRESCRIBE-PANELEN
 Prescribe-panelen visar inte varning vid ogiltig input (t.ex. ogiltigt datum i "Datum"-läge eller packageSize=0).
-Den ger bara tomt resultat. I huvudformuläret finns tydliga felmeddelanden – lite ojämnt.
+Den ger bara tomt resultat. I huvudformuläret finns tydliga felmeddelanden – lite ojämnt. Se över felhanteringen i panelen.
 
 #REFAKTORERA calcLongterm
 Refaktorering av calcLongterm
@@ -15,6 +15,9 @@ I tooltip-systemet används fortfarande document.createElement direkt. Det är d
 #MINSKA ONÖDIGA NULL-CHECKS
 Minska onödiga defensiva null-checks (där flödet redan garanterar värde)
 Flera if (!el) return; eller if (el) el.xxx = ... i render-funktioner (buildMedList, renderFormForMed, renderResultForMed) kan förenklas. Exempel i ui-renew.js → buildMedList
+
+Minska onödiga null-checks
+→ Kör om hela test-calc.js + lägg till minst 5–10 nya tester för prescribe-logiken och state-uppdateringar.
 
 #CENTRALISERA STATE-MUTATIONER
 centralisera state-mutationer är en av de viktigaste rekommendationerna i våra kodkvalitetsregler för att hålla koden långsiktigt underhållbar och säker.
@@ -97,4 +100,7 @@ Kör 100 simuleringar av verktyget med hjälp av AI - mål 0% anmärkningar
 
 3) Långsikt (juni-augusti -26)
 Standardutförande är läkarvyn - skapa en  sjuksköterskevy som hanterar receptförfrågningar initialt eller vid ett besök hos ssk som förbereder vad läkaren bör göra. Oklart ännu vad det ska innehålla exakt.
+Förberedelse inför sjuksköterskevy (maj–juni)
+Definiera exakt vad ssk-vyn ska innehålla (t.ex. initial bedömning, flaggor till läkare, förenklad formulär, etc.)
+Identifiera vilka delar av nuvarande kod som kan återanvändas (calcCore, state-hantering, textgenerering)
 
