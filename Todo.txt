@@ -82,6 +82,14 @@ updatePrescribeState(i, { months: parseInt(durSel.value, 10) });
 Exempel 3 – i calc() (calc-renew.js):
 Istället för många rader states[i].isOveruse = ... etc. blir det ett enda updateMedState(i, { ... }) med alla fält från derived.
 
+#SKAPA ANVÄNDARGUIDE
+Integrera och publicera användardokumentationen
+Vi skapade just en fullständig användarmanual (Användarmanual för Receptberäkning).
+Lägg till som ny punkt:
+Skapa USER-GUIDE.md i repositoriet
+Lägg till en länk till den i sidfoten (eller som hjälpsida i appen)
+Uppdatera README.md med länk till manualen
+
 2) Inom några veckor (någon gång under maj -26)
 När allt är på plats i verktyget och optimerat enligt state of the art:
 
