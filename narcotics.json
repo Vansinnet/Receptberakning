@@ -1,6 +1,0 @@
-[
-  { "s": "II", "m": ["Alfentanil","Amfetamin","Buprenorfin","Dexamfetamin","Fentanyl","Hydromorfon","Ketobemidon","Kokain","Metadon","Metylfenidat","Morfin","Oxykodon","Pentobarbital","Remifentanil","Sufentanil"] },
-  { "s": "III", "m": ["Flunitrazepam","Glutetimid","Pentazocin"] },
-  { "s": "IV", "m": ["Alprazolam","Backlofen","Bensfetamin","Bromazepam","Diazepam","Fenobarbital","Klobazam","Klometiazol","Klonazepam","Lorazepam","Midazolam","Nitrazepam","Oxazepam","Stesolid","Triazolam","Zolpidem","Zopiklon"] },
-  { "s": "V", "m": ["Etylmorfin","Kodein","Pregabalin","Tramadol"] }
-]
