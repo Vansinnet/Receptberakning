@@ -11,7 +11,7 @@ Roadmap
 
 #SKAPA ANVÄNDARGUIDE – dokumentation
 
-#REFAKTORERA calcLongterm kan du flytta ner till punkt 2 (inom några veckor) eller ta bort från kort sikt helt.
+#REFAKTORERA calcLongterm kan vi flytta ner till punkt (inom några veckor) eller ta bort från kort sikt helt.
 
 En rad om att köra hela test-sviten efter varje refactor (du nämner det under null-checks – bra, men gör det till en generell regel).
 
