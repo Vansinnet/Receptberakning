@@ -1,97 +1,19 @@
 Roadmap
 1) Kort sikt
 
-#SE ÖVER PRESCRIBE-PANELEN
-Prescribe-panelen visar inte varning vid ogiltig input (t.ex. ogiltigt datum i "Datum"-läge eller packageSize=0).
-Den ger bara tomt resultat. I huvudformuläret finns tydliga felmeddelanden – lite ojämnt. Se över felhanteringen i panelen.
+#ANVÄND ALLTID el() – tooltip (5 min)
 
-#REFAKTORERA calcLongterm
-Refaktorering av calcLongterm
-Funktionen (236 rader) blandar beräkning och DOM-manipulation i ett svep, till skillnad från receptförnyelsens calcCore/calc-separation. Det stör inte idag, men det är korrekt tillvägagångsätt
+#CENTRALISERA STATE-MUTATIONER – detta ger störst långsiktig vinst
 
-#ANVÄND ALLTID el()
-I tooltip-systemet används fortfarande document.createElement direkt. Det är det enda stället i hela kodbasen som bryter mot regeln "Använd alltid el() från utils.js — aldrig document.createElement direkt".
+#MINSKA ONÖDIGA NULL-CHECKS – gör detta direkt efter centraliseringen (då blir det ännu tydligare vilka checks som är onödiga)
 
-#MINSKA ONÖDIGA NULL-CHECKS
-Minska onödiga defensiva null-checks (där flödet redan garanterar värde)
-Flera if (!el) return; eller if (el) el.xxx = ... i render-funktioner (buildMedList, renderFormForMed, renderResultForMed) kan förenklas. Exempel i ui-renew.js → buildMedList
+#SE ÖVER PRESCRIBE-PANELEN – felhantering
 
-Minska onödiga null-checks
-→ Kör om hela test-calc.js + lägg till minst 5–10 nya tester för prescribe-logiken och state-uppdateringar.
+#SKAPA ANVÄNDARGUIDE – dokumentation
 
-#CENTRALISERA STATE-MUTATIONER
-centralisera state-mutationer är en av de viktigaste rekommendationerna i våra kodkvalitetsregler för att hålla koden långsiktigt underhållbar och säker.
-Varför det är ett problem idag:
-Just nu sker mutationer av states[i] och prescribeState[i] direkt på minst 6–8 olika ställen i kodbasen:
+#REFAKTORERA calcLongterm kan du flytta ner till punkt 2 (inom några veckor) eller ta bort från kort sikt helt.
 
-calc() (i calc-renew.js)
-setEarlyDecision()
-clearCurrentCard()
-renderPrescribePanel() + buildPrescribeInner() (i prescribe.js)
-generateAndDistribute()
-addMedCard() och executeClearAll()
-Det bryter mot mottot:
-Undvik att mutera states[] eller prescribeState direkt från flera olika funktioner.
-Om vi ändrar något som rör tillstånd, kontrollera att mutationen sker på ett ställe och att downstream-funktioner läser från tillståndet snarare än tar emot det som argument på olika sätt.
-Konsekvenser:
-Det är svårt att få en överblick över alla ställen där tillståndet kan ändras.
-Risk att glömma uppdatera ett fält när man lägger till ny logik (t.ex. activeTab, patientLang eller packageSize).
-Svårare att debugga — vi måste söka igenom hela kodbasen för att förstå varför ett värde plötsligt ändrats.
-När vi i framtiden vill lägga till t.ex. validering, logging, undo eller immutable patterns blir det en mardröm.
-Lösningen – centralisera till två hjälpfunktioner
-Vi skapar två tydliga entry points som alla mutationer går igenom. Allt annat i koden läser bara från states[] / prescribeState[].
-Lägg till dessa två funktioner i app.js (direkt efter /* State */-sektionen):
-JavaScript// Centraliserad uppdatering av läkemedels-state
-// Alla ändringar av states[i] går genom denna funktion
-function updateMedState(i, patch) {
-  if (!states[i]) states[i] = {};
-  Object.assign(states[i], patch);
-}
-
-// Centraliserad uppdatering av prescribe-state
-// Alla ändringar av prescribeState[i] går genom denna funktion
-function updatePrescribeState(i, patch) {
-  if (!prescribeState[i]) {
-    prescribeState[i] = { mode: 'months', months: 7, endDate: '', packageSize: '' };
-  }
-  Object.assign(prescribeState[i], patch);
-}
-Exempel före/efter
-Exempel 1 – i setEarlyDecision() (ui-renew.js eller app.js):
-JavaScript// FÖRE (spridd mutation)
-const s = states[i];
-s.earlyRenewalDecision = decision;
-s.statusText = decision === 'yes' ? 'OK – förnyas (klinisk bed.)' : 'För tidig förnyelse';
-s.verdictTitle = ...;
-s.verdictSub = ...;
-JavaScript// EFTER (centraliserad)
-updateMedState(i, {
-  earlyRenewalDecision: decision,
-  statusText:   decision === 'yes' ? 'OK – förnyas (klinisk bed.)' : 'För tidig förnyelse',
-  verdictTitle: decision === 'yes' ? 'OK – Förnya recept' : 'För tidig förnyelse – bedömning krävs',
-  verdictSub:   decision === 'yes'
-    ? 'Klinisk bedömning: förnyelse trots förhöjd förbrukning.'
-    : `Snitt ${s.displayAvgStr} överstiger ordination med >10%.`
-});
-Exempel 2 – i buildPrescribeInner() / event handlers (prescribe.js):
-JavaScript// FÖRE
-prescribeState[i].packageSize = pkgInp.value;
-prescribeState[i].mode = mode;
-prescribeState[i].months = parseInt(...);
-JavaScript// EFTER
-updatePrescribeState(i, { packageSize: pkgInp.value });
-updatePrescribeState(i, { mode });
-updatePrescribeState(i, { months: parseInt(durSel.value, 10) });
-Exempel 3 – i calc() (calc-renew.js):
-Istället för många rader states[i].isOveruse = ... etc. blir det ett enda updateMedState(i, { ... }) med alla fält från derived.
-
-#SKAPA ANVÄNDARGUIDE
-Integrera och publicera användardokumentationen
-Vi skapade just en fullständig användarmanual (Användarmanual för Receptberäkning).
-Lägg till som ny punkt:
-Skapa USER-GUIDE.md i repositoriet
-Lägg till en länk till den i sidfoten (eller som hjälpsida i appen)
-Uppdatera README.md med länk till manualen
+En rad om att köra hela test-sviten efter varje refactor (du nämner det under null-checks – bra, men gör det till en generell regel).
 
 2) Inom några veckor (någon gång under maj -26)
 När allt är på plats i verktyget och optimerat enligt state of the art:
