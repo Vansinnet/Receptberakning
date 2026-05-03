@@ -3,7 +3,7 @@
 
 **Välkommen till Receptberäkning** – ett kliniskt beslutsstöd för läkare vid receptförnyelse via 1177 och analys av långvarig förbrukning.
 
-Verktyget är helt offline, innehåller inga externa beroenden och sparar ingen patientdata.
+Verktyget är helt offline (arbetar lokalt i webbläsaren efter att du gått in i verktyget), innehåller inga externa beroenden och sparar ingen patientdata.
 
 ---
 
