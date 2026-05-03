@@ -77,6 +77,10 @@ Förbättring #6: Print-stödet är bra men kunde visa prescribe-sammanställnin
 
 Förbättring #7: Tillgänglighet: tooltip-bubblan kan hamna utanför viewport på små skärmar.
 
+Förbättring #8: Överdriven defensivitet vs. "Tyst misslyckande"
+Observation: I JavaScript är det vanligt med if (s && s.valid). Koden har en bra balans, men kom ihåg regeln "föredra tydlig struktur framför överkommen defensivitet".
+Svaghet: "Tysta misslyckanden" (early returns som inte uppdaterar UI) är en stor risk i kliniska verktyg. Om tillståndet är ogiltigt (s.valid === false), måste UI uppdateras så att felmeddelanden rensas eller en grå/låst ruta visas. Returnerar vi bara return; stannar applikationen kvar i sitt förra tillstånd, och läkaren kanske tror att det gamla resultatet gäller för den nya indatan.
+
 2) Inom några veckor (någon gång under maj -26)
 När allt är på plats i verktyget och optimerat enligt state of the art:
 
