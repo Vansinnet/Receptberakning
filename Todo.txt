@@ -13,7 +13,11 @@ Roadmap
 
 #REFAKTORERA calcLongterm kan vi flytta ner till punkt (inom några veckor) eller ta bort från kort sikt helt.
 
-En rad om att köra hela test-sviten efter varje refactor (du nämner det under null-checks – bra, men gör det till en generell regel).
+#UPPDATERA test-calc.js
+Utöka klinisk testning (test-calc.js)
+Nuvarande problem: Testerna täcker primärt calcCore i calc-renew.js. Men vi har viktig klinisk logik i prescribe.js (som calcPrescribeResult med dess tidsberäkningar) och i longterm.js (förbrukningsanalys).
+
+En rad om att köra hela test-sviten efter varje refactor (du nämner det under null-checks – bra, men gör det till en generell regel). Separera beräkning och textgenerering från DOM (särskilt i longterm.js)
 
 2) Inom några veckor (någon gång under maj -26)
 När allt är på plats i verktyget och optimerat enligt state of the art:
