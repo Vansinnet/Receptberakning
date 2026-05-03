@@ -106,7 +106,7 @@ När förnyelse godkänts visas en panel till höger:
 **Svar:** Mycket exaktare – då används faktisk förbrukning istället för antagande.
 
 **Fråga:** Kan jag använda verktyget utan internet?  
-**Svar:** Ja, helt offline efter att filen laddats ner.
+**Svar:** Ja, helt offline efter att filerna laddats ner och läggs i samma mapp. Starta sedan index.html i din webbläsare.
 
 **Fråga:** Sparas mina uppgifter?  
 **Svar:** Nej. Allt finns bara i webbläsarens minne under sessionen.
