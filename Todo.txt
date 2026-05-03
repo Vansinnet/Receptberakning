@@ -1,15 +1,81 @@
 Roadmap
 1) Kort sikt
 
-#CENTRALISERA STATE-MUTATIONER – detta ger störst långsiktig vinst
+Bugg #1: Tillståndsbugg vid borttagning av läkemedelskort (medCardCount > 1)
+I clearCurrentCard() (app.js + ui-renew.js): när man tar bort ett kort i mitten hanteras states.splice() och prescribeState omindexering, men calcDebounced[]-arrayen byggs om med gamla closures. Detta kan leda till att calc(i) anropas på fel index vid snabb växling.
+Klinisk risk: Låg–medelhög (fel läkemedel visas i resultat).
+Reproduktion: Lägg till 3 kort → ta bort kort nr 2 → växla till kort 3 → debounce kan trigga fel beräkning.
 
-#MINSKA ONÖDIGA NULL-CHECKS – gör detta direkt efter centraliseringen (då blir det ännu tydligare vilka checks som är onödiga)
+Bugg #2: Vid viss omrendering (t.ex. switch mellan kort + debounce-cykel) kan flagsChanged triggas felaktigt och beslutet rensas. Läkaren måste då välja om:
 
-#SKAPA ANVÄNDARGUIDE – dokumentation
+Huvudlogiken ligger i calc-renew.js → funktionen calcCore(inputData, prev) (raderna med flagsChanged):JavaScriptconst flagsChanged = prev.isOveruse !== isOveruse || prev.isTooEarly !== isTooEarly;
+const earlyRenewalDecision = flagsChanged ? null : (prev.earlyRenewalDecision || null);
+Detta returneras och skrivs sedan över i calc() (samma fil):JavaScriptconst prev = {
+  isOveruse:            s.isOveruse            || false,
+  isTooEarly:           s.isTooEarly           || false,
+  earlyRenewalDecision: s.earlyRenewalDecision || null,
+};
+const derived = calcCore(inputData, prev);
+Object.assign(states[i], derived);   // ← här skrivs decision om till null
 
-#UPPDATERA test-calc.js
-Utöka klinisk testning (test-calc.js)
+Exakt call-stack som triggar buggen:
+
+Läkaren har valt "Ja, förnya" → setEarlyDecision('yes') (app.js) → sätter states[i].earlyRenewalDecision = 'yes'.
+Någon omrendering sker:
+selectMed(i) (ui-renew.js) → buildMedList() → renderFormForMed() → renderResultForMed()
+ELLER debounce-cykeln i formuläret (formPanel.addEventListener('input') i app.js) → calcDebounced[activeMedIdx]() → calc()
+
+calc() kör saveFormValues() (även om ingenting ändrats) → validateInputs() → calcCore().
+I calcCore() jämförs prev.isOveruse/isTooEarly (från gamla state) med de nya beräknade värdena.
+Om det finns minsta lilla skillnad (t.ex. getToday()-cache, mikro-skillnad i daysSince, parseDateUTC, eller att calculable flippar) → flagsChanged = true → earlyRenewalDecision = null.
+
+Bugg #3: renderResultForMed antar ibland att s.metrics alltid finns (även om valid:true men calculable:false).
+renderResultForMed antar ibland att s.metrics alltid finns (även när valid:true men calculable:false)
+Var buggen sitter:
+
+I ui-renew.js → renderResultForMed(i):JavaScriptif (!s.valid) { ... return; }   // ← här går vi förbi
+
+/* Mätvärden */
+const metricsGrid = getEl('metricsGrid');
+if (metricsGrid && s.metrics) {   // ← skydd finns, men...
+  metricsGrid.textContent = '';
+  s.metrics.forEach(...)        // ← här antas att det är en array
+}
+Problemet uppstår när valid: true men calculable: false (t.ex. daysSince === 0).
+
+Vad calcCore returnerar i det fallet:
+JavaScriptreturn {
+  valid: true,
+  calculable: false,
+  isOveruse: false,
+  isTooEarly: false,
+  metrics: [],          // ← explicit tom array
+  alerts: [],
+  ...
+};
+Varför det ändå kan gå fel:
+
+Object.assign(states[i], derived) skriver inte alltid över metrics om det redan fanns en gammal värde i state.
+I vissa tidiga tillstånd (t.ex. precis efter clearCurrentCard() eller innan första beräkningen är klar) kan s.metrics vara undefined.
+if (metricsGrid && s.metrics) skyddar mot undefined, men om s.metrics är null eller en icke-array kan forEach krascha (eller skapa tom grid utan felmeddelande).
+När calculable: false visas fortfarande hela resultContent (inklusive metricsGrid) – läkaren ser en tom eller felaktig mätvärdes-ruta.
+
+Bugg #4: Prescribe-panelen försvinner helt på mobil utan någon förklaring ("varför försvinner högerkolumnen?").
+
+Förbättring #1: CENTRALISERA STATE-MUTATIONER – detta ger störst långsiktig vinst
+
+Förbättring #2: MINSKA ONÖDIGA NULL-CHECKS – gör detta direkt efter centraliseringen (då blir det ännu tydligare vilka checks som är onödiga)
+
+Förbättring #3: SKAPA ANVÄNDARGUIDE – dokumentation
+
+Förbättring #4: UPPDATERA test-calc.js
 Vi har viktig logik i prescribe.js som behöver inkluderas i test-calc.js
+
+Förbättring #5: Öka inaktivitetstimern till 10 minuter. 5 minuter är för aggressivt, då läkaren kan bli störd under användning av andra ärenden och därmed vara borta från verktyget.
+
+Förbättring #6: Print-stödet är bra men kunde visa prescribe-sammanställningen tydligare.
+
+Förbättring #7: Tillgänglighet: tooltip-bubblan kan hamna utanför viewport på små skärmar.
 
 2) Inom några veckor (någon gång under maj -26)
 När allt är på plats i verktyget och optimerat enligt state of the art:
