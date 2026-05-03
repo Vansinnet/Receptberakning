@@ -68,7 +68,7 @@ Förbättring #1: CENTRALISERA STATE-MUTATIONER – detta ger störst långsikti
 
 Förbättring #2: MINSKA ONÖDIGA NULL-CHECKS – gör detta direkt efter centraliseringen (då blir det ännu tydligare vilka checks som är onödiga)
 
-Förbättring #3: SKAPA ANVÄNDARGUIDE – dokumentation
+Förbättring #3: SKAPA ANVÄNDARGUIDE – dokumentation ✅
 
 Förbättring #4: UPPDATERA test-calc.js
 Vi har viktig logik i prescribe.js som behöver inkluderas i test-calc.js
