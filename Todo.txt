@@ -1,157 +1,96 @@
 Roadmap
 1) Kort sikt
 
-Bugg #1: Tillståndsbugg vid borttagning av läkemedelskort (medCardCount > 1)
-I clearCurrentCard() (app.js + ui-renew.js): när man tar bort ett kort i mitten hanteras states.splice() och prescribeState omindexering, men calcDebounced[]-arrayen byggs om med gamla closures. Detta kan leda till att calc(i) anropas på fel index vid snabb växling.
-Klinisk risk: Låg–medelhög (fel läkemedel visas i resultat).
-Reproduktion: Lägg till 3 kort → ta bort kort nr 2 → växla till kort 3 → debounce kan trigga fel beräkning.
+Bugg #1: Felaktig state-hantering vid borttagning av läkemedelskort (stort kluster)
+Påverkar: clearCurrentCard() i app.js, calcDebounced[], prescribeState, states[] och ui-renew.js
+Root cause:
 
-Race condition med pending debounce-timers efter borttagning av kort (utökning av din #1)
-Plats: app.js: clearCurrentCard() + calcDebounced (array med closures).
-Beskrivning:
-Även om du gör calcDebounced.length = 0; + ensureDebounce-loop efter splice, kan redan queued debounce-timers (från input-event precis innan borttagning) fortfarande trigga med gamla closure-index. De muterar fel states[j] eller kör calc() på fel kort.
-Reproduktion:
-Lägg till 3 kort → skriv i kort #2 (debounce startar) → ta bort kort #2 snabbt → pending timer kör på fel index.
-Klinisk risk: Låg–medel (fel läkemedel beräknas visas).
-Fix-förslag: Byt till objekt-baserad debounce (debouncers = {} keyed by index) + clearTimeout innan splice.
+states.splice() + manuell omindexering av prescribeState
+calcDebounced är en array med closures som behåller gamla index
+Pending debounce-timers från input-event körs efter borttagning
+prescribeState reindexering hanterar inte multipla borttagningar korrekt
 
-Bugg #2: Vid viss omrendering (t.ex. switch mellan kort + debounce-cykel) kan flagsChanged triggas felaktigt och beslutet rensas. Läkaren måste då välja om:
-
-Huvudlogiken ligger i calc-renew.js → funktionen calcCore(inputData, prev) (raderna med flagsChanged):JavaScriptconst flagsChanged = prev.isOveruse !== isOveruse || prev.isTooEarly !== isTooEarly;
-const earlyRenewalDecision = flagsChanged ? null : (prev.earlyRenewalDecision || null);
-Detta returneras och skrivs sedan över i calc() (samma fil):JavaScriptconst prev = {
-  isOveruse:            s.isOveruse            || false,
-  isTooEarly:           s.isTooEarly           || false,
-  earlyRenewalDecision: s.earlyRenewalDecision || null,
-};
-const derived = calcCore(inputData, prev);
-Object.assign(states[i], derived);   // ← här skrivs decision om till null
-
-Exakt call-stack som triggar buggen:
-
-Läkaren har valt "Ja, förnya" → setEarlyDecision('yes') (app.js) → sätter states[i].earlyRenewalDecision = 'yes'.
-Någon omrendering sker:
-selectMed(i) (ui-renew.js) → buildMedList() → renderFormForMed() → renderResultForMed()
-ELLER debounce-cykeln i formuläret (formPanel.addEventListener('input') i app.js) → calcDebounced[activeMedIdx]() → calc()
-
-calc() kör saveFormValues() (även om ingenting ändrats) → validateInputs() → calcCore().
-I calcCore() jämförs prev.isOveruse/isTooEarly (från gamla state) med de nya beräknade värdena.
-Om det finns minsta lilla skillnad (t.ex. getToday()-cache, mikro-skillnad i daysSince, parseDateUTC, eller att calculable flippar) → flagsChanged = true → earlyRenewalDecision = null.
-
-Bugg #3: renderResultForMed antar ibland att s.metrics alltid finns (även om valid:true men calculable:false).
-renderResultForMed antar ibland att s.metrics alltid finns (även när valid:true men calculable:false)
-Var buggen sitter:
-
-I ui-renew.js → renderResultForMed(i):JavaScriptif (!s.valid) { ... return; }   // ← här går vi förbi
-
-/* Mätvärden */
-const metricsGrid = getEl('metricsGrid');
-if (metricsGrid && s.metrics) {   // ← skydd finns, men...
-  metricsGrid.textContent = '';
-  s.metrics.forEach(...)        // ← här antas att det är en array
-}
-Problemet uppstår när valid: true men calculable: false (t.ex. daysSince === 0).
-
-Vad calcCore returnerar i det fallet:
-JavaScriptreturn {
-  valid: true,
-  calculable: false,
-  isOveruse: false,
-  isTooEarly: false,
-  metrics: [],          // ← explicit tom array
-  alerts: [],
-  ...
-};
-Varför det ändå kan gå fel:
-
-Object.assign(states[i], derived) skriver inte alltid över metrics om det redan fanns en gammal värde i state.
-I vissa tidiga tillstånd (t.ex. precis efter clearCurrentCard() eller innan första beräkningen är klar) kan s.metrics vara undefined.
-if (metricsGrid && s.metrics) skyddar mot undefined, men om s.metrics är null eller en icke-array kan forEach krascha (eller skapa tom grid utan felmeddelande).
-När calculable: false visas fortfarande hela resultContent (inklusive metricsGrid) – läkaren ser en tom eller felaktig mätvärdes-ruta.
-
-Stale/ghost-data i UI efter ofullständiga return-värden från calcCore (hög risk, relaterad till men bredare än din #3)
-Plats: calc-renew.js: calcCore() (rader ~140–220, alla early-return-paths) + app.js: calc() (Object.assign(states[i], derived)).
-Beskrivning:
-Många felvägar returnerar ofullständiga objekt:
-
-daysSince === 0 → {valid:true, calculable:false, metrics:[] ...}
-remaining > total / totalDays > 3650 / too_many_refs → ingen metrics, alerts, tlPct etc.
-valid:false (incomplete/invalid_date) → nästan inget.
-
-Object.assign behåller då gamla värden från tidigare giltig beräkning.
-renderResultForMed() går förbi if(!s.valid) och renderar gamla metrics/alerts/tidslinje bredvid det nya verdictet ("Kan ej beräknas" / "Orimliga värden").
-
-Bugg #4: Mobiltelefon. Prescribe-panelen försvinner helt på mobil utan någon förklaring ("varför försvinner högerkolumnen?").
-
-Bugg #5: Mobiltelefon. Tillgänglighet: tooltip-bubblan kan hamna utanför viewport på små skärmar.
-
-Bugg #6: Viktigt att förpackningsstorlek ska kunna vara annorlunda än när man matar in senaste recept. Det är ett aktivt val att läkare kanske vill ändra förpackningsstorlek. Behövs kommentar om det saknas. Spelar det någon roll i nedanstående? 
-
-Prescribe-panelens förpackningsstorlek uppdateras aldrig när amtInput ändras (prescribe.js)
-Plats: prescribe.js: renderPrescribePanel() (rader ~220–230, if (!prescribeState[i].packageSize)).
-Beskrivning:
-Prefill-logiken kör endast vid första byggandet av panelen. Ändrar läkaren Förpackningsstorlek (st) i huvudformuläret efteråt → prescribe-panelen behåller det gamla värdet (eller tomt). Beräkningen av antal förpackningar blir felaktig utan varning.
 Reproduktion:
 
-Fyll i läkemedel (amt=100) → öppna prescribe-panel.
-Ändra amtInput till 30 → prescribe-panel visar fortfarande "100 st".
+Lägg till 3–4 kort → fyll i data → ta bort kort i mitten → växla mellan kort eller vänta på debounce
 
-Klinisk risk: Medel (fel antal förpackningar föreslås vid ny förskrivning).
-Fix-förslag: Lägg till sync-logik i saveFormValues eller calc() som uppdaterar prescribeState[i].packageSize om det är tomt eller matchar gamla amt.
+Klinisk risk: Medelhög (fel läkemedel kan beräknas/visas)
+Fix-förslag:
+Byt till objekt-baserad debounce (debouncers = {} keyed by index) + clearTimeout före splice. Centralisera all state-mutation i en removeMedCard(i)-funktion som hanterar alla arrays/objekt atomärt.
 
-Bugg #7: Inaktivitetstimern triggas inte av interaktioner i prescribe- och longterm-fliken
-Plats: app.js: resetTimer() (endast document-level click/keydown/touchstart) + prescribe/longterm event listeners.
-Beskrivning:
-prescribeInner (selects, inputs) och lt-periods-container har egna listeners som aldrig kallar resetTimer(true). Timer kan gå ut mitt i arbete med månadsval eller perioder.
-Klinisk risk: Låg (men irriterande i klinisk miljö).
-Fix-förslag: Lägg till resetTimer(true) i alla relevanta event listeners (eller använd en global document delegation som redan finns).
+Bugg #2: earlyRenewalDecision rensas eller fastnar felaktigt
+Påverkar: calcCore() i calc-renew.js (rader med flagsChanged), calc() i app.js, setEarlyDecision() i app.js
+Root cause:
 
-Bug #8: calcLongtermCore visar ingen varning för ogiltiga perioder när med/dos saknas
-Plats: longterm.js: calcLongterm() + calcLongtermCore().
-Beskrivning:
-periodErrors sätts alltid, men om medRaw eller ordDose saknas returneras tidigt (showEl('lt-result', false)) utan att toggla fel på fälten. Användaren ser inga röda fält trots ogiltiga datum/total.
-Reproduktion: Tom dos + ogiltigt datum i period → inga felmarkeringar.
-Klinisk risk: Låg (endast UX).
+flagsChanged = prev.isOveruse !== isOveruse || prev.isTooEarly !== isTooEarly är för känslig (mikro-skillnader i daysSince, getToday(), calculable etc.)
+Object.assign(states[i], derived) skriver alltid över earlyRenewalDecision
+Beslutet sparas i setEarlyDecision() men rensas vid nästa calc() eller omrendering
 
-Bug #9: Felaktig månadsberäkning i Ny förskrivning (hög klinisk risk)
-Plats: prescribe.js → calcPrescribeResult() (rader ~80–100, tYear / tMonth från today).
-Beskrivning:
-När nuvarande recept har dagar kvar (daysAlreadyCovered > 0) ska ny förskrivning starta från prescribedEndDate, inte från idag. Koden använder alltid today.getUTCFullYear() + today.getUTCMonth() vid "Månader"-läge.
-Resultat: läkaren får för kort period (t.ex. 1 månad blir 1 månad minus redan täckta dagar).
 Reproduktion:
 
-Recept som räcker 20 dagar till.
-Välj "Ny förskrivning" → 3 månader.
-Beräkningen startar från idag → fel slutdatum och för få förpackningar.
+Välj "Ja, förnya" på överförbrukning/för tidigt → ändra något litet i formuläret eller växla kort → beslutet försvinner (eller fastnar vid ogiltigt tillstånd)
 
-Klinisk risk: Hög (fel förskrivningslängd → över-/underförskrivning).
+Klinisk risk: Medelhög (läkaren måste välja om beslutet upprepade gånger)
+Fix-förslag:
+Gör flagsChanged-logiken mer robust (jämför bara de kliniska flaggorna, inte calculable eller exakta datum). Separera earlyRenewalDecision från de auto-beräknade flaggorna i state.
 
-Bug #10: Stale UI-data i resultatrutan vid felvägar (utökning av #6/#12)
-Plats: calc-renew.js (alla early returns i calcCore) + app.js: calc() (Object.assign) + ui-renew.js: renderResultForMed().
-Beskrivning:
-Många felvägar returnerar ofullständiga objekt (metrics, alerts, tlPct, verdictSub etc. saknas). Object.assign behåller gamla värden → läkaren ser gamla mätvärden/tidslinje bredvid "Kan ej beräknas" eller "Orimliga värden".
-Reproduktion: Giltigt recept → OK-resultat → ändra till Doser kvar > total eller daysSince=0.
-Klinisk risk: Medel–hög (läkaren kan lita på gamla siffror).
+Bugg #3: Stale/ghost UI-data efter ofullständiga calcCore-returer
+Påverkar: calcCore() (alla early returns), calc() (Object.assign), renderResultForMed() i ui-renew.js
+Root cause:
 
-Bug #11: FASS-knappen i longterm behåller gammal länk efter rensning
-Plats: longterm.js → calcLongterm() + clearLongterm().
-Beskrivning:
-Vid clearLongterm() döljs knappen men href uppdateras inte. Nästa gång man skriver ett nytt namn visas knappen med gammal länk tills ny beräkning körs.
-Reproduktion: Skriv läkemedel → FASS visas → rensa → skriv nytt namn.
-Klinisk risk: Låg (endast UX).
+Många return-vägar i calcCore() returnerar ofullständiga objekt (saknar metrics, alerts, tlPct, verdictSub m.m.)
+Object.assign behåller gamla värden från tidigare giltig beräkning
+renderResultForMed() renderar gammal data även vid calculable: false eller valid: false
 
-Bug #12: Multi-med textgenerering hanterar blandade beslut otydligt
-Plats: calc-renew.js → generateAndDistribute() + buildPatientText/buildJournalText.
-Beskrivning:
-Vid flera läkemedel med mix av OK / för tidigt / överförbrukning + klinisk override blir den gemensamma patient- och journaltexten ibland förvirrande eller använder fel mall för vissa läkemedel.
-Klinisk risk: Låg–medel (texten behöver granskas manuellt).
+Reproduktion:
 
-Bug #13: prescribeState blir trasig vid upprepad borttagning av kort
-Plats: app.js → clearCurrentCard() (reindexering av prescribeState).
-Beskrivning:
-newPS[j] = prescribeState[j >= i ? j + 1 : j] ?? null hanterar inte alla edge cases vid flera borttagningar i rad. Efter 2–3 borttagningar kan prescribeState[i] vara undefined eller peka på fel data när man växlar kort. Panelen blir tom eller visar data från ett annat läkemedel.
-Reproduktion: Lägg till 4 kort → ta bort kort 2, sedan kort 3 → växla till kort 4.
-Klinisk risk: Medel (stale/ogiltig förskrivningspanel).
+Giltigt recept → OK-resultat → ändra till daysSince=0, remaining > total eller orimliga värden → gamla mätvärden/tidslinje/alerts visas fortfarande
+
+Klinisk risk: Medelhög (läkaren kan lita på gamla siffror)
+Fix-förslag:
+Se till att calcCore() alltid returnerar ett fullständigt state-objekt med alla fält (eller lägg till resetUI: true). I renderResultForMed() rensa explicit alla element när !s.valid || !s.calculable.
+
+Bugg #4: Prescribe-panelen (Ny förskrivning) – två relaterade fel
+Påverkar: prescribe.js (calcPrescribeResult(), renderPrescribePanel())
+4a: Felaktig månadsberäkning (hög risk)
+
+När det finns dagar kvar på nuvarande recept (daysAlreadyCovered > 0) använder koden fortfarande today som bas för månadsberäkning istället för prescribedEndDate.
+
+4b: packageSize synkas aldrig
+
+prescribeState[i].packageSize fylls bara vid första renderingen. Ändring av amtInput i huvudformuläret uppdaterar inte prescribe-panelen.
+
+Reproduktion:
+
+Recept med 20 dagar kvar → välj 3 månader → får för kort period
+Ändra amtInput från 100 till 30 → prescribe-panel visar fortfarande 100
+
+Klinisk risk: Hög (fel antal förpackningar och fel förskrivningslängd)
+Fix-förslag:
+Använd prescribedEndDate som startdatum vid månadsberäkning. Lägg till synkronisering av packageSize i saveFormValues() eller calc() (med kommentar att läkaren medvetet får ändra storlek).
+
+Bugg #5: Inaktivitetstimern fungerar inte i prescribe- och longterm-fliken
+Påverkar: app.js (resetTimer()), event listeners i prescribe.js och longterm.js
+Root cause:
+Endast globala document-events återställer timern. Inputs/selects/knappar i prescribe-panelen och longterm-perioderna saknar resetTimer(true).
+Klinisk risk: Låg (irriterande)
+Fix-förslag:
+Lägg till resetTimer(true) i alla relevanta event listeners eller använd event delegation på hela app-shell.
+
+Bugg #6: Mobile & tillgänglighet
+6a: Prescribe-panelen döljs helt på mobil (@media (max-width: 900px)) utan förklaring.
+6b: Tooltip-bubblan kan hamna utanför viewport på små skärmar.
+Klinisk risk: Låg–medel (UX)
+Fix-förslag:
+Visa en tydlig notering på mobil eller gör panelen kollapsbar. Förbättra tooltip-positionering med viewport-check.
+
+Bugg #7: Mindre UX- och edge-case buggar
+
+#7a: autoFormatDate tillåter ogiltiga datum (t.ex. 2026-04-31) utan live-felmeddelande.
+#7b: Longterm overlap-detektering klassar angränsande perioder (samma dag) som overlap.
+#7c: FASS-knappen i longterm behåller gammal href efter clearLongterm().
+#7d: Svag feedback vid ogiltig indata i prescribe-panelen (ingen toggleError).
+#7e: Ingen bra skärmläsare-feedback när max 8 läkemedel nås.
 
 Förbättring #1: CENTRALISERA STATE-MUTATIONER – detta ger störst långsiktig vinst
 
