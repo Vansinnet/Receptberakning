@@ -9,7 +9,7 @@ Verktyget är helt offline (arbetar lokalt i webbläsaren efter att du gått in 
 
 ## 1. Kom igång
 
-Använd verktyget direkt online här:  
+Använd verktyget här:  
 **[https://receptberakning.pages.dev/](https://receptberakning.pages.dev/)**
 
 (alltid den senaste versionen – ingen nedladdning behövs)
