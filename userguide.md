@@ -113,17 +113,14 @@ När förnyelse godkänts visas en panel till höger:
 
 ---
 
-## 7. Tips från läkare till läkare
+## 7. Tips till läkare
 
-- Använd **Doser kvar** när patienten ger tydlig uppgift – det ger bäst precision.
+- Använd **Doser kvar** när patienten ger tydlig uppgift om det – det ger bäst precision i beslutsstödet.
 - Vid narkotika eller högriskläkemedel – dubbelkolla alltid manuellt.
 - Kopiera journaltexten direkt – den är anpassad efter ditt beslut.
 - Använd fliken **Långvarig förbrukning** vid oklar följsamhet eller misstänkt över-/underförbrukning.
 
 ---
-
-**Vill du ha en kortare version för utskrift eller en snabbguide (1 sida)?**  
-Säg bara till så skapar jag den också.
 
 **Lycka till med verktyget!**  
 Det är skapat för att spara tid och öka patientsäkerheten – använd det med ditt kliniska omdöme.
