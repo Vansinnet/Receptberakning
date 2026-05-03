@@ -73,7 +73,7 @@ Förbättring #3: SKAPA ANVÄNDARGUIDE – dokumentation ✅
 Förbättring #4: UPPDATERA test-calc.js
 Vi har viktig logik i prescribe.js som behöver inkluderas i test-calc.js
 
-Förbättring #5: Öka inaktivitetstimern till 10 minuter. 5 minuter är för aggressivt, då läkaren kan bli störd under användning av andra ärenden och därmed vara borta från verktyget. Infoga kommentar om varför 10 minuter besämts och att det är ett aktivt val.
+Förbättring #5: Öka inaktivitetstimern till 10 minuter. 5 minuter är för aggressivt, då läkaren kan bli störd under användning av andra ärenden och därmed vara borta från verktyget. Infoga kommentar om varför 10 minuter besämts och att det är ett aktivt val. Uppdatera sedan userguide.md och ev. readme.md om den nya tidsgränsen
 
 Förbättring #6: Print-stödet är bra men kunde visa prescribe-sammanställningen tydligare.
 
