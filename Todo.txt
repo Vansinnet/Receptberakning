@@ -113,6 +113,46 @@ periodErrors sätts alltid, men om medRaw eller ordDose saknas returneras tidigt
 Reproduktion: Tom dos + ogiltigt datum i period → inga felmarkeringar.
 Klinisk risk: Låg (endast UX).
 
+Bug #9: Felaktig månadsberäkning i Ny förskrivning (hög klinisk risk)
+Plats: prescribe.js → calcPrescribeResult() (rader ~80–100, tYear / tMonth från today).
+Beskrivning:
+När nuvarande recept har dagar kvar (daysAlreadyCovered > 0) ska ny förskrivning starta från prescribedEndDate, inte från idag. Koden använder alltid today.getUTCFullYear() + today.getUTCMonth() vid "Månader"-läge.
+Resultat: läkaren får för kort period (t.ex. 1 månad blir 1 månad minus redan täckta dagar).
+Reproduktion:
+
+Recept som räcker 20 dagar till.
+Välj "Ny förskrivning" → 3 månader.
+Beräkningen startar från idag → fel slutdatum och för få förpackningar.
+
+Klinisk risk: Hög (fel förskrivningslängd → över-/underförskrivning).
+
+Bug #10: Stale UI-data i resultatrutan vid felvägar (utökning av #6/#12)
+Plats: calc-renew.js (alla early returns i calcCore) + app.js: calc() (Object.assign) + ui-renew.js: renderResultForMed().
+Beskrivning:
+Många felvägar returnerar ofullständiga objekt (metrics, alerts, tlPct, verdictSub etc. saknas). Object.assign behåller gamla värden → läkaren ser gamla mätvärden/tidslinje bredvid "Kan ej beräknas" eller "Orimliga värden".
+Reproduktion: Giltigt recept → OK-resultat → ändra till Doser kvar > total eller daysSince=0.
+Klinisk risk: Medel–hög (läkaren kan lita på gamla siffror).
+
+Bug #11: FASS-knappen i longterm behåller gammal länk efter rensning
+Plats: longterm.js → calcLongterm() + clearLongterm().
+Beskrivning:
+Vid clearLongterm() döljs knappen men href uppdateras inte. Nästa gång man skriver ett nytt namn visas knappen med gammal länk tills ny beräkning körs.
+Reproduktion: Skriv läkemedel → FASS visas → rensa → skriv nytt namn.
+Klinisk risk: Låg (endast UX).
+
+Bug #12: Multi-med textgenerering hanterar blandade beslut otydligt
+Plats: calc-renew.js → generateAndDistribute() + buildPatientText/buildJournalText.
+Beskrivning:
+Vid flera läkemedel med mix av OK / för tidigt / överförbrukning + klinisk override blir den gemensamma patient- och journaltexten ibland förvirrande eller använder fel mall för vissa läkemedel.
+Klinisk risk: Låg–medel (texten behöver granskas manuellt).
+
+Bug #13: prescribeState blir trasig vid upprepad borttagning av kort
+Plats: app.js → clearCurrentCard() (reindexering av prescribeState).
+Beskrivning:
+newPS[j] = prescribeState[j >= i ? j + 1 : j] ?? null hanterar inte alla edge cases vid flera borttagningar i rad. Efter 2–3 borttagningar kan prescribeState[i] vara undefined eller peka på fel data när man växlar kort. Panelen blir tom eller visar data från ett annat läkemedel.
+Reproduktion: Lägg till 4 kort → ta bort kort 2, sedan kort 3 → växla till kort 4.
+Klinisk risk: Medel (stale/ogiltig förskrivningspanel).
+
 Förbättring #1: CENTRALISERA STATE-MUTATIONER – detta ger störst långsiktig vinst
 
 Förbättring #2: MINSKA ONÖDIGA NULL-CHECKS – gör detta direkt efter centraliseringen (då blir det ännu tydligare vilka checks som är onödiga)
