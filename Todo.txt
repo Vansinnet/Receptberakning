@@ -60,7 +60,9 @@ I vissa tidiga tillstånd (t.ex. precis efter clearCurrentCard() eller innan fö
 if (metricsGrid && s.metrics) skyddar mot undefined, men om s.metrics är null eller en icke-array kan forEach krascha (eller skapa tom grid utan felmeddelande).
 När calculable: false visas fortfarande hela resultContent (inklusive metricsGrid) – läkaren ser en tom eller felaktig mätvärdes-ruta.
 
-Bugg #4: Prescribe-panelen försvinner helt på mobil utan någon förklaring ("varför försvinner högerkolumnen?").
+Bugg #4: Mobiltelefon. Prescribe-panelen försvinner helt på mobil utan någon förklaring ("varför försvinner högerkolumnen?").
+
+Bugg #5: Mobiltelefon. Tillgänglighet: tooltip-bubblan kan hamna utanför viewport på små skärmar.
 
 Förbättring #1: CENTRALISERA STATE-MUTATIONER – detta ger störst långsiktig vinst
 
@@ -71,13 +73,11 @@ Förbättring #3: SKAPA ANVÄNDARGUIDE – dokumentation
 Förbättring #4: UPPDATERA test-calc.js
 Vi har viktig logik i prescribe.js som behöver inkluderas i test-calc.js
 
-Förbättring #5: Öka inaktivitetstimern till 10 minuter. 5 minuter är för aggressivt, då läkaren kan bli störd under användning av andra ärenden och därmed vara borta från verktyget.
+Förbättring #5: Öka inaktivitetstimern till 10 minuter. 5 minuter är för aggressivt, då läkaren kan bli störd under användning av andra ärenden och därmed vara borta från verktyget. Infoga kommentar om varför 10 minuter besämts och att det är ett aktivt val.
 
 Förbättring #6: Print-stödet är bra men kunde visa prescribe-sammanställningen tydligare.
 
-Förbättring #7: Tillgänglighet: tooltip-bubblan kan hamna utanför viewport på små skärmar.
-
-Förbättring #8: Överdriven defensivitet vs. "Tyst misslyckande"
+Förbättring #7: Överdriven defensivitet vs. "Tyst misslyckande"
 Observation: I JavaScript är det vanligt med if (s && s.valid). Koden har en bra balans, men kom ihåg regeln "föredra tydlig struktur framför överkommen defensivitet".
 Svaghet: "Tysta misslyckanden" (early returns som inte uppdaterar UI) är en stor risk i kliniska verktyg. Om tillståndet är ogiltigt (s.valid === false), måste UI uppdateras så att felmeddelanden rensas eller en grå/låst ruta visas. Returnerar vi bara return; stannar applikationen kvar i sitt förra tillstånd, och läkaren kanske tror att det gamla resultatet gäller för den nya indatan.
 
