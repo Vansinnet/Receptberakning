@@ -9,11 +9,10 @@ Verktyget är helt offline, innehåller inga externa beroenden och sparar ingen 
 
 ## 1. Kom igång
 
-1. Ladda ner hela verktyget som **en enda fil** (`index.html`) eller samtliga filer.
-2. Öppna `index.html` i valfri modern webbläsare (Chrome, Edge, Firefox eller Safari).
-3. Verktyget startar direkt – ingen inloggning behövs.
+Använd verktyget direkt online här:  
+**[https://receptberakning.pages.dev/](https://receptberakning.pages.dev/)**
 
-**Tips:** Spara filen på skrivbordet eller på en USB-sticka så har du den alltid tillgänglig.
+(alltid den senaste versionen – ingen nedladdning behövs)
 
 ---
 
