@@ -1,17 +1,17 @@
 Roadmap
 1) Kort sikt
 
-#ANVÄND ALLTID el() – tooltip (5 min)
+#ANVÄND ALLTID el() – tooltip (5 min) - ✅
 
 #CENTRALISERA STATE-MUTATIONER – detta ger störst långsiktig vinst
 
 #MINSKA ONÖDIGA NULL-CHECKS – gör detta direkt efter centraliseringen (då blir det ännu tydligare vilka checks som är onödiga)
 
-#SE ÖVER PRESCRIBE-PANELEN – felhantering
+#SE ÖVER PRESCRIBE-PANELEN – felhantering - ✅
 
 #SKAPA ANVÄNDARGUIDE – dokumentation
 
-#REFAKTORERA calcLongterm kan vi flytta ner till punkt (inom några veckor) eller ta bort från kort sikt helt.
+#REFAKTORERA calcLongterm kan vi flytta ner till punkt (inom några veckor) eller ta bort från kort sikt helt. ✅
 
 #UPPDATERA test-calc.js
 Utöka klinisk testning (test-calc.js)
