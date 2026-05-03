@@ -82,29 +82,30 @@ function clearLongterm() {
   showEl('lt-bar-section', false); showEl('lt-period-table-section', false);
 }
 
-function calcLongterm() {
-  resetTimer();
-  const medEl = getEl('lt-med'), doseEl = getEl('lt-dose');
-  if (!medEl || !doseEl) return;
-  const medRaw   = medEl.value.trim();
-  const doseRaw  = doseEl.value;
-  const ordDose  = parseFloat(doseRaw.replace(',', '.'));
-  const doseIsInvalid = doseRaw !== '' && (isNaN(ordDose) || ordDose < 0.1 || ordDose > 50);
-  toggleError(doseEl, doseIsInvalid);
+// Gränsvärden för förbrukningsbedömning — används av både kärna och UI
+const LT_OVER  = 1.10;
+const LT_UNDER = 0.80;
 
-  const today   = getToday();
-  const periods = [];
+/* Ren beräkningsfunktion — ingen DOM.
+   Returnerar alltid periodErrors så att UI:t kan markera ogiltiga fält
+   även när dos eller läkemedel saknas. */
+function calcLongtermCore(medRaw, ordDose, rawPeriods) {
+  const today = getToday();
+  const periodErrors = [];
+  const periods      = [];
 
-  for (let i = 0; i < ltPeriods.length; i++) {
-    const period    = ltPeriods[i];
-    const startDate = parseDateUTC(period.start);
-    const endDate   = parseDateUTC(period.end);
-    const totalVal  = parseFloat(period.total);
+  for (let i = 0; i < rawPeriods.length; i++) {
+    const p         = rawPeriods[i];
+    const startDate = parseDateUTC(p.start);
+    const endDate   = parseDateUTC(p.end);
+    const totalVal  = parseFloat(p.total);
 
-    // Felen visas i DOM men datat läses från ltPeriods (källan för sanning)
-    toggleError(getEl('lt-start-' + i), !!(period.start !== '' && (!startDate || startDate > today)));
-    toggleError(getEl('lt-end-'   + i), !!(period.end   !== '' && (!endDate   || (startDate && endDate <= startDate))));
-    toggleError(getEl('lt-total-' + i), !!(period.total !== '' && (isNaN(totalVal) || totalVal <= 0)));
+    periodErrors.push({
+      idx:        i,
+      startError: !!(p.start !== '' && (!startDate || startDate > today)),
+      endError:   !!(p.end   !== '' && (!endDate   || (startDate && endDate <= startDate))),
+      totalError: !!(p.total !== '' && (isNaN(totalVal) || totalVal <= 0)),
+    });
 
     if (startDate && endDate && !isNaN(totalVal) && totalVal > 0 && startDate < endDate) {
       const days = getDaysDiff(endDate, startDate);
@@ -113,29 +114,20 @@ function calcLongterm() {
     }
   }
 
-  if (!medRaw || doseIsInvalid || isNaN(ordDose) || periods.length === 0) {
-    showEl('lt-result', false);
-    return;
+  if (isNaN(ordDose) || ordDose <= 0 || periods.length === 0) {
+    return { valid: false, periodErrors };
   }
 
   periods.sort((a, b) => a.startDate - b.startDate);
-  showEl('lt-result', true, 'flex');
 
-  const ltAlerts  = getEl('lt-alerts');       if (ltAlerts)  ltAlerts.textContent  = '';
-  const ltOverlap = getEl('lt-overlap-alert'); if (ltOverlap) ltOverlap.textContent = '';
-
-  if (periods.length > 1) {
-    for (let i = 0; i < periods.length - 1; i++) {
-      if (periods[i].endDate > periods[i + 1].startDate) {
-        renderAlert('lt-overlap-alert', 'warn', 'Överlappande perioder', 'Tidsperioderna överlappar varandra. Kontrollera att alla perioder är disjunkta.');
-        break;
-      }
-    }
+  let hasOverlap = false;
+  for (let i = 0; i < periods.length - 1; i++) {
+    if (periods[i].endDate > periods[i + 1].startDate) { hasOverlap = true; break; }
   }
 
   const totalTablets   = periods.reduce((s, p) => s + p.total, 0);
   const totalDays      = periods.reduce((s, p) => s + p.days,  0);
-  if (totalDays === 0) { showEl('lt-result', false); return; }
+  if (totalDays === 0) return { valid: false, periodErrors };
 
   const overallAvg     = totalTablets / totalDays;
   const consumptionPct = (overallAvg / ordDose) * 100;
@@ -143,27 +135,19 @@ function calcLongterm() {
   let avgStr = `${overallAvg.toFixed(2)} st/dag`;
   if (doseUnit) avgStr += ` (${(overallAvg * doseUnit.amount).toFixed(1)} ${doseUnit.unit}/dag)`;
 
-  const resGridEl = getEl('lt-resGrid');
-  if (resGridEl) {
-    resGridEl.textContent = '';
-    const frag = document.createDocumentFragment();
-    buildResultRow(frag, 'Analyserade perioder',       `${periods.length} st`);
-    buildResultRow(frag, 'Total analyslängd',          `${totalDays} dagar`);
-    buildResultRow(frag, 'Totalt uttagna tabletter',   `${totalTablets} st`);
-    frag.appendChild(el('hr', { cls: 'divider' }));
-    buildResultRow(frag, 'Ordinerad dos',    `${ordDose} st/dag`);
-    buildResultRow(frag, 'Snittförbrukning', avgStr);
-    buildResultRow(frag, 'Relativt ordination', `${consumptionPct.toFixed(1)}%`);
-    resGridEl.appendChild(frag);
-  }
+  // Per-period klassificering beräknas här så att UI:t slipper upprepa logiken
+  periods.forEach(p => {
+    p.classification = p.avgPerDay > ordDose * LT_OVER  ? 'over'
+                     : p.avgPerDay < ordDose * LT_UNDER ? 'under'
+                     : 'ok';
+  });
 
-  const OVER = 1.10, UNDER = 0.80;
   let overallStatus, alertType, alertTitle, alertMsg;
-  if (overallAvg > ordDose * OVER) {
+  if (overallAvg > ordDose * LT_OVER) {
     overallStatus = 'over'; alertType = 'danger';
     alertTitle = 'Förbrukning överstiger ordination';
     alertMsg   = `Snitt ${avgStr} är ${(consumptionPct - 100).toFixed(1)}% över ordinerad dos (${ordDose} st/dag). Gör en individuell klinisk bedömning.`;
-  } else if (overallAvg < ordDose * UNDER) {
+  } else if (overallAvg < ordDose * LT_UNDER) {
     overallStatus = 'under'; alertType = 'warn';
     alertTitle = 'Låg förbrukning';
     alertMsg   = `Snitt ${avgStr} är ${(100 - consumptionPct).toFixed(1)}% under ordinerad dos (${ordDose} st/dag). Överväg om patienten tar medicinen som ordinerat.`;
@@ -172,14 +156,94 @@ function calcLongterm() {
     alertTitle = 'Förbrukning enligt ordination';
     alertMsg   = `Snitt ${avgStr} är i linje med ordinerad dos (${ordDose} st/dag), avvikelse ${Math.abs(consumptionPct - 100).toFixed(1)}%.`;
   }
-  renderAlert('lt-alerts', alertType, alertTitle, alertMsg);
 
-  const barPct = Math.min(150, Math.max(0, consumptionPct));
-  const barEl  = getEl('lt-bar');
+  const periodSummary = periods.map((p, idx) =>
+    `  Period ${idx + 1}: ${fmtDate(p.startDate)}–${fmtDate(p.endDate)} (${p.days} dagar, ${p.total} tabletter, snitt ${p.avgPerDay.toFixed(2)} st/dag)`
+  ).join('\n');
+
+  return {
+    valid: true,
+    periodErrors,
+    periods,
+    totalTablets,
+    totalDays,
+    overallAvg,
+    consumptionPct,
+    avgStr,
+    ordDose,
+    overallStatus,
+    alertType,
+    alertTitle,
+    alertMsg,
+    hasOverlap,
+    barPct:      Math.min(150, Math.max(0, consumptionPct)),
+    fassUrl:     getFassUrl(medRaw),
+    journalText: `Aktuellt: Förbrukningsanalys av ${medRaw}.\n\nOrdinerad dos: ${ordDose} st/dag.\nAnalysperiod: ${periods.length} period(er), totalt ${totalDays} dagar.\n\nPerioder:\n${periodSummary}\n\nSammanlagd snittförbrukning: ${avgStr} (${consumptionPct.toFixed(1)}% av ordinerad dos).\n\nBedömning: [fyll i här]`,
+  };
+}
+
+/* DOM-skal — läser fält, anropar kärnan, renderar resultatet */
+function calcLongterm() {
+  resetTimer();
+  const medEl = getEl('lt-med'), doseEl = getEl('lt-dose');
+  if (!medEl || !doseEl) return;
+
+  const medRaw  = medEl.value.trim();
+  const doseRaw = doseEl.value;
+  const ordDose = parseFloat(doseRaw.replace(',', '.'));
+  const doseIsInvalid = doseRaw !== '' && (isNaN(ordDose) || ordDose < 0.1 || ordDose > 50);
+  toggleError(doseEl, doseIsInvalid);
+
+  let result;
+  try {
+    result = calcLongtermCore(medRaw, ordDose, ltPeriods);
+  } catch (err) {
+    console.error('calcLongtermCore:', err.message);
+    showEl('lt-result', false);
+    return;
+  }
+
+  // Periodfältsfel appliceras alltid, oavsett om övriga fält är giltiga
+  result.periodErrors.forEach(({ idx, startError, endError, totalError }) => {
+    toggleError(getEl(`lt-start-${idx}`), startError);
+    toggleError(getEl(`lt-end-${idx}`),   endError);
+    toggleError(getEl(`lt-total-${idx}`), totalError);
+  });
+
+  if (!medRaw || doseIsInvalid || isNaN(ordDose) || !result.valid) {
+    showEl('lt-result', false);
+    return;
+  }
+
+  showEl('lt-result', true, 'flex');
+
+  const ltOverlap = getEl('lt-overlap-alert');
+  if (ltOverlap) ltOverlap.textContent = '';
+  if (result.hasOverlap) {
+    renderAlert('lt-overlap-alert', 'warn', 'Överlappande perioder', 'Tidsperioderna överlappar varandra. Kontrollera att alla perioder är disjunkta.');
+  }
+
+  const resGridEl = getEl('lt-resGrid');
+  if (resGridEl) {
+    resGridEl.textContent = '';
+    const frag = document.createDocumentFragment();
+    buildResultRow(frag, 'Analyserade perioder',     `${result.periods.length} st`);
+    buildResultRow(frag, 'Total analyslängd',        `${result.totalDays} dagar`);
+    buildResultRow(frag, 'Totalt uttagna tabletter', `${result.totalTablets} st`);
+    frag.appendChild(el('hr', { cls: 'divider' }));
+    buildResultRow(frag, 'Ordinerad dos',       `${result.ordDose} st/dag`);
+    buildResultRow(frag, 'Snittförbrukning',    result.avgStr);
+    buildResultRow(frag, 'Relativt ordination', `${result.consumptionPct.toFixed(1)}%`);
+    resGridEl.appendChild(frag);
+  }
+
+  renderAlert('lt-alerts', result.alertType, result.alertTitle, result.alertMsg);
+
+  const barEl = getEl('lt-bar');
   if (barEl) {
-    barEl.style.width = `${(barPct / 150) * 100}%`;
-    barEl.className   = `consumption-bar ${overallStatus}`;
-    barEl.textContent = barPct > 20 ? `${consumptionPct.toFixed(0)}%` : '';
+    barEl.style.width = `${(result.barPct / 150) * 100}%`;
+    barEl.className   = `consumption-bar ${result.overallStatus}`;
+    barEl.textContent = result.barPct > 20 ? `${result.consumptionPct.toFixed(0)}%` : '';
   }
   showEl('lt-bar-section', true);
 
@@ -187,17 +251,15 @@ function calcLongterm() {
   if (rowsContainer) {
     rowsContainer.textContent = '';
     const frag = document.createDocumentFragment();
-    periods.forEach(p => {
-      const pPct = (p.avgPerDay / ordDose) * 100;
-      let badgeClass, badgeText;
-      if (p.avgPerDay > ordDose * OVER)       { badgeClass = 'badge-over';  badgeText = 'Över'; }
-      else if (p.avgPerDay < ordDose * UNDER)  { badgeClass = 'badge-under'; badgeText = 'Under'; }
-      else                                     { badgeClass = 'badge-ok';   badgeText = 'OK'; }
+    result.periods.forEach(p => {
+      const pPct      = (p.avgPerDay / result.ordDose) * 100;
+      const badgeClass = `badge-${p.classification}`;
+      const badgeText  = p.classification === 'over' ? 'Över' : p.classification === 'under' ? 'Under' : 'OK';
 
       const row = el('div', { cls: 'period-row' });
-      row.appendChild(el('span', { cls: 'period-cell',          text: `${fmtDate(p.startDate)} – ${fmtDate(p.endDate)} (${p.days}d)` }));
+      row.appendChild(el('span', { cls: 'period-cell',             text: `${fmtDate(p.startDate)} – ${fmtDate(p.endDate)} (${p.days}d)` }));
       row.appendChild(el('span', { cls: 'period-cell mono ph-avg', text: `${p.avgPerDay.toFixed(2)} st/dag` }));
-      row.appendChild(el('span', { cls: 'period-cell mono',     text: `${pPct >= 100 ? '+' : ''}${(pPct - 100).toFixed(1)}%` }));
+      row.appendChild(el('span', { cls: 'period-cell mono',        text: `${pPct >= 100 ? '+' : ''}${(pPct - 100).toFixed(1)}%` }));
       const c4 = el('span', { cls: 'period-cell' });
       c4.appendChild(el('span', { cls: `badge ${badgeClass}`, text: badgeText }));
       row.appendChild(c4);
@@ -207,16 +269,11 @@ function calcLongterm() {
   }
   showEl('lt-period-table-section', true);
 
-  if (medRaw) {
-    const lb = getEl('lt-fassBtn');
-    if (lb) { lb.href = getFassUrl(medRaw); showEl('lt-fassBtn', true, 'inline-flex'); }
-  }
+  const lb = getEl('lt-fassBtn');
+  if (lb) { lb.href = result.fassUrl; showEl('lt-fassBtn', true, 'inline-flex'); }
 
-  const periodSummary = periods.map((p, idx) =>
-    `  Period ${idx + 1}: ${fmtDate(p.startDate)}–${fmtDate(p.endDate)} (${p.days} dagar, ${p.total} tabletter, snitt ${p.avgPerDay.toFixed(2)} st/dag)`
-  ).join('\n');
-  const journalText = `Aktuellt: Förbrukningsanalys av ${medRaw}.\n\nOrdinerad dos: ${ordDose} st/dag.\nAnalysperiod: ${periods.length} period(er), totalt ${totalDays} dagar.\n\nPerioder:\n${periodSummary}\n\nSammanlagd snittförbrukning: ${avgStr} (${consumptionPct.toFixed(1)}% av ordinerad dos).\n\nBedömning: [fyll i här]`;
-  const copyBody = getEl('lt-copyBody'); if (copyBody) copyBody.textContent = journalText;
+  const copyBody = getEl('lt-copyBody');
+  if (copyBody) copyBody.textContent = result.journalText;
   showEl('lt-copySection', true);
 }
 
@@ -228,9 +285,9 @@ function copyLtText() {
     if (!btn) return;
     const orig = btn.dataset.origLabel || btn.textContent;
     btn.dataset.origLabel = orig;
-    btn.textContent = '✅ Kopierat!';
+    btn.textContent = '\u2705 Kopierat!';
     if (ltCopyTimers.has(btn)) clearTimeout(ltCopyTimers.get(btn));
     const t = setTimeout(() => { btn.textContent = orig; delete btn.dataset.origLabel; ltCopyTimers.delete(btn); }, 1800);
     ltCopyTimers.set(btn, t);
-  }).catch(() => { if (btn) btn.textContent = '⚠️ Kopiera manuellt'; });
+  }).catch(() => { if (btn) btn.textContent = '\u26a0\ufe0f Kopiera manuellt'; });
 }

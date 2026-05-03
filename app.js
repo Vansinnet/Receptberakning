@@ -303,8 +303,7 @@ resetTimer();
    av overflow:auto på form- eller result-panel.
  */
 (function () {
-  const bubble = document.createElement('div');
-  bubble.className = 'tooltip-bubble';
+  const bubble = el('div', { cls: 'tooltip-bubble' });
   document.body.appendChild(bubble);
 
   function position(e) {

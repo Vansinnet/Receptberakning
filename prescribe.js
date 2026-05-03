@@ -55,11 +55,50 @@ function calcPrescribeResult(i) {
   return { startDate, startDateStr, daysAlreadyCovered, endDate, endDateStr: fmtDate(endDate), totalDays, totalTablets, packages, packageSize, dose };
 }
 
+// Ren valideringsfunktion — returnerar { type, msg } eller null.
+// Anropas av updatePrescribeResult för att avgöra vad som ska visas när
+// calcPrescribeResult inte kan producera ett resultat.
+function prescribeValidationHint(i, ps) {
+  if (!ps) return null;
+
+  const pkgVal = ps.packageSize;
+  const pkgNum = parseFloat(pkgVal) || 0;
+  if (pkgNum <= 0) {
+    // Tomt fält = läkaren har inte fyllt i än; ogiltigt värde = aktivt fel
+    return pkgVal !== ''
+      ? { type: 'warn', msg: 'Förpackningsstorleken måste vara ett heltal om minst 1.' }
+      : { type: 'info', msg: 'Ange förpackningsstorlek för att beräkna antal förpackningar.' };
+  }
+
+  if (ps.mode === 'date' && ps.endDate) {
+    const today    = getToday();
+    const s        = states[i] || {};
+    const prescEnd = parseDateUTC(s.prescribedEndDateStr);
+    const start    = (prescEnd && prescEnd > today) ? prescEnd : today;
+    const ed       = parseDateUTC(ps.endDate);
+    if (!ed)         return { type: 'warn', msg: 'Ange ett giltigt datum (ÅÅÅÅ-MM-DD).' };
+    if (ed <= start) return { type: 'warn', msg: `Slutdatumet måste vara efter ${fmtDate(start)}.` };
+  }
+
+  return null;
+}
+
 /* Uppdatera enbart resultatrutan (bevarar fokus i inmatningsfält) */
 function updatePrescribeResult(i) {
   const box = getEl('ps-result-' + i);
   if (!box) return;
-  const res = calcPrescribeResult(i);
+
+  let res;
+  try {
+    res = calcPrescribeResult(i);
+  } catch (err) {
+    console.error('updatePrescribeResult:', err.message);
+    box.textContent = '';
+    box.appendChild(buildAlertEl('warn', null, 'Beräkningen kunde inte genomföras. Kontrollera inmatningsfälten.'));
+    renderPrescribeSummary();
+    return;
+  }
+
   box.textContent = '';
 
   // Befintligt recept täcker redan hela perioden — inget nytt behöver förskrivas
@@ -70,20 +109,28 @@ function updatePrescribeResult(i) {
     return;
   }
 
-  if (!res || !res.packages) return;
+  if (res && res.packages) {
+    const numRow = el('div', { cls: 'prescribe-result-num-row' });
+    numRow.appendChild(el('div', { cls: 'prescribe-result-packages', text: String(res.packages) }));
+    numRow.appendChild(el('div', { cls: 'prescribe-result-unit', text: res.packageSize > 0 ? `förp.  à ${res.packageSize} st` : 'förp.' }));
 
-  const numRow = el('div', { cls: 'prescribe-result-num-row' });
-  numRow.appendChild(el('div', { cls: 'prescribe-result-packages', text: String(res.packages) }));
-  numRow.appendChild(el('div', { cls: 'prescribe-result-unit', text: res.packageSize > 0 ? `förp.  à ${res.packageSize} st` : 'förp.' }));
+    const wrap = el('div', { cls: 'prescribe-result' });
+    wrap.appendChild(el('div', { cls: 'prescribe-result-label',   text: 'Antal förpackningar att förskriva' }));
+    wrap.appendChild(numRow);
+    wrap.appendChild(el('div', { cls: 'prescribe-result-details', text: `${res.totalTablets} tabletter ÷ ${res.packageSize} st/förp.` }));
+    wrap.appendChild(el('div', { cls: 'prescribe-result-period',  text: `${res.startDateStr} – ${res.endDateStr}` }));
+    wrap.appendChild(el('div', { cls: 'prescribe-result-days',    text: `${res.totalDays} dagar` }));
+    box.appendChild(wrap);
+    renderPrescribeSummary();
+    return;
+  }
 
-  const wrap = el('div', { cls: 'prescribe-result' });
-  wrap.appendChild(el('div', { cls: 'prescribe-result-label',   text: 'Antal förpackningar att förskriva' }));
-  wrap.appendChild(numRow);
-  wrap.appendChild(el('div', { cls: 'prescribe-result-details', text: `${res.totalTablets} tabletter ÷ ${res.packageSize} st/förp.` }));
-  wrap.appendChild(el('div', { cls: 'prescribe-result-period',  text: `${res.startDateStr} – ${res.endDateStr}` }));
-  wrap.appendChild(el('div', { cls: 'prescribe-result-days',    text: `${res.totalDays} dagar` }));
-  box.appendChild(wrap);
-  renderPrescribeSummary();
+  // Inget beräkningsresultat — visa kontextuell vägledning om indata är ofullständiga
+  const hint = prescribeValidationHint(i, prescribeState[i]);
+  if (hint) {
+    box.appendChild(buildAlertEl(hint.type, null, hint.msg));
+    renderPrescribeSummary();
+  }
 }
 
 /* Bygg hela panelens innehåll (anropas vid initiering och lägesbyte) */
@@ -93,6 +140,8 @@ function buildPrescribeInner(i) {
   const s  = states[i] || {};
   const ps = prescribeState[i];
   if (!ps) return;
+
+  try {
   inner.textContent = '';
 
   inner.appendChild(el('div', { cls: 'prescribe-med-name', text: s.medRaw || `Läkemedel ${i+1}` }));
@@ -157,6 +206,11 @@ function buildPrescribeInner(i) {
 
   inner.appendChild(el('div', { attrs: { id: 'ps-result-' + i } }));
   updatePrescribeResult(i);
+  } catch (err) {
+    console.error('buildPrescribeInner:', err.message);
+    inner.textContent = '';
+    inner.appendChild(buildAlertEl('warn', null, 'Förskrivningspanelen kunde inte visas. Försök igen.'));
+  }
 }
 
 /* Uppdatera sammanfattningslistan högst upp i panelen */
@@ -164,6 +218,7 @@ function renderPrescribeSummary() {
   const box = getEl('prescribeSummary');
   if (!box) return;
 
+  try {
   const items = [];
   for (let i = 0; i < medCardCount; i++) {
     const s = states[i] || {};
@@ -197,6 +252,9 @@ function renderPrescribeSummary() {
   wrap.appendChild(el('div', { cls: 'prescribe-summary-header', text: 'Sammanställning av läkemedel att förskriva' }));
   wrap.appendChild(list);
   box.appendChild(wrap);
+  } catch (err) {
+    console.error('renderPrescribeSummary:', err.message);
+  }
 }
 
 // Håller koll på vilket index panelen senast byggdes för, så att vi
@@ -219,7 +277,12 @@ function renderPrescribePanel(i) {
   if (!prescribeState[i]) {
     prescribeState[i] = { mode: 'months', months: 7, endDate: '', packageSize: String(s.amt || '') };
   } else {
-    // Uppdatera bara om fältet är tomt — bevara manuell inmatning från läkaren
+    // AKTIVT VAL: packageSize synkas inte automatiskt när amtInput ändras i huvudformuläret.
+    // Skäl: Förpackningsstorleken på det nya receptet kan avsiktligt skilja sig från det
+    // föregående — läkaren väljer själv storlek i högerpanelen och beräkningen visar hur
+    // många förpackningar av den storleken som krävs. Automatisk överskrivning skulle
+    // förstöra ett pågående val utan att läkaren märker det.
+    // Fältet förfylls bara om det är tomt (t.ex. vid första öppning efter byte av läkemedel).
     if (!prescribeState[i].packageSize) {
       prescribeState[i].packageSize = String(s.amt || '');
     }

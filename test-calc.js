@@ -1,11 +1,15 @@
 /**
- * Enhetstester för calcCore (calc-renew.js)
+ * Enhetstester för calcCore (calc-renew.js) och calcLongtermCore (longterm.js)
  *
  * Kör: node test-calc.js
  *
- * Täcker: ofullständiga indata, daysSince=0, remaining>total,
+ * calcCore täcker: ofullständiga indata, daysSince=0, remaining>total,
  * totalDays>3650, ref=12, fraktionell dos, 7-dagars-suppression,
  * klinisk override och output-struktur.
+ *
+ * calcLongtermCore täcker: ogiltiga indata, periodfältsfel, normalfall,
+ * över/underförbrukning, gränsvärden, överlappande perioder,
+ * per-period klassificering och output-struktur.
  */
 'use strict';
 
@@ -41,13 +45,19 @@ vm.runInContext(`
 `, ctx);
 
 vm.runInContext(fs.readFileSync(path.join(__dirname, 'calc-renew.js'), 'utf8'), ctx);
+vm.runInContext(fs.readFileSync(path.join(__dirname, 'longterm.js'),   'utf8'), ctx);
 
 if (typeof ctx.calcCore !== 'function') {
   console.error('FEL: calcCore kunde inte laddas — kontrollera sökväg och filnamn.');
   process.exit(1);
 }
+if (typeof ctx.calcLongtermCore !== 'function') {
+  console.error('FEL: calcLongtermCore kunde inte laddas — kontrollera sökväg och filnamn.');
+  process.exit(1);
+}
 
-const calcCore = ctx.calcCore;
+const calcCore         = ctx.calcCore;
+const calcLongtermCore = ctx.calcLongtermCore;
 
 // Fast datum för alla tester — undviker flytande dagsavhängiga gränsvärden.
 // Valt mitt i ett vanligt år, långt ifrån DST-gränser och skottår.
@@ -420,6 +430,164 @@ test('avgNote skiljer sig beroende på om remaining är ifyllt', () => {
   assertContains(withRemaining.avgNote,    'faktisk förbrukning', 'avgNote med remaining');
   assertContains(withoutRemaining.avgNote, 'tillgängliga doser',  'avgNote utan remaining');
   assert(withRemaining.avgNote !== withoutRemaining.avgNote, 'avgNote ska skilja sig');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// HJÄLPARE FÖR LONGTERM-TESTER
+// ═══════════════════════════════════════════════════════════
+
+// YYYY-MM-DD för N dagar före MOCK_TODAY
+function daysAgo(n) {
+  const d = new Date(MOCK_TODAY_MS - n * 86400000);
+  return d.getUTCFullYear() + '-' +
+    String(d.getUTCMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getUTCDate()).padStart(2, '0');
+}
+
+// Konstruera ett råperiod-objekt
+function makePeriod(startDaysAgo, endDaysAgo, total) {
+  return { start: daysAgo(startDaysAgo), end: daysAgo(endDaysAgo), total: String(total) };
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// calcLongtermCore — TESTER
+// ═══════════════════════════════════════════════════════════
+
+group('calcLongtermCore — ogiltiga indata');
+
+test('ordDose=NaN → valid:false med periodErrors', () => {
+  const r = calcLongtermCore('Test 10 mg', NaN, [makePeriod(90, 0, 90)]);
+  assertEqual(r.valid, false);
+  assert(Array.isArray(r.periodErrors), 'periodErrors ska vara en array');
+});
+
+test('inga giltiga perioder → valid:false', () => {
+  const r = calcLongtermCore('Test 10 mg', 1, [{ start: '', end: '', total: '' }]);
+  assertEqual(r.valid, false);
+  assert(Array.isArray(r.periodErrors), 'periodErrors ska finnas');
+});
+
+test('startdatum i framtiden → periodErrors[0].startError=true', () => {
+  const future = new Date(MOCK_TODAY_MS + 86400000);
+  const futureStr = future.getUTCFullYear() + '-' +
+    String(future.getUTCMonth() + 1).padStart(2, '0') + '-' +
+    String(future.getUTCDate()).padStart(2, '0');
+  const r = calcLongtermCore('Test 10 mg', 1, [{ start: futureStr, end: daysAgo(0), total: '30' }]);
+  assertEqual(r.periodErrors[0].startError, true, 'startError ska vara true för framtida datum');
+  assertEqual(r.valid, false);
+});
+
+test('slutdatum före startdatum → periodErrors[0].endError=true', () => {
+  // start=daysAgo(10), end=daysAgo(30) → end < start
+  const r = calcLongtermCore('Test 10 mg', 1, [{ start: daysAgo(10), end: daysAgo(30), total: '20' }]);
+  assertEqual(r.periodErrors[0].endError, true, 'endError för omvänt datumpar');
+  assertEqual(r.valid, false);
+});
+
+test('negativt totalvärde → periodErrors[0].totalError=true', () => {
+  const r = calcLongtermCore('Test 10 mg', 1, [{ start: daysAgo(90), end: daysAgo(0), total: '-5' }]);
+  assertEqual(r.periodErrors[0].totalError, true);
+  assertEqual(r.valid, false);
+});
+
+test('periodErrors innehåller en post per inmatad period', () => {
+  const r = calcLongtermCore('Test 10 mg', 1, [makePeriod(180, 90, 90), makePeriod(90, 0, 90)]);
+  assertEqual(r.periodErrors.length, 2, 'periodErrors ska ha en post per period');
+});
+
+
+group('calcLongtermCore — normalfall');
+
+test('normal förbrukning (100%) → valid, overallStatus "ok"', () => {
+  // 90 dagar, 90 tabletter, dos=1 → avg=1.0 → exakt på dos
+  const r = calcLongtermCore('Test 10 mg', 1, [makePeriod(90, 0, 90)]);
+  assertEqual(r.valid, true);
+  assertEqual(r.overallStatus, 'ok');
+  assertEqual(r.totalDays, 90);
+  assertEqual(r.totalTablets, 90);
+});
+
+test('överförbrukning (>110%) → overallStatus "over", alertType "danger"', () => {
+  // 60 dagar, 90 tabletter, dos=1 → avg=1.5 (150%)
+  const r = calcLongtermCore('Test 10 mg', 1, [makePeriod(60, 0, 90)]);
+  assertEqual(r.valid, true);
+  assertEqual(r.overallStatus, 'over');
+  assertEqual(r.alertType, 'danger');
+});
+
+test('låg förbrukning (<80%) → overallStatus "under", alertType "warn"', () => {
+  // 90 dagar, 45 tabletter, dos=1 → avg=0.5 (50%)
+  const r = calcLongtermCore('Test 10 mg', 1, [makePeriod(90, 0, 45)]);
+  assertEqual(r.valid, true);
+  assertEqual(r.overallStatus, 'under');
+  assertEqual(r.alertType, 'warn');
+});
+
+test('exakt 110%-gränsen → ok (villkoret är >, inte >=)', () => {
+  // dos=1, 100 dagar, 110 tabletter → avg=1.10 exakt → ej >1.10 → ok
+  const r = calcLongtermCore('Test 10 mg', 1, [makePeriod(100, 0, 110)]);
+  assertEqual(r.overallStatus, 'ok', 'gränsvärde 110% ska ge ok, inte over');
+});
+
+
+group('calcLongtermCore — perioder');
+
+test('två perioder summerar totalDays och totalTablets korrekt', () => {
+  // Period 1: 180→90 dagar sedan (90 dagar), Period 2: 90→0 dagar sedan (90 dagar)
+  const r = calcLongtermCore('Test 10 mg', 1, [makePeriod(180, 90, 90), makePeriod(90, 0, 90)]);
+  assertEqual(r.valid, true);
+  assertEqual(r.totalDays, 180);
+  assertEqual(r.totalTablets, 180);
+  assertEqual(r.periods.length, 2);
+});
+
+test('överlappande perioder → hasOverlap:true', () => {
+  // Period 1 slutar 30 dagar sedan, Period 2 börjar 40 dagar sedan → Period 1 slutar EFTER Period 2 börjar
+  const r = calcLongtermCore('Test 10 mg', 1, [makePeriod(120, 30, 90), makePeriod(40, 5, 35)]);
+  assertEqual(r.valid, true);
+  assertEqual(r.hasOverlap, true);
+});
+
+test('angränsande (ej överlappande) perioder → hasOverlap:false', () => {
+  // Period 1 slutar exakt när Period 2 börjar
+  const r = calcLongtermCore('Test 10 mg', 1, [makePeriod(180, 90, 90), makePeriod(90, 0, 90)]);
+  assertEqual(r.hasOverlap, false);
+});
+
+test('per-period klassificering sätts korrekt', () => {
+  // Period 1: 60 dagar, 90 st → avg=1.5 → over
+  // Period 2: 90 dagar, 45 st → avg=0.5 → under
+  const r = calcLongtermCore('Test 10 mg', 1, [makePeriod(180, 120, 90), makePeriod(90, 0, 45)]);
+  assertEqual(r.valid, true);
+  const p1 = r.periods.find(p => p.days === 60);
+  const p2 = r.periods.find(p => p.days === 90);
+  assertEqual(p1.classification, 'over',  'period 1 ska klassas som over');
+  assertEqual(p2.classification, 'under', 'period 2 ska klassas som under');
+});
+
+
+group('calcLongtermCore — output-struktur');
+
+test('journalText innehåller läkemedelsnamn och dosuppgifter', () => {
+  const r = calcLongtermCore('Elvanse 50 mg', 1, [makePeriod(90, 0, 90)]);
+  assertContains(r.journalText, 'Elvanse 50 mg', 'läkemedelsnamn saknas i journalText');
+  assertContains(r.journalText, '1 st/dag', 'dos saknas i journalText');
+});
+
+test('fassUrl pekar på fass.se', () => {
+  const r = calcLongtermCore('Ritalin 10 mg', 1, [makePeriod(90, 0, 90)]);
+  assert(r.fassUrl.startsWith('https://www.fass.se/'), 'fassUrl ska peka på fass.se');
+});
+
+test('barPct är i intervallet [0, 150] och clampar vid extremvärden', () => {
+  // Normal: consumptionPct=100 → barPct=100
+  const rNorm = calcLongtermCore('Test 10 mg', 1, [makePeriod(90, 0, 90)]);
+  assert(rNorm.barPct >= 0 && rNorm.barPct <= 150, `barPct ${rNorm.barPct} utanför [0, 150]`);
+  // Extrem överförbrukning: consumptionPct=1000% → barPct ska clampa vid 150
+  const rExtreme = calcLongtermCore('Test 10 mg', 1, [makePeriod(10, 0, 100)]);
+  assertEqual(rExtreme.barPct, 150, 'barPct ska clampa vid 150');
 });
 
 
