@@ -1,21 +1,15 @@
 Roadmap
 1) Kort sikt
 
-#ANVÄND ALLTID el() – tooltip (5 min) - ✅
-
 #CENTRALISERA STATE-MUTATIONER – detta ger störst långsiktig vinst
 
 #MINSKA ONÖDIGA NULL-CHECKS – gör detta direkt efter centraliseringen (då blir det ännu tydligare vilka checks som är onödiga)
 
-#SE ÖVER PRESCRIBE-PANELEN – felhantering - ✅
-
 #SKAPA ANVÄNDARGUIDE – dokumentation
 
-#REFAKTORERA calcLongterm kan vi flytta ner till punkt (inom några veckor) eller ta bort från kort sikt helt. ✅
-
-#UPPDATERA test-calc.js ✅
+#UPPDATERA test-calc.js
 Utöka klinisk testning (test-calc.js)
-Nuvarande problem: Testerna täcker primärt calcCore i calc-renew.js. Men vi har viktig klinisk logik i prescribe.js (som calcPrescribeResult med dess tidsberäkningar) och i longterm.js (förbrukningsanalys).
+Vi har viktig logik i prescribe.js som behöver inkluderas i test-calc.js
 
 2) Inom några veckor (någon gång under maj -26)
 När allt är på plats i verktyget och optimerat enligt state of the art:
