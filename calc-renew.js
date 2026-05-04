@@ -23,15 +23,20 @@ function validateValues(medRaw, dateVal, doseRaw, amtRaw, refRaw, leftRaw) {
   else if (refIsInvalid) fieldErrors.refInput = 'Ange ett heltal mellan 1 och 12.';
 
   if (refOutOfRange) return { valid: false, reason: 'too_many_refs', fieldErrors };
-  if (!medRaw || !dateVal || isNaN(dose) || doseIsInvalid || isNaN(amt) || amtIsInvalid || refIsInvalid || !refNum || refNum < 1)
-    return { valid: false, reason: 'incomplete', fieldErrors };
+
+  // Datumvalidering sker före inkomplettkontrollen — annars rensas datumfelet
+  // av den tidiga returnen när övriga fält (dos, uttag) fortfarande är tomma.
+  const pDate = dateVal ? parseDateUTC(dateVal) : null;
+  if (dateVal && !pDate) fieldErrors.dateInput = 'Ogiltigt datum.';
+
+  const otherMissing = !medRaw || !dateVal || isNaN(dose) || doseIsInvalid || isNaN(amt) || amtIsInvalid || refIsInvalid || !refNum || refNum < 1;
+  if (otherMissing || !pDate) {
+    // Bevara 'invalid_date' som reason om ENBART datumet är ogiltigt (övriga fält OK).
+    const reason = (!pDate && dateVal && !otherMissing) ? 'invalid_date' : 'incomplete';
+    return { valid: false, reason, fieldErrors };
+  }
 
   const ref   = refNum;
-  const pDate = parseDateUTC(dateVal);
-  if (!pDate) {
-    fieldErrors.dateInput = 'Ogiltigt datum.';
-    return { valid: false, reason: 'invalid_date', fieldErrors };
-  }
   const today = getToday();
   if (pDate > today) {
     fieldErrors.dateInput = 'Datumet är satt i framtiden.';
@@ -294,12 +299,10 @@ function calcCore(inputData, prev) {
   };
 }
 
-function calc() {
-  const i = activeMedIdx;
+function calc(i = activeMedIdx) {
   resetTimer();
   saveFormValues(i);
-  if (!states[i]) states[i] = {};
-  states[i].valid = false;
+  applyMedStatePatch(i, { valid: false });
 
   // DOM: uppdatera FASS-länk och läkemedelsnamn i formulärhuvudet
   const s = states[i];
@@ -327,12 +330,12 @@ function calc() {
     derived = { valid: false, statusText: 'Internt fel — kontrollera inmatningen.' };
   }
 
-  Object.assign(states[i], derived);
+  applyMedStatePatch(i, derived);
 
   // UI-preferenser sätts efter en fullständig lyckad beräkning
   if (derived.valid && derived.calculable !== false) {
-    states[i].activeTab   = states[i].activeTab || 'patient';
-    states[i].patientLang = 'sv';
+    setMedUIPreference(i, 'activeTab',   states[i].activeTab || 'patient');
+    setMedUIPreference(i, 'patientLang', 'sv');
   }
 
   buildMedList();
@@ -399,7 +402,7 @@ function buildPatientText(lang, toRenew, tooEarly, overuse, validCount) {
       lines.push(t.singleTooEarly(tooEarly[0].name, s), '', t.closing);
     } else if (overuse.length === 1) {
       const s = states[overuse[0].i];
-      const prescribedEndPast = new Date(s.prescribedEndDateStr) < getToday();
+      const prescribedEndPast = parseDateUTC(s.prescribedEndDateStr) < getToday();
       const closing = prescribedEndPast
         ? t.closingEndPast
         : s.prescribedContactIsPast
@@ -417,7 +420,7 @@ function buildPatientText(lang, toRenew, tooEarly, overuse, validCount) {
     }
     for (const { name, i } of overuse) {
       const s = states[i];
-      const epast = new Date(s.prescribedEndDateStr) < getToday();
+      const epast = parseDateUTC(s.prescribedEndDateStr) < getToday();
       if (epast) {
         lines.push(t.multiOverusePast(name, s));
       } else {
@@ -531,14 +534,14 @@ function buildJournalText(toRenew, tooEarly, overuse, validCount) {
 function generateAndDistribute() {
   const validCount = states.filter(s => s.valid && s.calculable !== false).length;
   if (validCount === 0) {
-    for (let i = 0; i < medCardCount; i++) {
-      if (states[i]) { states[i].patientText = ''; states[i].patientTextEn = ''; states[i].journalText = ''; }
+    for (let i = 0; i < states.length; i++) {
+      if (states[i]) applyMedStatePatch(i, { patientText: '', patientTextEn: '', journalText: '' });
     }
     renderResultForMed(activeMedIdx); return;
   }
 
   const toRenew = [], tooEarly = [], overuse = [];
-  for (let i = 0; i < medCardCount; i++) {
+  for (let i = 0; i < states.length; i++) {
     const s = states[i]; if (!s || !s.valid || s.calculable === false) continue;
     const name = s.medRaw || `Läkemedel ${i+1}`;
     if      (s.isOveruse  && s.earlyRenewalDecision === 'yes') toRenew.push({ name, i, earlyRenewal: 'overuse' });
@@ -552,12 +555,14 @@ function generateAndDistribute() {
   const patientTextEn = buildPatientText('en', toRenew, tooEarly, overuse, validCount);
   const journalText   = buildJournalText(toRenew, tooEarly, overuse, validCount);
 
-  for (let i = 0; i < medCardCount; i++) {
-    if (!states[i] || !states[i].valid || states[i].calculable === false) continue;
-    states[i].patientText   = patientText;
-    states[i].patientTextEn = patientTextEn;
-    states[i].patientLang   = states[i].patientLang || 'sv';
-    states[i].journalText   = journalText;
+  for (let i = 0; i < states.length; i++) {
+    const s = states[i]; if (!s || !s.valid || s.calculable === false) continue;
+    applyMedStatePatch(i, {
+      patientText,
+      patientTextEn,
+      patientLang: s.patientLang || 'sv',
+      journalText,
+    });
   }
   renderResultForMed(activeMedIdx);
 }

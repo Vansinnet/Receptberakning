@@ -58,6 +58,8 @@ function calcPrescribeResult(i) {
 // Ren valideringsfunktion — returnerar { type, msg } eller null.
 // Anropas av updatePrescribeResult för att avgöra vad som ska visas när
 // calcPrescribeResult inte kan producera ett resultat.
+// field-nyckeln anger vilket inmatningsfält som är felaktigt ('pkg' eller 'date')
+// så att updatePrescribeResult kan applicera toggleError på rätt element.
 function prescribeValidationHint(i, ps) {
   if (!ps) return null;
 
@@ -66,8 +68,8 @@ function prescribeValidationHint(i, ps) {
   if (pkgNum <= 0) {
     // Tomt fält = läkaren har inte fyllt i än; ogiltigt värde = aktivt fel
     return pkgVal !== ''
-      ? { type: 'warn', msg: 'Förpackningsstorleken måste vara ett heltal om minst 1.' }
-      : { type: 'info', msg: 'Ange förpackningsstorlek för att beräkna antal förpackningar.' };
+      ? { type: 'warn', field: 'pkg',  msg: 'Förpackningsstorleken måste vara ett heltal om minst 1.' }
+      : { type: 'info', field: 'pkg',  msg: 'Ange förpackningsstorlek för att beräkna antal förpackningar.' };
   }
 
   if (ps.mode === 'date' && ps.endDate) {
@@ -76,8 +78,8 @@ function prescribeValidationHint(i, ps) {
     const prescEnd = parseDateUTC(s.prescribedEndDateStr);
     const start    = (prescEnd && prescEnd > today) ? prescEnd : today;
     const ed       = parseDateUTC(ps.endDate);
-    if (!ed)         return { type: 'warn', msg: 'Ange ett giltigt datum (ÅÅÅÅ-MM-DD).' };
-    if (ed <= start) return { type: 'warn', msg: `Slutdatumet måste vara efter ${fmtDate(start)}.` };
+    if (!ed)         return { type: 'warn', field: 'date', msg: 'Ange ett giltigt datum (ÅÅÅÅ-MM-DD).' };
+    if (ed <= start) return { type: 'warn', field: 'date', msg: `Slutdatumet måste vara efter ${fmtDate(start)}.` };
   }
 
   return null;
@@ -87,6 +89,10 @@ function prescribeValidationHint(i, ps) {
 function updatePrescribeResult(i) {
   const box = getEl('ps-result-' + i);
   if (!box) return;
+
+  // Återställ fältmarkeringar inför ny utvärdering
+  toggleError(getEl('ps-pkg-'     + i), false);
+  toggleError(getEl('ps-enddate-' + i), false);
 
   let res;
   try {
@@ -129,6 +135,10 @@ function updatePrescribeResult(i) {
   const hint = prescribeValidationHint(i, prescribeState[i]);
   if (hint) {
     box.appendChild(buildAlertEl(hint.type, null, hint.msg));
+    if (hint.type === 'warn') {
+      if (hint.field === 'pkg')  toggleError(getEl('ps-pkg-'     + i), true);
+      if (hint.field === 'date') toggleError(getEl('ps-enddate-' + i), true);
+    }
     renderPrescribeSummary();
   }
 }
@@ -150,7 +160,7 @@ function buildPrescribeInner(i) {
     attrs: { type: 'number', id: 'ps-pkg-' + i, min: '1', placeholder: 'T.ex. 30' },
     value: ps.packageSize || '',
   });
-  pkgInp.addEventListener('input', () => { prescribeState[i].packageSize = pkgInp.value; updatePrescribeResult(i); });
+  pkgInp.addEventListener('input', () => { applyPrescribeStatePatch(i, { packageSize: pkgInp.value }); updatePrescribeResult(i); });
   const pkgDiv = el('div', { cls: 'field', style: 'margin-top:10px' });
   pkgDiv.appendChild(el('label', { text: 'Förpackningsstorlek (st)', attrs: { for: 'ps-pkg-' + i } }));
   pkgDiv.appendChild(pkgInp);
@@ -172,7 +182,7 @@ function buildPrescribeInner(i) {
       text:  mode === 'months' ? 'Månader' : 'Datum',
       attrs: { type: 'button' },
     });
-    btn.addEventListener('click', () => { prescribeState[i].mode = mode; buildPrescribeInner(i); });
+    btn.addEventListener('click', () => { applyPrescribeStatePatch(i, { mode }); buildPrescribeInner(i); });
     toggleDiv.appendChild(btn);
   });
   inner.appendChild(toggleDiv);
@@ -186,7 +196,7 @@ function buildPrescribeInner(i) {
       if (m === ps.months) opt.selected = true;
       durSel.appendChild(opt);
     }
-    durSel.addEventListener('change', () => { prescribeState[i].months = parseInt(durSel.value, 10); updatePrescribeResult(i); });
+    durSel.addEventListener('change', () => { applyPrescribeStatePatch(i, { months: parseInt(durSel.value, 10) }); updatePrescribeResult(i); });
     durDiv.appendChild(durSel);
   } else {
     durDiv.appendChild(el('label', { text: 'Förskriva t.o.m.', attrs: { for: 'ps-enddate-' + i } }));
@@ -197,7 +207,7 @@ function buildPrescribeInner(i) {
     });
     durInp.addEventListener('input', () => {
       autoFormatDate(durInp);
-      prescribeState[i].endDate = durInp.value;
+      applyPrescribeStatePatch(i, { endDate: durInp.value });
       updatePrescribeResult(i);
     });
     durDiv.appendChild(durInp);
@@ -220,7 +230,7 @@ function renderPrescribeSummary() {
 
   try {
   const items = [];
-  for (let i = 0; i < medCardCount; i++) {
+  for (let i = 0; i < states.length; i++) {
     const s = states[i] || {};
     const ps = prescribeState[i];
     if (!ps || !canRenewMed(i)) continue;
@@ -275,7 +285,7 @@ function renderPrescribePanel(i) {
   panel.classList.remove('is-hidden');
 
   if (!prescribeState[i]) {
-    prescribeState[i] = { mode: 'months', months: 7, endDate: '', packageSize: String(s.amt || '') };
+    initPrescribeState(i, { mode: 'months', months: 7, endDate: '', packageSize: String(s.amt || '') });
   } else {
     // AKTIVT VAL: packageSize synkas inte automatiskt när amtInput ändras i huvudformuläret.
     // Skäl: Förpackningsstorleken på det nya receptet kan avsiktligt skilja sig från det
@@ -284,7 +294,7 @@ function renderPrescribePanel(i) {
     // förstöra ett pågående val utan att läkaren märker det.
     // Fältet förfylls bara om det är tomt (t.ex. vid första öppning efter byte av läkemedel).
     if (!prescribeState[i].packageSize) {
-      prescribeState[i].packageSize = String(s.amt || '');
+      applyPrescribeStatePatch(i, { packageSize: String(s.amt || '') });
     }
   }
 

@@ -4,7 +4,9 @@ const SAFE_ALERT_TYPES = new Set(['danger','warn','info','ok']);
 
 function debounce(fn, wait = 120) {
   let t;
-  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
+  const d = (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
+  d.cancel = () => clearTimeout(t);
+  return d;
 }
 
 /* Datumformatering */
@@ -158,5 +160,6 @@ function buildResultRow(frag, label, valueText, badgeNode=null) {
   const rk = el('span', { cls: 'rk', text: label });
   const rv = el('span', { cls: 'rv', text: valueText });
   if (badgeNode) { rv.appendChild(document.createTextNode(' ')); rv.appendChild(badgeNode); }
-  frag.appendChild(rk); frag.appendChild(rv);
+  frag.appendChild(rk);
+  frag.appendChild(rv);
 }

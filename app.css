@@ -1026,7 +1026,10 @@ select.theme-select option { background: var(--surface); color: var(--text); }
    RESPONSIV — faller tillbaka till staplat på smal skärm
    ════════════════════════════════════════════ */
 @media (max-width: 900px) {
-  .renew-layout { flex-direction: column; height: auto; }
+  .renew-layout { flex-direction: column; height: auto; overflow-y: auto; }
+  /* result-panel får inte äta upp all höjd i kolumnriktning — prescribe-panel
+     måste få plats nedanför. overflow-y: visible förhindrar dubbel scroll-container. */
+  .result-panel { flex: none; overflow-y: visible; }
   .med-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; }
   .med-list { flex-direction: row; flex-wrap: wrap; padding: 6px 8px; }
   .med-item { width: auto; }
@@ -1036,7 +1039,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   .longterm-body { flex-direction: column; }
   .longterm-form-col { flex: none; border-right: none; border-bottom: 1px solid var(--border); }
   .metrics { grid-template-columns: repeat(3, 1fr); }
-  .prescribe-panel { display: none !important; }
+  .prescribe-panel { width: 100%; border-left: none; border-top: 1px solid var(--border); }
 }
 
 @media (max-width: 768px) {

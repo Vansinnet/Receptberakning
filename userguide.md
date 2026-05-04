@@ -43,7 +43,7 @@ Resultatet visas direkt och uppdateras automatiskt vid varje ändring.
 
 ### Steg 4: Ta beslut (vid flaggat ärende)
 
-Vid överförbrukning eller för tidig förnyelse visas frågan **"Mot bakgrund av ovanstående — bedömer du att receptet ska förnyas?"**. Välj **✓ Ja, förnya** eller **✕ Nej, avslå** — beslutet återspeglas i de genererade texterna.
+Vid överförbrukning eller för tidig förnyelse visas frågan **"Mot bakgrund av ovanstående och patientens unika fall — bedömer du att receptet ska förnyas?"**. Välj **✓ Ja, förnya** eller **✕ Nej, avslå** — beslutet återspeglas i de genererade texterna.
 
 ### Steg 5: Kopiera texter
 

@@ -543,11 +543,15 @@ test('två perioder summerar totalDays och totalTablets korrekt', () => {
   assertEqual(r.periods.length, 2);
 });
 
-test('överlappande perioder → hasOverlap:true', () => {
-  // Period 1 slutar 30 dagar sedan, Period 2 börjar 40 dagar sedan → Period 1 slutar EFTER Period 2 börjar
+test('överlappande perioder → hasOverlap:true, valid:true, totalDays baseras på union', () => {
+  // P1: 120→30 dagar sedan (90 dagar, 90 tabletter), P2: 40→5 dagar sedan (35 dagar, 35 tabletter)
+  // P1 slutar 30 dagar sedan, P2 börjar 40 dagar sedan → överlapp 10 dagar
+  // Union: 120→5 dagar sedan = 115 dagar (inte 125 = 90+35)
   const r = calcLongtermCore('Test 10 mg', 1, [makePeriod(120, 30, 90), makePeriod(40, 5, 35)]);
   assertEqual(r.valid, true);
   assertEqual(r.hasOverlap, true);
+  assertEqual(r.totalTablets, 125, 'alla tabletter räknas in');
+  assertEqual(r.totalDays, 115, 'union av perioder = 115 dagar, ej 125');
 });
 
 test('angränsande (ej överlappande) perioder → hasOverlap:false', () => {

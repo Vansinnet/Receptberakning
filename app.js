@@ -4,13 +4,8 @@
    Klinisk data: endast i minnet (states[])
  */
 
-/* State */
-let states        = [{}];   // ett objekt per läkemedel
-let medCardCount  = 1;
-let activeMedIdx  = 0;      // vilket läkemedel som visas i mitten/höger
+/* State — deklareras och ägs av state.js */
 let warnTimer, clearTimer, countdownInt;
-let ltPeriods = [{ start: oneYearAgoStr(), total: '', end: todayStr() }];
-let prescribeState = {}; // per-läkemedelsindex: { mode, months, endDate, packageSize }
 
 /* Debounce-instanser per läkemedelsindex */
 const calcDebounced = [];
@@ -70,11 +65,10 @@ function resetTimer(isUserEvent=false) {
 
 /* Lägg till / ta bort läkemedel */
 function addMedCard() {
-  if (medCardCount >= 8) { showToast('Max 8 läkemedel kan hanteras samtidigt.'); return; }
-  states.push({});
-  medCardCount++;
-  ensureDebounce(medCardCount-1);
-  activeMedIdx = medCardCount-1;
+  if (states.length >= 8) { showToast('Max 8 läkemedel kan hanteras samtidigt.'); return; }
+  const newIdx = pushMedCard();
+  ensureDebounce(newIdx);
+  setActiveMed(newIdx);
   buildMedList();
   renderFormForMed(activeMedIdx);
   renderResultForMed(activeMedIdx);
@@ -83,22 +77,16 @@ function addMedCard() {
 function clearCurrentCard() {
   const i = activeMedIdx;
 
-  if (medCardCount > 1) {
+  if (states.length > 1) {
     // Ta bort kortet helt — kompaktera states och prescribeState
-    states.splice(i, 1);
+    spliceMedCard(i);
 
-    const newPS = {};
-    for (let j = 0; j < medCardCount - 1; j++) {
-      newPS[j] = prescribeState[j >= i ? j + 1 : j] ?? null;
-    }
-    prescribeState = newPS;
-
-    // calcDebounced-closures innehåller fasta idx-värden — bygg om från grunden
+    // calcDebounced-closures innehåller fasta idx-värden — avbryt väntande timers och bygg om från grunden
+    calcDebounced.forEach(d => d.cancel());
     calcDebounced.length = 0;
-    medCardCount--;
-    for (let j = 0; j < medCardCount; j++) ensureDebounce(j);
+    for (let j = 0; j < states.length; j++) ensureDebounce(j);
 
-    activeMedIdx = Math.min(i, medCardCount - 1);
+    setActiveMed(Math.min(i, states.length - 1));
     _prescribePanelBuiltFor = null;
     buildMedList();
     renderFormForMed(activeMedIdx);
@@ -108,8 +96,8 @@ function clearCurrentCard() {
   }
 
   // Enda kvarvarande läkemedel — nollställ formuläret
-  states[i] = { activeTab:'patient', patientLang:'sv' };
-  prescribeState[i] = null;
+  setMedState(i, { activeTab:'patient', patientLang:'sv' });
+  initPrescribeState(i, null);
   _prescribePanelBuiltFor = null;
   buildMedList();
   renderFormForMed(i);
@@ -128,20 +116,21 @@ function setEarlyDecision(decision) {
   const i = activeMedIdx;
   const s = states[i];
   if (!s || (!s.isTooEarly && !s.isOveruse)) return;
-  s.earlyRenewalDecision = decision;
+  const patch = { earlyRenewalDecision: decision };
   if (s.isOveruse) {
-    s.statusText   = decision === 'yes' ? 'OK – förnyas (klinisk bed.)' : 'För tidig förnyelse';
-    s.verdictTitle = decision === 'yes' ? 'OK – Förnya recept' : 'För tidig förnyelse – bedömning krävs';
-    s.verdictSub   = decision === 'yes'
+    patch.statusText   = decision === 'yes' ? 'OK – förnyas (klinisk bed.)' : 'För tidig förnyelse';
+    patch.verdictTitle = decision === 'yes' ? 'OK – Förnya recept' : 'För tidig förnyelse – bedömning krävs';
+    patch.verdictSub   = decision === 'yes'
       ? 'Klinisk bedömning: förnyelse trots förhöjd förbrukning.'
       : `Snitt ${s.displayAvgStr} överstiger ordination med >10%.`;
   } else {
-    s.statusText   = decision === 'yes' ? 'OK – förnyas tidigt' : `För tidigt — ${s.daysToPrescribedEnd}d kvar`;
-    s.verdictTitle = decision === 'yes' ? 'OK – Förnya recept' : `För tidigt – ${s.daysToPrescribedEnd} dagar kvar`;
-    s.verdictSub   = decision === 'yes'
+    patch.statusText   = decision === 'yes' ? 'OK – förnyas tidigt' : `För tidigt — ${s.daysToPrescribedEnd}d kvar`;
+    patch.verdictTitle = decision === 'yes' ? 'OK – Förnya recept' : `För tidigt – ${s.daysToPrescribedEnd} dagar kvar`;
+    patch.verdictSub   = decision === 'yes'
       ? `Klinisk bedömning: förnyelse trots ${s.daysToPrescribedEnd} dagar kvar av receptperioden.`
       : 'Förbrukning OK. Kontakta vården närmre slutdatumet.';
   }
+  applyMedStatePatch(i, patch);
   buildMedList();
   generateAndDistribute();
 }
@@ -153,8 +142,7 @@ function confirmClearAll(force=false) {
 }
 function closeClearModal() { const m=getEl('clearModal'); if (m) m.classList.remove('visible'); }
 function executeClearAll() {
-  states = [{}]; medCardCount=1; activeMedIdx=0;
-  prescribeState = {};
+  resetAllMedState();
   buildMedList();
   renderFormForMed(0);
   renderResultForMed(0); // anropar renderPrescribePanel(0) internt
@@ -189,7 +177,21 @@ buildPeriodContainer();
 const formPanel = getEl('formPanel');
 if (formPanel) {
   formPanel.addEventListener('input', e => {
-    if (e.target.id==='dateInput') autoFormatDate(e.target);
+    if (e.target.id === 'dateInput') {
+      autoFormatDate(e.target);
+      // Validera direkt när datumet är fullständigt (ÅÅÅÅ-MM-DD = 10 tecken).
+      // Under pågående inmatning (< 10 tecken) rensas eventuellt fel så att
+      // läkaren inte störs av felmarkeringar mitt i skrivandet.
+      const val = e.target.value;
+      if (val.length === 10) {
+        const pDate = parseDateUTC(val);
+        if (!pDate)          setFieldError('dateInput', 'Ogiltigt datum.');
+        else if (pDate > getToday()) setFieldError('dateInput', 'Datumet är satt i framtiden.');
+        else                 setFieldError('dateInput', '');
+      } else {
+        setFieldError('dateInput', '');
+      }
+    }
     saveFormValues(activeMedIdx);
     ensureDebounce(activeMedIdx); calcDebounced[activeMedIdx]();
   });
@@ -245,7 +247,7 @@ if (periodsContainer) {
     if (e.target.matches('input[type="text"]')) autoFormatDate(e.target);
     // Håll ltPeriods[] synkat med DOM — det är källan för sanning, inte DOM:en
     const m = e.target.id && e.target.id.match(/^lt-(start|total|end)-(\d+)$/);
-    if (m && ltPeriods[+m[2]]) ltPeriods[+m[2]][m[1]] = e.target.value;
+    if (m) setLtPeriodField(+m[2], m[1], e.target.value);
     calcLongtermDebounced();
   });
   periodsContainer.addEventListener('change', e => { if (e.target.matches('input[type="text"]')) calcLongterm(); });
@@ -280,7 +282,7 @@ window.addEventListener('focus',recalcOnDateChange);
 
 // Rensa vid pagehide (bfcache-säkerhet)
 window.addEventListener('pagehide',()=>{
-  states=states.map(()=>({}));
+  clearAllMedStateData();
   ['medInput','doseInput','amtInput','refInput','leftInput'].forEach(id=>{ const e=getEl(id);if(e)e.value=''; });
   const d=getEl('dateInput');if(d)d.value=todayStr();
   const b=getEl('copyBodyResult');if(b)b.textContent='';

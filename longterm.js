@@ -57,15 +57,13 @@ function buildPeriodContainer() {
 }
 
 function addPeriod() {
-  if (ltPeriods.length >= 10) return;
-  ltPeriods.push({ start: '', total: '', end: '' });
+  if (!pushLtPeriod()) return;
   buildPeriodContainer();
   calcLongterm();
 }
 
 function removePeriod(idx) {
-  if (ltPeriods.length <= 1) return;
-  ltPeriods.splice(idx, 1);
+  if (!spliceLtPeriod(idx)) return;
   buildPeriodContainer();
   calcLongterm();
 }
@@ -73,7 +71,7 @@ function removePeriod(idx) {
 function clearLongterm() {
   const m = getEl('lt-med'); if (m) m.value = '';
   const d = getEl('lt-dose'); if (d) { d.value = ''; toggleError(d, false); }
-  ltPeriods = [{ start: oneYearAgoStr(), total: '', end: todayStr() }];
+  resetLtPeriods();
   buildPeriodContainer();
   ['lt-alerts', 'lt-overlap-alert', 'lt-resGrid', 'lt-period-rows'].forEach(id => {
     const e = getEl(id); if (e) e.textContent = '';
@@ -125,8 +123,26 @@ function calcLongtermCore(medRaw, ordDose, rawPeriods) {
     if (periods[i].endDate > periods[i + 1].startDate) { hasOverlap = true; break; }
   }
 
-  const totalTablets   = periods.reduce((s, p) => s + p.total, 0);
-  const totalDays      = periods.reduce((s, p) => s + p.days,  0);
+  const totalTablets = periods.reduce((s, p) => s + p.total, 0);
+
+  // AKTIVT VAL: Vid överlapp används unionen av datumintervall som nämnare.
+  // Tabletterna räknas alltid i sin helhet (de är faktiskt uttagna), men överlappande
+  // dagar dubbelräknas inte — annars underskattas overallAvg och är kliniskt missvisande.
+  let totalDays;
+  if (hasOverlap) {
+    const merged = [];
+    for (const p of periods) {
+      if (merged.length === 0 || p.startDate >= merged[merged.length - 1].end) {
+        merged.push({ start: p.startDate, end: p.endDate });
+      } else if (p.endDate > merged[merged.length - 1].end) {
+        merged[merged.length - 1].end = p.endDate;
+      }
+    }
+    totalDays = merged.reduce((s, r) => s + getDaysDiff(r.end, r.start), 0);
+  } else {
+    totalDays = periods.reduce((s, p) => s + p.days, 0);
+  }
+
   if (totalDays === 0) return { valid: false, periodErrors };
 
   const overallAvg     = totalTablets / totalDays;
@@ -210,18 +226,18 @@ function calcLongterm() {
     toggleError(getEl(`lt-total-${idx}`), totalError);
   });
 
+  const ltOverlap = getEl('lt-overlap-alert');
+  if (ltOverlap) ltOverlap.textContent = '';
+  if (result.hasOverlap) {
+    renderAlert('lt-overlap-alert', 'warn', 'Överlappande perioder', 'Tidsperioderna överlappar varandra. Beräkningen använder union av datumintervall — överlappande dagar räknas inte dubbelt.');
+  }
+
   if (!medRaw || doseIsInvalid || isNaN(ordDose) || !result.valid) {
     showEl('lt-result', false);
     return;
   }
 
   showEl('lt-result', true, 'flex');
-
-  const ltOverlap = getEl('lt-overlap-alert');
-  if (ltOverlap) ltOverlap.textContent = '';
-  if (result.hasOverlap) {
-    renderAlert('lt-overlap-alert', 'warn', 'Överlappande perioder', 'Tidsperioderna överlappar varandra. Kontrollera att alla perioder är disjunkta.');
-  }
 
   const resGridEl = getEl('lt-resGrid');
   if (resGridEl) {
@@ -285,9 +301,9 @@ function copyLtText() {
     if (!btn) return;
     const orig = btn.dataset.origLabel || btn.textContent;
     btn.dataset.origLabel = orig;
-    btn.textContent = '\u2705 Kopierat!';
+    btn.textContent = '✅ Kopierat!';
     if (ltCopyTimers.has(btn)) clearTimeout(ltCopyTimers.get(btn));
     const t = setTimeout(() => { btn.textContent = orig; delete btn.dataset.origLabel; ltCopyTimers.delete(btn); }, 1800);
     ltCopyTimers.set(btn, t);
-  }).catch(() => { if (btn) btn.textContent = '\u26a0\ufe0f Kopiera manuellt'; });
+  }).catch(() => { if (btn) btn.textContent = '⚠️ Kopiera manuellt'; });
 }

@@ -4,8 +4,8 @@ function buildMedList() {
   list.textContent = '';
   // Inaktivera knappen när taket nås så att läkaren ser gränsen direkt
   const addBtn = getEl('addMedBtn');
-  if (addBtn) addBtn.disabled = medCardCount >= 8;
-  for (let i = 0; i < medCardCount; i++) {
+  if (addBtn) addBtn.disabled = states.length >= 8;
+  for (let i = 0; i < states.length; i++) {
     const s = states[i] || {};
     const isWarnDot = (s.isOveruse || s.isTooEarly) && s.earlyRenewalDecision !== 'yes';
 
@@ -27,7 +27,7 @@ function buildMedList() {
 }
 
 function selectMed(i) {
-  activeMedIdx = i;
+  setActiveMed(i);
   buildMedList();
   renderFormForMed(i);
   renderResultForMed(i);
@@ -63,15 +63,16 @@ function renderFormForMed(i) {
 }
 
 function saveFormValues(i) {
-  if (!states[i]) states[i] = {};
-  const s   = states[i];
-  s.medRaw  = (getEl('medInput')  || {}).value || '';
-  s.dateVal = (getEl('dateInput') || {}).value || todayStr();
-  s.doseRaw = (getEl('doseInput') || {}).value || '';
-  s.amtRaw  = (getEl('amtInput')  || {}).value || '';
-  s.refRaw  = (getEl('refInput')  || {}).value || '';
-  s.leftRaw = (getEl('leftInput') || {}).value || '';
-  s.medName = s.medRaw || `Läkemedel ${i + 1}`;
+  const medRaw = (getEl('medInput') || {}).value || '';
+  applyMedStatePatch(i, {
+    medRaw,
+    dateVal: (getEl('dateInput') || {}).value || todayStr(),
+    doseRaw: (getEl('doseInput') || {}).value || '',
+    amtRaw:  (getEl('amtInput')  || {}).value || '',
+    refRaw:  (getEl('refInput')  || {}).value || '',
+    leftRaw: (getEl('leftInput') || {}).value || '',
+    medName: medRaw || `Läkemedel ${i + 1}`,
+  });
 }
 
 // === RESULTAT — högerkolumn ===
@@ -107,16 +108,24 @@ function renderResultForMed(i) {
     if (vSub)   vSub.textContent   = s.verdictSub   || '';
   }
 
-  /* Tidslinje */
+  /* Tidslinje — renderas bara vid fullständig beräkning (calculable:true).
+     Partiella returer (daysSince=0, orimliga värden m.m.) saknar tlPct
+     och ska inte lämna gammal data synlig. */
   const tlFill  = getEl('tlFill');
   const tlStart = getEl('tlStart');
   const tlEnd   = getEl('tlEnd');
-  if (tlFill && s.tlPct !== undefined) {
-    tlFill.style.width = Math.min(100, s.tlPct) + '%';
-    tlFill.className   = 'tl-fill tl-fill-' + (s.isOveruse ? 'danger' : s.isTooEarly ? 'warn' : 'ok');
+  if (s.calculable === true && s.tlPct !== undefined) {
+    if (tlFill) {
+      tlFill.style.width = Math.min(100, s.tlPct) + '%';
+      tlFill.className   = 'tl-fill tl-fill-' + (s.isOveruse ? 'danger' : s.isTooEarly ? 'warn' : 'ok');
+    }
+    if (tlStart) tlStart.textContent = s.tlStart || '—';
+    if (tlEnd)   tlEnd.textContent   = s.tlEnd   || '—';
+  } else {
+    if (tlFill) { tlFill.style.width = '0%'; tlFill.className = 'tl-fill'; }
+    if (tlStart) tlStart.textContent = '—';
+    if (tlEnd)   tlEnd.textContent   = '—';
   }
-  if (tlStart) tlStart.textContent = s.tlStart || '—';
-  if (tlEnd)   tlEnd.textContent   = s.tlEnd   || '—';
 
   /* Mätvärden */
   const metricsGrid = getEl('metricsGrid');
@@ -168,13 +177,13 @@ function renderResultForMed(i) {
 
 function switchResultTab(tab) {
   if (!states[activeMedIdx]) return;
-  states[activeMedIdx].activeTab = tab;
+  setMedUIPreference(activeMedIdx, 'activeTab', tab);
   document.querySelectorAll('#copySection .copy-tab').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.tab === tab);
   });
   const body    = getEl('copyBodyResult');
   const langBtn = getEl('langBtnResult');
-  const s = states[activeMedIdx] || {};
+  const s = states[activeMedIdx];
   if (tab === 'patient') {
     const isEn = s.patientLang === 'en';
     if (body) body.textContent = isEn ? (s.patientTextEn || s.patientText || '') : (s.patientText || '');
@@ -191,6 +200,6 @@ function switchResultTab(tab) {
 function togglePatientLangResult() {
   const s = states[activeMedIdx];
   if (!s || !s.patientTextEn) return;
-  s.patientLang = s.patientLang === 'en' ? 'sv' : 'en';
+  setMedUIPreference(activeMedIdx, 'patientLang', s.patientLang === 'en' ? 'sv' : 'en');
   switchResultTab('patient');
 }
