@@ -1,113 +1,19 @@
 Roadmap
 1) Kort sikt
 
-Bugg #1: Felaktig state-hantering vid borttagning av läkemedelskort (stort kluster)
-Påverkar: clearCurrentCard() i app.js, calcDebounced[], prescribeState, states[] och ui-renew.js
-Root cause:
+Förbättring #1: CENTRALISERA STATE-MUTATIONER – detta ger störst långsiktig vinst ✅
 
-states.splice() + manuell omindexering av prescribeState
-calcDebounced är en array med closures som behåller gamla index
-Pending debounce-timers från input-event körs efter borttagning
-prescribeState reindexering hanterar inte multipla borttagningar korrekt
-
-Reproduktion:
-
-Lägg till 3–4 kort → fyll i data → ta bort kort i mitten → växla mellan kort eller vänta på debounce
-
-Klinisk risk: Medelhög (fel läkemedel kan beräknas/visas)
-Fix-förslag:
-Byt till objekt-baserad debounce (debouncers = {} keyed by index) + clearTimeout före splice. Centralisera all state-mutation i en removeMedCard(i)-funktion som hanterar alla arrays/objekt atomärt.
-
-Bugg #2: earlyRenewalDecision rensas eller fastnar felaktigt
-Påverkar: calcCore() i calc-renew.js (rader med flagsChanged), calc() i app.js, setEarlyDecision() i app.js
-Root cause:
-
-flagsChanged = prev.isOveruse !== isOveruse || prev.isTooEarly !== isTooEarly är för känslig (mikro-skillnader i daysSince, getToday(), calculable etc.)
-Object.assign(states[i], derived) skriver alltid över earlyRenewalDecision
-Beslutet sparas i setEarlyDecision() men rensas vid nästa calc() eller omrendering
-
-Reproduktion:
-
-Välj "Ja, förnya" på överförbrukning/för tidigt → ändra något litet i formuläret eller växla kort → beslutet försvinner (eller fastnar vid ogiltigt tillstånd)
-
-Klinisk risk: Medelhög (läkaren måste välja om beslutet upprepade gånger)
-Fix-förslag:
-Gör flagsChanged-logiken mer robust (jämför bara de kliniska flaggorna, inte calculable eller exakta datum). Separera earlyRenewalDecision från de auto-beräknade flaggorna i state.
-
-Bugg #3: Stale/ghost UI-data efter ofullständiga calcCore-returer
-Påverkar: calcCore() (alla early returns), calc() (Object.assign), renderResultForMed() i ui-renew.js
-Root cause:
-
-Många return-vägar i calcCore() returnerar ofullständiga objekt (saknar metrics, alerts, tlPct, verdictSub m.m.)
-Object.assign behåller gamla värden från tidigare giltig beräkning
-renderResultForMed() renderar gammal data även vid calculable: false eller valid: false
-
-Reproduktion:
-
-Giltigt recept → OK-resultat → ändra till daysSince=0, remaining > total eller orimliga värden → gamla mätvärden/tidslinje/alerts visas fortfarande
-
-Klinisk risk: Medelhög (läkaren kan lita på gamla siffror)
-Fix-förslag:
-Se till att calcCore() alltid returnerar ett fullständigt state-objekt med alla fält (eller lägg till resetUI: true). I renderResultForMed() rensa explicit alla element när !s.valid || !s.calculable.
-
-Bugg #4: Prescribe-panelen (Ny förskrivning) – två relaterade fel
-Påverkar: prescribe.js (calcPrescribeResult(), renderPrescribePanel())
-4a: Felaktig månadsberäkning (hög risk)
-
-När det finns dagar kvar på nuvarande recept (daysAlreadyCovered > 0) använder koden fortfarande today som bas för månadsberäkning istället för prescribedEndDate.
-
-4b: packageSize synkas aldrig
-
-prescribeState[i].packageSize fylls bara vid första renderingen. Ändring av amtInput i huvudformuläret uppdaterar inte prescribe-panelen.
-
-Reproduktion:
-
-Recept med 20 dagar kvar → välj 3 månader → får för kort period
-Ändra amtInput från 100 till 30 → prescribe-panel visar fortfarande 100
-
-Klinisk risk: Hög (fel antal förpackningar och fel förskrivningslängd)
-Fix-förslag:
-Använd prescribedEndDate som startdatum vid månadsberäkning. Lägg till synkronisering av packageSize i saveFormValues() eller calc() (med kommentar att läkaren medvetet får ändra storlek).
-
-Bugg #5: Inaktivitetstimern fungerar inte i prescribe- och longterm-fliken
-Påverkar: app.js (resetTimer()), event listeners i prescribe.js och longterm.js
-Root cause:
-Endast globala document-events återställer timern. Inputs/selects/knappar i prescribe-panelen och longterm-perioderna saknar resetTimer(true).
-Klinisk risk: Låg (irriterande)
-Fix-förslag:
-Lägg till resetTimer(true) i alla relevanta event listeners eller använd event delegation på hela app-shell.
-
-Bugg #6: Mobile & tillgänglighet
-6a: Prescribe-panelen döljs helt på mobil (@media (max-width: 900px)) utan förklaring.
-6b: Tooltip-bubblan kan hamna utanför viewport på små skärmar.
-Klinisk risk: Låg–medel (UX)
-Fix-förslag:
-Visa en tydlig notering på mobil eller gör panelen kollapsbar. Förbättra tooltip-positionering med viewport-check.
-
-Bugg #7: Mindre UX- och edge-case buggar
-
-#7a: autoFormatDate tillåter ogiltiga datum (t.ex. 2026-04-31) utan live-felmeddelande.
-#7b: Longterm overlap-detektering klassar angränsande perioder (samma dag) som overlap.
-#7c: FASS-knappen i longterm behåller gammal href efter clearLongterm().
-#7d: Svag feedback vid ogiltig indata i prescribe-panelen (ingen toggleError).
-#7e: Ingen bra skärmläsare-feedback när max 8 läkemedel nås.
-
-Förbättring #1: CENTRALISERA STATE-MUTATIONER – detta ger störst långsiktig vinst
-
-Förbättring #2: MINSKA ONÖDIGA NULL-CHECKS – gör detta direkt efter centraliseringen (då blir det ännu tydligare vilka checks som är onödiga)
+Förbättring #2: MINSKA ONÖDIGA NULL-CHECKS – gör detta direkt efter centraliseringen (då blir det ännu tydligare vilka checks som är onödiga) ✅
 
 Förbättring #3: SKAPA ANVÄNDARGUIDE – dokumentation ✅
 
 Förbättring #4: UPPDATERA test-calc.js
-Vi har viktig logik i prescribe.js som behöver inkluderas i test-calc.js
+Vi har viktig logik i prescribe.js som behöver inkluderas i test-calc.js ✅
 
-Förbättring #5: Öka inaktivitetstimern till 15 minuter. 5 minuter är för aggressivt, då läkaren kan bli störd under användning av andra ärenden och därmed vara borta från verktyget. Infoga kommentar om varför 10 minuter besämts och att det är ett aktivt val. Uppdatera sedan userguide.md och ev. readme.md om den nya tidsgränsen
+Förbättring #5: Öka inaktivitetstimern till 15 minuter. 5 minuter är för aggressivt, då läkaren kan bli störd under användning av andra ärenden och därmed vara borta från verktyget. Infoga kommentar om varför 10 minuter besämts och att det är ett aktivt val. Uppdatera sedan userguide.md och ev. readme.md om den nya tidsgränsen ✅
 
 Förbättring #6: Print-stödet är bra men kunde visa prescribe-sammanställningen tydligare.
 
-Förbättring #7: Överdriven defensivitet vs. "Tyst misslyckande"
-Observation: I JavaScript är det vanligt med if (s && s.valid). Koden har en bra balans, men kom ihåg regeln "föredra tydlig struktur framför överkommen defensivitet".
-Svaghet: "Tysta misslyckanden" (early returns som inte uppdaterar UI) är en stor risk i kliniska verktyg. Om tillståndet är ogiltigt (s.valid === false), måste UI uppdateras så att felmeddelanden rensas eller en grå/låst ruta visas. Returnerar vi bara return; stannar applikationen kvar i sitt förra tillstånd, och läkaren kanske tror att det gamla resultatet gäller för den nya indatan.
 
 2) Inom några veckor (någon gång under maj -26)
 När allt är på plats i verktyget och optimerat enligt state of the art:
