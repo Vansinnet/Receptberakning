@@ -34,6 +34,12 @@
 
 <body>
 
+<noscript>
+  <div class="noscript-msg" role="alert">
+    <strong>JavaScript krävs.</strong> Aktivera JavaScript i din webbläsare för att använda receptberäkningsverktyget.
+  </div>
+</noscript>
+
 <!-- ── APP SHELL ── -->
 <div class="app-shell">
 
@@ -58,8 +64,8 @@
     </div>
     <div class="topbar-nav-row">
       <nav class="main-tabs" role="tablist">
-        <button class="main-tab active" role="tab" aria-selected="true" data-tab="renew">💊 Receptförnyelse</button>
-        <button class="main-tab" role="tab" aria-selected="false" data-tab="longterm">📊 Långvarig förbrukning</button>
+        <button class="main-tab active" role="tab" id="tab-renew" aria-selected="true" aria-controls="panel-renew" data-tab="renew">💊 Receptförnyelse</button>
+        <button class="main-tab" role="tab" id="tab-longterm" aria-selected="false" aria-controls="panel-longterm" data-tab="longterm">📊 Långvarig förbrukning</button>
       </nav>
       <div class="topbar-right">
         <div class="topbar-setting">
@@ -77,7 +83,7 @@
 
 
   <!-- ── FLIK: RECEPTFÖRNYELSE ── -->
-  <div id="panel-renew" class="tab-panel active">
+  <div id="panel-renew" class="tab-panel active" role="tabpanel" aria-labelledby="tab-renew">
     <div class="renew-layout">
 
       <!-- VÄNSTER: LÄKEMEDELSLISTA -->
@@ -222,7 +228,7 @@
   </div>
 
   <!-- ── FLIK: LÅNGVARIG FÖRBRUKNING ── -->
-  <div id="panel-longterm" class="tab-panel">
+  <div id="panel-longterm" class="tab-panel" role="tabpanel" aria-labelledby="tab-longterm">
     <div class="longterm-layout">
       <div class="longterm-card card">
 
@@ -336,8 +342,8 @@
 
 <!-- MODAL: rensa bekräftelse -->
 <div class="modal-overlay" id="clearModal">
-  <div class="modal-content">
-    <h3 class="modal-title">⚠️ Återställ allt?</h3>
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="clearModalTitle">
+    <h3 class="modal-title" id="clearModalTitle">⚠️ Återställ allt?</h3>
     <p class="modal-text">Är du säker på att du vill rensa all inmatad data? Detta kan inte ångras.</p>
     <div class="modal-actions">
       <button id="executeClearAllBtn" class="btn btn-danger">Återställ allt</button>

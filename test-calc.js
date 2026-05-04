@@ -1,5 +1,6 @@
 /**
- * Enhetstester för calcCore (calc-renew.js) och calcLongtermCore (longterm.js)
+ * Enhetstester för calcCore (calc-renew.js), calcLongtermCore (longterm.js)
+ * och calcPrescribeResult / canRenewMed / prescribeValidationHint (prescribe.js)
  *
  * Kör: node test-calc.js
  *
@@ -10,6 +11,11 @@
  * calcLongtermCore täcker: ogiltiga indata, periodfältsfel, normalfall,
  * över/underförbrukning, gränsvärden, överlappande perioder,
  * per-period klassificering och output-struktur.
+ *
+ * prescribe.js täcker: canRenewMed (giltighetskontroll för förnyelse),
+ * prescribeValidationHint (inmatningsgranskning av förskrivningspanel) och
+ * calcPrescribeResult (förpackningsberäkning, månadsklämning, befintlig
+ * recepttäckning, datumläge och avrundning uppåt).
  */
 'use strict';
 
@@ -44,8 +50,23 @@ vm.runInContext(`
   };
 `, ctx);
 
+// state.js måste laddas före prescribe.js eftersom prescribe.js läser states[] och prescribeState[]
+vm.runInContext(fs.readFileSync(path.join(__dirname, 'state.js'),      'utf8'), ctx);
 vm.runInContext(fs.readFileSync(path.join(__dirname, 'calc-renew.js'), 'utf8'), ctx);
 vm.runInContext(fs.readFileSync(path.join(__dirname, 'longterm.js'),   'utf8'), ctx);
+vm.runInContext(fs.readFileSync(path.join(__dirname, 'prescribe.js'),  'utf8'), ctx);
+
+// states[] och prescribeState[] är `let`-variabler och syns inte på ctx-objektet.
+// Exponera hjälpfunktioner inifrån VM-kontexten för att sätta state per test.
+vm.runInContext(`
+  function __setTestState(i, data) {
+    while (states.length <= i) states.push({});
+    states[i] = data || {};
+  }
+  function __setTestPS(i, data) {
+    prescribeState[i] = (data !== null && data !== undefined) ? data : null;
+  }
+`, ctx);
 
 if (typeof ctx.calcCore !== 'function') {
   console.error('FEL: calcCore kunde inte laddas — kontrollera sökväg och filnamn.');
@@ -55,9 +76,18 @@ if (typeof ctx.calcLongtermCore !== 'function') {
   console.error('FEL: calcLongtermCore kunde inte laddas — kontrollera sökväg och filnamn.');
   process.exit(1);
 }
+if (typeof ctx.calcPrescribeResult !== 'function') {
+  console.error('FEL: calcPrescribeResult kunde inte laddas — kontrollera prescribe.js.');
+  process.exit(1);
+}
 
-const calcCore         = ctx.calcCore;
-const calcLongtermCore = ctx.calcLongtermCore;
+const calcCore             = ctx.calcCore;
+const calcLongtermCore     = ctx.calcLongtermCore;
+const canRenewMed          = ctx.canRenewMed;
+const calcPrescribeResult  = ctx.calcPrescribeResult;
+const prescribeValidationHint = ctx.prescribeValidationHint;
+const setTestState         = ctx.__setTestState;
+const setTestPS            = ctx.__setTestPS;
 
 // Fast datum för alla tester — undviker flytande dagsavhängiga gränsvärden.
 // Valt mitt i ett vanligt år, långt ifrån DST-gränser och skottår.
@@ -592,6 +622,219 @@ test('barPct är i intervallet [0, 150] och clampar vid extremvärden', () => {
   // Extrem överförbrukning: consumptionPct=1000% → barPct ska clampa vid 150
   const rExtreme = calcLongtermCore('Test 10 mg', 1, [makePeriod(10, 0, 100)]);
   assertEqual(rExtreme.barPct, 150, 'barPct ska clampa vid 150');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// HJÄLPARE FÖR PRESCRIBE-TESTER
+// ═══════════════════════════════════════════════════════════
+
+// YYYY-MM-DD för N dagar efter MOCK_TODAY
+function daysFromNow(n) {
+  const d = new Date(MOCK_TODAY_MS + n * 86400000);
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// canRenewMed — TESTER
+// ═══════════════════════════════════════════════════════════
+
+group('canRenewMed — förnyelsebehörighet');
+
+test('valid:false → false (formulär ej ifyllt)', () => {
+  setTestState(0, { valid: false });
+  assertEqual(canRenewMed(0), false);
+});
+
+test('calculable:false → false (recept utfärdat idag, beräkning omöjlig)', () => {
+  setTestState(0, { valid: true, calculable: false });
+  assertEqual(canRenewMed(0), false);
+});
+
+test('valid, inga flaggor → true (normalfall, OK att förnya)', () => {
+  setTestState(0, { valid: true, calculable: true, isOveruse: false, isTooEarly: false });
+  assertEqual(canRenewMed(0), true);
+});
+
+test('isOveruse utan beslut → false', () => {
+  setTestState(0, { valid: true, calculable: true, isOveruse: true, earlyRenewalDecision: null });
+  assertEqual(canRenewMed(0), false);
+});
+
+test('isTooEarly utan beslut → false', () => {
+  setTestState(0, { valid: true, calculable: true, isTooEarly: true, earlyRenewalDecision: null });
+  assertEqual(canRenewMed(0), false);
+});
+
+test('isOveruse + earlyRenewalDecision "yes" → true', () => {
+  setTestState(0, { valid: true, calculable: true, isOveruse: true, earlyRenewalDecision: 'yes' });
+  assertEqual(canRenewMed(0), true);
+});
+
+test('isTooEarly + earlyRenewalDecision "yes" → true', () => {
+  setTestState(0, { valid: true, calculable: true, isTooEarly: true, earlyRenewalDecision: 'yes' });
+  assertEqual(canRenewMed(0), true);
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// prescribeValidationHint — TESTER
+// ═══════════════════════════════════════════════════════════
+
+group('prescribeValidationHint — inmatningsgranskning');
+
+test('ps=null → null (ingen förskrivningspanel öppen)', () => {
+  setTestState(0, {});
+  assertEqual(prescribeValidationHint(0, null), null);
+});
+
+test('packageSize="" → info-hint (fältet inte ifyllt än)', () => {
+  setTestState(0, {});
+  const h = prescribeValidationHint(0, { packageSize: '', mode: 'months', months: 3 });
+  assertEqual(h.type,  'info', 'tom sträng ska ge info, ej warn');
+  assertEqual(h.field, 'pkg');
+});
+
+test('packageSize="0" → warn-hint (explicit ogiltigt värde)', () => {
+  setTestState(0, {});
+  const h = prescribeValidationHint(0, { packageSize: '0', mode: 'months', months: 3 });
+  assertEqual(h.type,  'warn', 'noll ska ge warn, inte info');
+  assertEqual(h.field, 'pkg');
+});
+
+test('giltig packageSize, månadsläge → null (ingen datumgranskning i månadsläge)', () => {
+  setTestState(0, {});
+  const h = prescribeValidationHint(0, { packageSize: '30', mode: 'months', months: 3, endDate: '' });
+  assertEqual(h, null);
+});
+
+test('datumläge, ogiltigt slutdatum → warn med field:"date"', () => {
+  setTestState(0, { prescribedEndDateStr: '2025-06-01' }); // passerat → start = idag
+  const h = prescribeValidationHint(0, { packageSize: '30', mode: 'date', endDate: 'fel-datum' });
+  assertEqual(h.type,  'warn');
+  assertEqual(h.field, 'date');
+  assertContains(h.msg, 'giltigt datum');
+});
+
+test('datumläge, slutdatum före startdatum → warn', () => {
+  // prescribedEnd passerat → startDate = idag (2025-06-15); endDate 5 dagar sedan < idag
+  setTestState(0, { prescribedEndDateStr: '2025-06-01' });
+  const h = prescribeValidationHint(0, { packageSize: '30', mode: 'date', endDate: daysAgo(5) });
+  assertEqual(h.type,  'warn');
+  assertEqual(h.field, 'date');
+  assertContains(h.msg, 'efter');
+});
+
+test('datumläge, giltigt framtida slutdatum → null', () => {
+  setTestState(0, { prescribedEndDateStr: '2025-06-01' });
+  const h = prescribeValidationHint(0, { packageSize: '30', mode: 'date', endDate: '2025-12-31' });
+  assertEqual(h, null);
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// calcPrescribeResult — TESTER
+// ═══════════════════════════════════════════════════════════
+
+group('calcPrescribeResult — förpackningsberäkning');
+
+test('prescribeState saknas → null', () => {
+  setTestState(0, { dose: 1, prescribedEndDateStr: '2025-06-01' });
+  setTestPS(0, null);
+  assertEqual(calcPrescribeResult(0), null);
+});
+
+test('recept utgånget → startDate=idag, daysAlreadyCovered=0', () => {
+  // prescribedEnd = 14 dagar sedan → startDate = idag = 2025-06-15
+  // 3 månader: 2025-06-15 → 2025-09-15 = 92 dagar; 92 ÷ 100 = 1 förp
+  setTestState(0, { dose: 1, prescribedEndDateStr: '2025-06-01' });
+  setTestPS(0, { mode: 'months', months: 3, packageSize: '100', endDate: '' });
+  const r = calcPrescribeResult(0);
+  assertEqual(r.startDateStr,       '2025-06-15', 'startDate ska vara idag');
+  assertEqual(r.daysAlreadyCovered, 0,            'inget befintligt överskott');
+  assertEqual(r.totalDays,          92,           '15 jun → 15 sep = 92 dagar');
+  assertEqual(r.packages,           1,            'ceil(92 ÷ 100) = 1 förp');
+});
+
+test('recept fortfarande giltigt → startDate=receptslut, daysAlreadyCovered>0', () => {
+  // prescribedEnd om 30 dagar (2025-07-15) → startDate = 2025-07-15
+  // 3 månader from idag = 2025-09-15; 2025-09-15 − 2025-07-15 = 62 dagar
+  setTestState(0, { dose: 1, prescribedEndDateStr: daysFromNow(30) });
+  setTestPS(0, { mode: 'months', months: 3, packageSize: '100', endDate: '' });
+  const r = calcPrescribeResult(0);
+  assertEqual(r.daysAlreadyCovered, 30, 'befintlig täckning ska räknas bort');
+  assertEqual(r.startDateStr,       daysFromNow(30));
+  assertEqual(r.totalDays,          62, '15 sep − 15 jul = 62 dagar');
+  assertEqual(r.packages,           1,  'ceil(62 ÷ 100) = 1 förp');
+});
+
+test('befintligt recept täcker hela perioden → packages=0, totalDays=0', () => {
+  // prescribedEnd om 120 dagar (in i okt); begärd period 3 mån (t.o.m. 15 sep) → överlapp
+  setTestState(0, { dose: 1, prescribedEndDateStr: daysFromNow(120) });
+  setTestPS(0, { mode: 'months', months: 3, packageSize: '100', endDate: '' });
+  const r = calcPrescribeResult(0);
+  assertEqual(r.packages,           0,    'befintligt recept täcker allt');
+  assertEqual(r.totalDays,          0);
+  assert(r.daysAlreadyCovered > 0,        'daysAlreadyCovered ska vara positiv');
+});
+
+test('månadsläge: 31 jan + 1 månad → 28 feb, ej 3 mars (månadsklämning)', () => {
+  // Frys "idag" till 2025-01-31 för detta test och återställ i finally-blocket
+  const MOCK_JAN31 = new Date('2025-01-31T00:00:00.000Z').getTime();
+  ctx._mockToday = MOCK_JAN31;
+  try {
+    setTestState(0, { dose: 1, prescribedEndDateStr: '2025-01-30' });
+    setTestPS(0, { mode: 'months', months: 1, packageSize: '28', endDate: '' });
+    const r = calcPrescribeResult(0);
+    assertEqual(r.endDateStr, '2025-02-28', 'klämning ska ge 28 feb, inte 3 mars');
+    assertEqual(r.totalDays,  28,           '31 jan → 28 feb = 28 dagar');
+    assertEqual(r.packages,   1,            'ceil(28 ÷ 28) = 1 förp');
+  } finally {
+    ctx._mockToday = MOCK_TODAY_MS;
+  }
+});
+
+test('datumläge: korrekt beräkning med avrundning uppåt (Math.ceil)', () => {
+  // 91 dagar × 1 st/dag = 91 tabletter; 91 ÷ 90 st/förp = 1.011 → ceil = 2 förp
+  setTestState(0, { dose: 1, prescribedEndDateStr: '2025-06-01' });
+  setTestPS(0, { mode: 'date', endDate: '2025-09-14', packageSize: '90', months: 1 });
+  const r = calcPrescribeResult(0);
+  assertEqual(r.totalDays,    91, '15 jun → 14 sep = 91 dagar');
+  assertEqual(r.totalTablets, 91);
+  assertEqual(r.packages,      2, 'Math.ceil(91 ÷ 90) = 2');
+});
+
+test('datumläge: slutdatum < startdatum → packages=0', () => {
+  // prescribedEnd passerat → startDate = idag; endDate 5 dagar sedan < idag
+  setTestState(0, { dose: 1, prescribedEndDateStr: '2025-06-01' });
+  setTestPS(0, { mode: 'date', endDate: daysAgo(5), packageSize: '30', months: 1 });
+  const r = calcPrescribeResult(0);
+  assertEqual(r.packages, 0, 'slutdatum före startdatum → 0 förpackningar');
+});
+
+test('datumläge: fraktionell dos (0,5 st/dag) → korrekt tabletträkning', () => {
+  // 60 dagar × 0,5 st/dag = 30 tabletter; 30 ÷ 30 st/förp = 1 förp (exakt)
+  setTestState(0, { dose: 0.5, prescribedEndDateStr: '2025-06-01' });
+  setTestPS(0, { mode: 'date', endDate: '2025-08-14', packageSize: '30', months: 1 });
+  const r = calcPrescribeResult(0);
+  assertEqual(r.totalDays,    60, '15 jun → 14 aug = 60 dagar');
+  assertEqual(r.totalTablets, 30, 'ceil(60 × 0,5) = 30');
+  assertEqual(r.packages,      1);
+});
+
+test('packageSize=0 → packages=0', () => {
+  setTestState(0, { dose: 1, prescribedEndDateStr: '2025-06-01' });
+  setTestPS(0, { mode: 'months', months: 3, packageSize: '0', endDate: '' });
+  const r = calcPrescribeResult(0);
+  assertEqual(r.packages, 0, 'förpackningsstorlek 0 ska ge 0 förpackningar');
+});
+
+test('dos=0 → packages=0', () => {
+  setTestState(0, { dose: 0, prescribedEndDateStr: '2025-06-01' });
+  setTestPS(0, { mode: 'months', months: 3, packageSize: '100', endDate: '' });
+  const r = calcPrescribeResult(0);
+  assertEqual(r.packages, 0, 'dos 0 ska ge 0 förpackningar');
 });
 
 

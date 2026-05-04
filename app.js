@@ -48,6 +48,9 @@ function resetTimer(isUserEvent=false) {
   clearTimeout(warnTimer); clearTimeout(clearTimer); clearInterval(countdownInt);
   const toast = getEl('toast'), toastCount = getEl('toastCount');
   if (toast) toast.classList.remove('visible');
+  // AKTIVT VAL: 15 minuters inaktivitet innan sidan rensas (varning vid 14 min).
+  // Läkare avbryts ofta mitt i arbetet av kollegor, telefonsamtal eller akuta situationer —
+  // en kortare timer orsakar frustration och tvingar omstart av pågående bedömning.
   warnTimer = setTimeout(() => {
     let s = 60;
     if (!toast||!toastCount) return;
@@ -56,11 +59,11 @@ function resetTimer(isUserEvent=false) {
       s--; if (toastCount) toastCount.textContent = String(s);
       if (s<=0) clearInterval(countdownInt);
     }, 1000);
-  }, 4*60*1000);
+  }, 14*60*1000);
   clearTimer = setTimeout(() => {
     clearInterval(countdownInt); if (toast) toast.classList.remove('visible');
     confirmClearAll(true);
-  }, 5*60*1000);
+  }, 15*60*1000);
 }
 
 /* Lägg till / ta bort läkemedel */
@@ -136,11 +139,24 @@ function setEarlyDecision(decision) {
 }
 
 /* Rensa allt */
+let _clearModalTrigger = null;
 function confirmClearAll(force=false) {
-  if (force) executeClearAll();
-  else { const m=getEl('clearModal'); if (m) m.classList.add('visible'); }
+  if (force) { executeClearAll(); return; }
+  const m = getEl('clearModal');
+  if (!m) return;
+  _clearModalTrigger = document.activeElement;
+  m.classList.add('visible');
+  const btn = getEl('executeClearAllBtn');
+  if (btn) btn.focus();
 }
-function closeClearModal() { const m=getEl('clearModal'); if (m) m.classList.remove('visible'); }
+function closeClearModal() {
+  const m = getEl('clearModal');
+  if (m) m.classList.remove('visible');
+  if (_clearModalTrigger && typeof _clearModalTrigger.focus === 'function') {
+    _clearModalTrigger.focus();
+    _clearModalTrigger = null;
+  }
+}
 function executeClearAll() {
   resetAllMedState();
   buildMedList();
@@ -263,9 +279,23 @@ const ltCopyBtn=getEl('ltCopyBtn'); if(ltCopyBtn) ltCopyBtn.addEventListener('cl
 const earlyYesBtn = getEl('earlyDecisionYes'); if (earlyYesBtn) earlyYesBtn.addEventListener('click', () => setEarlyDecision('yes'));
 const earlyNoBtn  = getEl('earlyDecisionNo');  if (earlyNoBtn)  earlyNoBtn.addEventListener('click',  () => setEarlyDecision('no'));
 
-// Modal
+// Modal: knappar, ESC-tangent och focustrap
 const closeClearModalBtn=getEl('closeClearModalBtn'); if(closeClearModalBtn) closeClearModalBtn.addEventListener('click',closeClearModal);
 const executeClearAllBtn=getEl('executeClearAllBtn'); if(executeClearAllBtn) executeClearAllBtn.addEventListener('click',executeClearAll);
+document.addEventListener('keydown', e => {
+  const m = getEl('clearModal');
+  if (!m || !m.classList.contains('visible')) return;
+  if (e.key === 'Escape') { e.preventDefault(); closeClearModal(); return; }
+  if (e.key === 'Tab') {
+    const focusable = [getEl('executeClearAllBtn'), getEl('closeClearModalBtn')].filter(Boolean);
+    if (focusable.length < 2) return;
+    if (e.shiftKey && document.activeElement === focusable[0]) {
+      e.preventDefault(); focusable[focusable.length - 1].focus();
+    } else if (!e.shiftKey && document.activeElement === focusable[focusable.length - 1]) {
+      e.preventDefault(); focusable[0].focus();
+    }
+  }
+});
 
 // Inaktivitetstimer
 const continueSessionBtn=getEl('continueSessionBtn'); if(continueSessionBtn) continueSessionBtn.addEventListener('click',resetTimer);

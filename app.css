@@ -98,6 +98,16 @@ html, body {
   transition: background 0.3s, color 0.3s;
 }
 
+/* ── Noscript-fallback ── */
+.noscript-msg {
+  padding: 20px 24px;
+  background: var(--amber-bg);
+  border-bottom: 1px solid var(--amber-border);
+  color: var(--text);
+  font-size: 14px;
+  text-align: center;
+}
+
 /* ════════════════════════════════════════════
    APP SHELL — centrerad max-bredd
    ════════════════════════════════════════════ */

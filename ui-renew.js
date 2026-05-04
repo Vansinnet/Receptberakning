@@ -17,12 +17,13 @@ function buildMedList() {
 
     const btn = el('button', {
       cls:     'med-item' + (i === activeMedIdx ? ' active' : ''),
-      attrs:   { role: 'listitem' },
       dataset: { idx: String(i) },
     });
     btn.appendChild(dot); btn.appendChild(info);
     btn.addEventListener('click', () => selectMed(i));
-    list.appendChild(btn);
+    const li = el('div', { attrs: { role: 'listitem' } });
+    li.appendChild(btn);
+    list.appendChild(li);
   }
 }
 
