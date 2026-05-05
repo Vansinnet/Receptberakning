@@ -106,7 +106,7 @@ function clearCurrentCard() {
   renderFormForMed(i);
   renderResultForMed(i);
   ['medInput','doseInput','amtInput','refInput','leftInput'].forEach(id => {
-    const el=getEl(id); if (el) el.value='';
+    const inputEl=getEl(id); if (inputEl) inputEl.value='';
     setFieldError(id, '');
   });
   const dateEl = getEl('dateInput'); if (dateEl) dateEl.value=todayStr();
@@ -312,11 +312,11 @@ const continueSessionBtn=getEl('continueSessionBtn'); if(continueSessionBtn) con
 // Datum-cache och omräkning vid fönsterfokus
 function recalcOnDateChange() {
   _todayCache=null; _todayCacheKey='';
-  if (states[activeMedIdx]&&states[activeMedIdx].valid) calc();
+  if (states[activeMedIdx]) calc();
   // Kör bara om läkaren har börjat fylla i långtidsfliken — annars rensas ett
   // tomt formulär i onödan vid varje fönsterreaktivering.
-  const ltDoseEl = getEl('lt-dose');
-  if (ltDoseEl && ltDoseEl.value) calcLongterm();
+  const doseEl = getEl('lt-dose');
+  if (doseEl && doseEl.value) calcLongterm();
 }
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden) recalcOnDateChange(); });
 window.addEventListener('focus',recalcOnDateChange);

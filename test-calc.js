@@ -839,6 +839,353 @@ test('dos=0 → packages=0', () => {
 
 
 // ═══════════════════════════════════════════════════════════
+// validateValues — TESTER
+// ═══════════════════════════════════════════════════════════
+
+group('validateValues — inmatningsvalidering');
+
+const validateValues = ctx.validateValues;
+
+test('komplett giltig indata → valid:true med parsade värden', () => {
+  const r = validateValues('Elvanse 50 mg', '2025-01-01', '1', '100', '3', '');
+  assertEqual(r.valid, true);
+  assertEqual(r.amt,  100, 'amt');
+  assertEqual(r.dose, 1,   'dose');
+  assertEqual(r.ref,  3,   'ref');
+  assertEqual(r.remaining, null, 'remaining ska vara null när leftRaw är tom');
+});
+
+test('remaining ifyllt → remaining parsas korrekt', () => {
+  const r = validateValues('Elvanse 50 mg', '2025-01-01', '1', '100', '3', '40');
+  assertEqual(r.valid, true);
+  assertEqual(r.remaining, 40);
+});
+
+test('dateVal.length > 10 → invalid_date med fieldErrors.dateInput satt (fix: bugg 2)', () => {
+  // Tidigare returnerade funktionen med fieldErrors.dateInput='' → fältet markerades aldrig rött
+  const r = validateValues('Elvanse 50 mg', '2025-01-01-extra', '1', '100', '3', '');
+  assertEqual(r.valid, false);
+  assertEqual(r.reason, 'invalid_date');
+  assert(r.fieldErrors.dateInput !== '', 'fieldErrors.dateInput ska innehålla feltext');
+});
+
+test('framtida datum → invalid_date med fieldErrors.dateInput', () => {
+  const r = validateValues('Elvanse 50 mg', '2030-06-15', '1', '100', '3', '');
+  assertEqual(r.valid, false);
+  assertEqual(r.reason, 'invalid_date');
+  assert(r.fieldErrors.dateInput !== '', 'fieldErrors.dateInput ska vara satt för framtida datum');
+});
+
+test('dos > 50 → incomplete med fieldErrors.doseInput', () => {
+  const r = validateValues('Elvanse 50 mg', '2025-01-01', '99', '100', '3', '');
+  assertEqual(r.valid, false);
+  assert(r.fieldErrors.doseInput !== '', 'fieldErrors.doseInput ska vara satt');
+});
+
+test('ref = 12 → valid (max tillåtet)', () => {
+  const r = validateValues('Elvanse 50 mg', '2025-01-01', '1', '100', '12', '');
+  assertEqual(r.valid, true);
+  assertEqual(r.ref, 12);
+});
+
+test('ref = 13 → too_many_refs med fieldErrors.refInput', () => {
+  const r = validateValues('Elvanse 50 mg', '2025-01-01', '1', '100', '13', '');
+  assertEqual(r.valid, false);
+  assertEqual(r.reason, 'too_many_refs');
+  assert(r.fieldErrors.refInput !== '', 'fieldErrors.refInput ska vara satt');
+});
+
+test('remaining negativt → incomplete med fieldErrors.leftInput', () => {
+  const r = validateValues('Elvanse 50 mg', '2025-01-01', '1', '100', '3', '-1');
+  assertEqual(r.valid, false);
+  assert(r.fieldErrors.leftInput !== '', 'fieldErrors.leftInput ska vara satt');
+});
+
+test('läkemedelsnamn > 100 tecken → incomplete med fieldErrors.medInput', () => {
+  const r = validateValues('A'.repeat(101), '2025-01-01', '1', '100', '3', '');
+  assertEqual(r.valid, false);
+  assert(r.fieldErrors.medInput !== '', 'fieldErrors.medInput ska vara satt');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// calcLongtermCore — spanError (ny fix)
+// ═══════════════════════════════════════════════════════════
+
+group('calcLongtermCore — spanError (>50 år, ny fix)');
+
+test('period >50 år → spanError:true, exkluderas utan att start/slut-fel markeras', () => {
+  // 1970-06-15 → 2025-06-15 = ~55 år = ~20 075 dagar > 18 250 (365×50).
+  // Båda datumen är giltiga (1950–2100) och start < slut — fälten ska inte
+  // flaggas som startError/endError, utan enbart som spanError.
+  const r = calcLongtermCore('Test 10 mg', 1, [{ start: '1970-06-15', end: '2025-06-15', total: '100' }]);
+  assertEqual(r.periodErrors[0].spanError,    true,  'spanError ska vara true');
+  assertEqual(r.periodErrors[0].startError,   false, 'startError ska vara false (datumet är giltigt)');
+  assertEqual(r.periodErrors[0].endError,     false, 'endError ska vara false (datumet är giltigt)');
+  assertEqual(r.valid, false, 'ingen giltig period kvar → valid:false');
+});
+
+test('normal period → spanError:false', () => {
+  const r = calcLongtermCore('Test 10 mg', 1, [makePeriod(90, 0, 90)]);
+  assertEqual(r.periodErrors[0].spanError, false, 'spanError ska vara false för normal period');
+});
+
+test('en giltig + en >50-årsperiod → den giltiga beräknas, den långa exkluderas', () => {
+  // Säkerställer att spanError inte smittar av sig på korrekta perioder
+  // och att kalkylresultatet enbart baseras på den giltiga perioden.
+  const r = calcLongtermCore('Test 10 mg', 1, [
+    { start: '1970-06-15', end: '2025-06-15', total: '100' },
+    makePeriod(90, 0, 90),
+  ]);
+  assertEqual(r.periodErrors[0].spanError, true,  'första perioden ska ha spanError');
+  assertEqual(r.periodErrors[1].spanError, false, 'andra perioden ska sakna spanError');
+  assertEqual(r.valid, true, 'en giltig period finns → valid:true');
+  assertEqual(r.periods.length, 1, 'bara den korta perioden ska inkluderas i beräkning');
+  assertEqual(r.totalTablets, 90, 'totalTablets ska vara från den giltiga perioden');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// HJÄLPARE FÖR TEXTGENERERINGSTESTER
+// ═══════════════════════════════════════════════════════════
+
+const buildPatientText = ctx.buildPatientText;
+const buildJournalText = ctx.buildJournalText;
+
+// Minimal state för ett läkemedel i normalfall (OK att förnya).
+// MOCK_TODAY = 2025-06-15; prescribedEnd 2025-06-25 = 10 dagar kvar.
+// earlyThreshold = round(300 × 0.20) = 60 → 10 < 60 → ej isTooEarly.
+function makeRenewState(overrides = {}) {
+  return {
+    medRaw:               'Elvanse 50 mg',
+    pDateStr:             '2024-09-28',
+    total:                300,
+    dose:                 1,
+    prescribedEndDateStr: '2025-06-25',
+    displayAvgStr:        '1.00 st/dag',
+    avgNote:              '(beräknat under antagandet att alla tillgängliga doser är förbrukade)',
+    remainingDoses:       null,
+    daysRemaining:        10,
+    daysToPrescribedEnd:  10,
+    earlyRenewalDecision: null,
+    ...overrides,
+  };
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// buildPatientText — TESTER
+// ═══════════════════════════════════════════════════════════
+
+group('buildPatientText — patientbrev (sv)');
+
+test('single toRenew → brev innehåller läkemedelsnamn, handläggningstid och kontaktinfo', () => {
+  setTestState(0, makeRenewState());
+  const text = buildPatientText('sv', [{ name: 'Elvanse 50 mg', i: 0 }], [], [], 1);
+  assertContains(text, 'Elvanse 50 mg', 'brevet ska innehålla läkemedelsnamnet');
+  assertContains(text, '2–3 arbetsdagar', 'brevet ska ange handläggningstid');
+  assertContains(text, '1177', 'brevet ska innehålla kontaktinformation');
+});
+
+test('single tooEarly → brev innehåller beräknat slutdatum och förnyelsedatum', () => {
+  setTestState(0, makeRenewState({
+    prescribedEndDateStr: '2025-12-31',
+    renewDateStr:         '2025-10-12',
+    daysToPrescribedEnd:  199,
+  }));
+  const text = buildPatientText('sv', [], [{ name: 'Elvanse 50 mg', i: 0 }], [], 1);
+  assertContains(text, '2025-12-31', 'brevet ska innehålla beräknat slutdatum');
+  assertContains(text, '2025-10-12', 'brevet ska innehålla förnyelsedatum');
+});
+
+test('single overuse, prescribedEnd passerat → brev anger att receptet kan förnyas nu', () => {
+  // parseDateUTC('2025-01-01') < MOCK_TODAY(2025-06-15) → prescribedEndPast=true → closingEndPast
+  setTestState(0, makeRenewState({
+    prescribedEndDateStr:      '2025-01-01',
+    prescribedContactIsPast:   true,
+    prescribedContactDateStr:  '2025-06-15',
+  }));
+  const text = buildPatientText('sv', [], [], [{ name: 'Elvanse 50 mg', i: 0 }], 1);
+  assertContains(text, 'förnyas', 'brevet ska indikera att receptet nu kan förnyas');
+});
+
+test('single overuse, prescribedEnd i framtiden → brev innehåller kontaktdatum', () => {
+  // parseDateUTC('2025-09-01') > MOCK_TODAY → prescribedEndPast=false → closingFuture
+  setTestState(0, makeRenewState({
+    prescribedEndDateStr:      '2025-09-01',
+    prescribedContactIsPast:   false,
+    prescribedContactDateStr:  '2025-08-25',
+  }));
+  const text = buildPatientText('sv', [], [], [{ name: 'Elvanse 50 mg', i: 0 }], 1);
+  assertContains(text, '2025-08-25', 'brevet ska innehålla datum för när patienten ska höra av sig');
+});
+
+test('multi: två läkemedel att förnya → multiIntro + båda namnen', () => {
+  setTestState(0, makeRenewState({ medRaw: 'Elvanse 50 mg' }));
+  setTestState(1, makeRenewState({ medRaw: 'Melatonin 3 mg' }));
+  const text = buildPatientText(
+    'sv',
+    [{ name: 'Elvanse 50 mg', i: 0 }, { name: 'Melatonin 3 mg', i: 1 }],
+    [], [], 2
+  );
+  assertContains(text, 'Elvanse 50 mg',  'brevet ska innehålla första läkemedlet');
+  assertContains(text, 'Melatonin 3 mg', 'brevet ska innehålla andra läkemedlet');
+});
+
+test('multi: ett att förnya, ett för tidigt → båda hanteras med rätt text', () => {
+  setTestState(0, makeRenewState({ medRaw: 'Elvanse 50 mg' }));
+  setTestState(1, makeRenewState({
+    medRaw:               'Melatonin 3 mg',
+    prescribedEndDateStr: '2025-12-31',
+    renewDateStr:         '2025-10-12',
+    daysToPrescribedEnd:  199,
+  }));
+  const text = buildPatientText(
+    'sv',
+    [{ name: 'Elvanse 50 mg',  i: 0 }],
+    [{ name: 'Melatonin 3 mg', i: 1 }],
+    [], 2
+  );
+  assertContains(text, '2–3 arbetsdagar', 'Elvanse ska förnyas med normal handläggningstid');
+  assertContains(text, '2025-10-12',      'Melatonin ska ha förnyelsedatum');
+});
+
+test('engelsk version → brev på engelska med rätt terminologi', () => {
+  setTestState(0, makeRenewState());
+  const text = buildPatientText('en', [{ name: 'Elvanse 50 mg', i: 0 }], [], [], 1);
+  assertContains(text, 'working days', 'engelskt brev ska använda "working days"');
+  assertContains(text, '1177',         'kontaktinfo ska finnas även på engelska');
+});
+
+test('okänt språk faller tillbaka på svenska', () => {
+  setTestState(0, makeRenewState());
+  const textSv = buildPatientText('sv', [{ name: 'Elvanse 50 mg', i: 0 }], [], [], 1);
+  const textXx = buildPatientText('xx', [{ name: 'Elvanse 50 mg', i: 0 }], [], [], 1);
+  assertEqual(textSv, textXx, 'okänt språk ska ge samma text som svenska');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// buildJournalText — TESTER
+// ═══════════════════════════════════════════════════════════
+
+group('buildJournalText — journalanteckning');
+
+test('single toRenew → journaltext innehåller kontaktorsak, dosuppgifter och åtgärd', () => {
+  setTestState(0, makeRenewState());
+  const text = buildJournalText([{ name: 'Elvanse 50 mg', i: 0 }], [], [], 1);
+  assertContains(text, 'Receptförnyelse via 1177', 'ska innehålla kontaktorsak');
+  assertContains(text, 'Nytt recept utfärdat',     'ska innehålla åtgärd');
+  assertContains(text, 'Elvanse 50 mg',            'ska innehålla läkemedelsnamn');
+  assertContains(text, '1 st/dag',                 'ska innehålla ordinerad dos');
+  assertContains(text, '300',                      'ska innehålla totalt antal doser');
+});
+
+test('single toRenew (earlyRenewal=overuse) → journaltext dokumenterar klinisk bedömning', () => {
+  setTestState(0, makeRenewState({ displayAvgStr: '1.50 st/dag' }));
+  const text = buildJournalText(
+    [{ name: 'Elvanse 50 mg', i: 0, earlyRenewal: 'overuse' }],
+    [], [], 1
+  );
+  assertContains(text, 'klinisk indikation', 'klinisk bedömning ska dokumenteras i journalen');
+  assertContains(text, '1.50 st/dag',        'snittförbrukning ska finnas med');
+});
+
+test('single toRenew (earlyRenewal=tooEarly) → journaltext nämner kvarvarande dagar', () => {
+  setTestState(0, makeRenewState({
+    prescribedEndDateStr: '2025-09-01',
+    daysToPrescribedEnd:  78,
+  }));
+  const text = buildJournalText(
+    [{ name: 'Elvanse 50 mg', i: 0, earlyRenewal: 'tooEarly' }],
+    [], [], 1
+  );
+  assertContains(text, '78',              'ska nämna antal kvarvarande dagar');
+  assertContains(text, 'klinisk indikation', 'ska dokumentera klinisk bedömning');
+});
+
+test('single tooEarly → journaltext innehåller "Ej förnyat" och beräknat slutdatum', () => {
+  setTestState(0, makeRenewState({
+    prescribedEndDateStr: '2025-12-31',
+    daysToPrescribedEnd:  199,
+  }));
+  const text = buildJournalText([], [{ name: 'Elvanse 50 mg', i: 0 }], [], 1);
+  assertContains(text, 'Ej förnyat',  'ska markera att receptet ej förnyades');
+  assertContains(text, '199',         'ska innehålla antal dagar kvar');
+  assertContains(text, '2025-12-31', 'ska innehålla beräknat slutdatum');
+});
+
+test('single overuse utan beslut → platshållare för åtgärd i journalen', () => {
+  setTestState(0, makeRenewState({
+    prescribedEndDateStr: '2025-09-01',
+    daysRemaining:        78,
+    earlyRenewalDecision: null,
+  }));
+  const text = buildJournalText([], [], [{ name: 'Elvanse 50 mg', i: 0 }], 1);
+  assertContains(text, '[Nytt recept utfärdat', 'platshållare ska finnas för läkarens val');
+});
+
+test('single overuse med beslut "no" → "Ej förnyat" i åtgärdsraden', () => {
+  setTestState(0, makeRenewState({
+    prescribedEndDateStr: '2025-09-01',
+    daysRemaining:        78,
+    earlyRenewalDecision: 'no',
+  }));
+  const text = buildJournalText([], [], [{ name: 'Elvanse 50 mg', i: 0 }], 1);
+  assertContains(text, 'Ej förnyat efter klinisk', 'ska dokumentera att receptet nekades');
+});
+
+test('single overuse med kvarvarande doser → dagar kvar framgår av journalen', () => {
+  setTestState(0, makeRenewState({
+    prescribedEndDateStr: '2025-09-01',
+    daysRemaining:        30,
+    remainingDoses:       30,
+    earlyRenewalDecision: null,
+  }));
+  const text = buildJournalText([], [], [{ name: 'Elvanse 50 mg', i: 0 }], 1);
+  assertContains(text, '30 doser', 'kvarvarande doser ska anges i journalen');
+});
+
+test('multi: toRenew + tooEarly → summering listar rätt läkemedel', () => {
+  setTestState(0, makeRenewState({ medRaw: 'Elvanse 50 mg' }));
+  setTestState(1, makeRenewState({
+    medRaw:               'Melatonin 3 mg',
+    prescribedEndDateStr: '2025-12-31',
+    daysToPrescribedEnd:  199,
+  }));
+  const text = buildJournalText(
+    [{ name: 'Elvanse 50 mg',  i: 0 }],
+    [{ name: 'Melatonin 3 mg', i: 1 }],
+    [], 2
+  );
+  assertContains(text, 'Recept utfärdat för: Elvanse 50 mg', 'summering ska lista förnyade läkemedel');
+  assertContains(text, 'Melatonin 3 mg', 'ej förnyat läkemedel ska nämnas i journalen');
+  assertContains(text, 'Ej förnyat — för tidigt', 'orsak till avslag ska framgå');
+});
+
+test('multi: enbart overuse → "Inga recept utfärdade" i summering', () => {
+  setTestState(0, makeRenewState({
+    prescribedEndDateStr: '2025-09-01',
+    daysRemaining:        78,
+    earlyRenewalDecision: null,
+  }));
+  setTestState(1, makeRenewState({
+    medRaw:               'Melatonin 3 mg',
+    prescribedEndDateStr: '2025-10-01',
+    daysRemaining:        108,
+    earlyRenewalDecision: null,
+  }));
+  const text = buildJournalText(
+    [],
+    [],
+    [{ name: 'Elvanse 50 mg', i: 0 }, { name: 'Melatonin 3 mg', i: 1 }],
+    2
+  );
+  assertContains(text, 'Inga recept utfärdade', 'ska ange att inga recept förnyades');
+});
+
+
+// ═══════════════════════════════════════════════════════════
 // SAMMANFATTNING
 // ═══════════════════════════════════════════════════════════
 

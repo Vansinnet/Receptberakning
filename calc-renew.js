@@ -9,7 +9,10 @@ function validateValues(medRaw, dateVal, doseRaw, amtRaw, refRaw, leftRaw) {
     fieldErrors.medInput = 'Läkemedelsnamnet får inte överstiga 100 tecken.';
     return { valid: false, reason: 'incomplete', fieldErrors };
   }
-  if (dateVal.length > 10)  return { valid: false, reason: 'invalid_date', fieldErrors };
+  if (dateVal.length > 10) {
+    fieldErrors.dateInput = 'Ogiltigt datum.';
+    return { valid: false, reason: 'invalid_date', fieldErrors };
+  }
 
   const amt = parseInt(amtRaw, 10);
   const amtIsInvalid = amtRaw !== '' && (isNaN(amt) || amt <= 0 || amt > 10000 || !Number.isInteger(Number(amtRaw)));
@@ -120,7 +123,7 @@ function calcCore(inputData, prev) {
 
   if (totalDays > 3650) {
     return {
-      valid: true, isOveruse: false, isTooEarly: false,
+      valid: true, calculable: false, isOveruse: false, isTooEarly: false,
       verdictTitle: 'Orimliga värden',
       verdictSub:   'Beräknad tid överstiger 10 år.',
       metrics: [],
@@ -140,7 +143,7 @@ function calcCore(inputData, prev) {
   if (hasRemaining) {
     if (remaining > total) {
       return {
-        valid: true, isOveruse: false, isTooEarly: false,
+        valid: true, calculable: false, isOveruse: false, isTooEarly: false,
         verdictTitle: 'Orimligt värde',
         verdictSub:   `Kvarvarande (${remaining}) kan inte överstiga totalt förskrivet (${total}).`,
         metrics: [], alerts: [],

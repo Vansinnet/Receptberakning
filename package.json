@@ -1,0 +1,13 @@
+{
+  "name": "receptberakning",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node test-calc.js && node test-ui.js",
+    "test:calc": "node test-calc.js",
+    "test:ui": "node test-ui.js"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.1"
+  }
+}

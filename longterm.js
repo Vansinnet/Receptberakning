@@ -2,6 +2,7 @@
 function buildPeriodContainer() {
   const container = getEl('lt-periods-container');
   if (!container) return;
+  try {
   container.textContent = '';
 
   ltPeriods.forEach((period, i) => {
@@ -53,6 +54,11 @@ function buildPeriodContainer() {
 
     container.appendChild(wrap);
   });
+  } catch (err) {
+    console.error('buildPeriodContainer:', err.message, err);
+    container.textContent = '';
+    container.appendChild(buildAlertEl('warn', null, 'Periodlistan kunde inte visas. Försök ladda om sidan.'));
+  }
 }
 
 function addPeriod() {
@@ -102,11 +108,17 @@ function calcLongtermCore(medRaw, ordDose, rawPeriods) {
       startError: !!(p.start !== '' && (!startDate || startDate > today)),
       endError:   !!(p.end   !== '' && (!endDate   || (startDate && endDate <= startDate))),
       totalError: !!(p.total !== '' && (isNaN(totalVal) || totalVal <= 0)),
+      spanError:  false,
     });
 
     if (startDate && endDate && !isNaN(totalVal) && totalVal > 0 && startDate < endDate) {
       const days = getDaysDiff(endDate, startDate);
-      if (days === 0 || days > 365 * 50) continue;
+      if (days === 0 || days > 365 * 50) {
+        // Perioden är felfri i sig men orimligt lång — markera start+slutdatum
+        // så att läkaren ser vilket par som exkluderades, utan tyst felkalkyl.
+        periodErrors[periodErrors.length - 1].spanError = true;
+        continue;
+      }
       periods.push({ startDate, endDate, total: totalVal, days, avgPerDay: totalVal / days });
     }
   }
@@ -219,9 +231,9 @@ function calcLongterm() {
   }
 
   // Periodfältsfel appliceras alltid, oavsett om övriga fält är giltiga
-  result.periodErrors.forEach(({ idx, startError, endError, totalError }) => {
-    toggleError(getEl(`lt-start-${idx}`), startError);
-    toggleError(getEl(`lt-end-${idx}`),   endError);
+  result.periodErrors.forEach(({ idx, startError, endError, totalError, spanError }) => {
+    toggleError(getEl(`lt-start-${idx}`), startError || spanError);
+    toggleError(getEl(`lt-end-${idx}`),   endError   || spanError);
     toggleError(getEl(`lt-total-${idx}`), totalError);
   });
 

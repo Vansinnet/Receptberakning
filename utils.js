@@ -130,11 +130,11 @@ function getDaysDiff(d1,d2) { return Math.round((d1-d2)/86400000); }
 function extractDoseUnit(medRaw) {
   // Längre former (mikrogram, microgram, gram) måste stå före kortare (µg, mcg, g)
   // så att t.ex. "50 gram" inte felmatchar på enbart "g".
-  const m = medRaw.match(/(\d+(?:[.,]\d+)?)\s*(mg|ml|µg|mikrogram|microgram|mcg|nanogram|gram|ng|g)\b/i);
+  const m = medRaw.match(/(\d+(?:[.,]\d+)?)\s*(mg|ml|µg|mikrogram|microgram|mcg|nanogram|gram|ng|IU|IE|g)\b/i);
   if (!m) return null;
   const amount  = parseFloat(m[1].replace(',', '.'));
   const rawUnit = m[2].toLowerCase();
-  const NORMALIZE = { mikrogram: 'µg', microgram: 'µg', mcg: 'µg', nanogram: 'ng', gram: 'g' };
+  const NORMALIZE = { mikrogram: 'µg', microgram: 'µg', mcg: 'µg', nanogram: 'ng', gram: 'g', ie: 'IE', iu: 'IE' };
   const unit = NORMALIZE[rawUnit] ?? rawUnit;
   return { amount, unit };
 }
