@@ -1,18 +1,7 @@
 Roadmap
 1) Kort sikt
-
-Förbättring #1: CENTRALISERA STATE-MUTATIONER – detta ger störst långsiktig vinst ✅
-
-Förbättring #2: MINSKA ONÖDIGA NULL-CHECKS – gör detta direkt efter centraliseringen (då blir det ännu tydligare vilka checks som är onödiga) ✅
-
-Förbättring #3: SKAPA ANVÄNDARGUIDE – dokumentation ✅
-
-Förbättring #4: UPPDATERA test-calc.js
-Vi har viktig logik i prescribe.js som behöver inkluderas i test-calc.js ✅
-
-Förbättring #5: Öka inaktivitetstimern till 15 minuter. 5 minuter är för aggressivt, då läkaren kan bli störd under användning av andra ärenden och därmed vara borta från verktyget. Infoga kommentar om varför 10 minuter besämts och att det är ett aktivt val. Uppdatera sedan userguide.md och ev. readme.md om den nya tidsgränsen ✅
-
-Förbättring #6: Print-stödet är bra men kunde visa prescribe-sammanställningen tydligare.
+Fixa ett test av både ui och calc, merga dem till ett test där resultatet tydligt delar in ui i en del och calc i en del.
+Förbättring #1: Print-stödet är bra men kunde visa prescribe-sammanställningen tydligare.
 
 
 2) Inom några veckor (någon gång under maj -26)
