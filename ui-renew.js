@@ -101,7 +101,8 @@ function renderResultForMed(i) {
   if (vBox) {
     const decidedYes = s.earlyRenewalDecision === 'yes';
     const vType = (s.isOveruse || s.isTooEarly) && decidedYes ? 'ok'
-      : s.isOveruse  ? 'danger'
+      : s.isOveruse && !s.unreliableAvg ? 'danger'
+      : s.isOveruse  ? 'warn'
       : s.isTooEarly ? 'warn'
       : 'ok';
     vBox.className = 'verdict verdict-' + vType;
@@ -119,7 +120,12 @@ function renderResultForMed(i) {
   if (s.calculable === true && s.tlPct !== undefined) {
     if (tlFill) {
       tlFill.style.width = Math.min(100, s.tlPct) + '%';
-      tlFill.className   = 'tl-fill tl-fill-' + (s.isOveruse ? 'danger' : s.isTooEarly ? 'warn' : 'ok');
+      tlFill.className   = 'tl-fill tl-fill-' + (
+        s.isOveruse && !s.unreliableAvg ? 'danger'
+        : s.isOveruse                   ? 'warn'
+        : s.isTooEarly                  ? 'warn'
+        : 'ok'
+      );
     }
     if (tlStart) tlStart.textContent = s.tlStart || '—';
     if (tlEnd)   tlEnd.textContent   = s.tlEnd   || '—';

@@ -463,6 +463,64 @@ test('avgNote skiljer sig beroende på om remaining är ifyllt', () => {
 });
 
 
+group('Kantfall: opålitlig snittberäkning (recept yngre än ett uttag)');
+
+test('ref=12, daysSince=10, dose=1, amt=30 → unreliableAvg=true, isOveruse behålls, alert.type="warn"', () => {
+  // Det rapporterade scenariot: nyligen utfärdat 12-uttagsrecept där modellens
+  // total/daysSince ger artificiellt högt snitt (36 st/dag).
+  const r = calcCore(makeInput({ amt: 30, dose: 1, ref: 12, daysSince: 10 }), NO_PREV);
+  assertEqual(r.unreliableAvg, true);
+  assertEqual(r.isOveruse, true, 'isOveruse behålls så earlyDecisionBox visas');
+  const danger = r.alerts.find(a => a.type === 'danger');
+  assert(!danger, 'ingen danger-alert ska finnas vid opålitligt snitt');
+  const warn = r.alerts.find(a => a.title === 'Snittberäkning ej tillförlitlig');
+  assert(warn, '"Snittberäkning ej tillförlitlig"-warn saknas');
+});
+
+test('opålitligt snitt → metrics-cls för Snittförbrukning är inte "danger"', () => {
+  const r = calcCore(makeInput({ amt: 30, dose: 1, ref: 12, daysSince: 10 }), NO_PREV);
+  const m = r.metrics.find(x => x.label === 'Snittförbrukning');
+  assert(m, 'Snittförbrukning saknas i metrics');
+  assert(m.cls !== 'danger', `cls var "${m.cls}", förväntade icke-danger`);
+});
+
+test('opålitligt snitt → verdictTitle innehåller "bedömning krävs" (för earlyDecisionBox)', () => {
+  // Säkerställer att läkaren fortfarande styrs till klinisk bedömning.
+  const r = calcCore(makeInput({ amt: 30, dose: 1, ref: 12, daysSince: 10 }), NO_PREV);
+  assertContains(r.verdictTitle, 'bedömning krävs');
+});
+
+test('opålitligt snitt + remaining ifyllt → unreliableAvg=false (snittet blir meningsfullt)', () => {
+  // När läkaren bidrar med kvarvarande doser räknas avg på consumed, inte total/daysSince.
+  // Då gäller modellens vanliga semantik och varningstypen ska vara den befintliga danger-alerten.
+  const r = calcCore(makeInput({ amt: 30, dose: 1, ref: 12, daysSince: 10, remaining: 0 }), NO_PREV);
+  assertEqual(r.unreliableAvg, false);
+});
+
+test('gränsfall daysSince=batchDuration → unreliableAvg=false (strikt mindre än)', () => {
+  // amt=30, dose=1 → batchDuration=30. daysSince=30 ska INTE klassas som opålitligt.
+  const r = calcCore(makeInput({ amt: 30, dose: 1, ref: 6, daysSince: 30 }), NO_PREV);
+  assertEqual(r.unreliableAvg, false);
+});
+
+test('gränsfall daysSince=batchDuration-1 → unreliableAvg=true', () => {
+  const r = calcCore(makeInput({ amt: 30, dose: 1, ref: 6, daysSince: 29 }), NO_PREV);
+  assertEqual(r.unreliableAvg, true);
+});
+
+test('avg över ordination med pålitligt snitt → danger-alert behålls (inte warn)', () => {
+  // amt=10, dose=1, ref=3 → batchDuration=10, totalDays=30.
+  // daysSince=15 ≥ batchDuration → unreliableAvg=false.
+  // avg = (10×3)/15 = 2.0 > dose×1.10 = 1.10 ✓
+  // daysToPrescribedEnd = 30-15 = 15 > 14 ✓ → isOveruse=true → danger.
+  const r = calcCore(makeInput({ amt: 10, dose: 1, ref: 3, daysSince: 15 }), NO_PREV);
+  assertEqual(r.unreliableAvg, false);
+  assertEqual(r.isOveruse, true);
+  const danger = r.alerts.find(a => a.type === 'danger' && a.title === 'Förbrukning överstiger ordination');
+  assert(danger, 'danger-alert "Förbrukning överstiger ordination" saknas vid pålitligt högt snitt');
+});
+
+
 // ═══════════════════════════════════════════════════════════
 // HJÄLPARE FÖR LONGTERM-TESTER
 // ═══════════════════════════════════════════════════════════
