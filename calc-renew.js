@@ -337,7 +337,7 @@ function calc(i = activeMedIdx) {
   // UI-preferenser sätts efter en fullständig lyckad beräkning
   if (derived.valid && derived.calculable !== false) {
     setMedUIPreference(i, 'activeTab',   states[i].activeTab || 'patient');
-    setMedUIPreference(i, 'patientLang', 'sv');
+    setMedUIPreference(i, 'patientLang', states[i].patientLang || 'sv');
   }
 
   buildMedList();
