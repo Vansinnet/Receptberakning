@@ -10,7 +10,6 @@ function buildPeriodContainer() {
 
     const row = el('div', { cls: 'form-row-3', attrs: { id: `lt-period-${i}` } });
 
-    // Skapar ett formulärfält med label och input — återanvänds för alla tre kolumner
     function makeField(forId, labelText, tooltip, inputAttrs, inputValue) {
       const field = el('div', { cls: 'field' });
       field.appendChild(el('label', { attrs: { for: forId, 'data-tooltip': tooltip }, text: labelText }));

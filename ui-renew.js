@@ -64,14 +64,15 @@ function renderFormForMed(i) {
 }
 
 function saveFormValues(i) {
-  const medRaw = (getEl('medInput') || {}).value || '';
+  const medRaw = getEl('medInput').value.trim();
+  const leftEl = getEl('leftInput');
   applyMedStatePatch(i, {
     medRaw,
-    dateVal: (getEl('dateInput') || {}).value || todayStr(),
-    doseRaw: (getEl('doseInput') || {}).value || '',
-    amtRaw:  (getEl('amtInput')  || {}).value || '',
-    refRaw:  (getEl('refInput')  || {}).value || '',
-    leftRaw: (getEl('leftInput') || {}).value || '',
+    dateVal: getEl('dateInput').value || todayStr(),
+    doseRaw: getEl('doseInput').value || '',
+    amtRaw:  getEl('amtInput').value  || '',
+    refRaw:  getEl('refInput').value  || '',
+    leftRaw: leftEl ? leftEl.value    : '',
     medName: medRaw || `Läkemedel ${i + 1}`,
   });
 }

@@ -11,10 +11,10 @@ let warnTimer, clearTimer, countdownInt;
 const calcDebounced = [];
 function ensureDebounce(i) {
   if (calcDebounced[i]) return;
-  while (calcDebounced.length <= i) {
-    const idx = calcDebounced.length;
-    calcDebounced.push(debounce(() => calc(idx), 120));
-  }
+  // Fyll luckor med null för att göra index i adresserbart utan att allokera
+  // debounce-instanser för kort som inte existerar än.
+  while (calcDebounced.length < i) calcDebounced.push(null);
+  calcDebounced[i] = debounce(() => calc(i), 120);
 }
 const calcLongtermDebounced = debounce(() => calcLongterm(), 150);
 
@@ -85,12 +85,12 @@ function clearCurrentCard() {
     spliceMedCard(i);
 
     // calcDebounced-closures innehåller fasta idx-värden — avbryt väntande timers och bygg om från grunden
-    calcDebounced.forEach(d => d.cancel());
+    calcDebounced.forEach(d => d && d.cancel());
     calcDebounced.length = 0;
     for (let j = 0; j < states.length; j++) ensureDebounce(j);
 
     setActiveMed(Math.min(i, states.length - 1));
-    _prescribePanelBuiltFor = null;
+    resetPrescribePanel();
     buildMedList();
     renderFormForMed(activeMedIdx);
     renderResultForMed(activeMedIdx);
@@ -101,7 +101,7 @@ function clearCurrentCard() {
   // Enda kvarvarande läkemedel — nollställ formuläret
   setMedState(i, { activeTab:'patient', patientLang:'sv' });
   initPrescribeState(i, null);
-  _prescribePanelBuiltFor = null;
+  resetPrescribePanel();
   buildMedList();
   renderFormForMed(i);
   renderResultForMed(i);
@@ -305,7 +305,10 @@ const continueSessionBtn=getEl('continueSessionBtn'); if(continueSessionBtn) con
 function recalcOnDateChange() {
   _todayCache=null; _todayCacheKey='';
   if (states[activeMedIdx]&&states[activeMedIdx].valid) calc();
-  if (ltPeriods.length > 0) calcLongterm();
+  // Kör bara om läkaren har börjat fylla i långtidsfliken — annars rensas ett
+  // tomt formulär i onödan vid varje fönsterreaktivering.
+  const ltDoseEl = getEl('lt-dose');
+  if (ltDoseEl && ltDoseEl.value) calcLongterm();
 }
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden) recalcOnDateChange(); });
 window.addEventListener('focus',recalcOnDateChange);
@@ -350,9 +353,9 @@ resetTimer();
   }
 
   document.addEventListener('mouseover', e => {
-    const el = e.target.closest('[data-tooltip]');
-    if (!el) return;
-    bubble.textContent = el.dataset.tooltip;
+    const tooltipTarget = e.target.closest('[data-tooltip]');
+    if (!tooltipTarget) return;
+    bubble.textContent = tooltipTarget.dataset.tooltip;
     bubble.classList.add('visible');
   });
   document.addEventListener('mousemove', e => {

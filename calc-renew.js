@@ -5,7 +5,10 @@
 function validateValues(medRaw, dateVal, doseRaw, amtRaw, refRaw, leftRaw) {
   const fieldErrors = { medInput: '', dateInput: '', doseInput: '', amtInput: '', refInput: '', leftInput: '' };
 
-  if (medRaw.length > 100) return { valid: false, reason: 'incomplete', fieldErrors };
+  if (medRaw.length > 100) {
+    fieldErrors.medInput = 'Läkemedelsnamnet får inte överstiga 100 tecken.';
+    return { valid: false, reason: 'incomplete', fieldErrors };
+  }
   if (dateVal.length > 10)  return { valid: false, reason: 'invalid_date', fieldErrors };
 
   const amt = parseInt(amtRaw, 10);
@@ -153,7 +156,10 @@ function calcCore(inputData, prev) {
     }
     const consumed = calcBase - remaining;
     if (consumed < 0) {
-      return { valid: false, statusText: 'Orimliga värden' };
+      // Kontrollflödet borde aldrig nå hit — consumed < 0 är logiskt uteslutet av
+      // earlyPickup-logiken ovan. Om det ändå sker är det ett programmeringsfel.
+      console.error('[calcCore] consumed < 0 — oväntat tillstånd', { calcBase, remaining });
+      return { valid: false, isOveruse: false, isTooEarly: false, statusText: 'Internt fel — kontrollera inmatningen.' };
     }
     avgNum        = consumed / daysSince;
     daysRemaining = Math.floor(remaining / inputData.dose);

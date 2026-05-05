@@ -264,12 +264,19 @@ function renderPrescribeSummary() {
   box.appendChild(wrap);
   } catch (err) {
     console.error('renderPrescribeSummary:', err.message);
+    box.textContent = '';
+    box.appendChild(buildAlertEl('warn', null, 'Sammanställningen kunde inte visas.'));
+    box.style.display = 'block';
   }
 }
 
 // Håller koll på vilket index panelen senast byggdes för, så att vi
 // slipper riva och återbygga DOM:en (och tappa fokus) vid varje debounce-cykel.
 let _prescribePanelBuiltFor = null;
+
+function resetPrescribePanel() {
+  _prescribePanelBuiltFor = null;
+}
 
 /* Visa/dölj och initiera panelen för givet läkemedelsindex */
 function renderPrescribePanel(i) {
