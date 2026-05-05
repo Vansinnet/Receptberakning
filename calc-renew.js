@@ -135,14 +135,6 @@ function calcCore(inputData, prev) {
   const batchesDispensed = Math.min(inputData.ref, Math.floor(daysSince / batchDuration) + 1);
   const accessibleTotal  = Math.min(total, batchesDispensed * inputData.amt);
 
-  // Snittet räknas på total/daysSince när remaining saknas (se grenen längre ned).
-  // Innan ett uttag (~batchDuration dagar) har förflutit är den kvoten inte meningsfull
-  // — den representerar antagandet "allt förbrukat" tillämpat på en datamängd som är
-  // för liten för antagandet (t.ex. 12-uttagsrecept dag 10: 360/10 = 36 st/dag vid dose=1).
-  // Flaggan dämpar varningens severity i UI och text utan att undertrycka isOveruse —
-  // läkaren ska fortfarande ta ställning via earlyDecisionBox.
-  const unreliableAvg = !hasRemaining && daysSince < batchDuration;
-
   let endDate, daysRemaining, avgNum, earlyPickup = false, calcBase = accessibleTotal;
 
   if (hasRemaining) {
@@ -227,18 +219,13 @@ function calcCore(inputData, prev) {
           : ` (slut sedan ${Math.abs(daysToPrescribedEnd)} dagar)`;
         return fmtDate(prescribedEndDate) + note;
       })(), cls: endCls, tooltip: 'Beräknat datum då receptet tar slut vid ordinerad dos. Doser kvar används enbart för att beräkna snittförbrukning.' },
-    { label: 'Snittförbrukning', value: displayAvg, cls: (isOveruse && !unreliableAvg) ? 'danger' : '', tooltip: 'Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dosdagar återstår eller receptperioden har mer än 14 dagar kvar. Snittet är opålitligt innan ett uttag har förbrukats.' },
+    { label: 'Snittförbrukning', value: displayAvg, cls: isOveruse ? 'danger' : '', tooltip: 'Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dosdagar återstår eller receptperioden har mer än 14 dagar kvar.' },
   ];
 
   let verdictTitle, verdictSub;
   if (isOveruse) {
-    if (unreliableAvg) {
-      verdictTitle = 'Tidig bedömning krävs – snittet är ej tillförlitligt';
-      verdictSub   = `Receptet utfärdat för ${daysSince} dagar sedan — färre dagar än ett uttag täcker (${Math.round(batchDuration)} dagar vid ordinerad dos). Snittberäkningen är inte verifierad förbrukning. Bekräfta med patient.`;
-    } else {
-      verdictTitle = 'För tidig förnyelse – bedömning krävs';
-      verdictSub   = `Snitt ${avgNum.toFixed(2)} st/dag överstiger ordination med >10%.`;
-    }
+    verdictTitle = 'För tidig förnyelse – bedömning krävs';
+    verdictSub   = `Snitt ${avgNum.toFixed(2)} st/dag överstiger ordination med >10%.`;
   } else if (isTooEarly) {
     verdictTitle = `För tidigt – ${daysToPrescribedEnd} dagar kvar`;
     verdictSub   = 'Förbrukning OK. Kontakta vården närmre slutdatumet.';
@@ -258,16 +245,8 @@ function calcCore(inputData, prev) {
   const consumptionPct         = (avgNum / inputData.dose) * 100;
   const overuseSupressedBy7day = !isOveruse && daysRemaining <= 7 && avgNum > inputData.dose * 1.10;
   if (isOveruse) {
-    if (unreliableAvg) {
-      alerts.push({
-        type: 'warn',
-        title: 'Snittberäkning ej tillförlitlig',
-        message: `Receptet är ${daysSince} dagar gammalt — färre dagar än ett uttag täcker (${Math.round(batchDuration)} dagar vid ordinerad dos). Snitt ${displayAvg} baseras på modellantagandet att alla hittills tillgängliga doser är förbrukade och kan vara missvisande. Bekräfta faktisk förbrukning med patient innan klinisk bedömning.`,
-      });
-    } else {
-      const daysNote = daysRemaining > 0 ? ` — ${daysRemaining} dagar kvar` : ` — förskrivningen är slut`;
-      alerts.push({ type: 'danger', title: 'Förbrukning överstiger ordination', message: `Snitt ${displayAvg} ${avgNote}${daysNote}. Gör en individuell bedömning.` });
-    }
+    const daysNote = daysRemaining > 0 ? ` — ${daysRemaining} dagar kvar` : ` — förskrivningen är slut`;
+    alerts.push({ type: 'danger', title: 'Förbrukning överstiger ordination', message: `Snitt ${displayAvg} ${avgNote}${daysNote}. Gör en individuell bedömning.` });
   } else if (overuseSupressedBy7day) {
     alerts.push({ type: 'warn', title: 'Förhöjd förbrukning noterad', message: `Snitt ${displayAvg} överstiger ordination med >10%, men medicinen beräknas ta slut inom 7 dagar. Förnyelse godkänd — notera förbrukningstakten.` });
   } else if (avgNum === 0) {
@@ -304,7 +283,7 @@ function calcCore(inputData, prev) {
 
   return {
     valid: true, calculable: true,
-    isOveruse, isTooEarly, earlyRenewalDecision, unreliableAvg,
+    isOveruse, isTooEarly, earlyRenewalDecision,
     statusText, verdictTitle, verdictSub,
     metrics, alerts,
     tlPct, tlStart: fmtDate(inputData.pDate), tlEnd: fmtDate(prescribedEndDate),
@@ -470,23 +449,12 @@ function buildJournalText(toRenew, tooEarly, overuse, validCount) {
     if (toRenew.length === 1) {
       const s = states[toRenew[0].i];
       if (toRenew[0].earlyRenewal === 'overuse') {
-        if (s.unreliableAvg) {
-          // Receptet är yngre än ett uttag — påståendet "överstiger ordination" är inte sant
-          // och får inte hamna i journalen. Den faktiska bedömningen sker mot patientens uppgift,
-          // inte mot snittberäkningen.
-          lines.push(
-            'Kontaktorsak: Receptförnyelse via 1177.', '',
-            `Bedömning: Patienten begär förnyelse av ${toRenew[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} doser, ordination ${s.dose} st/dag) och beräknas räcka till ${s.prescribedEndDateStr}.${remainingDosesNote(s)} Receptet är yngre än ett uttag — snittberäkningen är inte tillförlitlig och bedömningen baseras på patientens uppgift om förbrukning. Receptet förnyas på klinisk indikation efter individuell bedömning.`,
-            '', 'Åtgärd: Nytt recept utfärdat. Svar skickat till patient via 1177.'
-          );
-        } else {
-          lines.push(
-            'Kontaktorsak: Receptförnyelse via 1177.', '',
-            `Bedömning: Patienten begär förnyelse av ${toRenew[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} doser, ordination ${s.dose} st/dag) och borde räcka till ${s.prescribedEndDateStr}.${remainingDosesNote(s)}`,
-            `Beräknad snittförbrukning: ${s.displayAvgStr} ${s.avgNote} — överstiger ordination. Receptet förnyas på klinisk indikation efter individuell bedömning.`,
-            '', 'Åtgärd: Nytt recept utfärdat. Svar skickat till patient via 1177.'
-          );
-        }
+        lines.push(
+          'Kontaktorsak: Receptförnyelse via 1177.', '',
+          `Bedömning: Patienten begär förnyelse av ${toRenew[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} doser, ordination ${s.dose} st/dag) och borde räcka till ${s.prescribedEndDateStr}.${remainingDosesNote(s)}`,
+          `Beräknad snittförbrukning: ${s.displayAvgStr} ${s.avgNote} — överstiger ordination. Receptet förnyas på klinisk indikation efter individuell bedömning.`,
+          '', 'Åtgärd: Nytt recept utfärdat. Svar skickat till patient via 1177.'
+        );
       } else {
         const earlyNote = toRenew[0].earlyRenewal === 'tooEarly'
           ? ` Receptet förnyas på klinisk indikation efter individuell bedömning trots att receptperioden löper ut ${s.prescribedEndDateStr} (${s.daysToPrescribedEnd} dagar kvar).`
@@ -520,14 +488,9 @@ function buildJournalText(toRenew, tooEarly, overuse, validCount) {
       const atgard = s.earlyRenewalDecision === 'no'
         ? 'Åtgärd: Ej förnyat efter klinisk, individuell bedömning.'
         : 'Åtgärd: [Nytt recept utfärdat / Ej utfärdat — motivering]';
-      // unreliableAvg: snittet säger inget meningsfullt om förbrukningen, så vi noterar det
-      // istället för att presentera siffran utan kontext.
-      const avgLine = s.unreliableAvg
-        ? 'Snittberäkning ej tillförlitlig — receptet är yngre än ett uttag.'
-        : `Beräknad snittförbrukning: ${s.displayAvgStr} ${s.avgNote}.`;
       lines.push(
         'Kontaktorsak: Receptförnyelse via 1177.', '',
-        `Bedömning: Patienten begär förnyelse av ${overuse[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} doser, ordination ${s.dose} st/dag) och borde räcka till ${s.prescribedEndDateStr}. ${sn} ${avgLine}`,
+        `Bedömning: Patienten begär förnyelse av ${overuse[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} doser, ordination ${s.dose} st/dag) och borde räcka till ${s.prescribedEndDateStr}. ${sn} Beräknad snittförbrukning: ${s.displayAvgStr} ${s.avgNote}.`,
         '', atgard
       );
     }
@@ -543,9 +506,7 @@ function buildJournalText(toRenew, tooEarly, overuse, validCount) {
       // Överförbrukningsfall ger ingen dosnotering — receptperioden är redan avvikande
       const remNote = earlyRenewal !== 'overuse' ? remainingDosesNote(s) : '';
       const endInfo = earlyRenewal === 'overuse'
-        ? (s.unreliableAvg
-            ? `Borde räcka t.o.m. ${s.prescribedEndDateStr}. Recept yngre än ett uttag — snittberäkning ej tillförlitlig.`
-            : `Borde räcka t.o.m. ${s.prescribedEndDateStr}. Snitt: ${s.displayAvgStr} — överstiger ordination.`)
+        ? `Borde räcka t.o.m. ${s.prescribedEndDateStr}. Snitt: ${s.displayAvgStr} — överstiger ordination.`
         : `Räcker t.o.m. ${s.prescribedEndDateStr}.${remNote} Snitt: ${s.displayAvgStr}.`;
       lines.push(`${name}: Utfärdat ${s.pDateStr} (${s.total} doser, ${s.dose} st/dag). ${endInfo} ${atgardText}`, '');
     }
@@ -565,10 +526,7 @@ function buildJournalText(toRenew, tooEarly, overuse, validCount) {
       const atgard = s.earlyRenewalDecision === 'no'
         ? 'Åtgärd: Ej förnyat efter klinisk, individuell bedömning.'
         : 'Åtgärd: [Nytt recept utfärdat / Ej utfärdat — motivering]';
-      const snittPart = s.unreliableAvg
-        ? 'Snittberäkning ej tillförlitlig (recept yngre än ett uttag).'
-        : `Snitt: ${s.displayAvgStr}.`;
-      lines.push(`${name}: Utfärdat ${s.pDateStr} (${s.total} doser, ${s.dose} st/dag). Borde räcka t.o.m. ${s.prescribedEndDateStr}. ${sn} ${snittPart} ${atgard}`, '');
+      lines.push(`${name}: Utfärdat ${s.pDateStr} (${s.total} doser, ${s.dose} st/dag). Borde räcka t.o.m. ${s.prescribedEndDateStr}. ${sn} Snitt: ${s.displayAvgStr}. ${atgard}`, '');
     }
     lines.push(
       toRenew.length > 0

@@ -121,21 +121,11 @@ function setEarlyDecision(decision) {
   if (!s || (!s.isTooEarly && !s.isOveruse)) return;
   const patch = { earlyRenewalDecision: decision };
   if (s.isOveruse) {
-    // Snittet är opålitligt om receptet är yngre än ett uttag — texterna får
-    // inte påstå "förhöjd förbrukning" eftersom siffran inte är meningsfull.
-    if (s.unreliableAvg) {
-      patch.statusText   = decision === 'yes' ? 'OK – förnyas (klinisk bed.)' : 'Bedömning krävs';
-      patch.verdictTitle = decision === 'yes' ? 'OK – Förnya recept' : 'Tidig bedömning krävs – snittet är ej tillförlitligt';
-      patch.verdictSub   = decision === 'yes'
-        ? 'Klinisk bedömning: förnyelse efter individuell bedömning.'
-        : 'Receptet är yngre än ett uttag — snittberäkningen är inte tillförlitlig.';
-    } else {
-      patch.statusText   = decision === 'yes' ? 'OK – förnyas (klinisk bed.)' : 'För tidig förnyelse';
-      patch.verdictTitle = decision === 'yes' ? 'OK – Förnya recept' : 'För tidig förnyelse – bedömning krävs';
-      patch.verdictSub   = decision === 'yes'
-        ? 'Klinisk bedömning: förnyelse trots förhöjd förbrukning.'
-        : `Snitt ${s.displayAvgStr} överstiger ordination med >10%.`;
-    }
+    patch.statusText   = decision === 'yes' ? 'OK – förnyas (klinisk bed.)' : 'För tidig förnyelse';
+    patch.verdictTitle = decision === 'yes' ? 'OK – Förnya recept' : 'För tidig förnyelse – bedömning krävs';
+    patch.verdictSub   = decision === 'yes'
+      ? 'Klinisk bedömning: förnyelse trots förhöjd förbrukning.'
+      : `Snitt ${s.displayAvgStr} överstiger ordination med >10%.`;
   } else {
     patch.statusText   = decision === 'yes' ? 'OK – förnyas tidigt' : `För tidigt — ${s.daysToPrescribedEnd}d kvar`;
     patch.verdictTitle = decision === 'yes' ? 'OK – Förnya recept' : `För tidigt – ${s.daysToPrescribedEnd} dagar kvar`;
