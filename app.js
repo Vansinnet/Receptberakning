@@ -193,6 +193,14 @@ buildPeriodContainer();
 const formPanel = getEl('formPanel');
 if (formPanel) {
   formPanel.addEventListener('input', e => {
+    if (e.target.id === 'medInput') {
+      const v = e.target.value;
+      if (v && v[0] !== v[0].toUpperCase()) {
+        const pos = e.target.selectionStart;
+        e.target.value = v[0].toUpperCase() + v.slice(1);
+        e.target.setSelectionRange(pos, pos);
+      }
+    }
     if (e.target.id === 'dateInput') {
       autoFormatDate(e.target);
       // Validera direkt när datumet är fullständigt (ÅÅÅÅ-MM-DD = 10 tecken).
