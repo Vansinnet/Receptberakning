@@ -300,6 +300,8 @@ function calcCore(inputData, prev) {
 }
 
 function calc(i = activeMedIdx) {
+  // AKTIVT VAL: ignorera föråldrade debounce-anrop om användaren bytt läkemedel under fördröjningen
+  if (i !== activeMedIdx) return;
   resetTimer();
   saveFormValues(i);
   applyMedStatePatch(i, { valid: false });
