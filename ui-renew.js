@@ -191,7 +191,50 @@ function switchResultTab(tab) {
     if (body) body.textContent = isEn ? (s.patientTextEn || s.patientText || '') : (s.patientText || '');
     if (langBtn) {
       langBtn.classList.remove('is-hidden');
-      langBtn.textContent = isEn ? '🇸🇪 Svenska' : '🌐 English';
+      langBtn.textContent = '';
+
+      // createElementNS krävs för korrekt SVG-namnrymd — innerHTML inuti <button> är inkonsekvent.
+      // Delade hjälpare för båda flaggorna.
+      const NS = 'http://www.w3.org/2000/svg';
+      const mkEl = (tag, attrs) => {
+        const e = document.createElementNS(NS, tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        return e;
+      };
+      const mkFlag = (...elements) => {
+        const svg = document.createElementNS(NS, 'svg');
+        svg.setAttribute('viewBox', '0 0 22 14');
+        svg.setAttribute('width', '20');
+        svg.setAttribute('height', '13');
+        svg.setAttribute('aria-hidden', 'true');
+        svg.style.cssText = 'vertical-align:middle;margin-right:5px;border-radius:2px;display:inline-block';
+        elements.forEach(e => svg.appendChild(e));
+        return svg;
+      };
+
+      if (isEn) {
+        // Svensk flagga: blå bakgrund, gult kors
+        langBtn.appendChild(mkFlag(
+          mkEl('rect', { width: '22', height: '14', fill: '#006AA7' }),
+          mkEl('rect', { x: '6', width: '3', height: '14', fill: '#FECC02' }),
+          mkEl('rect', { y: '5.5', width: '22', height: '3', fill: '#FECC02' })
+        ));
+        langBtn.appendChild(document.createTextNode('Svenska'));
+      } else {
+        // Union Jack: blå bakgrund, vita och röda diagonaler, vitt och rött kors
+        langBtn.appendChild(mkFlag(
+          mkEl('rect',  { width: '22', height: '14', fill: '#012169' }),
+          mkEl('line',  { x1: '0', y1: '0',  x2: '22', y2: '14', stroke: '#FFFFFF', 'stroke-width': '4.5' }),
+          mkEl('line',  { x1: '22', y1: '0', x2: '0',  y2: '14', stroke: '#FFFFFF', 'stroke-width': '4.5' }),
+          mkEl('line',  { x1: '0', y1: '0',  x2: '22', y2: '14', stroke: '#C8102E', 'stroke-width': '2' }),
+          mkEl('line',  { x1: '22', y1: '0', x2: '0',  y2: '14', stroke: '#C8102E', 'stroke-width': '2' }),
+          mkEl('rect',  { x: '8',   width: '6', height: '14', fill: '#FFFFFF' }),
+          mkEl('rect',  { y: '4',   width: '22', height: '6', fill: '#FFFFFF' }),
+          mkEl('rect',  { x: '9.5', width: '3', height: '14', fill: '#C8102E' }),
+          mkEl('rect',  { y: '5.5', width: '22', height: '3', fill: '#C8102E' })
+        ));
+        langBtn.appendChild(document.createTextNode('English'));
+      }
     }
   } else {
     if (body) body.textContent = s.journalText || '';

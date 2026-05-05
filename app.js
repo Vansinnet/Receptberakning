@@ -315,6 +315,7 @@ window.addEventListener('focus',recalcOnDateChange);
 
 // Rensa vid pagehide (bfcache-säkerhet)
 window.addEventListener('pagehide',()=>{
+  const ltPeriodCount = ltPeriods.length;
   clearAllMedStateData();
   ['medInput','doseInput','amtInput','refInput','leftInput'].forEach(id=>{ const e=getEl(id);if(e)e.value=''; });
   const d=getEl('dateInput');if(d)d.value=todayStr();
@@ -322,7 +323,7 @@ window.addEventListener('pagehide',()=>{
   const lm=getEl('lt-med');if(lm)lm.value='';
   const ld=getEl('lt-dose');if(ld)ld.value='';
   const lc=getEl('lt-copyBody');if(lc)lc.textContent='';
-  for (let i = 0; i < ltPeriods.length; i++) {
+  for (let i = 0; i < ltPeriodCount; i++) {
     const se = getEl('lt-start-' + i); if (se) se.value = '';
     const te = getEl('lt-total-' + i); if (te) te.value = '';
     const ee = getEl('lt-end-'   + i); if (ee) ee.value = '';

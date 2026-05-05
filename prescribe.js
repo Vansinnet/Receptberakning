@@ -72,7 +72,10 @@ function prescribeValidationHint(i, ps) {
       : { type: 'info', field: 'pkg',  msg: 'Ange förpackningsstorlek för att beräkna antal förpackningar.' };
   }
 
-  if (ps.mode === 'date' && ps.endDate) {
+  if (ps.mode === 'date') {
+    if (!ps.endDate) {
+      return { type: 'info', field: 'date', msg: 'Ange ett slutdatum för att beräkna antal förpackningar.' };
+    }
     const today    = getToday();
     const s        = states[i] || {};
     const prescEnd = parseDateUTC(s.prescribedEndDateStr);

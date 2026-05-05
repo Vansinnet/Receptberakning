@@ -86,7 +86,7 @@ function calcCore(inputData, prev) {
   if (!inputData.valid) {
     if (inputData.reason === 'too_many_refs') {
       return {
-        valid: true, isOveruse: false, isTooEarly: false,
+        valid: true, calculable: false, isOveruse: false, isTooEarly: false,
         verdictTitle: 'Ogiltigt antal uttag',
         verdictSub:   'Max 12 uttag stöds.',
         metrics: [],
@@ -223,9 +223,15 @@ function calcCore(inputData, prev) {
   ];
 
   let verdictTitle, verdictSub;
-  if (isOveruse) {
+  if (isOveruse && earlyRenewalDecision === 'yes') {
+    verdictTitle = 'OK – Förnya recept';
+    verdictSub   = 'Klinisk bedömning: förnyelse trots förhöjd förbrukning.';
+  } else if (isOveruse) {
     verdictTitle = 'För tidig förnyelse – bedömning krävs';
     verdictSub   = `Snitt ${avgNum.toFixed(2)} st/dag överstiger ordination med >10%.`;
+  } else if (isTooEarly && earlyRenewalDecision === 'yes') {
+    verdictTitle = 'OK – Förnya recept';
+    verdictSub   = `Klinisk bedömning: förnyelse trots ${daysToPrescribedEnd} dagar kvar av receptperioden.`;
   } else if (isTooEarly) {
     verdictTitle = `För tidigt – ${daysToPrescribedEnd} dagar kvar`;
     verdictSub   = 'Förbrukning OK. Kontakta vården närmre slutdatumet.';
