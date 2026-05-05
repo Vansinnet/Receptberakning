@@ -67,8 +67,13 @@ function resetTimer(isUserEvent=false) {
 }
 
 /* Lägg till / ta bort läkemedel */
+let _addMedLocked = false;
 function addMedCard() {
+  if (_addMedLocked) return;
   if (states.length >= 8) { showToast('Max 8 läkemedel kan hanteras samtidigt.'); return; }
+  _addMedLocked = true;
+  setTimeout(() => { _addMedLocked = false; }, 300);
+
   const newIdx = pushMedCard();
   ensureDebounce(newIdx);
   setActiveMed(newIdx);
@@ -325,12 +330,15 @@ window.addEventListener('focus',recalcOnDateChange);
 window.addEventListener('pagehide',()=>{
   const ltPeriodCount = ltPeriods.length;
   clearAllMedStateData();
+  resetPrescribePanel();
   ['medInput','doseInput','amtInput','refInput','leftInput'].forEach(id=>{ const e=getEl(id);if(e)e.value=''; });
   const d=getEl('dateInput');if(d)d.value=todayStr();
   const b=getEl('copyBodyResult');if(b)b.textContent='';
   const lm=getEl('lt-med');if(lm)lm.value='';
   const ld=getEl('lt-dose');if(ld)ld.value='';
   const lc=getEl('lt-copyBody');if(lc)lc.textContent='';
+  const pi=getEl('prescribeInner');if(pi)pi.textContent='';
+  const ps=getEl('prescribeSummary');if(ps){ps.textContent='';ps.style.display='none';}
   for (let i = 0; i < ltPeriodCount; i++) {
     const se = getEl('lt-start-' + i); if (se) se.value = '';
     const te = getEl('lt-total-' + i); if (te) te.value = '';

@@ -105,6 +105,20 @@ function assertEqual(a, b, lbl) {
     );
 }
 
+function assertNotEqual(a, b, lbl) {
+  if (a === b)
+    throw new Error(
+      `${lbl ? lbl + ': ' : ''}förväntade ett värde skilt från ${JSON.stringify(b)}`
+    );
+}
+
+function assertContains(str, substr, label) {
+  if (!String(str).includes(substr))
+    throw new Error(
+      `${label ? label + ': ' : ''}"${str}" innehåller inte "${substr}"`
+    );
+}
+
 // Minimalstate för ett fullständigt giltigt, beräknat läkemedel.
 // Alla fält som render-funktionerna läser finns med.
 function makeValidState(overrides = {}) {
@@ -510,6 +524,519 @@ test('saveFormValues kastar inte när alla fält finns', () => {
   getEl('refInput').value  = '1';
   ctx.saveFormValues(0); // ska inte kasta
 });
+
+// ═══════════════════════════════════════════════════════════
+// renderResultForMed — metricsGrid
+// ═══════════════════════════════════════════════════════════
+
+group('renderResultForMed — metricsGrid');
+
+test('tre metrics → tre .metric-element renderas', () => {
+  setState(0, makeValidState());
+  ctx.renderResultForMed(0);
+  assertEqual(doc.querySelectorAll('#metricsGrid .metric').length, 3, 'antal metric-element');
+});
+
+test('metric med cls danger → metric-val har klassen danger', () => {
+  setState(0, makeValidState({
+    metrics: [
+      { label: 'L1', value: 'V1', cls: 'danger', tooltip: '' },
+      { label: 'L2', value: 'V2', cls: '',       tooltip: '' },
+      { label: 'L3', value: 'V3', cls: '',       tooltip: '' },
+    ],
+  }));
+  ctx.renderResultForMed(0);
+  const firstVal = doc.querySelector('#metricsGrid .metric-val');
+  assert(firstVal.classList.contains('danger'), 'metric-val ska ha klassen danger');
+});
+
+test('metric med tooltip → dataset.tooltip satt på .metric-elementet', () => {
+  setState(0, makeValidState({
+    metrics: [
+      { label: 'L1', value: 'V1', cls: '', tooltip: 'Min tooltip' },
+      { label: 'L2', value: 'V2', cls: '', tooltip: '' },
+      { label: 'L3', value: 'V3', cls: '', tooltip: '' },
+    ],
+  }));
+  ctx.renderResultForMed(0);
+  const firstMetric = doc.querySelector('#metricsGrid .metric');
+  assertEqual(firstMetric.dataset.tooltip, 'Min tooltip', 'dataset.tooltip ska sättas');
+});
+
+test('inga metrics → metricsGrid är tom', () => {
+  setState(0, makeValidState({ metrics: [] }));
+  ctx.renderResultForMed(0);
+  assertEqual(doc.querySelectorAll('#metricsGrid .metric').length, 0, 'metricsGrid ska vara tom');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// renderResultForMed — alerts
+// ═══════════════════════════════════════════════════════════
+
+group('renderResultForMed — alerts');
+
+test('inga alerts → resultAlerts är tom', () => {
+  setState(0, makeValidState({ alerts: [] }));
+  ctx.renderResultForMed(0);
+  assertEqual(getEl('resultAlerts').childElementCount, 0, 'resultAlerts ska vara tom');
+});
+
+test('en alert → resultAlerts innehåller ett barn-element', () => {
+  setState(0, makeValidState({
+    alerts: [{ type: 'warn', title: 'Testtitel', message: 'Testmeddelande.' }],
+  }));
+  ctx.renderResultForMed(0);
+  assert(getEl('resultAlerts').childElementCount > 0, 'resultAlerts ska innehålla ett element');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// renderResultForMed — verdictIcon
+// ═══════════════════════════════════════════════════════════
+
+group('renderResultForMed — verdictIcon');
+
+test('OK-state → verdictIcon visar ✓', () => {
+  setState(0, makeValidState());
+  ctx.renderResultForMed(0);
+  assertEqual(getEl('verdictIcon').textContent, '✓', 'verdictIcon ska vara ✓ vid OK');
+});
+
+test('isOveruse → verdictIcon visar ⚠', () => {
+  setState(0, makeValidState({ isOveruse: true }));
+  ctx.renderResultForMed(0);
+  assertEqual(getEl('verdictIcon').textContent, '⚠', 'verdictIcon ska vara ⚠ vid overuse');
+});
+
+test('isTooEarly → verdictIcon visar !', () => {
+  setState(0, makeValidState({ isTooEarly: true }));
+  ctx.renderResultForMed(0);
+  assertEqual(getEl('verdictIcon').textContent, '!', 'verdictIcon ska vara ! vid isTooEarly');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// togglePatientLangResult
+// ═══════════════════════════════════════════════════════════
+
+group('togglePatientLangResult');
+
+test('sv → en: patientTextEn visas i copyBodyResult efter toggle', () => {
+  setState(0, makeValidState({
+    patientText: 'sv-text', patientTextEn: 'en-text',
+    patientLang: 'sv', activeTab: 'patient',
+  }));
+  ctx.togglePatientLangResult();
+  assertEqual(getEl('copyBodyResult').textContent, 'en-text', 'patientTextEn ska visas efter toggle till engelska');
+});
+
+test('en → sv: patientText visas i copyBodyResult efter toggle', () => {
+  setState(0, makeValidState({
+    patientText: 'sv-text', patientTextEn: 'en-text',
+    patientLang: 'en', activeTab: 'patient',
+  }));
+  ctx.togglePatientLangResult();
+  assertEqual(getEl('copyBodyResult').textContent, 'sv-text', 'patientText ska visas efter toggle till svenska');
+});
+
+test('saknas patientTextEn → toggle är no-op, text förblir oförändrad', () => {
+  setState(0, makeValidState({
+    patientText: 'sv-text', patientTextEn: '',
+    patientLang: 'sv', activeTab: 'patient',
+  }));
+  ctx.switchResultTab('patient');
+  const before = getEl('copyBodyResult').textContent;
+  ctx.togglePatientLangResult();
+  assertEqual(getEl('copyBodyResult').textContent, before, 'text ska inte ändras när patientTextEn saknas');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// renderPrescribePanel
+// ═══════════════════════════════════════════════════════════
+
+group('renderPrescribePanel');
+
+test('valid:false → prescribePanel är dold', () => {
+  setState(0, { valid: false });
+  ctx.renderPrescribePanel(0);
+  assert(getEl('prescribePanel').classList.contains('is-hidden'), 'prescribePanel ska vara dold');
+});
+
+test('isTooEarly utan beslut → prescribePanel är dold (canRenewMed = false)', () => {
+  setState(0, makeValidState({ isTooEarly: true, earlyRenewalDecision: null }));
+  ctx.renderPrescribePanel(0);
+  assert(getEl('prescribePanel').classList.contains('is-hidden'), 'prescribePanel ska vara dold vid isTooEarly utan beslut');
+});
+
+test('valid, inga flaggor → prescribePanel är synlig', () => {
+  setState(0, makeValidState());
+  ctx.renderPrescribePanel(0);
+  assert(!getEl('prescribePanel').classList.contains('is-hidden'), 'prescribePanel ska vara synlig vid OK-state');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// buildMedList — isTooEarly
+// ═══════════════════════════════════════════════════════════
+
+group('buildMedList — isTooEarly');
+
+test('isTooEarly utan override → status-dot har warn', () => {
+  setState(0, makeValidState({ isTooEarly: true, earlyRenewalDecision: null }));
+  ctx.buildMedList();
+  assert(doc.querySelector('#medList .status-dot').classList.contains('warn'), 'warn saknas för isTooEarly');
+});
+
+test('isTooEarly med override yes → status-dot har ok, inte warn', () => {
+  setState(0, makeValidState({ isTooEarly: true, earlyRenewalDecision: 'yes' }));
+  ctx.buildMedList();
+  const dot = doc.querySelector('#medList .status-dot');
+  assert(dot.classList.contains('ok'),    'ok saknas när isTooEarly + override=yes');
+  assert(!dot.classList.contains('warn'), 'warn ska inte finnas när override=yes');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// switchResultTab — flik-aktiv-klass
+// ═══════════════════════════════════════════════════════════
+
+group('switchResultTab — flik-aktiv-klass');
+
+test('journal-flik → journal-knappen har active, patient-knappen inte', () => {
+  setState(0, makeValidState());
+  ctx.switchResultTab('journal');
+  const tabs       = doc.querySelectorAll('#copySection .copy-tab');
+  const journalTab = Array.from(tabs).find(b => b.dataset.tab === 'journal');
+  const patientTab = Array.from(tabs).find(b => b.dataset.tab === 'patient');
+  assert(journalTab != null, 'journal-flik hittades inte i DOM');
+  assert(patientTab != null, 'patient-flik hittades inte i DOM');
+  assert(journalTab.classList.contains('active'),  'journal-flik ska ha active');
+  assert(!patientTab.classList.contains('active'), 'patient-flik ska inte ha active');
+});
+
+test('patient-flik → patient-knappen har active, journal-knappen inte', () => {
+  setState(0, makeValidState());
+  ctx.switchResultTab('patient');
+  const tabs       = doc.querySelectorAll('#copySection .copy-tab');
+  const journalTab = Array.from(tabs).find(b => b.dataset.tab === 'journal');
+  const patientTab = Array.from(tabs).find(b => b.dataset.tab === 'patient');
+  assert(journalTab != null, 'journal-flik hittades inte i DOM');
+  assert(patientTab != null, 'patient-flik hittades inte i DOM');
+  assert(patientTab.classList.contains('active'),  'patient-flik ska ha active');
+  assert(!journalTab.classList.contains('active'), 'journal-flik ska inte ha active');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// buildPrescribeInner — paneluppbyggnad
+// ═══════════════════════════════════════════════════════════
+
+group('buildPrescribeInner — paneluppbyggnad');
+
+test('läkemedelsnamn visas i panelen', () => {
+  setState(0, makeValidState({ medRaw: 'Elvanse 50 mg', dose: 1, prescribedEndDateStr: '2025-06-01' }));
+  ctx.initPrescribeState(0, { mode: 'months', months: 3, packageSize: '30', endDate: '' });
+  ctx.buildPrescribeInner(0);
+  const nameEl = doc.querySelector('.prescribe-med-name');
+  assert(nameEl !== null, '.prescribe-med-name ska finnas');
+  assertEqual(nameEl.textContent, 'Elvanse 50 mg', 'läkemedelsnamn');
+});
+
+test('förpackningsstorlek fylls i från prescribeState', () => {
+  setState(0, makeValidState({ dose: 1, prescribedEndDateStr: '2025-06-01' }));
+  ctx.initPrescribeState(0, { mode: 'months', months: 3, packageSize: '100', endDate: '' });
+  ctx.buildPrescribeInner(0);
+  assertEqual(getEl('ps-pkg-0').value, '100', 'packageSize');
+});
+
+test('månadsläge → select har 12 optioner och rätt månad vald', () => {
+  setState(0, makeValidState({ dose: 1, prescribedEndDateStr: '2025-06-01' }));
+  ctx.initPrescribeState(0, { mode: 'months', months: 5, packageSize: '30', endDate: '' });
+  ctx.buildPrescribeInner(0);
+  const sel = getEl('ps-months-0');
+  assert(sel !== null, 'ps-months-0 ska finnas');
+  assertEqual(sel.options.length, 12, '12 optioner');
+  assertEqual(sel.value, '5', 'månad 5 vald');
+});
+
+test('datumläge → datuminmatning visas med rätt värde', () => {
+  setState(0, makeValidState({ dose: 1, prescribedEndDateStr: '2025-06-01' }));
+  ctx.initPrescribeState(0, { mode: 'date', months: 1, packageSize: '30', endDate: '2025-09-15' });
+  ctx.buildPrescribeInner(0);
+  assert(getEl('ps-enddate-0') !== null, 'ps-enddate-0 ska finnas');
+  assertEqual(getEl('ps-enddate-0').value, '2025-09-15', 'endDate');
+});
+
+test('mode-toggle: rätt knapp är active', () => {
+  setState(0, makeValidState({ dose: 1, prescribedEndDateStr: '2025-06-01' }));
+  ctx.initPrescribeState(0, { mode: 'date', months: 1, packageSize: '30', endDate: '' });
+  ctx.buildPrescribeInner(0);
+  const btns = doc.querySelectorAll('.prescribe-mode-btn');
+  const dateBtn = Array.from(btns).find(b => b.textContent === 'Datum');
+  const monthBtn = Array.from(btns).find(b => b.textContent === 'Månader');
+  assert(dateBtn && dateBtn.classList.contains('active'), 'Datum-knapp ska vara active');
+  assert(monthBtn && !monthBtn.classList.contains('active'), 'Månader-knapp ska inte vara active');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// updatePrescribeResult — resultatvisning
+// ═══════════════════════════════════════════════════════════
+
+group('updatePrescribeResult — resultatvisning');
+
+test('giltig indata → förpackningsantal visas', () => {
+  // prescribedEnd passerat (2025-06-01) → startDate = idag (2025-06-15)
+  // 3 månader: 2025-06-15 → 2025-09-15 = 92 dagar; 92 tabletter ÷ 30 st/förp = 4 förp
+  setState(0, makeValidState({ dose: 1, prescribedEndDateStr: '2025-06-01' }));
+  ctx.initPrescribeState(0, { mode: 'months', months: 3, packageSize: '30', endDate: '' });
+  ctx.buildPrescribeInner(0);
+  const pkgEl = doc.querySelector('.prescribe-result-packages');
+  assert(pkgEl !== null, '.prescribe-result-packages ska finnas');
+  assertEqual(pkgEl.textContent, '4', '92 dagar ÷ 30 st/förp = 4 förp');
+});
+
+test('befintligt recept täcker hela perioden → "täcker redan" visas', () => {
+  // prescribedEnd 120 dagar fram (2025-10-13) > 3-månadersmål (2025-09-15)
+  // → befintligt recept täcker hela den begärda perioden
+  setState(0, makeValidState({ dose: 1, prescribedEndDateStr: '2025-10-13' }));
+  ctx.initPrescribeState(0, { mode: 'months', months: 3, packageSize: '30', endDate: '' });
+  ctx.buildPrescribeInner(0);
+  const coveredEl = doc.querySelector('.prescribe-result-covered');
+  assert(coveredEl !== null, '.prescribe-result-covered ska finnas');
+  assertContains(coveredEl.textContent, 'täcker redan', 'meddelande om befintlig täckning');
+});
+
+test('tom packageSize → hint visas i resultatrutan', () => {
+  setState(0, makeValidState({ dose: 1, prescribedEndDateStr: '2025-06-01' }));
+  ctx.initPrescribeState(0, { mode: 'months', months: 3, packageSize: '', endDate: '' });
+  ctx.buildPrescribeInner(0);
+  const box = getEl('ps-result-0');
+  assert(box.children.length > 0, 'resultatrutan ska ha innehåll');
+  assertContains(box.textContent, 'förpackningsstorlek', 'hint om förpackningsstorlek');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// setEarlyDecision — kliniskt beslut
+// ═══════════════════════════════════════════════════════════
+
+group('setEarlyDecision — kliniskt beslut');
+
+// Hjälpfunktion: state med alla fält som buildJournalText behöver vid overuse
+function makeOveruseState(overrides = {}) {
+  return makeValidState({
+    isOveruse: true, isTooEarly: false, earlyRenewalDecision: null,
+    verdictTitle: 'För tidig förnyelse – bedömning krävs',
+    verdictSub: 'Snitt 1.50 st/dag överstiger ordination med >10%.',
+    statusText: 'För tidig förnyelse',
+    dose: 1, pDateStr: '2024-09-28', total: 300,
+    prescribedEndDateStr: '2025-09-01',
+    displayAvgStr: '1.50 st/dag',
+    avgNote: '(beräknat under antagandet att alla tillgängliga doser är förbrukade)',
+    remainingDoses: null, daysRemaining: 78, daysToPrescribedEnd: 78,
+    tlPct: 80, tlStart: '2024-09-28', tlEnd: '2025-09-01',
+    ...overrides,
+  });
+}
+
+function makeTooEarlyState(overrides = {}) {
+  return makeValidState({
+    isOveruse: false, isTooEarly: true, earlyRenewalDecision: null,
+    verdictTitle: 'För tidigt – 78 dagar kvar',
+    verdictSub: 'Förbrukning OK. Kontakta vården närmre slutdatumet.',
+    statusText: 'För tidigt — 78d kvar',
+    dose: 1, pDateStr: '2024-09-28', total: 300,
+    prescribedEndDateStr: '2025-09-01',
+    displayAvgStr: '1.00 st/dag',
+    avgNote: '(beräknat under antagandet att alla tillgängliga doser är förbrukade)',
+    remainingDoses: null, daysRemaining: 78, daysToPrescribedEnd: 78,
+    tlPct: 80, tlStart: '2024-09-28', tlEnd: '2025-09-01',
+    ...overrides,
+  });
+}
+
+test('"yes" på isOveruse → verdictBox får verdict-ok', () => {
+  setState(0, makeOveruseState());
+  ctx.setEarlyDecision('yes');
+  assert(!getEl('verdictBox').classList.contains('verdict-danger'), 'verdict-danger ska vara borta');
+  assert(getEl('verdictBox').classList.contains('verdict-ok'), 'verdict-ok ska finnas efter yes');
+});
+
+test('"no" på isOveruse → verdictBox behåller verdict-danger', () => {
+  setState(0, makeOveruseState());
+  ctx.setEarlyDecision('no');
+  assert(getEl('verdictBox').classList.contains('verdict-danger'), 'verdict-danger ska bestå efter no');
+  assert(!getEl('verdictBox').classList.contains('verdict-ok'), 'verdict-ok ska inte finnas efter no');
+});
+
+test('"yes" på isTooEarly → verdictBox får verdict-ok', () => {
+  setState(0, makeTooEarlyState());
+  ctx.setEarlyDecision('yes');
+  assert(!getEl('verdictBox').classList.contains('verdict-warn'), 'verdict-warn ska vara borta');
+  assert(getEl('verdictBox').classList.contains('verdict-ok'), 'verdict-ok ska finnas efter yes');
+});
+
+test('"no" på isTooEarly → verdictBox behåller verdict-warn', () => {
+  setState(0, makeTooEarlyState());
+  ctx.setEarlyDecision('no');
+  assert(getEl('verdictBox').classList.contains('verdict-warn'), 'verdict-warn ska bestå efter no');
+  assert(!getEl('verdictBox').classList.contains('verdict-ok'), 'verdict-ok ska inte finnas efter no');
+});
+
+test('OK-state → setEarlyDecision är no-op, verdict förblir OK', () => {
+  setState(0, makeValidState({ isOveruse: false, isTooEarly: false }));
+  ctx.renderResultForMed(0);
+  ctx.setEarlyDecision('yes');
+  assert(getEl('verdictBox').classList.contains('verdict-ok'), 'verdict-ok ska bestå vid OK-state');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// generateAndDistribute — textdistribution
+// ═══════════════════════════════════════════════════════════
+
+group('generateAndDistribute — textdistribution');
+
+test('inga giltiga states → patientText töms', () => {
+  setState(0, { valid: false });
+  ctx.generateAndDistribute();
+  // renderResultForMed anropas med activeMedIdx=0; valid=false → emptyState syns
+  assert(getEl('resultContent').classList.contains('is-hidden'), 'resultContent ska vara dolt');
+  assert(!getEl('resultEmptyState').classList.contains('is-hidden'), 'emptyState ska synas');
+});
+
+test('två OK-states → patientText innehåller båda läkemedelsnamnen', () => {
+  setState(0, makeValidState({
+    medRaw: 'Elvanse 50 mg', dose: 1, pDateStr: '2024-09-28', total: 300,
+    prescribedEndDateStr: '2025-09-01', displayAvgStr: '1.00 st/dag',
+    avgNote: '(test)', remainingDoses: null, daysToPrescribedEnd: 78,
+    tlPct: 80, tlStart: '2024-09-28', tlEnd: '2025-09-01',
+  }));
+  setState(1, makeValidState({
+    medRaw: 'Melatonin 3 mg', dose: 1, pDateStr: '2024-10-01', total: 200,
+    prescribedEndDateStr: '2025-09-15', displayAvgStr: '1.00 st/dag',
+    avgNote: '(test)', remainingDoses: null, daysToPrescribedEnd: 92,
+    tlPct: 70, tlStart: '2024-10-01', tlEnd: '2025-09-15',
+  }));
+  ctx.generateAndDistribute();
+  ctx.switchResultTab('patient');
+  const bodyText = getEl('copyBodyResult').textContent;
+  assertContains(bodyText, 'Elvanse 50 mg', 'första läkemedlet');
+  assertContains(bodyText, 'Melatonin 3 mg', 'andra läkemedlet');
+});
+
+test('ett OK + ett isTooEarly → patientText innehåller förnyelsebesked och avslag', () => {
+  setState(0, makeValidState({
+    medRaw: 'Elvanse 50 mg', dose: 1, pDateStr: '2024-09-28', total: 300,
+    prescribedEndDateStr: '2025-09-01', displayAvgStr: '1.00 st/dag',
+    avgNote: '(test)', remainingDoses: null, daysToPrescribedEnd: 78,
+    tlPct: 80, tlStart: '2024-09-28', tlEnd: '2025-09-01',
+  }));
+  setState(1, makeTooEarlyState({ medRaw: 'Melatonin 3 mg' }));
+  ctx.generateAndDistribute();
+  ctx.switchResultTab('patient');
+  const bodyText = getEl('copyBodyResult').textContent;
+  assertContains(bodyText, '2–3 arbetsdagar', 'Elvanse ska förnyas');
+  assertContains(bodyText, 'Melatonin 3 mg', 'Melatonin ska nämnas');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// buildPeriodContainer — långvarig flik
+// ═══════════════════════════════════════════════════════════
+
+group('buildPeriodContainer — långvarig flik');
+
+test('en period → tre inputfält renderas (start, total, end)', () => {
+  ctx.resetLtPeriods();
+  ctx.buildPeriodContainer();
+  assert(getEl('lt-start-0') !== null, 'lt-start-0 ska finnas');
+  assert(getEl('lt-total-0') !== null, 'lt-total-0 ska finnas');
+  assert(getEl('lt-end-0') !== null, 'lt-end-0 ska finnas');
+});
+
+test('första perioden saknar ta-bort-knapp', () => {
+  ctx.resetLtPeriods();
+  ctx.buildPeriodContainer();
+  const container = getEl('lt-periods-container');
+  const removeBtns = container.querySelectorAll('[data-action="remove-period"]');
+  assertEqual(removeBtns.length, 0, 'period 0 ska inte ha ta-bort-knapp');
+});
+
+test('två perioder → andra perioden har ta-bort-knapp', () => {
+  ctx.resetLtPeriods();
+  ctx.pushLtPeriod();
+  ctx.buildPeriodContainer();
+  const container = getEl('lt-periods-container');
+  const removeBtns = container.querySelectorAll('[data-action="remove-period"]');
+  assert(removeBtns.length >= 1, 'period 1 ska ha ta-bort-knapp');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// calcLongterm — DOM-skal
+// ═══════════════════════════════════════════════════════════
+
+group('calcLongterm — DOM-skal');
+
+// Hjälpare: ställ in ltPeriods med giltiga datum relativt mockat idag (2025-06-15)
+function setupLtPeriods(periods) {
+  ctx.resetLtPeriods();
+  periods.forEach((p, i) => {
+    if (i > 0) ctx.pushLtPeriod();
+    ctx.setLtPeriodField(i, 'start', p.start);
+    ctx.setLtPeriodField(i, 'total', p.total);
+    ctx.setLtPeriodField(i, 'end', p.end);
+  });
+}
+
+test('giltig indata → resultat visas', () => {
+  getEl('lt-med').value = 'Elvanse 50 mg';
+  getEl('lt-dose').value = '1';
+  setupLtPeriods([{ start: '2025-03-15', total: '90', end: '2025-06-15' }]);
+  ctx.calcLongterm();
+  assertEqual(getEl('lt-result').style.display, 'flex', 'lt-result ska vara synlig');
+});
+
+test('saknat läkemedelsnamn → resultat döljs', () => {
+  getEl('lt-med').value = '';
+  getEl('lt-dose').value = '1';
+  setupLtPeriods([{ start: '2025-03-15', total: '90', end: '2025-06-15' }]);
+  ctx.calcLongterm();
+  assertNotEqual(getEl('lt-result').style.display, 'flex', 'lt-result ska vara dold');
+});
+
+test('giltig indata → resultGrid innehåller analyslängd', () => {
+  getEl('lt-med').value = 'Ritalin 10 mg';
+  getEl('lt-dose').value = '1';
+  // 2025-03-15 → 2025-06-15 = 92 dagar (16+30+31+15)
+  setupLtPeriods([{ start: '2025-03-15', total: '90', end: '2025-06-15' }]);
+  ctx.calcLongterm();
+  const gridText = getEl('lt-resGrid').textContent;
+  assertContains(gridText, '92 dagar', 'analyslängd ska visas');
+  assertContains(gridText, '90 st', 'total tabletter ska visas');
+});
+
+test('giltig indata → FASS-länk visas', () => {
+  getEl('lt-med').value = 'Elvanse 50 mg';
+  getEl('lt-dose').value = '1';
+  setupLtPeriods([{ start: '2025-03-15', total: '90', end: '2025-06-15' }]);
+  ctx.calcLongterm();
+  assertEqual(getEl('lt-fassBtn').style.display, 'inline-flex', 'FASS-länk ska vara synlig');
+});
+
+test('giltig indata → copySection visas med journalText', () => {
+  getEl('lt-med').value = 'Elvanse 50 mg';
+  getEl('lt-dose').value = '1';
+  setupLtPeriods([{ start: '2025-03-15', total: '90', end: '2025-06-15' }]);
+  ctx.calcLongterm();
+  assertNotEqual(getEl('lt-copySection').style.display, 'none', 'lt-copySection ska vara synlig');
+  assertContains(getEl('lt-copyBody').textContent, 'Elvanse 50 mg', 'journalText ska innehålla läkemedelsnamn');
+});
+
 
 // ═══════════════════════════════════════════════════════════
 // SAMMANFATTNING

@@ -32,6 +32,10 @@ function selectMed(i) {
   buildMedList();
   renderFormForMed(i);
   renderResultForMed(i);
+  // Flytta fokus till första formulärfältet så att tangentbordsanvändare
+  // slipper tabba genom hela sidopanelen för att börja fylla i läkemedlet.
+  const medInput = getEl('medInput');
+  if (medInput) medInput.focus();
 }
 
 // === FORMULÄR — mittenkolumn ===

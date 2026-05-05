@@ -90,6 +90,10 @@ function showEl(id, show, displayValue = 'block') {
 }
 
 function showToast(msg, durationMs = 3000) {
+  // Ta bort eventuellt tidigare toast så att de inte staplas vid snabba anrop.
+  const prev = document.querySelector('.toast-flash');
+  if (prev) prev.remove();
+
   const div = el('div', { cls: 'toast-flash', text: msg, attrs: { role: 'status', 'aria-live': 'polite' } });
   document.body.appendChild(div);
   requestAnimationFrame(() => div.classList.add('visible'));

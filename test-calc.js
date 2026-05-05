@@ -252,15 +252,7 @@ test('låg förbrukning (<80 %) → OK att förnya med warn-alert', () => {
 group('För tidigt att förnya');
 
 test('>20 % av receptperioden kvar, normal förbrukning → isTooEarly', () => {
-  // total=300, totalDays=300; daysSince=30
-  // avg=300/30=10 — men batchesDispensed=1, accessibleTotal=100, avg=100/30≈3.3
-  // daysToPrescribedEnd=270 > earlyThreshold=60 → isTooEarly=true
-  // Obs: isOveruse kräver daysRemaining>7 OR daysToPrescribedEnd>14 — men
-  //   isTooEarly=!isOveruse, så isOveruse kontrolleras först
-  // avg(3.3)>1.10 AND (daysRemaining>7 OR 270>14) → isOveruse=true (ej isTooEarly)
-  // — detta är ett overuse-fall, inte ett tooEarly-fall för dessa params.
-  //
-  // Välj istället daysSince=30 med remaining=80 (consummed=100-80=20, avg=20/30≈0.67 → OK)
+  // amt=100, dose=1, ref=3, daysSince=30, remaining=80
   // accessibleTotal=100 vid batchesDispensed=1; remaining=80<100 → calcBase=100
   // consumed=100-80=20; avg=0.67 → ej overuse; daysToPrescribedEnd=270>60 → isTooEarly ✓
   const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 30, remaining: 80 }), NO_PREV);
@@ -329,12 +321,9 @@ test('ref=12, normal förbrukning → korrekt beräkning utan undantag', () => {
 });
 
 test('ref=12, tidigt i perioden → isTooEarly', () => {
-  // daysSince=30, daysToPrescribedEnd=1170 > earlyThreshold=240 → isTooEarly
-  // avg=1200/30=40 → isOveruse: 40>1.10 AND (daysRemaining>7 OR 1170>14) → true
-  // men isTooEarly = !isOveruse → false...
-  // Korrigering: behöver låg avg för isTooEarly. remaining=1170 (precis hämtat)
-  // earlyPickup: 1170 > accessibleTotal=100? Ja → calcBase=min(12,12)*100=1200
-  // consumed=1200-1170=30; avg=30/30=1.0 → ej overuse; daysToPrescribedEnd=1170>240 → isTooEarly
+  // daysSince=30; remaining=1170 > accessibleTotal=100 → earlyPickup=true
+  // calcBase=min(12,12)*100=1200; consumed=1200-1170=30; avg=30/30=1.0 → ej overuse
+  // daysToPrescribedEnd=1170>240 → isTooEarly
   const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 12, daysSince: 30, remaining: 1170 }), NO_PREV);
   assertEqual(r.isTooEarly, true);
   assertEqual(r.isOveruse, false);
@@ -1182,6 +1171,334 @@ test('multi: enbart overuse → "Inga recept utfärdade" i summering', () => {
     2
   );
   assertContains(text, 'Inga recept utfärdade', 'ska ange att inga recept förnyades');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// calcCore — statusText-grenar (saknade)
+// ═══════════════════════════════════════════════════════════
+
+group('calcCore — statusText-grenar');
+
+test('isOveruse + decision yes → statusText "OK – förnyas (klinisk bed.)"', () => {
+  const r = calcCore(
+    makeInput({ amt: 100, dose: 1, ref: 1, daysSince: 50 }),
+    { isOveruse: true, isTooEarly: false, earlyRenewalDecision: 'yes' }
+  );
+  assertEqual(r.statusText, 'OK – förnyas (klinisk bed.)');
+});
+
+test('isTooEarly + decision yes → statusText "OK – förnyas tidigt"', () => {
+  const r = calcCore(
+    makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 30, remaining: 80 }),
+    { isOveruse: false, isTooEarly: true, earlyRenewalDecision: 'yes' }
+  );
+  assertEqual(r.statusText, 'OK – förnyas tidigt');
+});
+
+test('isTooEarly utan beslut → statusText innehåller "För tidigt" och dagar kvar', () => {
+  const r = calcCore(
+    makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 30, remaining: 80 }),
+    NO_PREV
+  );
+  assertEqual(r.isTooEarly, true);
+  assertContains(r.statusText, 'För tidigt');
+  assertContains(r.statusText, 'd kvar');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// calcCore — alerts (saknade grenar)
+// ═══════════════════════════════════════════════════════════
+
+group('calcCore — alerts (saknade grenar)');
+
+test('avgNum = 0 (consumed = 0) → danger-alert "Ingen förbrukning"', () => {
+  // remaining = accessibleTotal → consumed = 0 → avgNum = 0
+  // amt=100, dose=1, ref=1, daysSince=50 → batchesDispensed=1, accessibleTotal=100, remaining=100
+  const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 1, daysSince: 50, remaining: 100 }), NO_PREV);
+  assert(
+    r.alerts.some(a => a.type === 'danger' && a.title.includes('förbrukning')),
+    'danger-alert "Ingen förbrukning" saknas'
+  );
+});
+
+test('avgNum > 2,5× dos → warn-alert "Datakontroll"', () => {
+  // consumed=100, daysSince=10 → avgNum=10 > dose×2.5=2.5
+  const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 1, daysSince: 10, remaining: 0 }), NO_PREV);
+  assert(
+    r.alerts.some(a => a.type === 'warn' && a.title === 'Datakontroll'),
+    'warn-alert "Datakontroll" saknas vid avgNum > 2,5× dos'
+  );
+});
+
+test('låg förbrukning + isTooEarly → warn (Låg förbrukning) och info (För tidigt) genereras båda', () => {
+  // daysSince=30, remaining=80: consumed=20, avg≈0.67 (<80%) → låg förbrukning
+  // daysToPrescribedEnd=270 > earlyThreshold=60 → isTooEarly
+  const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 30, remaining: 80 }), NO_PREV);
+  assertEqual(r.isTooEarly, true);
+  assert(r.alerts.some(a => a.type === 'warn' && a.title.includes('Låg förbrukning')),
+    'warn "Låg förbrukning" saknas');
+  assert(r.alerts.some(a => a.type === 'info' && a.title.includes('För tidigt')),
+    'info "För tidigt" saknas');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// calcCore — output-fält (saknade)
+// ═══════════════════════════════════════════════════════════
+
+group('calcCore — output-fält');
+
+test('metrics[1].cls = danger när receptet löpt ut (daysToPrescribedEnd < 0)', () => {
+  // daysSince=400, totalDays=300 → prescribedEnd passerat med 100 dagar
+  const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 400 }), NO_PREV);
+  assertEqual(r.metrics[1].cls, 'danger', 'endCls ska vara danger');
+});
+
+test('metrics[1].cls = warn inom 20%-tröskeln (daysToPrescribedEnd ≤ earlyThreshold)', () => {
+  // totalDays=300, earlyThreshold=60; daysSince=255 → daysToPrescribedEnd=45 ≤ 60
+  const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 255 }), NO_PREV);
+  assertEqual(r.metrics[1].cls, 'warn', 'endCls ska vara warn nära slutdatum');
+});
+
+test('metrics[1].cls = ok med lång tid kvar (daysToPrescribedEnd > earlyThreshold)', () => {
+  // daysSince=30, remaining=80 → daysToPrescribedEnd=270 > earlyThreshold=60
+  const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 30, remaining: 80 }), NO_PREV);
+  assertEqual(r.metrics[1].cls, 'ok', 'endCls ska vara ok med lång tid kvar');
+});
+
+test('isOveruse → prescribedContactDateStr och prescribedContactIsPast finns i utdata', () => {
+  const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 1, daysSince: 50 }), NO_PREV);
+  assertEqual(r.isOveruse, true);
+  assert(r.prescribedContactDateStr !== undefined, 'prescribedContactDateStr saknas');
+  assert(typeof r.prescribedContactIsPast === 'boolean', 'prescribedContactIsPast ska vara boolean');
+});
+
+test('isTooEarly → renewDateStr finns och matchar ÅÅÅÅ-MM-DD', () => {
+  const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 30, remaining: 80 }), NO_PREV);
+  assertEqual(r.isTooEarly, true);
+  assert(r.renewDateStr !== undefined, 'renewDateStr saknas');
+  assert(/^\d{4}-\d{2}-\d{2}$/.test(r.renewDateStr), 'renewDateStr ska matcha ÅÅÅÅ-MM-DD');
+});
+
+test('hasRemaining → endDateStr baseras på kvarvarande doser, skiljer sig från prescribedEndDateStr', () => {
+  // remaining=50, dose=1 → daysRemaining=50 → endDate = today+50
+  // prescribedEnd = (today-1) + 100 = today+99 — dessa ska skilja sig
+  const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 1, daysSince: 1, remaining: 50 }), NO_PREV);
+  assert(/^\d{4}-\d{2}-\d{2}$/.test(r.endDateStr), 'endDateStr ska vara ett datum');
+  assert(r.endDateStr !== r.prescribedEndDateStr, 'endDateStr och prescribedEndDateStr ska skilja sig');
+});
+
+test('daysRemaining och daysToPrescribedEnd finns i utdata och är tal', () => {
+  const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 150 }), NO_PREV);
+  assert(typeof r.daysRemaining       === 'number', 'daysRemaining saknas eller är inte ett tal');
+  assert(typeof r.daysToPrescribedEnd === 'number', 'daysToPrescribedEnd saknas eller är inte ett tal');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// validateValues — kantfall (saknade)
+// ═══════════════════════════════════════════════════════════
+
+group('validateValues — kantfall (saknade)');
+
+test('dos med kommatecken ("1,5") → parsas korrekt till 1.5', () => {
+  const r = validateValues('Test 10 mg', '2025-01-01', '1,5', '100', '3', '');
+  assertEqual(r.valid, true);
+  assertEqual(r.dose, 1.5, 'komma ska tolkas som decimalavskiljare');
+});
+
+test('amt = 1 (minimum) → valid', () => {
+  const r = validateValues('Test 10 mg', '2025-01-01', '1', '1', '1', '');
+  assertEqual(r.valid, true);
+  assertEqual(r.amt, 1);
+});
+
+test('amt = 10 000 (maximum) → valid', () => {
+  const r = validateValues('Test 10 mg', '2025-01-01', '1', '10000', '1', '');
+  assertEqual(r.valid, true);
+  assertEqual(r.amt, 10000);
+});
+
+test('amt = 10 001 (överstiger maximum) → fieldErrors.amtInput satt', () => {
+  const r = validateValues('Test 10 mg', '2025-01-01', '1', '10001', '1', '');
+  assertEqual(r.valid, false);
+  assert(r.fieldErrors.amtInput !== '', 'fieldErrors.amtInput ska vara satt');
+});
+
+test('leftRaw = "0" (exakt noll) → valid, remaining = 0', () => {
+  const r = validateValues('Test 10 mg', '2025-01-01', '1', '100', '3', '0');
+  assertEqual(r.valid, true);
+  assertEqual(r.remaining, 0, 'noll kvarvarande doser ska vara ett giltigt värde');
+});
+
+test('tom medRaw → incomplete', () => {
+  const r = validateValues('', '2025-01-01', '1', '100', '3', '');
+  assertEqual(r.valid, false);
+  assertEqual(r.reason, 'incomplete');
+});
+
+test('ref = 1 (minimum) → valid', () => {
+  const r = validateValues('Test 10 mg', '2025-01-01', '1', '100', '1', '');
+  assertEqual(r.valid, true);
+  assertEqual(r.ref, 1);
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// remainingDosesNote
+// ═══════════════════════════════════════════════════════════
+
+group('remainingDosesNote');
+
+const remainingDosesNote = ctx.remainingDosesNote;
+
+test('remainingDoses = null → tom sträng', () => {
+  assertEqual(remainingDosesNote({ remainingDoses: null }), '');
+});
+
+test('remainingDoses = 30, daysRemaining = 30 → nämner antal doser och dagar', () => {
+  const note = remainingDosesNote({ remainingDoses: 30, daysRemaining: 30 });
+  assertContains(note, '30 doser');
+  assertContains(note, '30 dagar');
+});
+
+test('remainingDoses = 0, daysRemaining = 0 → anger att medicinen är slut', () => {
+  const note = remainingDosesNote({ remainingDoses: 0, daysRemaining: 0 });
+  assertContains(note, 'slut');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// buildPatientText — ytterligare fall
+// ═══════════════════════════════════════════════════════════
+
+group('buildPatientText — ytterligare fall');
+
+test('single overuse, prescribedEnd i framtiden och kontaktdatum passerat → closingContactPast', () => {
+  setTestState(0, makeRenewState({
+    prescribedEndDateStr:     '2025-09-01',
+    prescribedContactIsPast:  true,
+    prescribedContactDateStr: '2025-06-10',
+  }));
+  const text = buildPatientText('sv', [], [], [{ name: 'Elvanse 50 mg', i: 0 }], 1);
+  assertContains(text, 'ta slut inom kort', 'closingContactPast-grenen ska nämna att medicinen snart tar slut');
+});
+
+test('multi: ett att förnya, ett overuse med prescribedEnd passerat → "kan nu förnyas"', () => {
+  setTestState(0, makeRenewState({ medRaw: 'Elvanse 50 mg' }));
+  setTestState(1, makeRenewState({
+    medRaw:               'Melatonin 3 mg',
+    prescribedEndDateStr: '2025-01-01',  // passerat → multiOverusePast
+  }));
+  const text = buildPatientText(
+    'sv',
+    [{ name: 'Elvanse 50 mg',  i: 0 }],
+    [],
+    [{ name: 'Melatonin 3 mg', i: 1 }],
+    2
+  );
+  assertContains(text, 'kan nu förnyas', 'multiOverusePast ska ange att receptet kan förnyas');
+});
+
+test('multi: overuse med kontaktdatum passerat → "ta slut inom kort"', () => {
+  setTestState(0, makeRenewState({ medRaw: 'Elvanse 50 mg' }));
+  setTestState(1, makeRenewState({
+    medRaw:                   'Melatonin 3 mg',
+    prescribedEndDateStr:     '2025-09-01',
+    prescribedContactIsPast:  true,
+    prescribedContactDateStr: '2025-06-10',
+  }));
+  const text = buildPatientText(
+    'sv',
+    [{ name: 'Elvanse 50 mg',  i: 0 }],
+    [],
+    [{ name: 'Melatonin 3 mg', i: 1 }],
+    2
+  );
+  assertContains(text, 'ta slut inom kort', 'multiContactPast ska nämnas');
+});
+
+test('multi: overuse med kontaktdatum i framtiden → kontaktdatum nämns', () => {
+  setTestState(0, makeRenewState({ medRaw: 'Elvanse 50 mg' }));
+  setTestState(1, makeRenewState({
+    medRaw:                   'Melatonin 3 mg',
+    prescribedEndDateStr:     '2025-10-01',
+    prescribedContactIsPast:  false,
+    prescribedContactDateStr: '2025-09-24',
+  }));
+  const text = buildPatientText(
+    'sv',
+    [{ name: 'Elvanse 50 mg',  i: 0 }],
+    [],
+    [{ name: 'Melatonin 3 mg', i: 1 }],
+    2
+  );
+  assertContains(text, '2025-09-24', 'multiFuture ska innehålla kontaktdatum');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// buildJournalText — ytterligare fall
+// ═══════════════════════════════════════════════════════════
+
+group('buildJournalText — ytterligare fall');
+
+test('multi: overuse med earlyRenewalDecision "no" → "Ej förnyat efter klinisk"', () => {
+  setTestState(0, makeRenewState({ medRaw: 'Elvanse 50 mg' }));
+  setTestState(1, makeRenewState({
+    medRaw:               'Melatonin 3 mg',
+    prescribedEndDateStr: '2025-09-01',
+    daysRemaining:        78,
+    earlyRenewalDecision: 'no',
+  }));
+  const text = buildJournalText(
+    [{ name: 'Elvanse 50 mg',  i: 0 }],
+    [],
+    [{ name: 'Melatonin 3 mg', i: 1 }],
+    2
+  );
+  assertContains(text, 'Ej förnyat efter klinisk', '"Ej förnyat" med klinisk bedömning ska framgå');
+});
+
+test('multi: earlyRenewal="overuse" i toRenew → "överstiger ordination" och klinisk bedömning', () => {
+  setTestState(0, makeRenewState({
+    medRaw:        'Elvanse 50 mg',
+    displayAvgStr: '1.80 st/dag',
+  }));
+  const text = buildJournalText(
+    [{ name: 'Elvanse 50 mg', i: 0, earlyRenewal: 'overuse' }],
+    [], [], 2
+  );
+  assertContains(text, 'överstiger ordination', 'snittförbrukning ska flaggas');
+  assertContains(text, 'klinisk, individuell bedömning', 'klinisk bedömning ska dokumenteras');
+});
+
+test('multi: earlyRenewal="tooEarly" i toRenew → klinisk bedömning och dagar kvar i åtgärdsraden', () => {
+  setTestState(0, makeRenewState({
+    medRaw:               'Elvanse 50 mg',
+    prescribedEndDateStr: '2025-09-01',
+    daysToPrescribedEnd:  78,
+  }));
+  const text = buildJournalText(
+    [{ name: 'Elvanse 50 mg', i: 0, earlyRenewal: 'tooEarly' }],
+    [], [], 2
+  );
+  assertContains(text, 'klinisk, individuell bedömning', 'tooEarly ska dokumentera klinisk bedömning');
+  assertContains(text, '78d kvar', 'kvarvarande dagar ska nämnas i åtgärdsraden');
+});
+
+test('multi: overuse med remainingDoses → doser kvar nämns i journalen', () => {
+  setTestState(0, makeRenewState({
+    medRaw:               'Elvanse 50 mg',
+    prescribedEndDateStr: '2025-09-01',
+    daysRemaining:        30,
+    remainingDoses:       30,
+    earlyRenewalDecision: null,
+  }));
+  const text = buildJournalText([], [], [{ name: 'Elvanse 50 mg', i: 0 }], 2);
+  assertContains(text, '30 doser', 'kvarvarande doser ska nämnas i journalen');
 });
 
 

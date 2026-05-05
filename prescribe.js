@@ -60,32 +60,42 @@ function calcPrescribeResult(i) {
 // calcPrescribeResult inte kan producera ett resultat.
 // field-nyckeln anger vilket inmatningsfält som är felaktigt ('pkg' eller 'date')
 // så att updatePrescribeResult kan applicera toggleError på rätt element.
+// Kontrollerar både paketstorlek och datum oberoende — returnerar det allvarligaste
+// felet (warn före info) så att användaren alltid ser relevant vägledning.
 function prescribeValidationHint(i, ps) {
   if (!ps) return null;
 
+  let pkgHint = null, dateHint = null;
+
   const pkgVal = ps.packageSize;
   const pkgNum = parseFloat(pkgVal) || 0;
-  if (pkgNum <= 0) {
-    // Tomt fält = läkaren har inte fyllt i än; ogiltigt värde = aktivt fel
-    return pkgVal !== ''
-      ? { type: 'warn', field: 'pkg',  msg: 'Förpackningsstorleken måste vara ett heltal om minst 1.' }
-      : { type: 'info', field: 'pkg',  msg: 'Ange förpackningsstorlek för att beräkna antal förpackningar.' };
+  if (!pkgVal || pkgNum <= 0) {
+    pkgHint = pkgVal !== ''
+      ? { type: 'warn', field: 'pkg', msg: 'Förpackningsstorleken måste vara ett heltal om minst 1.' }
+      : { type: 'info', field: 'pkg', msg: 'Ange förpackningsstorlek för att beräkna antal förpackningar.' };
+  } else if (!Number.isInteger(pkgNum)) {
+    pkgHint = { type: 'warn', field: 'pkg', msg: 'Förpackningsstorleken måste vara ett heltal.' };
   }
 
   if (ps.mode === 'date') {
     if (!ps.endDate) {
-      return { type: 'info', field: 'date', msg: 'Ange ett slutdatum för att beräkna antal förpackningar.' };
+      dateHint = { type: 'info', field: 'date', msg: 'Ange ett slutdatum för att beräkna antal förpackningar.' };
+    } else {
+      const today    = getToday();
+      const s        = states[i] || {};
+      const prescEnd = parseDateUTC(s.prescribedEndDateStr);
+      const start    = (prescEnd && prescEnd > today) ? prescEnd : today;
+      const ed       = parseDateUTC(ps.endDate);
+      if (!ed)          dateHint = { type: 'warn', field: 'date', msg: 'Ange ett giltigt datum (ÅÅÅÅ-MM-DD).' };
+      else if (ed <= start) dateHint = { type: 'warn', field: 'date', msg: `Slutdatumet måste vara efter ${fmtDate(start)}.` };
     }
-    const today    = getToday();
-    const s        = states[i] || {};
-    const prescEnd = parseDateUTC(s.prescribedEndDateStr);
-    const start    = (prescEnd && prescEnd > today) ? prescEnd : today;
-    const ed       = parseDateUTC(ps.endDate);
-    if (!ed)         return { type: 'warn', field: 'date', msg: 'Ange ett giltigt datum (ÅÅÅÅ-MM-DD).' };
-    if (ed <= start) return { type: 'warn', field: 'date', msg: `Slutdatumet måste vara efter ${fmtDate(start)}.` };
   }
 
-  return null;
+  // Returnera det allvarligaste felet (warn > info). Om båda är lika allvarliga,
+  // prioritera pkg eftersom det är primärfältet.
+  if (pkgHint && pkgHint.type === 'warn') return pkgHint;
+  if (dateHint && dateHint.type === 'warn') return dateHint;
+  return pkgHint || dateHint;
 }
 
 /* Uppdatera enbart resultatrutan (bevarar fokus i inmatningsfält) */
@@ -109,6 +119,20 @@ function updatePrescribeResult(i) {
   }
 
   box.textContent = '';
+
+  // Uppdatera info-raden (startdatum, täckning) — även vid samma-index-optimering
+  // då buildPrescribeInner inte körs.
+  const infoVal = getEl('ps-info-val-' + i);
+  const infoSub = getEl('ps-info-sub-' + i);
+  if (infoVal) infoVal.textContent = res ? res.startDateStr : '—';
+  if (infoSub) {
+    if (res && res.daysAlreadyCovered > 0) {
+      infoSub.textContent = `Nuv. recept täcker ${res.daysAlreadyCovered} dagar`;
+      infoSub.classList.remove('is-hidden');
+    } else {
+      infoSub.classList.add('is-hidden');
+    }
+  }
 
   // Befintligt recept täcker redan hela perioden — inget nytt behöver förskrivas
   if (res && res.packages === 0 && res.totalDays === 0 && res.daysAlreadyCovered > 0) {
@@ -160,7 +184,7 @@ function buildPrescribeInner(i) {
     inner.appendChild(el('div', { cls: 'prescribe-med-name', text: s.medRaw || `Läkemedel ${i+1}` }));
 
     const pkgInp = el('input', {
-      attrs: { type: 'number', id: 'ps-pkg-' + i, min: '1', placeholder: 'T.ex. 30' },
+      attrs: { type: 'number', id: 'ps-pkg-' + i, min: '1', step: '1', placeholder: 'T.ex. 30' },
       value: ps.packageSize || '',
     });
     pkgInp.addEventListener('input', () => { applyPrescribeStatePatch(i, { packageSize: pkgInp.value }); updatePrescribeResult(i); });
@@ -172,9 +196,12 @@ function buildPrescribeInner(i) {
     const res     = calcPrescribeResult(i);
     const infoDiv = el('div', { cls: 'prescribe-info-row' });
     infoDiv.appendChild(el('div', { cls: 'prescribe-info-label', text: 'Förskrivning fr.o.m.' }));
-    infoDiv.appendChild(el('div', { cls: 'prescribe-info-val',   text: res ? res.startDateStr : '—' }));
+    infoDiv.appendChild(el('div', { cls: 'prescribe-info-val',   text: res ? res.startDateStr : '—', attrs: { id: 'ps-info-val-' + i } }));
     if (res && res.daysAlreadyCovered > 0) {
-      infoDiv.appendChild(el('div', { cls: 'prescribe-info-sub', text: `Nuv. recept täcker ${res.daysAlreadyCovered} dagar` }));
+      infoDiv.appendChild(el('div', { cls: 'prescribe-info-sub', text: `Nuv. recept täcker ${res.daysAlreadyCovered} dagar`, attrs: { id: 'ps-info-sub-' + i } }));
+    } else {
+      // Skapa platshållare så att updatePrescribeResult kan uppdatera den vid behov
+      infoDiv.appendChild(el('div', { cls: 'prescribe-info-sub is-hidden', attrs: { id: 'ps-info-sub-' + i } }));
     }
     inner.appendChild(infoDiv);
 

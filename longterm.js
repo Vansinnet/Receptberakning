@@ -184,8 +184,13 @@ function calcLongtermCore(medRaw, ordDose, rawPeriods) {
     alertMsg   = `Snitt ${avgStr} är i linje med ordinerad dos (${ordDose} st/dag), avvikelse ${Math.abs(consumptionPct - 100).toFixed(1)}%.`;
   }
 
-  const periodSummary = periods.map((p, idx) =>
-    `  Period ${idx + 1}: ${fmtDate(p.startDate)}–${fmtDate(p.endDate)} (${p.days} dagar, ${p.total} tabletter, snitt ${p.avgPerDay.toFixed(2)} st/dag)`
+  // AKTIVT VAL: Ingen "Period N:"-numrering i journaltexten.
+  // Perioderna sorteras ovan efter startdatum för korrekt överlappsdetektion,
+  // vilket gör att sorteringsordningen kan skilja sig från UI:ts inmatningsordning.
+  // "Period 1:" i journalen skulle då peka på fel period — datumintervallen är
+  // entydiga och behöver ingen numrering.
+  const periodSummary = periods.map(p =>
+    `  ${fmtDate(p.startDate)}–${fmtDate(p.endDate)} (${p.days} dagar, ${p.total} tabletter, snitt ${p.avgPerDay.toFixed(2)} st/dag)`
   ).join('\n');
 
   return {
