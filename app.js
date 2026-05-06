@@ -282,7 +282,7 @@ if (periodsContainer) {
   periodsContainer.addEventListener('change', e => { if (e.target.matches('input[type="text"]')) calcLongterm(); });
   periodsContainer.addEventListener('click', e => { const btn=e.target.closest('[data-action="remove-period"]'); if(btn){const idx=parseInt(btn.dataset.idx,10);if(!isNaN(idx))removePeriod(idx);} });
 }
-const ltMedEl=getEl('lt-med'); if(ltMedEl) ltMedEl.addEventListener('input',calcLongtermDebounced);
+const ltMedEl=getEl('lt-med'); if(ltMedEl) ltMedEl.addEventListener('input',e=>{if(e.target.value&&e.target.value[0]!==e.target.value[0].toUpperCase()){const p=e.target.selectionStart;e.target.value=e.target.value[0].toUpperCase()+e.target.value.slice(1);e.target.setSelectionRange(p,p);}calcLongtermDebounced();});
 const ltDoseEl=getEl('lt-dose'); if(ltDoseEl) ltDoseEl.addEventListener('input',calcLongtermDebounced);
 const addPeriodBtn=getEl('addPeriodBtn'); if(addPeriodBtn) addPeriodBtn.addEventListener('click',addPeriod);
 const clearLongtermBtn=getEl('clearLongtermBtn'); if(clearLongtermBtn) clearLongtermBtn.addEventListener('click',clearLongterm);
