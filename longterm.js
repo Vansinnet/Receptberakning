@@ -276,6 +276,7 @@ function calcLongterm() {
     barEl.style.width = `${(result.barPct / 150) * 100}%`;
     barEl.className   = `consumption-bar ${result.overallStatus}`;
     barEl.textContent = result.barPct > 20 ? `${result.consumptionPct.toFixed(0)}%` : '';
+    barEl.setAttribute('aria-valuenow', String(Math.round(result.barPct)));
   }
   showEl('lt-bar-section', true);
 
@@ -288,13 +289,13 @@ function calcLongterm() {
       const badgeClass = `badge-${p.classification}`;
       const badgeText  = p.classification === 'over' ? 'Över' : p.classification === 'under' ? 'Under' : 'OK';
 
-      const row = el('div', { cls: 'period-row' });
-      row.appendChild(el('span', { cls: 'period-cell',             text: `${fmtDate(p.startDate)} – ${fmtDate(p.endDate)} (${p.days}d)` }));
-      row.appendChild(el('span', { cls: 'period-cell mono ph-avg', text: `${p.avgPerDay.toFixed(2)} st/dag` }));
-      row.appendChild(el('span', { cls: 'period-cell mono',        text: `${pPct >= 100 ? '+' : ''}${(pPct - 100).toFixed(1)}%` }));
-      const c4 = el('span', { cls: 'period-cell' });
-      c4.appendChild(el('span', { cls: `badge ${badgeClass}`, text: badgeText }));
-      row.appendChild(c4);
+      const row = el('tr', { cls: 'period-row' });
+      row.appendChild(el('td', { cls: 'period-cell',             text: `${fmtDate(p.startDate)} – ${fmtDate(p.endDate)} (${p.days}d)` }));
+      row.appendChild(el('td', { cls: 'period-cell mono ph-avg', text: `${p.avgPerDay.toFixed(2)} st/dag` }));
+      row.appendChild(el('td', { cls: 'period-cell mono',        text: `${pPct >= 100 ? '+' : ''}${(pPct - 100).toFixed(1)}%` }));
+      const td4 = el('td', { cls: 'period-cell' });
+      td4.appendChild(el('span', { cls: `badge ${badgeClass}`, text: badgeText }));
+      row.appendChild(td4);
       frag.appendChild(row);
     });
     rowsContainer.appendChild(frag);
@@ -313,11 +314,13 @@ const ltCopyTimers = new Map();
 function copyLtText() {
   const body = getEl('lt-copyBody'), text = body ? body.textContent : '';
   const btn  = getEl('ltCopyBtn');
+  if (!navigator.clipboard) { if (btn) btn.textContent = '⚠️ Kopiera manuellt'; return; }
   navigator.clipboard.writeText(text).then(() => {
     if (!btn) return;
     const orig = btn.dataset.origLabel || btn.textContent;
     btn.dataset.origLabel = orig;
     btn.textContent = '✅ Kopierat!';
+    const ann = getEl('a11y-announce'); if (ann) ann.textContent = 'Text kopierad till urklipp.';
     if (ltCopyTimers.has(btn)) clearTimeout(ltCopyTimers.get(btn));
     const t = setTimeout(() => { btn.textContent = orig; delete btn.dataset.origLabel; ltCopyTimers.delete(btn); }, 1800);
     ltCopyTimers.set(btn, t);

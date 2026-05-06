@@ -10,6 +10,7 @@ function buildMedList() {
     const isWarnDot = (s.isOveruse || s.isTooEarly) && s.earlyRenewalDecision !== 'yes';
 
     const dot    = el('span', { cls: 'status-dot' + (s.valid ? (isWarnDot ? ' warn' : ' ok') : '') });
+    if (s.valid) dot.appendChild(el('span', { cls: 'sr-only', text: isWarnDot ? 'Åtgärd krävs' : 'OK att förnya' }));
     const name   = el('div',  { cls: 'med-item-name',   text: s.medName    || `Läkemedel ${i + 1}` });
     const status = el('div',  { cls: 'med-item-status', text: s.statusText || 'Ej ifyllt' });
     const info   = el('div',  { cls: 'med-item-info' });
@@ -18,6 +19,7 @@ function buildMedList() {
     const btn = el('button', {
       cls:     'med-item' + (i === activeMedIdx ? ' active' : ''),
       dataset: { idx: String(i) },
+      attrs:   i === activeMedIdx ? { 'aria-current': 'true' } : {},
     });
     btn.appendChild(dot); btn.appendChild(info);
     btn.addEventListener('click', () => selectMed(i));
@@ -130,11 +132,12 @@ function renderResultForMed(i) {
     if (tlFill) {
       tlFill.style.width = Math.min(100, s.tlPct) + '%';
       tlFill.className   = 'tl-fill tl-fill-' + (s.isOveruse ? 'danger' : s.isTooEarly ? 'warn' : 'ok');
+      tlFill.setAttribute('aria-valuenow', String(Math.round(Math.min(100, s.tlPct))));
     }
     if (tlStart) tlStart.textContent = s.tlStart || '—';
     if (tlEnd)   tlEnd.textContent   = s.tlEnd   || '—';
   } else {
-    if (tlFill) { tlFill.style.width = '0%'; tlFill.className = 'tl-fill'; }
+    if (tlFill) { tlFill.style.width = '0%'; tlFill.className = 'tl-fill'; tlFill.setAttribute('aria-valuenow', '0'); }
     if (tlStart) tlStart.textContent = '—';
     if (tlEnd)   tlEnd.textContent   = '—';
   }
@@ -191,7 +194,9 @@ function switchResultTab(tab) {
   if (!states[activeMedIdx]) return;
   setMedUIPreference(activeMedIdx, 'activeTab', tab);
   document.querySelectorAll('#copySection .copy-tab').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.tab === tab);
+    const isActive = btn.dataset.tab === tab;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-selected', String(isActive));
   });
   const body    = getEl('copyBodyResult');
   const langBtn = getEl('langBtnResult');

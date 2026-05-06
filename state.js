@@ -41,6 +41,7 @@ function setMedUIPreference(i, key, value) {
 function clearAllMedStateData() {
   states        = states.map(() => ({}));
   prescribeState = {};
+  activeMedIdx  = 0;
   ltPeriods     = ltPeriods.map(() => ({ start: '', total: '', end: '' }));
 }
 

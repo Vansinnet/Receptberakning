@@ -7,11 +7,9 @@ function validateValues(medRaw, dateVal, doseRaw, amtRaw, refRaw, leftRaw) {
 
   if (medRaw.length > 100) {
     fieldErrors.medInput = 'Läkemedelsnamnet får inte överstiga 100 tecken.';
-    return { valid: false, reason: 'incomplete', fieldErrors };
   }
   if (dateVal.length > 10) {
     fieldErrors.dateInput = 'Ogiltigt datum.';
-    return { valid: false, reason: 'invalid_date', fieldErrors };
   }
 
   const amt = parseInt(amtRaw, 10);
@@ -30,15 +28,14 @@ function validateValues(medRaw, dateVal, doseRaw, amtRaw, refRaw, leftRaw) {
 
   if (refOutOfRange) return { valid: false, reason: 'too_many_refs', fieldErrors };
 
-  // Datumvalidering sker före inkomplettkontrollen — annars rensas datumfelet
-  // av den tidiga returnen när övriga fält (dos, uttag) fortfarande är tomma.
   const pDate = dateVal ? parseDateUTC(dateVal) : null;
   if (dateVal && !pDate) fieldErrors.dateInput = 'Ogiltigt datum.';
 
   const otherMissing = !medRaw || !dateVal || isNaN(dose) || doseIsInvalid || isNaN(amt) || amtIsInvalid || refIsInvalid || !refNum || refNum < 1;
-  if (otherMissing || !pDate) {
+  const hasFieldError = Object.values(fieldErrors).some(e => e !== '');
+  if (otherMissing || !pDate || hasFieldError) {
     // Bevara 'invalid_date' som reason om ENBART datumet är ogiltigt (övriga fält OK).
-    const reason = (!pDate && dateVal && !otherMissing) ? 'invalid_date' : 'incomplete';
+    const reason = (!pDate && dateVal && !otherMissing && fieldErrors.medInput === '') ? 'invalid_date' : 'incomplete';
     return { valid: false, reason, fieldErrors };
   }
 

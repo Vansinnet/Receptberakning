@@ -148,11 +148,15 @@ function updatePrescribeResult(i) {
     numRow.appendChild(el('div', { cls: 'prescribe-result-unit', text: res.packageSize > 0 ? `förp.  à ${res.packageSize} st` : 'förp.' }));
 
     const wrap = el('div', { cls: 'prescribe-result' });
-    wrap.appendChild(el('div', { cls: 'prescribe-result-label',   text: 'Antal förpackningar att förskriva' }));
+    wrap.appendChild(el('div', { cls: 'prescribe-result-label',   text: 'Antal förpackningar att förskriva',
+      attrs: { 'data-tooltip': 'Antal förpackningar som krävs för att täcka den angivna perioden med den ordinerade dosen. Avrundas uppåt till hela förpackningar.' } }));
     wrap.appendChild(numRow);
-    wrap.appendChild(el('div', { cls: 'prescribe-result-details', text: `${res.totalTablets} tabletter ÷ ${res.packageSize} st/förp.` }));
-    wrap.appendChild(el('div', { cls: 'prescribe-result-period',  text: `${res.startDateStr} – ${res.endDateStr}` }));
-    wrap.appendChild(el('div', { cls: 'prescribe-result-days',    text: `${res.totalDays} dagar` }));
+    wrap.appendChild(el('div', { cls: 'prescribe-result-details', text: `${res.totalTablets} tabletter ÷ ${res.packageSize} st/förp.`,
+      attrs: { 'data-tooltip': 'Totalt antal tabletter dividerat med förpackningsstorlek.' } }));
+    wrap.appendChild(el('div', { cls: 'prescribe-result-period',  text: `${res.startDateStr} – ${res.endDateStr}`,
+      attrs: { 'data-tooltip': 'Period som den nya förskrivningen täcker.' } }));
+    wrap.appendChild(el('div', { cls: 'prescribe-result-days',    text: `${res.totalDays} dagar`,
+      attrs: { 'data-tooltip': 'Totalt antal dagar från förskrivningsstart till slutdatum.' } }));
     box.appendChild(wrap);
     renderPrescribeSummary();
     return;
@@ -189,13 +193,13 @@ function buildPrescribeInner(i) {
     });
     pkgInp.addEventListener('input', () => { applyPrescribeStatePatch(i, { packageSize: pkgInp.value }); updatePrescribeResult(i); });
     const pkgDiv = el('div', { cls: 'field', style: 'margin-top:10px' });
-    pkgDiv.appendChild(el('label', { text: 'Förpackningsstorlek (st)', attrs: { for: 'ps-pkg-' + i } }));
+    pkgDiv.appendChild(el('label', { text: 'Förpackningsstorlek (st)', attrs: { for: 'ps-pkg-' + i, 'data-tooltip': 'Antal tabletter per förpackning. Beräkningen dividerar totalt antal tabletter med förpackningsstorleken för att bestämma hur många förpackningar som ska förskrivas.' } }));
     pkgDiv.appendChild(pkgInp);
     inner.appendChild(pkgDiv);
 
     const res     = calcPrescribeResult(i);
     const infoDiv = el('div', { cls: 'prescribe-info-row' });
-    infoDiv.appendChild(el('div', { cls: 'prescribe-info-label', text: 'Förskrivning fr.o.m.' }));
+    infoDiv.appendChild(el('div', { cls: 'prescribe-info-label', text: 'Förskrivning fr.o.m.', attrs: { 'data-tooltip': 'Förskrivningen startar när nuvarande recept löper ut för att undvika dubbel täckning.' } }));
     infoDiv.appendChild(el('div', { cls: 'prescribe-info-val',   text: res ? res.startDateStr : '—', attrs: { id: 'ps-info-val-' + i } }));
     if (res && res.daysAlreadyCovered > 0) {
       infoDiv.appendChild(el('div', { cls: 'prescribe-info-sub', text: `Nuv. recept täcker ${res.daysAlreadyCovered} dagar`, attrs: { id: 'ps-info-sub-' + i } }));
@@ -206,11 +210,15 @@ function buildPrescribeInner(i) {
     inner.appendChild(infoDiv);
 
     const toggleDiv = el('div', { cls: 'prescribe-mode-toggle' });
+    const modeTooltips = {
+      months: 'Ange antal månader som förskrivningen ska täcka, inklusive tid som nuvarande recept redan täcker.',
+      date:   'Ange ett specifikt slutdatum för förskrivningen.',
+    };
     ['months', 'date'].forEach(mode => {
       const btn = el('button', {
         cls:   'prescribe-mode-btn' + (ps.mode === mode ? ' active' : ''),
         text:  mode === 'months' ? 'Månader' : 'Datum',
-        attrs: { type: 'button' },
+        attrs: { type: 'button', 'data-tooltip': modeTooltips[mode] },
       });
       btn.addEventListener('click', () => { applyPrescribeStatePatch(i, { mode }); buildPrescribeInner(i); });
       toggleDiv.appendChild(btn);
@@ -219,7 +227,7 @@ function buildPrescribeInner(i) {
 
     const durDiv = el('div', { cls: 'field' });
     if (ps.mode === 'months') {
-      durDiv.appendChild(el('label', { text: 'Förskriva i antal månader', attrs: { for: 'ps-months-' + i } }));
+      durDiv.appendChild(el('label', { text: 'Förskriva i antal månader', attrs: { for: 'ps-months-' + i, 'data-tooltip': 'Antal månader som den nya förskrivningen ska täcka. Tid som nuvarande recept täcker räknas av automatiskt.' } }));
       const durSel = el('select', { cls: 'prescribe-select', attrs: { id: 'ps-months-' + i } });
       for (let m = 1; m <= 12; m++) {
         const opt = el('option', { text: m === 1 ? '1 månad' : `${m} månader`, value: String(m) });
@@ -229,7 +237,7 @@ function buildPrescribeInner(i) {
       durSel.addEventListener('change', () => { applyPrescribeStatePatch(i, { months: parseInt(durSel.value, 10) }); updatePrescribeResult(i); });
       durDiv.appendChild(durSel);
     } else {
-      durDiv.appendChild(el('label', { text: 'Förskriva t.o.m.', attrs: { for: 'ps-enddate-' + i } }));
+      durDiv.appendChild(el('label', { text: 'Förskriva t.o.m.', attrs: { for: 'ps-enddate-' + i, 'data-tooltip': 'Sista datum som den nya förskrivningen ska täcka. Måste vara efter nuvarande recepts slutdatum.' } }));
       const durInp = el('input', {
         attrs: { type: 'text', id: 'ps-enddate-' + i, inputmode: 'numeric',
                  placeholder: 'ÅÅÅÅ-MM-DD', maxlength: '10', autocomplete: 'off' },

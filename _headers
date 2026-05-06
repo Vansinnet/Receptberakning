@@ -10,7 +10,7 @@
 
   # Stänger av webbläsarfunktioner som verktyget inte behöver
   # Inkluderar moderna fingerprinting- och spårnings-APIs
-  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=(), interest-cohort=(), browsing-topics=(), attribution-reporting=(), identity-credentials-get=()
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=(), accelerometer=(), ambient-light-sensor=(), autoplay=(), display-capture=(), fullscreen=(), gyroscope=(), magnetometer=(), midi=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), xr-spatial-tracking=(), interest-cohort=(), browsing-topics=(), attribution-reporting=(), identity-credentials-get=()
 
   # Förhindrar att sidan bäddas in i en iframe (clickjacking-skydd)
   # frame-ancestors i <meta>-CSP ignoreras av webbläsare per spec — denna header krävs
@@ -31,15 +31,17 @@
   # Säkert här eftersom appen inte laddar några externa resurser
   Cross-Origin-Embedder-Policy: require-corp
 
+  # Förhindrar DNS-prefetch på utgående länkar (FASS) — undviker DNS-läckage
+  # innan användaren aktivt klickar
+  X-DNS-Prefetch-Control: off
+
+  # Blockar cross-domain-förfrågningar från Adobe Flash/PDF (defense-in-depth)
+  X-Permitted-Cross-Domain-Policies: none
+
 # Strikt cache-policy för HTML-dokumentet — förhindrar att webbläsaren sparar sidan
 # till diskcache på delade datorer i klinisk miljö. Gäller enbart index.html;
 # statiska resurser (CSS/JS) kan cachas normalt eftersom de inte innehåller patientdata.
 /
-  Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0
-  Pragma: no-cache
-  Expires: 0
-
-/index.html
   Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0
   Pragma: no-cache
   Expires: 0

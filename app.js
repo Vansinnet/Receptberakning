@@ -24,6 +24,8 @@ function applyTheme(t) {
   document.documentElement.setAttribute('data-theme', safeTheme);
   const sel = getEl('themeSelect'); if (sel) sel.value = safeTheme;
   try { localStorage.setItem('theme', safeTheme); } catch(e) {}
+  const ann = getEl('a11y-announce');
+  if (ann) ann.textContent = safeTheme === 'dark' ? 'Mörkt tema valt' : safeTheme === 'sakura' ? 'Körsbärstema valt' : 'Kliniskt tema valt';
 }
 
 // === FLIK-HANTERING (huvud) ===
@@ -68,6 +70,7 @@ function resetTimer(isUserEvent=false) {
 
 /* Lägg till / ta bort läkemedel */
 let _addMedLocked = false;
+let _clearCardLocked = false;
 function addMedCard() {
   if (_addMedLocked) return;
   if (states.length >= 8) { showToast('Max 8 läkemedel kan hanteras samtidigt.'); return; }
@@ -83,6 +86,10 @@ function addMedCard() {
 }
 
 function clearCurrentCard() {
+  if (_clearCardLocked) return;
+  _clearCardLocked = true;
+  setTimeout(() => { _clearCardLocked = false; }, 300);
+
   const i = activeMedIdx;
 
   if (states.length > 1) {
@@ -177,9 +184,11 @@ function copyResultText() {
   const body = getEl('copyBodyResult');
   const text = body ? body.textContent : '';
   const btn = getEl('copyBtnResult');
+  if (!navigator.clipboard) { if(btn) btn.textContent='⚠️ Kopiera manuellt'; return; }
   navigator.clipboard.writeText(text).then(()=>{
     if (!btn) return;
     const orig = btn.dataset.origLabel||btn.textContent; btn.dataset.origLabel=orig; btn.textContent='✅ Kopierat!';
+    const ann = getEl('a11y-announce'); if (ann) ann.textContent = 'Text kopierad till urklipp.';
     clearTimeout(copyFeedbackTimers['result']);
     copyFeedbackTimers['result'] = setTimeout(()=>{ btn.textContent=orig; delete btn.dataset.origLabel; },1800);
   }).catch(()=>{ if(btn) btn.textContent='⚠️ Kopiera manuellt'; });
@@ -317,9 +326,31 @@ const continueSessionBtn=getEl('continueSessionBtn'); if(continueSessionBtn) con
 // Datum-cache och omräkning vid fönsterfokus
 function recalcOnDateChange() {
   _todayCache=null; _todayCacheKey='';
-  if (states[activeMedIdx]) calc();
-  // Kör bara om läkaren har börjat fylla i långtidsfliken — annars rensas ett
-  // tomt formulär i onödan vid varje fönsterreaktivering.
+  calc();
+  for (let i = 0; i < states.length; i++) {
+    if (i === activeMedIdx) continue;
+    const s = states[i];
+    // AKTIVT VAL: calculable===false hoppas inte över — daysSince===0-kort ska kunna
+    // räknas om vid datumomslag. Övriga calculable:false-fall (totalDays>3650, remaining>total)
+    // är inte datumkänsliga men kostnaden för ett extra calcCore-anrop är försumbar.
+    if (!s || !s.valid) continue;
+    const inputData = validateValues(
+      s.medRaw || '', s.dateVal || '', s.doseRaw || '',
+      s.amtRaw || '', s.refRaw || '', s.leftRaw || ''
+    );
+    if (!inputData.valid) continue;
+    const prev = {
+      isOveruse: s.isOveruse || false,
+      isTooEarly: s.isTooEarly || false,
+      earlyRenewalDecision: s.earlyRenewalDecision || null,
+    };
+    try {
+      applyMedStatePatch(i, calcCore(inputData, prev));
+    } catch (err) {
+      console.error('[calcCore] oväntat fel:', err.message || err);
+    }
+  }
+  generateAndDistribute();
   const doseEl = getEl('lt-dose');
   if (doseEl && doseEl.value) calcLongterm();
 }
@@ -345,7 +376,15 @@ window.addEventListener('pagehide',()=>{
     const ee = getEl('lt-end-'   + i); if (ee) ee.value = '';
   }
 });
-window.addEventListener('pageshow',e=>{ if(!e.persisted)return; _todayCache=null; resetTimer(); });
+window.addEventListener('pageshow',e=>{
+  if(!e.persisted)return;
+  _todayCache=null;
+  resetTimer();
+  buildMedList();
+  renderFormForMed(activeMedIdx);
+  renderResultForMed(activeMedIdx);
+  buildPeriodContainer();
+});
 
 resetTimer();
 
@@ -384,4 +423,16 @@ resetTimer();
   });
   document.addEventListener('click', () => bubble.classList.remove('visible'));
   document.addEventListener('scroll', () => bubble.classList.remove('visible'), true);
+  document.addEventListener('focusin', e => {
+    const tooltipTarget = e.target.closest('[data-tooltip]');
+    if (!tooltipTarget) { bubble.classList.remove('visible'); return; }
+    bubble.textContent = tooltipTarget.dataset.tooltip;
+    bubble.classList.add('visible');
+    const rect = tooltipTarget.getBoundingClientRect();
+    position({ clientX: rect.left + rect.width / 2, clientY: rect.top });
+  });
+  document.addEventListener('focusout', e => {
+    if (!e.relatedTarget || !e.relatedTarget.closest('[data-tooltip]'))
+      bubble.classList.remove('visible');
+  });
 }());
