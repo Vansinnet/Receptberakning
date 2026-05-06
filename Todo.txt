@@ -1,13 +1,7 @@
 Roadmap
 1) Kort sikt
-Fixa ett test av både ui och calc, merga dem till ett test där resultatet tydligt delar in ui i en del och calc i en del.
+
 Förbättring #1: Print-stödet är bra men kunde visa prescribe-sammanställningen tydligare.
-
-
-2) Inom några veckor (någon gång under maj -26)
-När allt är på plats i verktyget och optimerat enligt state of the art:
-
-Kör 100 simuleringar av verktyget med hjälp av AI - mål 0% anmärkningar
 
 3) Långsikt (juni-augusti -26)
 Standardutförande är läkarvyn - skapa en  sjuksköterskevy som hanterar receptförfrågningar initialt eller vid ett besök hos ssk som förbereder vad läkaren bör göra. Oklart ännu vad det ska innehålla exakt.
