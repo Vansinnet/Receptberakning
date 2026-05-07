@@ -7,5 +7,11 @@ Förbättring #1: Print-stödet är bra men kunde visa prescribe-sammanställnin
 Standardutförande är läkarvyn - skapa en  sjuksköterskevy som hanterar receptförfrågningar initialt eller vid ett besök hos ssk som förbereder vad läkaren bör göra. Oklart ännu vad det ska innehålla exakt.
 Förberedelse inför sjuksköterskevy (maj–juni)
 Definiera exakt vad ssk-vyn ska innehålla (t.ex. initial bedömning, flaggor till läkare, förenklad formulär, etc.)
+Hittills: 
+Formulera delsvar till patient att ärendet är bedömt och har lagst till läkare för bedömning
+Formulera slutgiltigt svar att patienten får vänta på recept och återkomma datum YYXXZZ.
+Journal ska framgå att besök har ägt rum och puls och blodtryck (eller andra avgörande faktorer) är kontrollerat och okej. Ärendet läggs till läkare för vidare handläggning. Det ska också framgår när patienten senast fick recept och hur länge det förväntades räcka så att läkaren kan läsa journal direkt.
+
+
 Identifiera vilka delar av nuvarande kod som kan återanvändas (calcCore, state-hantering, textgenerering)
 
