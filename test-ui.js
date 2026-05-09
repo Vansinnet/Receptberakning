@@ -1025,7 +1025,7 @@ test('giltig indata → FASS-länk visas', () => {
   getEl('lt-dose').value = '1';
   setupLtPeriods([{ start: '2025-03-15', total: '90', end: '2025-06-15' }]);
   ctx.calcLongterm();
-  assertEqual(getEl('lt-fassBtn').style.display, 'inline-flex', 'FASS-länk ska vara synlig');
+  assert(!getEl('lt-fassBtn').classList.contains('is-hidden'), 'FASS-länk ska vara synlig (is-hidden borttagen)');
 });
 
 test('giltig indata → copySection visas med journalText', () => {

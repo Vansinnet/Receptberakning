@@ -1,5 +1,14 @@
 // === VALIDERING + BERÄKNING ===
 
+// Delad datumvalidering — används av både DOM-hanterare och validateValues
+function validateDateField(val) {
+  if (!val) return { valid: true, error: '' };
+  const pDate = parseDateUTC(val);
+  if (!pDate) return { valid: false, error: 'Ogiltigt datum.' };
+  if (pDate > getToday()) return { valid: false, error: 'Datumet är satt i framtiden.' };
+  return { valid: true, error: '', pDate };
+}
+
 // Ren valideringsfunktion utan DOM-beroende.
 // Returnerar alltid fieldErrors så att anroparen kan applicera dem på valfritt sätt.
 function validateValues(medRaw, dateVal, doseRaw, amtRaw, refRaw, leftRaw) {
@@ -158,7 +167,7 @@ function calcCore(inputData, prev) {
     if (consumed < 0) {
       // Kontrollflödet borde aldrig nå hit — consumed < 0 är logiskt uteslutet av
       // earlyPickup-logiken ovan. Om det ändå sker är det ett programmeringsfel.
-      console.error('[calcCore] consumed < 0 — oväntat tillstånd', { calcBase, remaining });
+      console.error('[calcCore] consumed < 0 — oväntat tillstånd. Kontrollera inmatningen.');
       return { valid: false, isOveruse: false, isTooEarly: false, statusText: 'Internt fel — kontrollera inmatningen.' };
     }
     avgNum        = consumed / daysSince;
@@ -249,7 +258,7 @@ function calcCore(inputData, prev) {
   // Alerts — byggs som strukturerade objekt, renderas via DOM (ingen innerHTML med användardata)
   const alerts = [];
   const consumptionPct         = (avgNum / inputData.dose) * 100;
-  const overuseSupressedBy7day = !isOveruse && daysRemaining <= 7 && avgNum > inputData.dose * 1.10;
+  const overuseSupressedBy7day = !isOveruse && daysRemaining >= 0 && daysRemaining <= 7 && avgNum > inputData.dose * 1.10;
   if (isOveruse) {
     const daysNote = daysRemaining > 0 ? ` — ${daysRemaining} dagar kvar` : ` — förskrivningen är slut`;
     alerts.push({ type: 'danger', title: 'Förbrukning överstiger ordination', message: `Snitt ${displayAvg} ${avgNote}${daysNote}. Gör en individuell bedömning.` });
@@ -311,22 +320,15 @@ function calcCore(inputData, prev) {
   };
 }
 
-function calc(i = activeMedIdx) {
+function calc(i = activeMedIdx, skipGenerate = false) {
   // AKTIVT VAL: ignorera föråldrade debounce-anrop om användaren bytt läkemedel under fördröjningen
   if (i !== activeMedIdx) return;
   resetTimer();
   saveFormValues(i);
   applyMedStatePatch(i, { valid: false });
 
-  // DOM: uppdatera FASS-länk och läkemedelsnamn i formulärhuvudet
+  updateFormHeader(i);
   const s = states[i];
-  const fassBtn = getEl('fassBtnForm');
-  if (fassBtn) {
-    if (s.medRaw) { fassBtn.href = getFassUrl(s.medRaw); fassBtn.classList.remove('is-hidden'); }
-    else fassBtn.classList.add('is-hidden');
-  }
-  const nameEl = getEl('formMedName');
-  if (nameEl) nameEl.textContent = s.medName || `Läkemedel ${i+1}`;
 
   const inputData = validateInputs();
   const prev = {
@@ -352,8 +354,8 @@ function calc(i = activeMedIdx) {
     setMedUIPreference(i, 'patientLang', states[i].patientLang || 'sv');
   }
 
-  buildMedList();
-  generateAndDistribute();
+  updateMedListStatuses();
+  if (!skipGenerate) generateAndDistribute();
 }
 
 // === TEXTGENERERING ===

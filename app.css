@@ -52,37 +52,27 @@
 
 [data-theme="klinisk"] {
   --primary: #0d9488; --primary-light: #f0fdfa; --primary-hover: #0f766e;
-  --bg: #f0fdfa; --surface: #ffffff; --surface2: #ccfbf1;
+  --bg: #f0fdfa; --surface2: #ccfbf1;
   --text: #134e4a; --text-muted: #3d706b;
   --border: #99f6e4; --border-strong: #5eead4;
   --shadow-sm: 0 1px 3px rgba(13,148,136,0.08), 0 1px 2px rgba(13,148,136,0.05);
   --shadow-md: 0 4px 16px rgba(13,148,136,0.10), 0 2px 6px rgba(13,148,136,0.06);
-  --green: #15803d;  --green-bg: #f0fdf4;  --green-border: #86efac;
-  --amber: #b45309;  --amber-bg: #fffbeb;  --amber-border: #fcd34d;
-  --red: #dc2626;    --red-bg: #fef2f2;    --red-border: #fca5a5;
-  --blue: #0369a1;   --blue-bg: #f0f9ff;   --blue-border: #bae6fd;
-  --violet: #7c3aed; --violet-bg: #f5f3ff; --violet-border: #ddd6fe;
-  --input-bg: #ffffff; --code-bg: #f0fdfa;
+  --blue: #0369a1; --blue-bg: #f0f9ff; --blue-border: #bae6fd;
+  --code-bg: #f0fdfa;
   --clear-btn: #ccfbf1; --clear-btn-hover: #99f6e4; --clear-btn-text: #134e4a;
-  --danger-bg: var(--red-bg); --danger-color: var(--red); --danger-border: var(--red-border); --danger-hover: var(--red-border);
 }
 
 
 [data-theme="sakura"] {
   --primary: #db2777; --primary-light: #fce7f3; --primary-hover: #be185d;
-  --bg: #fdf2f8; --surface: #ffffff; --surface2: #fce7f3;
+  --bg: #fdf2f8; --surface2: #fce7f3;
   --text: #831843; --text-muted: #9d174d;
   --border: #fbcfe8; --border-strong: #f9a8d4;
   --shadow-sm: 0 1px 3px rgba(219,39,119,0.08), 0 1px 2px rgba(219,39,119,0.05);
   --shadow-md: 0 4px 16px rgba(219,39,119,0.10), 0 2px 6px rgba(219,39,119,0.06);
-  --green: #15803d;  --green-bg: #f0fdf4;  --green-border: #86efac;
-  --amber: #b45309;  --amber-bg: #fffbeb;  --amber-border: #fcd34d;
-  --red: #dc2626;    --red-bg: #fef2f2;    --red-border: #fca5a5;
-  --blue: #0369a1;   --blue-bg: #f0f9ff;   --blue-border: #bae6fd;
-  --violet: #7c3aed; --violet-bg: #f5f3ff; --violet-border: #ddd6fe;
-  --input-bg: #ffffff; --code-bg: #fdf2f8;
+  --blue: #0369a1; --blue-bg: #f0f9ff; --blue-border: #bae6fd;
+  --code-bg: #fdf2f8;
   --clear-btn: #fce7f3; --clear-btn-hover: #fbcfe8; --clear-btn-text: #831843;
-  --danger-bg: var(--red-bg); --danger-color: var(--red); --danger-border: var(--red-border); --danger-hover: var(--red-border);
 }
 
 /* ── Reset ── */
@@ -360,7 +350,6 @@ html, body {
 .verdict-sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
 
 /* Tidslinje */
-.tl-wrap {}
 .tl-label {
   font-size: 10px; font-weight: 700; color: var(--text-muted);
   text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px;
@@ -369,7 +358,7 @@ html, body {
   height: 6px; background: var(--border); border-radius: 3px; position: relative;
 }
 .tl-fill {
-  height: 6px; border-radius: 3px; position: relative; transition: width 0.4s ease;
+  height: 6px; border-radius: 3px; position: relative; transition: width 0.4s ease; width: 0%;
 }
 .tl-fill-ok    { background: var(--green); }
 .tl-fill-warn  { background: var(--amber); }
@@ -615,12 +604,12 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   background: var(--primary-light); color: var(--primary);
   font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
+.card-num-lt { background: var(--violet-bg); color: var(--violet); }
 .card-title { font-size: 14px; font-weight: 700; }
 
 /* Tvåkolumns layout för Långvarig */
 .longterm-body {
   display: flex;
-  align-items: stretch;
   min-height: 400px;
 }
 .longterm-form-col {
@@ -641,6 +630,8 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   flex-direction: column;
   gap: 12px;
 }
+#lt-result { display: none; }
+#lt-copySection { display: none; }
 
 .info-banner-lt {
   background: var(--blue-bg); border: 1px solid var(--blue-border);
@@ -896,7 +887,6 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   width: 100%;
 }
 .prescribe-summary-row:hover {
-  background: var(--surface2);
   color: var(--text);
   border-color: var(--border);
 }

@@ -170,3 +170,24 @@ function buildResultRow(frag, label, valueText, badgeNode=null) {
   frag.appendChild(rk);
   frag.appendChild(rv);
 }
+
+/* Delad klippbordsfunktion */
+const _copyTimers = {};
+function copyTextToClipboard(bodyId, btnId, timerKey) {
+  const body = getEl(bodyId), text = body ? body.textContent : '';
+  const btn = getEl(btnId);
+  if (!navigator.clipboard) { if (btn) btn.textContent = '⚠️ Kopiera manuellt'; return; }
+  navigator.clipboard.writeText(text).then(() => {
+    if (!btn) return;
+    const orig = btn.dataset.origLabel || btn.textContent;
+    btn.dataset.origLabel = orig;
+    btn.textContent = '✅ Kopierat!';
+    const ann = getEl('a11y-announce'); if (ann) ann.textContent = 'Text kopierad till urklipp.';
+    if (_copyTimers[timerKey]) clearTimeout(_copyTimers[timerKey]);
+    _copyTimers[timerKey] = setTimeout(() => {
+      btn.textContent = orig;
+      delete btn.dataset.origLabel;
+      delete _copyTimers[timerKey];
+    }, 1800);
+  }).catch(() => { if (btn) btn.textContent = '⚠️ Kopiera manuellt'; });
+}

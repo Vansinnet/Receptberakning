@@ -174,7 +174,39 @@ function updatePrescribeResult(i) {
   }
 }
 
-/* Bygg hela panelens innehåll (anropas vid initiering och lägesbyte) */
+/* Bygger endast durationsfältet (månader-select eller datum-input) — används av både
+   buildPrescribeInner (initialt) och lägesväxling (inkrementellt). */
+function buildDurationField(i) {
+  const ps = prescribeState[i];
+  const durDiv = el('div', { cls: 'field', attrs: { id: 'ps-dur-' + i } });
+  if (ps.mode === 'months') {
+    durDiv.appendChild(el('label', { text: 'Förskriva i antal månader', attrs: { for: 'ps-months-' + i, 'data-tooltip': 'Antal månader som den nya förskrivningen ska täcka. Tid som nuvarande recept täcker räknas av automatiskt.' } }));
+    const durSel = el('select', { cls: 'prescribe-select', attrs: { id: 'ps-months-' + i } });
+    for (let m = 1; m <= 12; m++) {
+      const opt = el('option', { text: m === 1 ? '1 månad' : `${m} månader`, value: String(m) });
+      if (m === ps.months) opt.selected = true;
+      durSel.appendChild(opt);
+    }
+    durSel.addEventListener('change', () => { applyPrescribeStatePatch(i, { months: parseInt(durSel.value, 10) }); updatePrescribeResult(i); });
+    durDiv.appendChild(durSel);
+  } else {
+    durDiv.appendChild(el('label', { text: 'Förskriva t.o.m.', attrs: { for: 'ps-enddate-' + i, 'data-tooltip': 'Sista datum som den nya förskrivningen ska täcka. Måste vara efter nuvarande recepts slutdatum.' } }));
+    const durInp = el('input', {
+      attrs: { type: 'text', id: 'ps-enddate-' + i, inputmode: 'numeric',
+               placeholder: 'ÅÅÅÅ-MM-DD', maxlength: '10', autocomplete: 'off' },
+      value: ps.endDate || '',
+    });
+    durInp.addEventListener('input', () => {
+      autoFormatDate(durInp);
+      applyPrescribeStatePatch(i, { endDate: durInp.value });
+      updatePrescribeResult(i);
+    });
+    durDiv.appendChild(durInp);
+  }
+  return durDiv;
+}
+
+/* Bygg hela panelens innehåll (anropas vid initiering, ej vid lägesbyte) */
 function buildPrescribeInner(i) {
   const inner = getEl('prescribeInner');
   if (!inner) return;
@@ -219,38 +251,22 @@ function buildPrescribeInner(i) {
         cls:   'prescribe-mode-btn' + (ps.mode === mode ? ' active' : ''),
         text:  mode === 'months' ? 'Månader' : 'Datum',
         attrs: { type: 'button', 'data-tooltip': modeTooltips[mode] },
+        dataset: { mode },
       });
-      btn.addEventListener('click', () => { applyPrescribeStatePatch(i, { mode }); buildPrescribeInner(i); });
+      btn.addEventListener('click', () => {
+        applyPrescribeStatePatch(i, { mode: btn.dataset.mode });
+        toggleDiv.querySelectorAll('.prescribe-mode-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.mode === btn.dataset.mode);
+        });
+        const durEl = getEl('ps-dur-' + i);
+        if (durEl) durEl.replaceWith(buildDurationField(i));
+        updatePrescribeResult(i);
+      });
       toggleDiv.appendChild(btn);
     });
     inner.appendChild(toggleDiv);
 
-    const durDiv = el('div', { cls: 'field' });
-    if (ps.mode === 'months') {
-      durDiv.appendChild(el('label', { text: 'Förskriva i antal månader', attrs: { for: 'ps-months-' + i, 'data-tooltip': 'Antal månader som den nya förskrivningen ska täcka. Tid som nuvarande recept täcker räknas av automatiskt.' } }));
-      const durSel = el('select', { cls: 'prescribe-select', attrs: { id: 'ps-months-' + i } });
-      for (let m = 1; m <= 12; m++) {
-        const opt = el('option', { text: m === 1 ? '1 månad' : `${m} månader`, value: String(m) });
-        if (m === ps.months) opt.selected = true;
-        durSel.appendChild(opt);
-      }
-      durSel.addEventListener('change', () => { applyPrescribeStatePatch(i, { months: parseInt(durSel.value, 10) }); updatePrescribeResult(i); });
-      durDiv.appendChild(durSel);
-    } else {
-      durDiv.appendChild(el('label', { text: 'Förskriva t.o.m.', attrs: { for: 'ps-enddate-' + i, 'data-tooltip': 'Sista datum som den nya förskrivningen ska täcka. Måste vara efter nuvarande recepts slutdatum.' } }));
-      const durInp = el('input', {
-        attrs: { type: 'text', id: 'ps-enddate-' + i, inputmode: 'numeric',
-                 placeholder: 'ÅÅÅÅ-MM-DD', maxlength: '10', autocomplete: 'off' },
-        value: ps.endDate || '',
-      });
-      durInp.addEventListener('input', () => {
-        autoFormatDate(durInp);
-        applyPrescribeStatePatch(i, { endDate: durInp.value });
-        updatePrescribeResult(i);
-      });
-      durDiv.appendChild(durInp);
-    }
-    inner.appendChild(durDiv);
+    inner.appendChild(buildDurationField(i));
 
     inner.appendChild(el('div', { attrs: { id: 'ps-result-' + i } }));
     updatePrescribeResult(i);

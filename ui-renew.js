@@ -1,9 +1,53 @@
 // === LÄKEMEDELSLISTA — sidebar ===
+
+// Modulnivå-cache för statiska DOM-element — getElementById görs en gång per ID.
+// Alla ID:n är statiska (finns från sidladdning, tas aldrig bort ur DOM:en).
+const _dom = {};
+function _el(id) { return _dom[id] || (_dom[id] = document.getElementById(id)); }
+
+// Metrics-grid: jämför före omritning — calcCore genererar nya värden endast
+// när indata ändrats, vilket är långsammare än varje renderResultForMed-anrop.
+let _lastMetricsKey = '';
+
+// Uppdatera endast status och aktivmarkör — används vid kosmetiska ändringar (calc, setEarlyDecision).
+// Vid strukturella ändringar (läkemedel tillagt/borttaget/bytt) används buildMedList().
+function updateMedListStatuses() {
+  const list = _el('medList');
+  if (!list) return;
+  list.querySelectorAll('.med-item').forEach(btn => {
+    const i = parseInt(btn.dataset.idx, 10);
+    const s = states[i] || {};
+    const isActive   = i === activeMedIdx;
+    const isWarnDot  = (s.isOveruse || s.isTooEarly) && s.earlyRenewalDecision !== 'yes';
+
+    if (isActive) {
+      btn.classList.add('active');
+      btn.setAttribute('aria-current', 'true');
+    } else {
+      btn.classList.remove('active');
+      btn.removeAttribute('aria-current');
+    }
+
+    const dot = btn.querySelector('.status-dot');
+    if (dot) {
+      dot.className = 'status-dot' + (s.valid ? (isWarnDot ? ' warn' : ' ok') : '');
+      const sr = dot.querySelector('.sr-only');
+      if (sr) sr.textContent = s.valid ? (isWarnDot ? 'Åtgärd krävs' : 'OK att förnya') : '';
+    }
+
+    const status = btn.querySelector('.med-item-status');
+    if (status) status.textContent = s.statusText || 'Ej ifyllt';
+
+    const name = btn.querySelector('.med-item-name');
+    if (name) name.textContent = s.medName || `Läkemedel ${i + 1}`;
+  });
+}
+
 function buildMedList() {
-  const list = getEl('medList'); if (!list) return;
+  const list = _el('medList'); if (!list) return;
   list.textContent = '';
   // Inaktivera knappen när taket nås så att läkaren ser gränsen direkt
-  const addBtn = getEl('addMedBtn');
+  const addBtn = _el('addMedBtn');
   if (addBtn) addBtn.disabled = states.length >= 8;
   for (let i = 0; i < states.length; i++) {
     const s = states[i] || {};
@@ -36,33 +80,37 @@ function selectMed(i) {
   renderResultForMed(i);
   // Flytta fokus till första formulärfältet så att tangentbordsanvändare
   // slipper tabba genom hela sidopanelen för att börja fylla i läkemedlet.
-  const medInput = getEl('medInput');
+  const medInput = _el('medInput');
   if (medInput) medInput.focus();
 }
 
 // === FORMULÄR — mittenkolumn ===
-function renderFormForMed(i) {
+function updateFormHeader(i) {
   const s = states[i] || {};
-  const emptyState  = getEl('formEmptyState');
-  const formContent = getEl('formContent');
-  if (emptyState)  emptyState.classList.add('is-hidden');
-  if (formContent) formContent.classList.remove('is-hidden');
-
-  const nameEl = getEl('formMedName');
+  const nameEl = _el('formMedName');
   if (nameEl) nameEl.textContent = s.medName || `Läkemedel ${i + 1}`;
-
-  const medInput  = getEl('medInput');  if (medInput)  medInput.value  = s.medRaw  || '';
-  const dateInput = getEl('dateInput'); if (dateInput) dateInput.value = s.dateVal || todayStr();
-  const doseInput = getEl('doseInput'); if (doseInput) doseInput.value = s.doseRaw || '';
-  const amtInput  = getEl('amtInput');  if (amtInput)  amtInput.value  = s.amtRaw  || '';
-  const refInput  = getEl('refInput');  if (refInput)  refInput.value  = s.refRaw  || '';
-  const leftInput = getEl('leftInput'); if (leftInput) leftInput.value = s.leftRaw || '';
-
-  const fassBtn = getEl('fassBtnForm');
+  const fassBtn = _el('fassBtnForm');
   if (fassBtn) {
     if (s.medRaw) { fassBtn.href = getFassUrl(s.medRaw); fassBtn.classList.remove('is-hidden'); }
     else fassBtn.classList.add('is-hidden');
   }
+}
+
+function renderFormForMed(i) {
+  const s = states[i] || {};
+  const emptyState  = _el('formEmptyState');
+  const formContent = _el('formContent');
+  if (emptyState)  emptyState.classList.add('is-hidden');
+  if (formContent) formContent.classList.remove('is-hidden');
+
+  updateFormHeader(i);
+
+  const medInput  = _el('medInput');  if (medInput)  medInput.value  = s.medRaw  || '';
+  const dateInput = _el('dateInput'); if (dateInput) dateInput.value = s.dateVal || todayStr();
+  const doseInput = _el('doseInput'); if (doseInput) doseInput.value = s.doseRaw || '';
+  const amtInput  = _el('amtInput');  if (amtInput)  amtInput.value  = s.amtRaw  || '';
+  const refInput  = _el('refInput');  if (refInput)  refInput.value  = s.refRaw  || '';
+  const leftInput = _el('leftInput'); if (leftInput) leftInput.value = s.leftRaw || '';
 
   ['medInput', 'dateInput', 'doseInput', 'amtInput', 'refInput', 'leftInput'].forEach(id => {
     setFieldError(id, '');
@@ -70,12 +118,12 @@ function renderFormForMed(i) {
 }
 
 function saveFormValues(i) {
-  const medInputEl  = getEl('medInput');
-  const dateInputEl = getEl('dateInput');
-  const doseInputEl = getEl('doseInput');
-  const amtInputEl  = getEl('amtInput');
-  const refInputEl  = getEl('refInput');
-  const leftInputEl = getEl('leftInput');
+  const medInputEl  = _el('medInput');
+  const dateInputEl = _el('dateInput');
+  const doseInputEl = _el('doseInput');
+  const amtInputEl  = _el('amtInput');
+  const refInputEl  = _el('refInput');
+  const leftInputEl = _el('leftInput');
   if (!medInputEl || !dateInputEl || !doseInputEl || !amtInputEl || !refInputEl) return;
   const medRaw = medInputEl.value.trim();
   applyMedStatePatch(i, {
@@ -92,8 +140,8 @@ function saveFormValues(i) {
 // === RESULTAT — högerkolumn ===
 function renderResultForMed(i) {
   const s             = states[i] || {};
-  const emptyState    = getEl('resultEmptyState');
-  const resultContent = getEl('resultContent');
+  const emptyState    = _el('resultEmptyState');
+  const resultContent = _el('resultContent');
 
   if (!s.valid) {
     if (emptyState)    emptyState.classList.remove('is-hidden');
@@ -106,10 +154,10 @@ function renderResultForMed(i) {
   if (resultContent) resultContent.classList.remove('is-hidden');
 
   /* Verdict */
-  const vBox   = getEl('verdictBox');
-  const vIcon  = getEl('verdictIcon');
-  const vTitle = getEl('verdictTitle');
-  const vSub   = getEl('verdictSub');
+  const vBox   = _el('verdictBox');
+  const vIcon  = _el('verdictIcon');
+  const vTitle = _el('verdictTitle');
+  const vSub   = _el('verdictSub');
   if (vBox) {
     const decidedYes = s.earlyRenewalDecision === 'yes';
     const vType = (s.isOveruse || s.isTooEarly) && decidedYes ? 'ok'
@@ -122,12 +170,10 @@ function renderResultForMed(i) {
     if (vSub)   vSub.textContent   = s.verdictSub   || '';
   }
 
-  /* Tidslinje — renderas bara vid fullständig beräkning (calculable:true).
-     Partiella returer (daysSince=0, orimliga värden m.m.) saknar tlPct
-     och ska inte lämna gammal data synlig. */
-  const tlFill  = getEl('tlFill');
-  const tlStart = getEl('tlStart');
-  const tlEnd   = getEl('tlEnd');
+  /* Tidslinje */
+  const tlFill  = _el('tlFill');
+  const tlStart = _el('tlStart');
+  const tlEnd   = _el('tlEnd');
   if (s.calculable === true && s.tlPct !== undefined) {
     if (tlFill) {
       tlFill.style.width = Math.min(100, s.tlPct) + '%';
@@ -142,21 +188,25 @@ function renderResultForMed(i) {
     if (tlEnd)   tlEnd.textContent   = '—';
   }
 
-  /* Mätvärden */
-  const metricsGrid = getEl('metricsGrid');
+  /* Mätvärden — jämför före omritning */
+  const metricsGrid = _el('metricsGrid');
   if (metricsGrid && s.metrics) {
-    metricsGrid.textContent = '';
-    s.metrics.forEach(m => {
-      const div = el('div', { cls: 'metric' });
-      if (m.tooltip) div.dataset.tooltip = m.tooltip;
-      div.appendChild(el('div', { cls: 'metric-lbl', text: m.label }));
-      div.appendChild(el('div', { cls: 'metric-val' + (m.cls ? ' ' + m.cls : ''), text: m.value }));
-      metricsGrid.appendChild(div);
-    });
+    const key = s.metrics.map(m => m.value + '|' + (m.cls || '')).join(',');
+    if (key !== _lastMetricsKey) {
+      _lastMetricsKey = key;
+      metricsGrid.textContent = '';
+      s.metrics.forEach(m => {
+        const div = el('div', { cls: 'metric' });
+        if (m.tooltip) div.dataset.tooltip = m.tooltip;
+        div.appendChild(el('div', { cls: 'metric-lbl', text: m.label }));
+        div.appendChild(el('div', { cls: 'metric-val' + (m.cls ? ' ' + m.cls : ''), text: m.value }));
+        metricsGrid.appendChild(div);
+      });
+    }
   }
 
   /* Alerts */
-  const alertsEl = getEl('resultAlerts');
+  const alertsEl = _el('resultAlerts');
   if (alertsEl) {
     alertsEl.textContent = '';
     if (s.alerts && s.alerts.length) {
@@ -165,12 +215,12 @@ function renderResultForMed(i) {
   }
 
   /* Beslutsfråga för tidig förnyelse */
-  const earlyBox = getEl('earlyDecisionBox');
+  const earlyBox = _el('earlyDecisionBox');
   if (earlyBox) {
     if (s.isOveruse || s.isTooEarly) {
       earlyBox.classList.remove('is-hidden');
-      const yBtn = getEl('earlyDecisionYes');
-      const nBtn = getEl('earlyDecisionNo');
+      const yBtn = _el('earlyDecisionYes');
+      const nBtn = _el('earlyDecisionNo');
       if (yBtn) yBtn.classList.toggle('selected', s.earlyRenewalDecision === 'yes');
       if (nBtn) nBtn.classList.toggle('selected', s.earlyRenewalDecision === 'no');
     } else {
@@ -179,7 +229,7 @@ function renderResultForMed(i) {
   }
 
   /* Copy-sektion */
-  const copySection = getEl('copySection');
+  const copySection = _el('copySection');
   if (copySection) {
     const hasCopy = !!(s.patientText || s.journalText);
     copySection.style.display       = hasCopy ? 'flex' : 'none';
@@ -190,6 +240,45 @@ function renderResultForMed(i) {
   renderPrescribePanel(i);
 }
 
+// Modulnivå-cache för språkflagg-SVG:er — byggs en gång, klonas vid varje växling.
+// Flaggor är statisk grafik, inga patientdata.
+let _svFlag = null, _enFlag = null;
+function _ensureFlags() {
+  if (_svFlag) return;
+  const NS = 'http://www.w3.org/2000/svg';
+  const mkEl = (tag, attrs) => {
+    const e = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  };
+  const mkSvg = (...children) => {
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 22 14');
+    svg.setAttribute('width', '20');
+    svg.setAttribute('height', '13');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.style.cssText = 'vertical-align:middle;margin-right:5px;border-radius:2px;display:inline-block';
+    children.forEach(c => svg.appendChild(c));
+    return svg;
+  };
+  _svFlag = mkSvg(
+    mkEl('rect', { width: '22', height: '14', fill: '#006AA7' }),
+    mkEl('rect', { x: '6', width: '3', height: '14', fill: '#FECC02' }),
+    mkEl('rect', { y: '5.5', width: '22', height: '3', fill: '#FECC02' })
+  );
+  _enFlag = mkSvg(
+    mkEl('rect',  { width: '22', height: '14', fill: '#012169' }),
+    mkEl('line',  { x1: '0', y1: '0',  x2: '22', y2: '14', stroke: '#FFFFFF', 'stroke-width': '4.5' }),
+    mkEl('line',  { x1: '22', y1: '0', x2: '0',  y2: '14', stroke: '#FFFFFF', 'stroke-width': '4.5' }),
+    mkEl('line',  { x1: '0', y1: '0',  x2: '22', y2: '14', stroke: '#C8102E', 'stroke-width': '2' }),
+    mkEl('line',  { x1: '22', y1: '0', x2: '0',  y2: '14', stroke: '#C8102E', 'stroke-width': '2' }),
+    mkEl('rect',  { x: '8',   width: '6', height: '14', fill: '#FFFFFF' }),
+    mkEl('rect',  { y: '4',   width: '22', height: '6',  fill: '#FFFFFF' }),
+    mkEl('rect',  { x: '9.5', width: '3', height: '14', fill: '#C8102E' }),
+    mkEl('rect',  { y: '5.5', width: '22', height: '3',  fill: '#C8102E' })
+  );
+}
+
 function switchResultTab(tab) {
   if (!states[activeMedIdx]) return;
   setMedUIPreference(activeMedIdx, 'activeTab', tab);
@@ -198,8 +287,8 @@ function switchResultTab(tab) {
     btn.classList.toggle('active', isActive);
     btn.setAttribute('aria-selected', String(isActive));
   });
-  const body    = getEl('copyBodyResult');
-  const langBtn = getEl('langBtnResult');
+  const body    = _el('copyBodyResult');
+  const langBtn = _el('langBtnResult');
   const s = states[activeMedIdx];
   if (tab === 'patient') {
     const isEn = s.patientLang === 'en';
@@ -207,49 +296,9 @@ function switchResultTab(tab) {
     if (langBtn) {
       langBtn.classList.remove('is-hidden');
       langBtn.textContent = '';
-
-      // createElementNS krävs för korrekt SVG-namnrymd — innerHTML inuti <button> är inkonsekvent.
-      // Delade hjälpare för båda flaggorna.
-      const NS = 'http://www.w3.org/2000/svg';
-      const mkEl = (tag, attrs) => {
-        const e = document.createElementNS(NS, tag);
-        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
-        return e;
-      };
-      const mkFlag = (...elements) => {
-        const svg = document.createElementNS(NS, 'svg');
-        svg.setAttribute('viewBox', '0 0 22 14');
-        svg.setAttribute('width', '20');
-        svg.setAttribute('height', '13');
-        svg.setAttribute('aria-hidden', 'true');
-        svg.style.cssText = 'vertical-align:middle;margin-right:5px;border-radius:2px;display:inline-block';
-        elements.forEach(e => svg.appendChild(e));
-        return svg;
-      };
-
-      if (isEn) {
-        // Svensk flagga: blå bakgrund, gult kors
-        langBtn.appendChild(mkFlag(
-          mkEl('rect', { width: '22', height: '14', fill: '#006AA7' }),
-          mkEl('rect', { x: '6', width: '3', height: '14', fill: '#FECC02' }),
-          mkEl('rect', { y: '5.5', width: '22', height: '3', fill: '#FECC02' })
-        ));
-        langBtn.appendChild(document.createTextNode('Svenska'));
-      } else {
-        // Union Jack: blå bakgrund, vita och röda diagonaler, vitt och rött kors
-        langBtn.appendChild(mkFlag(
-          mkEl('rect',  { width: '22', height: '14', fill: '#012169' }),
-          mkEl('line',  { x1: '0', y1: '0',  x2: '22', y2: '14', stroke: '#FFFFFF', 'stroke-width': '4.5' }),
-          mkEl('line',  { x1: '22', y1: '0', x2: '0',  y2: '14', stroke: '#FFFFFF', 'stroke-width': '4.5' }),
-          mkEl('line',  { x1: '0', y1: '0',  x2: '22', y2: '14', stroke: '#C8102E', 'stroke-width': '2' }),
-          mkEl('line',  { x1: '22', y1: '0', x2: '0',  y2: '14', stroke: '#C8102E', 'stroke-width': '2' }),
-          mkEl('rect',  { x: '8',   width: '6', height: '14', fill: '#FFFFFF' }),
-          mkEl('rect',  { y: '4',   width: '22', height: '6', fill: '#FFFFFF' }),
-          mkEl('rect',  { x: '9.5', width: '3', height: '14', fill: '#C8102E' }),
-          mkEl('rect',  { y: '5.5', width: '22', height: '3', fill: '#C8102E' })
-        ));
-        langBtn.appendChild(document.createTextNode('English'));
-      }
+      _ensureFlags();
+      langBtn.appendChild((isEn ? _svFlag : _enFlag).cloneNode(true));
+      langBtn.appendChild(document.createTextNode(isEn ? 'Svenska' : 'English'));
     }
   } else {
     if (body) body.textContent = s.journalText || '';

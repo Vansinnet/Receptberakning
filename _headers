@@ -1,3 +1,4 @@
+# ⚠ /* på nästa rad är en Cloudflare URL-glob (matchar alla rotnivåfiler) — radera den ej
 /*
   # Förhindrar MIME-sniffing (browser tolkar aldrig CSS/JS som HTML)
   X-Content-Type-Options: nosniff

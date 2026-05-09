@@ -1,4 +1,54 @@
 // === FLIK 2: LÅNGVARIG FÖRBRUKNING ===
+function buildPeriodElement(period, i) {
+  const wrap = el('div', { attrs: { id: `lt-period-wrap-${i}` } });
+  wrap.appendChild(el('div', { cls: 'section-label', text: `Period ${i + 1}` }));
+
+  const row = el('div', { cls: 'form-row-3', attrs: { id: `lt-period-${i}` } });
+
+  function makeField(forId, labelText, tooltip, inputAttrs, inputValue) {
+    const field = el('div', { cls: 'field' });
+    field.appendChild(el('label', { attrs: { for: forId, 'data-tooltip': tooltip }, text: labelText }));
+    field.appendChild(el('input', { attrs: { id: forId, ...inputAttrs }, value: inputValue }));
+    return field;
+  }
+
+  row.appendChild(makeField(
+    `lt-start-${i}`, 'Startdatum',
+    'Startdatum för perioden — vanligen förskrivnings- eller uthämtningsdatum.',
+    { type: 'text', inputmode: 'numeric', placeholder: 'ÅÅÅÅ-MM-DD',
+      pattern: '\\d{4}-\\d{2}-\\d{2}', maxlength: '10', autocomplete: 'off' },
+    period.start
+  ));
+
+  row.appendChild(makeField(
+    `lt-total-${i}`, 'Antal uttagna tabletter',
+    'Totalt antal tabletter eller kapslar uttagna under perioden. Hämtas från apotekskvitto eller journaldokumentation.',
+    { type: 'number', placeholder: '100', min: '1' },
+    period.total
+  ));
+
+  row.appendChild(makeField(
+    `lt-end-${i}`, 'Slutdatum',
+    'Slutdatum för perioden — när medicinen tog slut eller nästa recept utfärdades.',
+    { type: 'text', inputmode: 'numeric', placeholder: 'ÅÅÅÅ-MM-DD',
+      pattern: '\\d{4}-\\d{2}-\\d{2}', maxlength: '10', autocomplete: 'off' },
+    period.end
+  ));
+
+  wrap.appendChild(row);
+
+  if (i > 0) {
+    wrap.appendChild(el('button', {
+      cls:   'btn btn-ghost',
+      style: 'font-size:11px;margin-bottom:8px',
+      text:  `✕ Ta bort period ${i + 1}`,
+      attrs: { type: 'button', 'data-action': 'remove-period', 'data-idx': String(i) },
+    }));
+  }
+
+  return wrap;
+}
+
 function buildPeriodContainer() {
   const container = getEl('lt-periods-container');
   if (!container) return;
@@ -6,53 +56,7 @@ function buildPeriodContainer() {
   container.textContent = '';
 
   ltPeriods.forEach((period, i) => {
-    const wrap = el('div', { attrs: { id: `lt-period-wrap-${i}` } });
-    wrap.appendChild(el('div', { cls: 'section-label', text: `Period ${i + 1}` }));
-
-    const row = el('div', { cls: 'form-row-3', attrs: { id: `lt-period-${i}` } });
-
-    function makeField(forId, labelText, tooltip, inputAttrs, inputValue) {
-      const field = el('div', { cls: 'field' });
-      field.appendChild(el('label', { attrs: { for: forId, 'data-tooltip': tooltip }, text: labelText }));
-      field.appendChild(el('input', { attrs: { id: forId, ...inputAttrs }, value: inputValue }));
-      return field;
-    }
-
-    row.appendChild(makeField(
-      `lt-start-${i}`, 'Startdatum',
-      'Startdatum för perioden — vanligen förskrivnings- eller uthämtningsdatum.',
-      { type: 'text', inputmode: 'numeric', placeholder: 'ÅÅÅÅ-MM-DD',
-        pattern: '\\d{4}-\\d{2}-\\d{2}', maxlength: '10', autocomplete: 'off' },
-      period.start
-    ));
-
-    row.appendChild(makeField(
-      `lt-total-${i}`, 'Antal uttagna tabletter',
-      'Totalt antal tabletter eller kapslar uttagna under perioden. Hämtas från apotekskvitto eller journaldokumentation.',
-      { type: 'number', placeholder: '100', min: '1' },
-      period.total
-    ));
-
-    row.appendChild(makeField(
-      `lt-end-${i}`, 'Slutdatum',
-      'Slutdatum för perioden — när medicinen tog slut eller nästa recept utfärdades.',
-      { type: 'text', inputmode: 'numeric', placeholder: 'ÅÅÅÅ-MM-DD',
-        pattern: '\\d{4}-\\d{2}-\\d{2}', maxlength: '10', autocomplete: 'off' },
-      period.end
-    ));
-
-    wrap.appendChild(row);
-
-    if (i > 0) {
-      wrap.appendChild(el('button', {
-        cls:   'btn btn-ghost',
-        style: 'font-size:11px;margin-bottom:8px',
-        text:  `✕ Ta bort period ${i + 1}`,
-        attrs: { type: 'button', 'data-action': 'remove-period', 'data-idx': String(i) },
-      }));
-    }
-
-    container.appendChild(wrap);
+    container.appendChild(buildPeriodElement(period, i));
   });
   } catch (err) {
     console.error('buildPeriodContainer:', err.message, err);
@@ -63,7 +67,11 @@ function buildPeriodContainer() {
 
 function addPeriod() {
   if (!pushLtPeriod()) return;
-  buildPeriodContainer();
+  const container = getEl('lt-periods-container');
+  if (container) {
+    const idx = ltPeriods.length - 1;
+    container.appendChild(buildPeriodElement(ltPeriods[idx], idx));
+  }
   calcLongterm();
 }
 
@@ -81,8 +89,10 @@ function clearLongterm() {
   ['lt-alerts', 'lt-overlap-alert', 'lt-resGrid', 'lt-period-rows'].forEach(id => {
     const e = getEl(id); if (e) e.textContent = '';
   });
-  showEl('lt-result', false); showEl('lt-copySection', false); showEl('lt-fassBtn', false);
-  showEl('lt-bar-section', false); showEl('lt-period-table-section', false);
+  showEl('lt-result', false); showEl('lt-copySection', false);
+  const lb = getEl('lt-fassBtn'); if (lb) lb.classList.add('is-hidden');
+  const barSec = getEl('lt-bar-section'); if (barSec) barSec.classList.add('is-hidden');
+  const periodTab = getEl('lt-period-table-section'); if (periodTab) periodTab.classList.add('is-hidden');
 }
 
 // Gränsvärden för förbrukningsbedömning — används av både kärna och UI
@@ -278,7 +288,7 @@ function calcLongterm() {
     barEl.textContent = result.barPct > 20 ? `${result.consumptionPct.toFixed(0)}%` : '';
     barEl.setAttribute('aria-valuenow', String(Math.round(result.barPct)));
   }
-  showEl('lt-bar-section', true);
+  const barSec = getEl('lt-bar-section'); if (barSec) barSec.classList.remove('is-hidden');
 
   const rowsContainer = getEl('lt-period-rows');
   if (rowsContainer) {
@@ -300,29 +310,16 @@ function calcLongterm() {
     });
     rowsContainer.appendChild(frag);
   }
-  showEl('lt-period-table-section', true);
+  const periodTab = getEl('lt-period-table-section'); if (periodTab) periodTab.classList.remove('is-hidden');
 
   const lb = getEl('lt-fassBtn');
-  if (lb) { lb.href = result.fassUrl; showEl('lt-fassBtn', true, 'inline-flex'); }
+  if (lb) { lb.href = result.fassUrl; lb.classList.remove('is-hidden'); }
 
   const copyBody = getEl('lt-copyBody');
   if (copyBody) copyBody.textContent = result.journalText;
   showEl('lt-copySection', true);
 }
 
-const ltCopyTimers = new Map();
 function copyLtText() {
-  const body = getEl('lt-copyBody'), text = body ? body.textContent : '';
-  const btn  = getEl('ltCopyBtn');
-  if (!navigator.clipboard) { if (btn) btn.textContent = '⚠️ Kopiera manuellt'; return; }
-  navigator.clipboard.writeText(text).then(() => {
-    if (!btn) return;
-    const orig = btn.dataset.origLabel || btn.textContent;
-    btn.dataset.origLabel = orig;
-    btn.textContent = '✅ Kopierat!';
-    const ann = getEl('a11y-announce'); if (ann) ann.textContent = 'Text kopierad till urklipp.';
-    if (ltCopyTimers.has(btn)) clearTimeout(ltCopyTimers.get(btn));
-    const t = setTimeout(() => { btn.textContent = orig; delete btn.dataset.origLabel; ltCopyTimers.delete(btn); }, 1800);
-    ltCopyTimers.set(btn, t);
-  }).catch(() => { if (btn) btn.textContent = '⚠️ Kopiera manuellt'; });
+  copyTextToClipboard('lt-copyBody', 'ltCopyBtn', 'lt');
 }

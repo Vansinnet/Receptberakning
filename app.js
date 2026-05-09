@@ -96,14 +96,15 @@ function clearCurrentCard() {
     // Ta bort kortet helt — kompaktera states och prescribeState
     spliceMedCard(i);
 
-    // calcDebounced-closures innehåller fasta idx-värden — avbryt väntande timers och bygg om från grunden
-    calcDebounced.forEach(d => d && d.cancel());
-    calcDebounced.length = 0;
-    for (let j = 0; j < states.length; j++) ensureDebounce(j);
+    // calcDebounced-closures innehåller fasta idx-värden. Avbryt endast föråldrade
+    // timers vid index >= i (prefix 0..i-1 har fortfarande korrekta stängningar).
+    for (let j = i; j < calcDebounced.length; j++) calcDebounced[j]?.cancel();
+    calcDebounced.splice(i, 1);
+    for (let j = i; j < states.length; j++) ensureDebounce(j);
 
     setActiveMed(Math.min(i, states.length - 1));
     resetPrescribePanel();
-    buildMedList();
+  buildMedList();
     renderFormForMed(activeMedIdx);
     renderResultForMed(activeMedIdx);
     generateAndDistribute();
@@ -146,7 +147,7 @@ function setEarlyDecision(decision) {
       : 'Förbrukning OK. Kontakta vården närmre slutdatumet.';
   }
   applyMedStatePatch(i, patch);
-  buildMedList();
+  updateMedListStatuses();
   generateAndDistribute();
 }
 
@@ -179,19 +180,8 @@ function executeClearAll() {
 }
 
 /* Kopiering */
-const copyFeedbackTimers = {};
 function copyResultText() {
-  const body = getEl('copyBodyResult');
-  const text = body ? body.textContent : '';
-  const btn = getEl('copyBtnResult');
-  if (!navigator.clipboard) { if(btn) btn.textContent='⚠️ Kopiera manuellt'; return; }
-  navigator.clipboard.writeText(text).then(()=>{
-    if (!btn) return;
-    const orig = btn.dataset.origLabel||btn.textContent; btn.dataset.origLabel=orig; btn.textContent='✅ Kopierat!';
-    const ann = getEl('a11y-announce'); if (ann) ann.textContent = 'Text kopierad till urklipp.';
-    clearTimeout(copyFeedbackTimers['result']);
-    copyFeedbackTimers['result'] = setTimeout(()=>{ btn.textContent=orig; delete btn.dataset.origLabel; },1800);
-  }).catch(()=>{ if(btn) btn.textContent='⚠️ Kopiera manuellt'; });
+  copyTextToClipboard('copyBodyResult', 'copyBtnResult', 'result');
 }
 
 // === INITIERING ===
@@ -217,15 +207,10 @@ if (formPanel) {
     }
     if (e.target.id === 'dateInput') {
       autoFormatDate(e.target);
-      // Validera direkt när datumet är fullständigt (ÅÅÅÅ-MM-DD = 10 tecken).
-      // Under pågående inmatning (< 10 tecken) rensas eventuellt fel så att
-      // läkaren inte störs av felmarkeringar mitt i skrivandet.
       const val = e.target.value;
       if (val.length === 10) {
-        const pDate = parseDateUTC(val);
-        if (!pDate)          setFieldError('dateInput', 'Ogiltigt datum.');
-        else if (pDate > getToday()) setFieldError('dateInput', 'Datumet är satt i framtiden.');
-        else                 setFieldError('dateInput', '');
+        const res = validateDateField(val);
+        setFieldError('dateInput', res.error);
       } else {
         setFieldError('dateInput', '');
       }
@@ -243,20 +228,9 @@ if (formPanel) {
         saveFormValues(activeMedIdx);
       }
     }
-    // Datumfältet valideras direkt vid blur — datumet är det enda fältet där ett
-    // felaktigt värde (t.ex. "260229") ser korrekt ut visuellt men inte ger något
-    // fel förrän hela calc()-cykeln kört klart.
     if (e.target.id === 'dateInput') {
-      const val = e.target.value;
-      if (!val) { setFieldError('dateInput', ''); return; }
-      const pDate = parseDateUTC(val);
-      if (!pDate) {
-        setFieldError('dateInput', 'Ogiltigt datum.');
-      } else if (pDate > getToday()) {
-        setFieldError('dateInput', 'Datumet är satt i framtiden.');
-      } else {
-        setFieldError('dateInput', '');
-      }
+      const res = validateDateField(e.target.value);
+      setFieldError('dateInput', res.error);
     }
   }, true); // capture=true eftersom blur inte bubblar
   formPanel.addEventListener('change', e => {
@@ -326,7 +300,7 @@ const continueSessionBtn=getEl('continueSessionBtn'); if(continueSessionBtn) con
 // Datum-cache och omräkning vid fönsterfokus
 function recalcOnDateChange() {
   _todayCache=null; _todayCacheKey='';
-  calc();
+  calc(activeMedIdx, true);
   for (let i = 0; i < states.length; i++) {
     if (i === activeMedIdx) continue;
     const s = states[i];
@@ -334,10 +308,26 @@ function recalcOnDateChange() {
     // räknas om vid datumomslag. Övriga calculable:false-fall (totalDays>3650, remaining>total)
     // är inte datumkänsliga men kostnaden för ett extra calcCore-anrop är försumbar.
     if (!s || !s.valid) continue;
-    const inputData = validateValues(
-      s.medRaw || '', s.dateVal || '', s.doseRaw || '',
-      s.amtRaw || '', s.refRaw || '', s.leftRaw || ''
-    );
+    let inputData;
+    if (s.calculable === true) {
+      // Återanvänd redan validerade värden — endast dagens datum har ändrats.
+      // calcCore läser getToday() internt, inte via inputData.
+      inputData = {
+        valid: true, fieldErrors: {},
+        medRaw: s.medRaw, dateVal: s.dateVal,
+        pDate: parseDateUTC(s.dateVal),
+        amt: s.amt, dose: s.dose,
+        ref: s.refRaw ? parseInt(s.refRaw, 10) : (s.total && s.amt ? Math.round(s.total / s.amt) : 1),
+        remaining: s.remainingDoses,
+        doseRaw: s.doseRaw, amtRaw: s.amtRaw,
+        refRaw: s.refRaw, leftRaw: s.leftRaw || '',
+      };
+    } else {
+      inputData = validateValues(
+        s.medRaw || '', s.dateVal || '', s.doseRaw || '',
+        s.amtRaw || '', s.refRaw || '', s.leftRaw || ''
+      );
+    }
     if (!inputData.valid) continue;
     const prev = {
       isOveruse: s.isOveruse || false,
@@ -422,7 +412,9 @@ resetTimer();
       bubble.classList.remove('visible');
   });
   document.addEventListener('click', () => bubble.classList.remove('visible'));
-  document.addEventListener('scroll', () => bubble.classList.remove('visible'), true);
+  document.addEventListener('scroll', () => {
+    if (bubble.classList.contains('visible')) bubble.classList.remove('visible');
+  }, true);
   document.addEventListener('focusin', e => {
     const tooltipTarget = e.target.closest('[data-tooltip]');
     if (!tooltipTarget) { bubble.classList.remove('visible'); return; }
