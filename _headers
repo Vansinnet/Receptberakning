@@ -11,7 +11,7 @@
 
   # Stänger av webbläsarfunktioner som verktyget inte behöver
   # Inkluderar moderna fingerprinting- och spårnings-APIs
-  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=(), accelerometer=(), ambient-light-sensor=(), autoplay=(), display-capture=(), fullscreen=(), gyroscope=(), magnetometer=(), midi=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), xr-spatial-tracking=(), interest-cohort=(), browsing-topics=(), attribution-reporting=(), identity-credentials-get=()
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=(), accelerometer=(), autoplay=(), display-capture=(), fullscreen=(), gyroscope=(), magnetometer=(), midi=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), xr-spatial-tracking=(), identity-credentials-get=()
 
   # Förhindrar att sidan bäddas in i en iframe (clickjacking-skydd)
   # frame-ancestors i <meta>-CSP ignoreras av webbläsare per spec — denna header krävs
