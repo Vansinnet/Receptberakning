@@ -20,12 +20,12 @@ function calcPrescribeResult(i) {
   const daysAlreadyCovered = (prescribedEnd && prescribedEnd > today) ? getDaysDiff(prescribedEnd, today) : 0;
 
   let endDate = null, totalDays = 0;
-  if (ps.mode === 'months' && ps.months > 0) {
+  if (_prescribeMode === 'months' && _prescribeMonths > 0) {
     // Måldatum = idag + önskade månader; befintlig täckning räknas in (se ovan).
     // Clampa dagen till sista dagen i målmånaden för att undvika rullover:
     // t.ex. 31 jan + 1 mån ska ge 28 feb, inte 3 mars.
     const tYear  = today.getUTCFullYear();
-    const tMonth = today.getUTCMonth() + ps.months;
+    const tMonth = today.getUTCMonth() + _prescribeMonths;
     const tDay   = today.getUTCDate();
     const lastDayOfTargetMonth = new Date(Date.UTC(tYear, tMonth + 1, 0)).getUTCDate();
     const targetEnd = new Date(Date.UTC(tYear, tMonth, Math.min(tDay, lastDayOfTargetMonth)));
@@ -34,8 +34,8 @@ function calcPrescribeResult(i) {
       return { startDate, startDateStr, daysAlreadyCovered, endDate: null, totalDays: 0, totalTablets: 0, packages: 0 };
     }
     endDate = targetEnd;
-  } else if (ps.mode === 'date' && ps.endDate) {
-    const ed = parseDateUTC(ps.endDate);
+  } else if (_prescribeMode === 'date' && _prescribeEndDate) {
+    const ed = parseDateUTC(_prescribeEndDate);
     if (ed && ed > startDate) { endDate = ed; totalDays = getDaysDiff(ed, startDate); }
   }
 
@@ -66,15 +66,15 @@ function prescribeValidationHint(i, ps) {
     pkgHint = { type: 'warn', field: 'pkg', msg: 'Förpackningsstorleken måste vara ett heltal.' };
   }
 
-  if (ps.mode === 'date') {
-    if (!ps.endDate) {
+  if (_prescribeMode === 'date') {
+    if (!_prescribeEndDate) {
       dateHint = { type: 'info', field: 'date', msg: 'Ange ett slutdatum för att beräkna antal förpackningar.' };
     } else {
       const today    = getToday();
       const s        = states[i] || {};
       const prescEnd = parseDateUTC(s.prescribedEndDateStr);
       const start    = (prescEnd && prescEnd > today) ? prescEnd : today;
-      const ed       = parseDateUTC(ps.endDate);
+      const ed       = parseDateUTC(_prescribeEndDate);
       if (!ed)          dateHint = { type: 'warn', field: 'date', msg: 'Ange ett giltigt datum (ÅÅÅÅ-MM-DD).' };
       else if (ed <= start) dateHint = { type: 'warn', field: 'date', msg: `Slutdatumet måste vara efter ${fmtDate(start)}.` };
     }
@@ -94,7 +94,7 @@ function updatePrescribeResult(i) {
 
   // Återställ fältmarkeringar inför ny utvärdering
   toggleError(getEl('ps-pkg-'     + i), false);
-  toggleError(getEl('ps-enddate-' + i), false);
+  toggleError(getEl('ps-global-enddate'), false);
 
   let res;
   try {
@@ -156,8 +156,8 @@ function updatePrescribeResult(i) {
   if (hint) {
     box.appendChild(buildAlertEl(hint.type, null, hint.msg));
     if (hint.type === 'warn') {
-      if (hint.field === 'pkg')  toggleError(getEl('ps-pkg-'     + i), true);
-      if (hint.field === 'date') toggleError(getEl('ps-enddate-' + i), true);
+      if (hint.field === 'pkg')  toggleError(getEl('ps-pkg-'          + i), true);
+      if (hint.field === 'date') toggleError(getEl('ps-global-enddate'),     true);
     }
     renderPrescribeSummary();
   }
@@ -165,34 +165,66 @@ function updatePrescribeResult(i) {
 
 /* Bygger endast durationsfältet (månader-select eller datum-input) — används av både
    buildPrescribeInner (initialt) och lägesväxling (inkrementellt). */
-function buildDurationField(i) {
-  const ps = prescribeState[i];
-  const durDiv = el('div', { cls: 'field', attrs: { id: 'ps-dur-' + i } });
-  if (ps.mode === 'months') {
-    durDiv.appendChild(el('label', { text: 'Förskriva i antal månader', attrs: { for: 'ps-months-' + i, 'data-tooltip': 'Antal månader som den nya förskrivningen ska täcka. Tid som nuvarande recept täcker räknas av automatiskt.' } }));
-    const durSel = el('select', { cls: 'prescribe-select', attrs: { id: 'ps-months-' + i } });
+function _buildDurationInner() {
+  const durDiv = el('div', { cls: 'field', attrs: { id: 'ps-dur' } });
+  if (_prescribeMode === 'months') {
+    durDiv.appendChild(el('label', { text: 'Förskriva i antal månader', attrs: { for: 'ps-global-months', 'data-tooltip': 'Antal månader som den nya förskrivningen ska täcka — gäller alla läkemedel. Tid som nuvarande recept täcker räknas av automatiskt.' } }));
+    const durSel = el('select', { cls: 'prescribe-select', attrs: { id: 'ps-global-months' } });
     for (let m = 1; m <= 12; m++) {
       const opt = el('option', { text: m === 1 ? '1 månad' : `${m} månader`, value: String(m) });
-      if (m === ps.months) opt.selected = true;
+      if (m === _prescribeMonths) opt.selected = true;
       durSel.appendChild(opt);
     }
-    durSel.addEventListener('change', () => { applyPrescribeStatePatch(i, { months: parseInt(durSel.value, 10) }); updatePrescribeResult(i); });
+    durSel.addEventListener('change', () => { _prescribeMonths = parseInt(durSel.value, 10); updateAllPrescribeResults(); });
     durDiv.appendChild(durSel);
   } else {
-    durDiv.appendChild(el('label', { text: 'Förskriva t.o.m.', attrs: { for: 'ps-enddate-' + i, 'data-tooltip': 'Sista datum som den nya förskrivningen ska täcka. Måste vara efter nuvarande recepts slutdatum.' } }));
+    durDiv.appendChild(el('label', { text: 'Förskriva t.o.m.', attrs: { for: 'ps-global-enddate', 'data-tooltip': 'Sista datum som den nya förskrivningen ska täcka — gäller alla läkemedel. Måste vara efter nuvarande recepts slutdatum.' } }));
     const durInp = el('input', {
-      attrs: { type: 'text', id: 'ps-enddate-' + i, inputmode: 'numeric',
+      attrs: { type: 'text', id: 'ps-global-enddate', inputmode: 'numeric',
                placeholder: 'ÅÅÅÅ-MM-DD', maxlength: '10', autocomplete: 'off' },
-      value: ps.endDate || '',
+      value: _prescribeEndDate || '',
     });
     durInp.addEventListener('input', () => {
       autoFormatDate(durInp);
-      applyPrescribeStatePatch(i, { endDate: durInp.value });
-      updatePrescribeResult(i);
+      _prescribeEndDate = durInp.value;
+      updateAllPrescribeResults();
     });
     durDiv.appendChild(durInp);
   }
   return durDiv;
+}
+
+function buildPrescribeDuration() {
+  const container = getEl('prescribeDuration');
+  if (!container) return;
+  container.textContent = '';
+
+  const toggleDiv = el('div', { cls: 'prescribe-mode-toggle' });
+  ['months', 'date'].forEach(mode => {
+    const btn = el('button', {
+      cls:   'prescribe-mode-btn' + (_prescribeMode === mode ? ' active' : ''),
+      text:  mode === 'months' ? 'Månader' : 'Datum',
+      attrs: { type: 'button' },
+      dataset: { mode },
+    });
+    btn.addEventListener('click', () => {
+      _prescribeMode = mode;
+      toggleDiv.querySelectorAll('.prescribe-mode-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.mode === mode);
+      });
+      const durEl = getEl('ps-dur');
+      if (durEl) durEl.replaceWith(_buildDurationInner());
+      updateAllPrescribeResults();
+    });
+    toggleDiv.appendChild(btn);
+  });
+  container.appendChild(toggleDiv);
+  container.appendChild(_buildDurationInner());
+}
+
+function updateAllPrescribeResults() {
+  if (_prescribePanelBuiltFor !== null) updatePrescribeResult(_prescribePanelBuiltFor);
+  renderPrescribeSummary();
 }
 
 /* Bygg hela panelens innehåll (anropas vid initiering, ej vid lägesbyte) */
@@ -230,33 +262,6 @@ function buildPrescribeInner(i) {
     }
     inner.appendChild(infoDiv);
 
-    const toggleDiv = el('div', { cls: 'prescribe-mode-toggle' });
-    const modeTooltips = {
-      months: 'Ange antal månader som förskrivningen ska täcka, inklusive tid som nuvarande recept redan täcker.',
-      date:   'Ange ett specifikt slutdatum för förskrivningen.',
-    };
-    ['months', 'date'].forEach(mode => {
-      const btn = el('button', {
-        cls:   'prescribe-mode-btn' + (ps.mode === mode ? ' active' : ''),
-        text:  mode === 'months' ? 'Månader' : 'Datum',
-        attrs: { type: 'button', 'data-tooltip': modeTooltips[mode] },
-        dataset: { mode },
-      });
-      btn.addEventListener('click', () => {
-        applyPrescribeStatePatch(i, { mode: btn.dataset.mode });
-        toggleDiv.querySelectorAll('.prescribe-mode-btn').forEach(b => {
-          b.classList.toggle('active', b.dataset.mode === btn.dataset.mode);
-        });
-        const durEl = getEl('ps-dur-' + i);
-        if (durEl) durEl.replaceWith(buildDurationField(i));
-        updatePrescribeResult(i);
-      });
-      toggleDiv.appendChild(btn);
-    });
-    inner.appendChild(toggleDiv);
-
-    inner.appendChild(buildDurationField(i));
-
     inner.appendChild(el('div', { attrs: { id: 'ps-result-' + i } }));
     updatePrescribeResult(i);
   } catch (err) {
@@ -273,22 +278,33 @@ function renderPrescribeSummary() {
 
   try {
   const items = [];
+  let summaryKey = '';
   for (let i = 0; i < states.length; i++) {
     const s = states[i] || {};
     const ps = prescribeState[i];
     if (!ps || !canRenewMed(i)) continue;
     const res = calcPrescribeResult(i);
-    items.push({ i, name: s.medRaw || `Läkemedel ${i + 1}`, packages: res ? res.packages : 0, pkgSize: parseFloat(ps.packageSize) || 0 });
+    const pkgs = res ? res.packages : 0;
+    items.push({ i, name: s.medRaw || `Läkemedel ${i + 1}`, packages: pkgs, pkgSize: parseFloat(ps.packageSize) || 0 });
+    summaryKey += `${i}:${pkgs}:${ps.packageSize}:${_prescribeMonths}:${_prescribeEndDate}:${s.amt}:${s.dose}:${s.prescribedEndDateStr}:${activeMedIdx}|`;
   }
 
+  if (items.length < 2) {
+    box.style.display = 'none';
+    box.textContent = '';
+    _lastSummaryKey = summaryKey;
+    return;
+  }
+  if (summaryKey === _lastSummaryKey) return;
+  _lastSummaryKey = summaryKey;
   box.textContent = '';
-  if (items.length < 2) { box.style.display = 'none'; return; }
   box.style.display = 'block';
 
   const list = el('div', { cls: 'prescribe-summary-list' });
   items.forEach(({ i, name, packages, pkgSize }) => {
     const rightEl = el('span', { cls: 'prescribe-summary-right' });
-    rightEl.appendChild(el('span', { cls: 'prescribe-summary-pkg', text: packages ? `${packages} förp.` : '—' }));
+    const calcDone = pkgSize > 0;
+    rightEl.appendChild(el('span', { cls: 'prescribe-summary-pkg', text: calcDone ? `${packages} förp.` : '—' }));
     if (pkgSize > 0) rightEl.appendChild(el('span', { cls: 'prescribe-summary-size', text: `à ${pkgSize} st` }));
 
     const row = el('button', {
@@ -316,9 +332,17 @@ function renderPrescribeSummary() {
 // Håller koll på vilket index panelen senast byggdes för, så att vi
 // slipper riva och återbygga DOM:en (och tappa fokus) vid varje debounce-cykel.
 let _prescribePanelBuiltFor = null;
+let _lastSummaryKey = '';
+let _prescribeMode = 'months';
+let _prescribeMonths = 7;
+let _prescribeEndDate = '';
 
 function resetPrescribePanel() {
   _prescribePanelBuiltFor = null;
+  _lastSummaryKey = '';
+  _prescribeMode = 'months';
+  _prescribeMonths = 7;
+  _prescribeEndDate = '';
 }
 
 /* Visa/dölj och initiera panelen för givet läkemedelsindex */
@@ -326,29 +350,56 @@ function renderPrescribePanel(i) {
   const panel = getEl('prescribePanel');
   if (!panel) return;
   const s = states[i] || {};
+  const activeEligible = canRenewMed(i);
 
-  if (!canRenewMed(i)) {
-    panel.classList.add('is-hidden');
-    _prescribePanelBuiltFor = null;
-    return;
-  }
-  panel.classList.remove('is-hidden');
-
+  // Envägsspegel: amt → packageSize. Skrivs över varje gång amt ändras.
+  // Läkarens manuella värde i förskrivningspanelen är temporärt — nästa
+  // gång Mängd per uttag ändras speglas det nya värdet in.
+  const currentAmt = String(s.amt || '');
   if (!prescribeState[i]) {
-    initPrescribeState(i, { mode: 'months', months: 7, endDate: '', packageSize: String(s.amt || '') });
+    initPrescribeState(i, { packageSize: currentAmt, _lastAmt: currentAmt });
   } else {
-    // packageSize synkas inte automatiskt med huvudformulärets amtInput:
-    // läkaren väljer förpackningsstorlek separat. Fältet förfylls endast om tomt.
-    if (prescribeState[i].packageSize === '') {
-      applyPrescribeStatePatch(i, { packageSize: String(s.amt || '') });
+    if (prescribeState[i]._lastAmt !== currentAmt && currentAmt !== '') {
+      prescribeState[i]._lastAmt = currentAmt;
+      prescribeState[i].packageSize = currentAmt;
+    } else if (prescribeState[i].packageSize === '') {
+      prescribeState[i].packageSize = currentAmt;
     }
   }
 
-  // Bygg bara om DOM:en om vi byter läkemedel. Annars räcker det att
-  // uppdatera resultatsiffran, så att fokus i datuminmatningen bevaras.
+  const pkgEl = getEl('ps-pkg-' + i);
+  if (pkgEl && prescribeState[i] && pkgEl.value !== prescribeState[i].packageSize) {
+    pkgEl.value = prescribeState[i].packageSize;
+  }
+
+  const durContainer = getEl('prescribeDuration');
+  if (durContainer && durContainer.children.length === 0) buildPrescribeDuration();
+
+  renderPrescribeSummary();
+
+  const summary = getEl('prescribeSummary');
+  const hasSummary = summary && summary.style.display !== 'none';
+
+  if (!activeEligible && !hasSummary) {
+    panel.classList.add('is-hidden');
+    _prescribePanelBuiltFor = null;
+    const inner = getEl('prescribeInner');
+    if (inner) inner.textContent = '';
+    return;
+  }
+
+  panel.classList.remove('is-hidden');
+
+  if (!activeEligible) {
+    _prescribePanelBuiltFor = null;
+    const inner = getEl('prescribeInner');
+    if (inner) inner.textContent = '';
+    return;
+  }
+
   if (_prescribePanelBuiltFor !== i) {
-    buildPrescribeInner(i);
     _prescribePanelBuiltFor = i;
+    buildPrescribeInner(i);
   } else {
     updatePrescribeResult(i);
   }

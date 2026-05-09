@@ -171,6 +171,9 @@ function executeClearAll() {
   resetAllMedState();
   resetPrescribePanel();
   resetMetricsCache();
+  const pi = getEl('prescribeInner'); if (pi) pi.textContent = '';
+  const ps = getEl('prescribeSummary'); if (ps) { ps.textContent = ''; ps.style.display = 'none'; }
+  const pd = getEl('prescribeDuration'); if (pd) pd.textContent = '';
   buildMedList();
   renderFormForMed(0);
   renderResultForMed(0);
@@ -359,6 +362,7 @@ window.addEventListener('pagehide',()=>{
   const lc=getEl('lt-copyBody');if(lc)lc.textContent='';
   const pi=getEl('prescribeInner');if(pi)pi.textContent='';
   const ps=getEl('prescribeSummary');if(ps){ps.textContent='';ps.style.display='none';}
+  const pd=getEl('prescribeDuration');if(pd)pd.textContent='';
   for (let i = 0; i < ltPeriodCount; i++) {
     const se = getEl('lt-start-' + i); if (se) se.value = '';
     const te = getEl('lt-total-' + i); if (te) te.value = '';

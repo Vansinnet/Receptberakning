@@ -56,6 +56,11 @@ vm.runInContext(`
     states[i] = data || {};
   }
   function __setActive(i) { activeMedIdx = i; }
+  function __setPrescribeGlobals(mode, months, endDate) {
+    _prescribeMode = mode;
+    _prescribeMonths = months;
+    _prescribeEndDate = endDate || '';
+  }
   function __resetState() {
     states         = [{}];
     activeMedIdx   = 0;
@@ -737,7 +742,8 @@ group('buildPrescribeInner — paneluppbyggnad');
 
 test('läkemedelsnamn visas i panelen', () => {
   setState(0, makeValidState({ medRaw: 'Elvanse 50 mg', dose: 1, prescribedEndDateStr: '2025-06-01' }));
-  ctx.initPrescribeState(0, { mode: 'months', months: 3, packageSize: '30', endDate: '' });
+  ctx.__setPrescribeGlobals('months', 3, '');
+  ctx.initPrescribeState(0, { packageSize: '30' });
   ctx.buildPrescribeInner(0);
   const nameEl = doc.querySelector('.prescribe-med-name');
   assert(nameEl !== null, '.prescribe-med-name ska finnas');
@@ -746,33 +752,40 @@ test('läkemedelsnamn visas i panelen', () => {
 
 test('förpackningsstorlek fylls i från prescribeState', () => {
   setState(0, makeValidState({ dose: 1, prescribedEndDateStr: '2025-06-01' }));
-  ctx.initPrescribeState(0, { mode: 'months', months: 3, packageSize: '100', endDate: '' });
+  ctx.__setPrescribeGlobals('months', 3, '');
+  ctx.initPrescribeState(0, { packageSize: '100' });
   ctx.buildPrescribeInner(0);
   assertEqual(getEl('ps-pkg-0').value, '100', 'packageSize');
 });
 
 test('månadsläge → select har 12 optioner och rätt månad vald', () => {
   setState(0, makeValidState({ dose: 1, prescribedEndDateStr: '2025-06-01' }));
-  ctx.initPrescribeState(0, { mode: 'months', months: 5, packageSize: '30', endDate: '' });
+  ctx.__setPrescribeGlobals('months', 5, '');
+  ctx.initPrescribeState(0, { packageSize: '30' });
   ctx.buildPrescribeInner(0);
-  const sel = getEl('ps-months-0');
-  assert(sel !== null, 'ps-months-0 ska finnas');
+  ctx.buildPrescribeDuration();
+  const sel = getEl('ps-global-months');
+  assert(sel !== null, 'ps-global-months ska finnas');
   assertEqual(sel.options.length, 12, '12 optioner');
   assertEqual(sel.value, '5', 'månad 5 vald');
 });
 
 test('datumläge → datuminmatning visas med rätt värde', () => {
   setState(0, makeValidState({ dose: 1, prescribedEndDateStr: '2025-06-01' }));
-  ctx.initPrescribeState(0, { mode: 'date', months: 1, packageSize: '30', endDate: '2025-09-15' });
+  ctx.__setPrescribeGlobals('date', 1, '2025-09-15');
+  ctx.initPrescribeState(0, { packageSize: '30' });
   ctx.buildPrescribeInner(0);
-  assert(getEl('ps-enddate-0') !== null, 'ps-enddate-0 ska finnas');
-  assertEqual(getEl('ps-enddate-0').value, '2025-09-15', 'endDate');
+  ctx.buildPrescribeDuration();
+  assert(getEl('ps-global-enddate') !== null, 'ps-global-enddate ska finnas');
+  assertEqual(getEl('ps-global-enddate').value, '2025-09-15', 'endDate');
 });
 
 test('mode-toggle: rätt knapp är active', () => {
   setState(0, makeValidState({ dose: 1, prescribedEndDateStr: '2025-06-01' }));
-  ctx.initPrescribeState(0, { mode: 'date', months: 1, packageSize: '30', endDate: '' });
+  ctx.__setPrescribeGlobals('date', 1, '');
+  ctx.initPrescribeState(0, { packageSize: '30' });
   ctx.buildPrescribeInner(0);
+  ctx.buildPrescribeDuration();
   const btns = doc.querySelectorAll('.prescribe-mode-btn');
   const dateBtn = Array.from(btns).find(b => b.textContent === 'Datum');
   const monthBtn = Array.from(btns).find(b => b.textContent === 'Månader');
@@ -791,7 +804,8 @@ test('giltig indata → förpackningsantal visas', () => {
   // prescribedEnd passerat (2025-06-01) → startDate = idag (2025-06-15)
   // 3 månader: 2025-06-15 → 2025-09-15 = 92 dagar; 92 tabletter ÷ 30 st/förp = 4 förp
   setState(0, makeValidState({ dose: 1, prescribedEndDateStr: '2025-06-01' }));
-  ctx.initPrescribeState(0, { mode: 'months', months: 3, packageSize: '30', endDate: '' });
+  ctx.__setPrescribeGlobals('months', 3, '');
+  ctx.initPrescribeState(0, { packageSize: '30' });
   ctx.buildPrescribeInner(0);
   const pkgEl = doc.querySelector('.prescribe-result-packages');
   assert(pkgEl !== null, '.prescribe-result-packages ska finnas');
@@ -802,7 +816,8 @@ test('befintligt recept täcker hela perioden → "täcker redan" visas', () => 
   // prescribedEnd 120 dagar fram (2025-10-13) > 3-månadersmål (2025-09-15)
   // → befintligt recept täcker hela den begärda perioden
   setState(0, makeValidState({ dose: 1, prescribedEndDateStr: '2025-10-13' }));
-  ctx.initPrescribeState(0, { mode: 'months', months: 3, packageSize: '30', endDate: '' });
+  ctx.__setPrescribeGlobals('months', 3, '');
+  ctx.initPrescribeState(0, { packageSize: '30' });
   ctx.buildPrescribeInner(0);
   const coveredEl = doc.querySelector('.prescribe-result-covered');
   assert(coveredEl !== null, '.prescribe-result-covered ska finnas');
@@ -811,7 +826,8 @@ test('befintligt recept täcker hela perioden → "täcker redan" visas', () => 
 
 test('tom packageSize → hint visas i resultatrutan', () => {
   setState(0, makeValidState({ dose: 1, prescribedEndDateStr: '2025-06-01' }));
-  ctx.initPrescribeState(0, { mode: 'months', months: 3, packageSize: '', endDate: '' });
+  ctx.__setPrescribeGlobals('months', 3, '');
+  ctx.initPrescribeState(0, { packageSize: '' });
   ctx.buildPrescribeInner(0);
   const box = getEl('ps-result-0');
   assert(box.children.length > 0, 'resultatrutan ska ha innehåll');

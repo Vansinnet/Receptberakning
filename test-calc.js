@@ -66,6 +66,11 @@ vm.runInContext(`
   function __setTestPS(i, data) {
     prescribeState[i] = (data !== null && data !== undefined) ? data : null;
   }
+  function __setPrescribeGlobals(mode, months, endDate) {
+    _prescribeMode = mode;
+    _prescribeMonths = months;
+    _prescribeEndDate = endDate || '';
+  }
 `, ctx);
 
 if (typeof ctx.calcCore !== 'function') {
@@ -88,6 +93,7 @@ const calcPrescribeResult  = ctx.calcPrescribeResult;
 const prescribeValidationHint = ctx.prescribeValidationHint;
 const setTestState         = ctx.__setTestState;
 const setTestPS            = ctx.__setTestPS;
+const __setPrescribeGlobals = ctx.__setPrescribeGlobals;
 
 // Fast datum för alla tester — undviker flytande dagsavhängiga gränsvärden.
 // Valt mitt i ett vanligt år, långt ifrån DST-gränser och skottår.
@@ -106,6 +112,7 @@ function group(name) {
 
 function test(name, fn) {
   try {
+    __setPrescribeGlobals('months', 7, '');
     fn();
     console.log(`  ✓ ${name}`);
     passed++;
@@ -700,7 +707,9 @@ test('giltig packageSize, månadsläge → null (ingen datumgranskning i månads
 
 test('datumläge, ogiltigt slutdatum → warn med field:"date"', () => {
   setTestState(0, { prescribedEndDateStr: '2025-06-01' }); // passerat → start = idag
-  const h = prescribeValidationHint(0, { packageSize: '30', mode: 'date', endDate: 'fel-datum' });
+  __setPrescribeGlobals('date', 7, 'fel-datum');
+  setTestPS(0, { packageSize: '30' });
+  const h = prescribeValidationHint(0, { packageSize: '30' });
   assertEqual(h.type,  'warn');
   assertEqual(h.field, 'date');
   assertContains(h.msg, 'giltigt datum');
@@ -709,15 +718,18 @@ test('datumläge, ogiltigt slutdatum → warn med field:"date"', () => {
 test('datumläge, slutdatum före startdatum → warn', () => {
   // prescribedEnd passerat → startDate = idag (2025-06-15); endDate 5 dagar sedan < idag
   setTestState(0, { prescribedEndDateStr: '2025-06-01' });
-  const h = prescribeValidationHint(0, { packageSize: '30', mode: 'date', endDate: daysAgo(5) });
+  __setPrescribeGlobals('date', 7, daysAgo(5));
+  setTestPS(0, { packageSize: '30' });
+  const h = prescribeValidationHint(0, { packageSize: '30' });
   assertEqual(h.type,  'warn');
   assertEqual(h.field, 'date');
   assertContains(h.msg, 'efter');
 });
 
 test('datumläge, giltigt framtida slutdatum → null', () => {
+  __setPrescribeGlobals('date', 7, '2025-12-31');
   setTestState(0, { prescribedEndDateStr: '2025-06-01' });
-  const h = prescribeValidationHint(0, { packageSize: '30', mode: 'date', endDate: '2025-12-31' });
+  const h = prescribeValidationHint(0, { packageSize: '30' });
   assertEqual(h, null);
 });
 
@@ -738,7 +750,8 @@ test('recept utgånget → startDate=idag, daysAlreadyCovered=0', () => {
   // prescribedEnd = 14 dagar sedan → startDate = idag = 2025-06-15
   // 3 månader: 2025-06-15 → 2025-09-15 = 92 dagar; 92 ÷ 100 = 1 förp
   setTestState(0, { dose: 1, prescribedEndDateStr: '2025-06-01' });
-  setTestPS(0, { mode: 'months', months: 3, packageSize: '100', endDate: '' });
+  __setPrescribeGlobals('months', 3, '');
+  setTestPS(0, { packageSize: '100' });
   const r = calcPrescribeResult(0);
   assertEqual(r.startDateStr,       '2025-06-15', 'startDate ska vara idag');
   assertEqual(r.daysAlreadyCovered, 0,            'inget befintligt överskott');
@@ -750,7 +763,8 @@ test('recept fortfarande giltigt → startDate=receptslut, daysAlreadyCovered>0'
   // prescribedEnd om 30 dagar (2025-07-15) → startDate = 2025-07-15
   // 3 månader from idag = 2025-09-15; 2025-09-15 − 2025-07-15 = 62 dagar
   setTestState(0, { dose: 1, prescribedEndDateStr: daysFromNow(30) });
-  setTestPS(0, { mode: 'months', months: 3, packageSize: '100', endDate: '' });
+  __setPrescribeGlobals('months', 3, '');
+  setTestPS(0, { packageSize: '100' });
   const r = calcPrescribeResult(0);
   assertEqual(r.daysAlreadyCovered, 30, 'befintlig täckning ska räknas bort');
   assertEqual(r.startDateStr,       daysFromNow(30));
@@ -761,7 +775,8 @@ test('recept fortfarande giltigt → startDate=receptslut, daysAlreadyCovered>0'
 test('befintligt recept täcker hela perioden → packages=0, totalDays=0', () => {
   // prescribedEnd om 120 dagar (in i okt); begärd period 3 mån (t.o.m. 15 sep) → överlapp
   setTestState(0, { dose: 1, prescribedEndDateStr: daysFromNow(120) });
-  setTestPS(0, { mode: 'months', months: 3, packageSize: '100', endDate: '' });
+  __setPrescribeGlobals('months', 3, '');
+  setTestPS(0, { packageSize: '100' });
   const r = calcPrescribeResult(0);
   assertEqual(r.packages,           0,    'befintligt recept täcker allt');
   assertEqual(r.totalDays,          0);
@@ -774,7 +789,8 @@ test('månadsläge: 31 jan + 1 månad → 28 feb, ej 3 mars (månadsklämning)',
   ctx._mockToday = MOCK_JAN31;
   try {
     setTestState(0, { dose: 1, prescribedEndDateStr: '2025-01-30' });
-    setTestPS(0, { mode: 'months', months: 1, packageSize: '28', endDate: '' });
+    __setPrescribeGlobals('months', 1, '');
+    setTestPS(0, { packageSize: '28' });
     const r = calcPrescribeResult(0);
     assertEqual(r.endDateStr, '2025-02-28', 'klämning ska ge 28 feb, inte 3 mars');
     assertEqual(r.totalDays,  28,           '31 jan → 28 feb = 28 dagar');
@@ -787,7 +803,8 @@ test('månadsläge: 31 jan + 1 månad → 28 feb, ej 3 mars (månadsklämning)',
 test('datumläge: korrekt beräkning med avrundning uppåt (Math.ceil)', () => {
   // 91 dagar × 1 st/dag = 91 tabletter; 91 ÷ 90 st/förp = 1.011 → ceil = 2 förp
   setTestState(0, { dose: 1, prescribedEndDateStr: '2025-06-01' });
-  setTestPS(0, { mode: 'date', endDate: '2025-09-14', packageSize: '90', months: 1 });
+  __setPrescribeGlobals('date', 7, '2025-09-14');
+  setTestPS(0, { packageSize: '90' });
   const r = calcPrescribeResult(0);
   assertEqual(r.totalDays,    91, '15 jun → 14 sep = 91 dagar');
   assertEqual(r.totalTablets, 91);
@@ -797,7 +814,8 @@ test('datumläge: korrekt beräkning med avrundning uppåt (Math.ceil)', () => {
 test('datumläge: slutdatum < startdatum → packages=0', () => {
   // prescribedEnd passerat → startDate = idag; endDate 5 dagar sedan < idag
   setTestState(0, { dose: 1, prescribedEndDateStr: '2025-06-01' });
-  setTestPS(0, { mode: 'date', endDate: daysAgo(5), packageSize: '30', months: 1 });
+  __setPrescribeGlobals('date', 7, daysAgo(5));
+  setTestPS(0, { packageSize: '30' });
   const r = calcPrescribeResult(0);
   assertEqual(r.packages, 0, 'slutdatum före startdatum → 0 förpackningar');
 });
@@ -805,7 +823,8 @@ test('datumläge: slutdatum < startdatum → packages=0', () => {
 test('datumläge: fraktionell dos (0,5 st/dag) → korrekt tabletträkning', () => {
   // 60 dagar × 0,5 st/dag = 30 tabletter; 30 ÷ 30 st/förp = 1 förp (exakt)
   setTestState(0, { dose: 0.5, prescribedEndDateStr: '2025-06-01' });
-  setTestPS(0, { mode: 'date', endDate: '2025-08-14', packageSize: '30', months: 1 });
+  __setPrescribeGlobals('date', 7, '2025-08-14');
+  setTestPS(0, { packageSize: '30' });
   const r = calcPrescribeResult(0);
   assertEqual(r.totalDays,    60, '15 jun → 14 aug = 60 dagar');
   assertEqual(r.totalTablets, 30, 'ceil(60 × 0,5) = 30');
