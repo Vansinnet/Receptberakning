@@ -1,12 +1,9 @@
-// === NY FÖRSKRIVNING ===
-
 function canRenewMed(i) {
   const s = states[i] || {};
   return s.valid && s.calculable !== false &&
     ((!s.isOveruse && !s.isTooEarly) || s.earlyRenewalDecision === 'yes');
 }
 
-/* Beräkna resultat utan att röra DOM */
 function calcPrescribeResult(i) {
   const s  = states[i] || {};
   const ps = prescribeState[i];
@@ -15,8 +12,7 @@ function calcPrescribeResult(i) {
   const today         = getToday();
   const prescribedEnd = parseDateUTC(s.prescribedEndDateStr);
 
-  // AKTIVT VAL: Ny förskrivning startar när nuvarande recept löper ut, inte idag.
-  // Skäl: Om patienten har läkemedel hemma ska läkaren inte förskriva mer än nödvändigt —
+  // Ny förskrivning startar när nuvarande recept löper ut, inte idag:
   // kvarvarande täckning räknas in i den begärda perioden (t.ex. "3 månader" inkluderar
   // de 25 dagar som nuvarande recept täcker, och nya tabletter förskrivs bara för resten).
   const startDate          = (prescribedEnd && prescribedEnd > today) ? prescribedEnd : today;
@@ -55,13 +51,6 @@ function calcPrescribeResult(i) {
   return { startDate, startDateStr, daysAlreadyCovered, endDate, endDateStr: fmtDate(endDate), totalDays, totalTablets, packages, packageSize, dose };
 }
 
-// Ren valideringsfunktion — returnerar { type, msg } eller null.
-// Anropas av updatePrescribeResult för att avgöra vad som ska visas när
-// calcPrescribeResult inte kan producera ett resultat.
-// field-nyckeln anger vilket inmatningsfält som är felaktigt ('pkg' eller 'date')
-// så att updatePrescribeResult kan applicera toggleError på rätt element.
-// Kontrollerar både paketstorlek och datum oberoende — returnerar det allvarligaste
-// felet (warn före info) så att användaren alltid ser relevant vägledning.
 function prescribeValidationHint(i, ps) {
   if (!ps) return null;
 
@@ -348,12 +337,8 @@ function renderPrescribePanel(i) {
   if (!prescribeState[i]) {
     initPrescribeState(i, { mode: 'months', months: 7, endDate: '', packageSize: String(s.amt || '') });
   } else {
-    // AKTIVT VAL: packageSize synkas inte automatiskt när amtInput ändras i huvudformuläret.
-    // Skäl: Förpackningsstorleken på det nya receptet kan avsiktligt skilja sig från det
-    // föregående — läkaren väljer själv storlek i högerpanelen och beräkningen visar hur
-    // många förpackningar av den storleken som krävs. Automatisk överskrivning skulle
-    // förstöra ett pågående val utan att läkaren märker det.
-    // Fältet förfylls bara om det är tomt (t.ex. vid första öppning efter byte av läkemedel).
+    // packageSize synkas inte automatiskt med huvudformulärets amtInput:
+    // läkaren väljer förpackningsstorlek separat. Fältet förfylls endast om tomt.
     if (prescribeState[i].packageSize === '') {
       applyPrescribeStatePatch(i, { packageSize: String(s.amt || '') });
     }

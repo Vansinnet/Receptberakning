@@ -1,18 +1,9 @@
-/*
-   STORAGE POLICY (GDPR)
-   localStorage: endast 'theme'
-   Klinisk data: endast i minnet (states[])
- */
 
-/* State — deklareras och ägs av state.js */
 let warnTimer, clearTimer, countdownInt;
 
-/* Debounce-instanser per läkemedelsindex */
 const calcDebounced = [];
 function ensureDebounce(i) {
   if (calcDebounced[i]) return;
-  // Fyll luckor med null för att göra index i adresserbart utan att allokera
-  // debounce-instanser för kort som inte existerar än.
   while (calcDebounced.length < i) calcDebounced.push(null);
   calcDebounced[i] = debounce(() => calc(i), 120);
 }
@@ -50,9 +41,8 @@ function resetTimer(isUserEvent=false) {
   clearTimeout(warnTimer); clearTimeout(clearTimer); clearInterval(countdownInt);
   const toast = getEl('toast'), toastCount = getEl('toastCount');
   if (toast) toast.classList.remove('visible');
-  // AKTIVT VAL: 15 minuters inaktivitet innan sidan rensas (varning vid 14 min).
-  // Läkare avbryts ofta mitt i arbetet av kollegor, telefonsamtal eller akuta situationer —
-  // en kortare timer orsakar frustration och tvingar omstart av pågående bedömning.
+  // 15 min inaktivitet innan rensning (varning vid 14 min). Längre tid än normalt
+  // eftersom läkare ofta avbryts av kollegor, telefonsamtal eller akuta situationer.
   warnTimer = setTimeout(() => {
     let s = 60;
     if (!toast||!toastCount) return;
@@ -304,9 +294,8 @@ function recalcOnDateChange() {
   for (let i = 0; i < states.length; i++) {
     if (i === activeMedIdx) continue;
     const s = states[i];
-    // AKTIVT VAL: calculable===false hoppas inte över — daysSince===0-kort ska kunna
-    // räknas om vid datumomslag. Övriga calculable:false-fall (totalDays>3650, remaining>total)
-    // är inte datumkänsliga men kostnaden för ett extra calcCore-anrop är försumbar.
+    // Hoppa inte över calculable===false — daysSince===0-kort ska kunna räknas om
+    // vid datumomslag. Övriga fall är inte datumkänsliga men kostnaden är försumbar.
     if (!s || !s.valid) continue;
     let inputData;
     if (s.calculable === true) {
@@ -378,31 +367,19 @@ window.addEventListener('pageshow',e=>{
 
 resetTimer();
 
-/*
-   TOOLTIP-SYSTEM
-   Fixed-positionerat så att det aldrig klipps
-   av overflow:auto på form- eller result-panel.
- */
-(function () {
-  const bubble = el('div', { cls: 'tooltip-bubble' });
-  document.body.appendChild(bubble);
-
-  function position(e) {
-    const margin = 10, bw = bubble.offsetWidth, bh = bubble.offsetHeight;
-    const vw = window.innerWidth, vh = window.innerHeight;
-    let x = e.clientX - bw / 2;
-    let y = e.clientY - bh - 14;
-    if (y < margin) y = e.clientY + 20;
-    x = Math.max(margin, Math.min(x, vw - bw - margin));
-    bubble.style.left = x + 'px';
-    bubble.style.top  = y + 'px';
-  }
-
+(function() {
+  const bubble = document.getElementById('tooltipBubble');
+  if (!bubble) return;
+  const position = e => {
+    bubble.style.left = (e.clientX + 12) + 'px';
+    bubble.style.top  = (e.clientY - 36) + 'px';
+  };
   document.addEventListener('mouseover', e => {
     const tooltipTarget = e.target.closest('[data-tooltip]');
     if (!tooltipTarget) return;
     bubble.textContent = tooltipTarget.dataset.tooltip;
     bubble.classList.add('visible');
+    position(e);
   });
   document.addEventListener('mousemove', e => {
     if (bubble.classList.contains('visible')) position(e);

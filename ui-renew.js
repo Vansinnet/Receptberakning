@@ -1,16 +1,8 @@
-// === LÄKEMEDELSLISTA — sidebar ===
-
-// Modulnivå-cache för statiska DOM-element — getElementById görs en gång per ID.
-// Alla ID:n är statiska (finns från sidladdning, tas aldrig bort ur DOM:en).
 const _dom = {};
 function _el(id) { return _dom[id] || (_dom[id] = document.getElementById(id)); }
 
-// Metrics-grid: jämför före omritning — calcCore genererar nya värden endast
-// när indata ändrats, vilket är långsammare än varje renderResultForMed-anrop.
 let _lastMetricsKey = '';
 
-// Uppdatera endast status och aktivmarkör — används vid kosmetiska ändringar (calc, setEarlyDecision).
-// Vid strukturella ändringar (läkemedel tillagt/borttaget/bytt) används buildMedList().
 function updateMedListStatuses() {
   const list = _el('medList');
   if (!list) return;
@@ -84,7 +76,6 @@ function selectMed(i) {
   if (medInput) medInput.focus();
 }
 
-// === FORMULÄR — mittenkolumn ===
 function updateFormHeader(i) {
   const s = states[i] || {};
   const nameEl = _el('formMedName');

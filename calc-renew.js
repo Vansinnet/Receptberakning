@@ -1,6 +1,3 @@
-// === VALIDERING + BERÄKNING ===
-
-// Delad datumvalidering — används av både DOM-hanterare och validateValues
 function validateDateField(val) {
   if (!val) return { valid: true, error: '' };
   const pDate = parseDateUTC(val);
@@ -9,8 +6,6 @@ function validateDateField(val) {
   return { valid: true, error: '', pDate };
 }
 
-// Ren valideringsfunktion utan DOM-beroende.
-// Returnerar alltid fieldErrors så att anroparen kan applicera dem på valfritt sätt.
 function validateValues(medRaw, dateVal, doseRaw, amtRaw, refRaw, leftRaw) {
   const fieldErrors = { medInput: '', dateInput: '', doseInput: '', amtInput: '', refInput: '', leftInput: '' };
 
@@ -63,7 +58,6 @@ function validateValues(medRaw, dateVal, doseRaw, amtRaw, refRaw, leftRaw) {
   return { valid: true, fieldErrors, medRaw, dateVal, pDate, amt, dose, ref, remaining, doseRaw, amtRaw, refRaw, leftRaw };
 }
 
-// DOM-skal: läser fältvärden, delegerar till validateValues, applicerar felmeddelanden.
 function validateInputs() {
   const medInput  = getEl('medInput');
   const dateInput = getEl('dateInput');
@@ -87,10 +81,6 @@ function validateInputs() {
   return result;
 }
 
-// Ren beräkningsfunktion utan DOM-beroende.
-// inputData: output från validateValues (eller validateInputs).
-// prev: { isOveruse, isTooEarly, earlyRenewalDecision } från föregående beräkningscykel.
-// Returnerar ett state-patch-objekt som appliceras på states[i] via Object.assign i calc().
 function calcCore(inputData, prev) {
   if (!inputData.valid) {
     if (inputData.reason === 'too_many_refs') {
@@ -178,13 +168,10 @@ function calcCore(inputData, prev) {
     endDate = new Date(inputData.pDate);
     endDate.setUTCDate(endDate.getUTCDate() + Math.round(totalDays));
     daysRemaining = getDaysDiff(endDate, today);
-    // AKTIVT VAL: Utan uppgift om kvarvarande doser räknas på total (amt × ref),
-    // inte accessibleTotal. Skäl: uttagsintervallet för tidigare recept är inte alltid
-    // känt — ur ett patientsäkerhetsperspektiv antas att patienten begär förnyelse
-    // för att alla förpackningar är uthämtade. Att räkna på färre uttag (accessibleTotal)
-    // skulle underskatta förbrukningstakten och riskera att missa en faktisk överförbrukning.
-    // Konsekvens: falskt positiva "överförbrukning"-varningar kan uppstå tidigt i
-    // receptperioden vid många uttag — läkaren ser detta och avgör med klinisk bedömning.
+    // Utan uppgift om kvarvarande doser räknas på total (amt × ref), inte accessibleTotal:
+    // uttagsintervallet är inte alltid känt. Antagandet att alla förpackningar är uthämtade
+    // undviker underskattning av förbrukningstakten (patientsäkerhet). Falskt positiva
+    // "överförbrukning"-varningar tidigt i receptperioden hanteras via klinisk bedömning.
     avgNum = total / daysSince;
   }
 
@@ -321,7 +308,7 @@ function calcCore(inputData, prev) {
 }
 
 function calc(i = activeMedIdx, skipGenerate = false) {
-  // AKTIVT VAL: ignorera föråldrade debounce-anrop om användaren bytt läkemedel under fördröjningen
+  // Ignorera föråldrade debounce-anrop om användaren bytt läkemedel under fördröjningen.
   if (i !== activeMedIdx) return;
   resetTimer();
   saveFormValues(i);

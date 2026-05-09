@@ -1,4 +1,3 @@
-// === FLIK 2: LÅNGVARIG FÖRBRUKNING ===
 function buildPeriodElement(period, i) {
   const wrap = el('div', { attrs: { id: `lt-period-wrap-${i}` } });
   wrap.appendChild(el('div', { cls: 'section-label', text: `Period ${i + 1}` }));
@@ -99,9 +98,6 @@ function clearLongterm() {
 const LT_OVER  = 1.10;
 const LT_UNDER = 0.80;
 
-/* Ren beräkningsfunktion — ingen DOM.
-   Returnerar alltid periodErrors så att UI:t kan markera ogiltiga fält
-   även när dos eller läkemedel saknas. */
 function calcLongtermCore(medRaw, ordDose, rawPeriods) {
   const today = getToday();
   const periodErrors = [];
@@ -146,9 +142,8 @@ function calcLongtermCore(medRaw, ordDose, rawPeriods) {
 
   const totalTablets = periods.reduce((s, p) => s + p.total, 0);
 
-  // AKTIVT VAL: Vid överlapp används unionen av datumintervall som nämnare.
-  // Tabletterna räknas alltid i sin helhet (de är faktiskt uttagna), men överlappande
-  // dagar dubbelräknas inte — annars underskattas overallAvg och är kliniskt missvisande.
+  // Vid överlapp: unionen av datumintervall som nämnare. Tabletterna räknas i sin helhet
+  // (faktiskt uttagna), men överlappande dagar dubbelräknas inte.
   let totalDays;
   if (hasOverlap) {
     const merged = [];
@@ -194,11 +189,8 @@ function calcLongtermCore(medRaw, ordDose, rawPeriods) {
     alertMsg   = `Snitt ${avgStr} är i linje med ordinerad dos (${ordDose} st/dag), avvikelse ${Math.abs(consumptionPct - 100).toFixed(1)}%.`;
   }
 
-  // AKTIVT VAL: Ingen "Period N:"-numrering i journaltexten.
-  // Perioderna sorteras ovan efter startdatum för korrekt överlappsdetektion,
-  // vilket gör att sorteringsordningen kan skilja sig från UI:ts inmatningsordning.
-  // "Period 1:" i journalen skulle då peka på fel period — datumintervallen är
-  // entydiga och behöver ingen numrering.
+  // Ingen "Period N:"-numrering i journalen — sorteringsordningen kan skilja sig
+  // från inmatningsordningen efter överlappsdetektion. Datumintervallen är entydiga.
   const periodSummary = periods.map(p =>
     `  ${fmtDate(p.startDate)}–${fmtDate(p.endDate)} (${p.days} dagar, ${p.total} tabletter, snitt ${p.avgPerDay.toFixed(2)} st/dag)`
   ).join('\n');
