@@ -3,6 +3,10 @@ function _el(id) { return _dom[id] || (_dom[id] = document.getElementById(id)); 
 
 let _lastMetricsKey = '';
 
+function resetMetricsCache() {
+  _lastMetricsKey = '';
+}
+
 function updateMedListStatuses() {
   const list = _el('medList');
   if (!list) return;

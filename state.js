@@ -83,6 +83,7 @@ function resetAllMedState() {
   states         = [{}];
   activeMedIdx   = 0;
   prescribeState = {};
+  resetLtPeriods();
 }
 
 // === LTPERIODS MUTATIONER ===

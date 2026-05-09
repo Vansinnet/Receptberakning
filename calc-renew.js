@@ -90,6 +90,7 @@ function calcCore(inputData, prev) {
         verdictSub:   'Max 12 uttag stöds.',
         metrics: [],
         alerts:  [{ type: 'danger', title: 'Ogiltigt antal uttag', message: 'Max 12 uttag stöds.' }],
+        patientText: '', patientTextEn: '', journalText: '',
         statusText: 'Ogiltigt antal',
       };
     }
@@ -124,6 +125,7 @@ function calcCore(inputData, prev) {
       verdictSub:   'Beräknad tid överstiger 10 år.',
       metrics: [],
       alerts:  [{ type: 'danger', title: 'Orimlig tid', message: 'Kontrollera inmatade värden.' }],
+      patientText: '', patientTextEn: '', journalText: '',
       statusText: 'Orimliga värden',
     };
   }
@@ -143,6 +145,7 @@ function calcCore(inputData, prev) {
         verdictTitle: 'Orimligt värde',
         verdictSub:   `Kvarvarande (${remaining}) kan inte överstiga totalt förskrivet (${total}).`,
         metrics: [], alerts: [],
+        patientText: '', patientTextEn: '', journalText: '',
         statusText: 'Orimliga värden',
       };
     }

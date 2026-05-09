@@ -41,8 +41,9 @@ function resetTimer(isUserEvent=false) {
   clearTimeout(warnTimer); clearTimeout(clearTimer); clearInterval(countdownInt);
   const toast = getEl('toast'), toastCount = getEl('toastCount');
   if (toast) toast.classList.remove('visible');
-  // 15 min inaktivitet innan rensning (varning vid 14 min). Längre tid än normalt
-  // eftersom läkare ofta avbryts av kollegor, telefonsamtal eller akuta situationer.
+  // 23 min inaktivitet innan rensning (varning vid 22 min). Förlängd tid eftersom
+  // läkare ofta avbryts av kollegor, telefonsamtal eller akuta situationer —
+  // och flera samtidiga läkemedel (max 8) kräver längre tid för genomgång.
   warnTimer = setTimeout(() => {
     let s = 60;
     if (!toast||!toastCount) return;
@@ -51,11 +52,11 @@ function resetTimer(isUserEvent=false) {
       s--; if (toastCount) toastCount.textContent = String(s);
       if (s<=0) clearInterval(countdownInt);
     }, 1000);
-  }, 14*60*1000);
+  }, 22*60*1000);
   clearTimer = setTimeout(() => {
     clearInterval(countdownInt); if (toast) toast.classList.remove('visible');
     confirmClearAll(true);
-  }, 15*60*1000);
+  }, 23*60*1000);
 }
 
 /* Lägg till / ta bort läkemedel */
@@ -88,7 +89,10 @@ function clearCurrentCard() {
 
     // calcDebounced-closures innehåller fasta idx-värden. Avbryt endast föråldrade
     // timers vid index >= i (prefix 0..i-1 har fortfarande korrekta stängningar).
-    for (let j = i; j < calcDebounced.length; j++) calcDebounced[j]?.cancel();
+    for (let j = i; j < calcDebounced.length; j++) {
+      calcDebounced[j]?.cancel();
+      calcDebounced[j] = null;
+    }
     calcDebounced.splice(i, 1);
     for (let j = i; j < states.length; j++) ensureDebounce(j);
 
@@ -105,6 +109,7 @@ function clearCurrentCard() {
   setMedState(i, { activeTab:'patient', patientLang:'sv' });
   initPrescribeState(i, null);
   resetPrescribePanel();
+  resetMetricsCache();
   buildMedList();
   renderFormForMed(i);
   renderResultForMed(i);
@@ -161,10 +166,14 @@ function closeClearModal() {
   }
 }
 function executeClearAll() {
+  for (let j = 0; j < calcDebounced.length; j++) calcDebounced[j]?.cancel();
+  calcLongtermDebounced.cancel();
   resetAllMedState();
+  resetPrescribePanel();
+  resetMetricsCache();
   buildMedList();
   renderFormForMed(0);
-  renderResultForMed(0); // anropar renderPrescribePanel(0) internt
+  renderResultForMed(0);
   clearLongterm();
   closeClearModal();
 }
@@ -341,6 +350,7 @@ window.addEventListener('pagehide',()=>{
   const ltPeriodCount = ltPeriods.length;
   clearAllMedStateData();
   resetPrescribePanel();
+  resetMetricsCache();
   ['medInput','doseInput','amtInput','refInput','leftInput'].forEach(id=>{ const e=getEl(id);if(e)e.value=''; });
   const d=getEl('dateInput');if(d)d.value=todayStr();
   const b=getEl('copyBodyResult');if(b)b.textContent='';
