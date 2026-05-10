@@ -48,7 +48,7 @@ Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder
 
 ### ✅ Receptförnyelse
 - Stöd för upp till **8 läkemedel**.
-- **Autocomplete** för läkemedelsnamn – sök bland ~2 000 preparat ur FASS.
+- **Autocomplete** för läkemedelsnamn – sök bland ~6 000 preparat ur FASS.
 - **Automatisk datumformatering** (ÅÅÅÅ-MM-DD).
 - **Valfritt fält för kvarvarande doser** – ger exakt snittberäkning i stället för worst‑case‑antagande.
 - **Direktlänk till FASS** för aktuellt läkemedel.
@@ -113,7 +113,7 @@ Tre inbyggda teman som växlas direkt:
   - `ui-renew.js` – UI-rendering för receptförnyelse (sidebar, formulär, resultatpanel, autocomplete)
   - `prescribe.js` – beräkningskärna och UI för nyförskrivning
   - `longterm.js` – långvarig förbrukning (beräkning + UI)
-  - `drugs.js` – läkemedelsdatabas (~2 000 preparat)
+  - `drugs.js` – läkemedelsdatabas (~6 000 preparat)
 - Fungerar **helt offline** – öppna bara `index.html` i en webbläsare.
 - **Standardiserad datumhantering** – alla datum hanteras som UTC för att undvika tidszonsproblem.
 - **Rena beräkningsfunktioner** (`calcCore`, `calcLongtermCore`, `calcPrescribeResult`) saknar DOM-beroenden. DOM-skal läser fält, anropar kärnan, renderar resultat.
