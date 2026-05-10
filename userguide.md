@@ -153,7 +153,7 @@ Fliken **📊 Långvarig förbrukning** är avsedd för analys av förbrukningsm
 
 **Rensa kort** – klicka **Rensa** i formulärhuvudet för att tömma ett enskilt läkemedelskort.
 
-**Återställ allt** – klicka **🔄 Återställ allt** i toppmenyn för att rensa samtliga kort. En bekräftelse krävs.
+**Ny patient** – klicka **Ny patient** under läkemedelslistan för att rensa alla kort och starta en ny patient. En bekräftelse krävs.
 
 **FASS** – klicka på FASS-länken bredvid läkemedelsnamnet för att öppna produktresumén i ny flik.
 

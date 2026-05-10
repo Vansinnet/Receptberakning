@@ -131,7 +131,7 @@ npm test              # Kör alla tester (calc + UI)
 npm run test:calc     # Endast beräkningslogik
 npm run test:ui       # Endast UI-rendering
 npm run build:db      # Crawla FASS och bygg product-db.json (~45 min)
-npm run generate:drugs # Generera drugs.js från ranking + FASS-data (~2 min)
+npm run generate:drugs # Generera drugs.js från product-db.json (~1 min)
 ```
 
 **Driftsätt online:**
@@ -146,8 +146,7 @@ Läkemedelsdatabasen (`drugs.js`) byggs i två steg:
 ```
 FASS.se (~14 000 NPL-ID:n)
   └─ build:db → data/product-db.json
-       └─ generate:drugs → Kod/drugs.js
-            (sammanfogar med Socialstyrelsens förskrivningsranking)
+       └─ generate:drugs → Kod/drugs.js (samtliga tabletter/kapslar)
 ```
 
 Bör köras kvartalsvis eller vid större förändringar i FASS sortiment.
