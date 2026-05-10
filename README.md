@@ -1,6 +1,6 @@
 # Receptberäkning
 
-> Kliniskt beslutsstöd för läkare vid handläggning av receptförnyelser via 1177 samt analys av långvarig förbrukning.
+> Kliniskt beslutsstöd för läkare vid handläggning av receptförnyelser via 1177, nyförskrivning samt analys av långvarig förbrukning.
 
 **Live:** [receptberakning.pages.dev](https://receptberakning.pages.dev/)
 
@@ -12,15 +12,15 @@
 
 ## Vad gör verktyget?
 
-Verktyget består av två huvudflikar:
+Verktyget består av tre funktioner fördelade på två huvudflikar:
 
 ### 1. 💊 Receptförnyelse
 Läkaren matar in ordinationsinformation (läkemedel + styrka, senaste receptdatum, mängd per uttag, antal uttag och ordinerad dygnsdos). Verktyget beräknar patientens förbrukningstakt och bedömer om förnyelse är lämplig.
 
 Baserat på beräkningen visas ett **utlåtande** med:
-- **OK att förnya** – förbrukning inom ±10 % av ordination, eller förhöjd förbrukning men mindre än 7 dagar kvar.
-- **För tidigt att förnya** – normal förbrukning men mer än 14 dagar kvar (standardgräns).
-- **Överförbrukning** – snittförbrukning >10 % över ordinerad dos och mer än 7 dagar kvar.
+- **OK att förnya** – förbrukning inom ±10 % av ordination, eller ≤20 % av receptperioden kvar.
+- **För tidigt att förnya** – normal förbrukning men mer än 20 % av receptperioden kvar.
+- **Överförbrukning** – snittförbrukning >10 % över ordinerad dos och (mer än 7 dosdagar kvar *eller* mer än 14 perioddagar kvar).
 
 För överförbrukning eller för tidig förnyelse kan läkaren **aktivt överstyra** via knapparna **Ja, förnya** / **Nej, avslå**. Detta påverkar både statusfärg, sidomeny och de genererade texterna.
 
@@ -31,7 +31,10 @@ För varje läkemedel genereras direkt:
 
 Stöd för upp till **8 läkemedel** i samma session – en sammanhållen patienttext och journalanteckning skapas för alla.
 
-### 2. 📊 Långvarig förbrukning
+### 2. 📦 Nyförskrivning
+När förnyelse beviljas visas en panel för beräkning av nytt recept. Läkaren anger önskad förskrivningsperiod (1–12 månader eller slutdatum) – verktyget beräknar exakt antal förpackningar som behövs, med hänsyn till kvarvarande dagar på befintligt recept. En sammanfattande översikt visas när flera läkemedel förnyas samtidigt.
+
+### 3. 📊 Långvarig förbrukning
 Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder). För varje period anges startdatum, antal uttagna tabletter och slutdatum. Verktyget beräknar:
 - Snittförbrukning per dag i varje period.
 - Avvikelse i procent mot ordinerad dos.
@@ -45,6 +48,7 @@ Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder
 
 ### ✅ Receptförnyelse
 - Stöd för upp till **8 läkemedel**.
+- **Autocomplete** för läkemedelsnamn – sök bland ~2 000 preparat ur FASS.
 - **Automatisk datumformatering** (ÅÅÅÅ-MM-DD).
 - **Valfritt fält för kvarvarande doser** – ger exakt snittberäkning i stället för worst‑case‑antagande.
 - **Direktlänk till FASS** för aktuellt läkemedel.
@@ -52,57 +56,101 @@ Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder
 - **Tidslinje** – visar hur stor del av receptperioden som förflutit.
 - **Mätvärden** med verktygstips (totalt förskrivet, slutdatum, snittförbrukning).
 - **Alerter** – varning vid låg/överförbrukning, tidig uthämtning, avvikande data.
-- **Kliniskt överstyrande** – vid överförbrukning eller för tidig begäran kan läkaren manuellt godkänna förnyelse (knapparna Ja/Nej).
+- **Kliniskt överstyrande** – vid överförbrukning eller för tidig begäran kan läkaren manuellt godkänna förnyelse (Ja/Nej).
 - **Svar till patient på svenska och engelska** – växla med en knapp, ingen översättningstjänst krävs.
-- **Journalanteckning** – anpassas efter om förnyelse beviljats eller ej.
+- **Journalanteckning** – anpassas efter förnyelsebeslut och klinisk bedömning.
 - **Kopieringsknappar** – för snabb inklistring i journalsystem/1177.
+
+### 📦 Nyförskrivning
+- Välj periodlängd via **månadsväljare** (1–12 månader) eller **angivet slutdatum**.
+- Beräknar exakt **antal förpackningar** med hänsyn till daglig dos, förpackningsstorlek och kvarvarande täckning från nuvarande recept.
+- Hanterar månadsövergångar korrekt (t.ex. 31 januari + 1 månad → 28 februari).
+- **Sammanfattande översikt** när flera läkemedel är aktuella för nyförskrivning.
 
 ### 📊 Långvarig förbrukning
 - **Upp till 10 perioder** – lägg till/ta bort efter behov.
 - Förvalda datum: start = ett år tillbaka, slut = idag.
 - Validering av datum (start < slut, inga framtida datum).
-- Varning vid överlappande perioder.
+- Hanterar **överlappande perioder** via datumunion för korrekt totaldygnsberäkning.
 - **Stapeldiagram** – relativ förbrukning (0–150 % av ordination).
 - **Periodtabell** – visar snitt/dag, avvikelse % och badge.
 - **Journalanteckning** – sammanfattar alla perioder och total snittförbrukning.
 
 ### 🔒 Integritet och säkerhet
 - All patientdata stannar **enbart i webbläsarens minne** – skickas aldrig till någon server.
-- **Automatisk rensning** efter 5 minuters inaktivitet (varning efter 4 min).
+- **Automatisk rensning** efter 23 minuters inaktivitet (varning efter 22 min) – anpassat för delade kliniska datorer.
 - Endast temainställningen sparas i `localStorage`.
 - **Content Security Policy** blockerar alla externa nätverksanrop.
 - **Inga externa bibliotek** – ren HTML/CSS/JavaScript.
+- **Trusted Types** enforced för skydd mot DOM-baserade XSS-attacker.
+- Data rensas vid `pagehide` (bfcache-säkerhet).
 
 ### 🎨 Utseende
 Tre inbyggda teman som växlas direkt:
 - **🩺 Klinisk** (standard) – lugn grön/teal-bas.
 - **🌙 Mörkt** – hög kontrast, mörk bakgrund.
-- **🌒 Natt** – varmt mörkt tema med orange accenter.
+- **🌸 Körsbär** – varmt rosa tema med mjuka accenter.
 
 ### 🧰 Övrigt
 - **Verktygstips** (`data-tooltip`) för nästan alla inmatningsfält och mätvärden.
 - **Toastmeddelande** vid inaktivitet.
 - **Modal** för bekräftelse vid rensning av all data.
 - **Responsiv design** – anpassar sig för smalare skärmar (staplad vy).
+- **Validering** – dygnsdos 0,1–50 st/dag, förpackningsstorlek 1–10 000, antal uttag 1–12, strikt datumvalidering inklusive skottår.
 
 ---
 
 ## Teknisk information
 
-- **Ren HTML/CSS/JavaScript** – inga ramverk, inga externa beroenden.
-- **En enda HTML-fil** med inbäddad CSS och JS (dock i utvecklingsversionen separata filer, men produktionsbygge kan vara sammanfogat).
-- Fungerar **helt offline** – öppna bara filen i en webbläsare.
+- **Ren HTML/CSS/JavaScript** – inga ramverk, inga externa beroenden i produktion.
+- **Modulär arkitektur** (alla filer i `Kod/`):
+  - `index.html` – applikationsskal
+  - `app.css` – all stilmall (tre teman, responsiv design)
+  - `app.js` – orkestrering (eventlyssnare, temahantering, inaktivitetstimer)
+  - `utils.js` – DOM-hjälpare, datumverktyg, toast, kopiering
+  - `state.js` – centraliserad tillståndshantering
+  - `calc-renew.js` – beräkningskärna och textgenerering för receptförnyelse
+  - `ui-renew.js` – UI-rendering för receptförnyelse (sidebar, formulär, resultatpanel, autocomplete)
+  - `prescribe.js` – beräkningskärna och UI för nyförskrivning
+  - `longterm.js` – långvarig förbrukning (beräkning + UI)
+  - `drugs.js` – läkemedelsdatabas (~2 000 preparat)
+- Fungerar **helt offline** – öppna bara `index.html` i en webbläsare.
 - **Standardiserad datumhantering** – alla datum hanteras som UTC för att undvika tidszonsproblem.
+- **Rena beräkningsfunktioner** (`calcCore`, `calcLongtermCore`, `calcPrescribeResult`) saknar DOM-beroenden. DOM-skal läser fält, anropar kärnan, renderar resultat.
 
 ---
 
 ## Kom igång
 
 **Lokalt:**
-Öppna index.html i valfri webbläsare – ingen installation behövs.
+Öppna `Kod/index.html` i valfri webbläsare – ingen installation behövs.
+
+**Utveckling:**
+```bash
+npm test              # Kör alla tester (calc + UI)
+npm run test:calc     # Endast beräkningslogik
+npm run test:ui       # Endast UI-rendering
+npm run build:db      # Crawla FASS och bygg product-db.json (~45 min)
+npm run generate:drugs # Generera drugs.js från ranking + FASS-data (~2 min)
+```
 
 **Driftsätt online:**
-Ladda upp samtliga filer (`index.html`, `app.css`, `app.js`) till valfri statisk webbserver, t.ex. GitHub Pages eller Cloudflare Pages.
+Ladda upp samtliga filer i `Kod/` till valfri statisk webbserver, t.ex. Cloudflare Pages. `_headers`-filen konfigurerar säkerhetsheaders (CSP, HSTS, COOP/COEP/CORP).
+
+---
+
+## Datapipeline
+
+Läkemedelsdatabasen (`drugs.js`) byggs i två steg:
+
+```
+FASS.se (~14 000 NPL-ID:n)
+  └─ build:db → data/product-db.json
+       └─ generate:drugs → Kod/drugs.js
+            (sammanfogar med Socialstyrelsens förskrivningsranking)
+```
+
+Bör köras kvartalsvis eller vid större förändringar i FASS sortiment.
 
 ---
 
