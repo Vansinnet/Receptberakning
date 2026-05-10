@@ -435,9 +435,9 @@ resetTimer();
   document.addEventListener('focusin', e => {
     const tooltipTarget = e.target.closest('[data-tooltip]');
     if (!tooltipTarget) { bubble.classList.remove('visible'); return; }
+    const rect = tooltipTarget.getBoundingClientRect();
     bubble.textContent = tooltipTarget.dataset.tooltip;
     bubble.classList.add('visible');
-    const rect = tooltipTarget.getBoundingClientRect();
     position({ clientX: rect.left + rect.width / 2, clientY: rect.top });
   });
   document.addEventListener('focusout', e => {
