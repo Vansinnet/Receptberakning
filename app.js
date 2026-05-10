@@ -147,27 +147,28 @@ function setEarlyDecision(decision) {
   generateAndDistribute();
 }
 
-/* Rensa allt */
-let _clearModalTrigger = null;
+/* Ny patient */
+let _newPatientModalTrigger = null;
 function confirmClearAll(force=false) {
   if (force) { executeClearAll(); return; }
-  const m = getEl('clearModal');
+  const m = getEl('newPatientModal');
   if (!m) return;
-  _clearModalTrigger = document.activeElement;
+  _newPatientModalTrigger = document.activeElement;
   m.classList.add('visible');
-  const btn = getEl('executeClearAllBtn');
+  const btn = getEl('executeNewPatientBtn');
   if (btn) btn.focus();
 }
-function closeClearModal() {
-  const m = getEl('clearModal');
+function closeNewPatientModal() {
+  const m = getEl('newPatientModal');
   if (m) m.classList.remove('visible');
-  if (_clearModalTrigger && typeof _clearModalTrigger.focus === 'function') {
-    _clearModalTrigger.focus();
-    _clearModalTrigger = null;
+  if (_newPatientModalTrigger && typeof _newPatientModalTrigger.focus === 'function') {
+    _newPatientModalTrigger.focus();
+    _newPatientModalTrigger = null;
   }
 }
 function executeClearAll() {
   for (let j = 0; j < calcDebounced.length; j++) calcDebounced[j]?.cancel();
+  calcDebounced.length = 0;
   calcLongtermDebounced.cancel();
   resetAllMedState();
   resetPrescribePanel();
@@ -179,7 +180,11 @@ function executeClearAll() {
   renderFormForMed(0);
   renderResultForMed(0);
   clearLongterm();
-  closeClearModal();
+  closeNewPatientModal();
+  const medInput = getEl('medInput');
+  if (medInput) medInput.focus();
+  const ann = getEl('a11y-announce');
+  if (ann) ann.textContent = 'All data har rensats. Redo för ny patient.';
 }
 
 /* Kopiering */
@@ -265,7 +270,7 @@ const addMedBtn = getEl('addMedBtn'); if (addMedBtn) addMedBtn.addEventListener(
 
 // Topbar
 const themeSelect = getEl('themeSelect'); if (themeSelect) themeSelect.addEventListener('change', e => applyTheme(e.target.value));
-const clearAllBtn = getEl('clearAllBtn'); if (clearAllBtn) clearAllBtn.addEventListener('click', () => confirmClearAll());
+const newPatientBtn = getEl('newPatientBtn'); if (newPatientBtn) newPatientBtn.addEventListener('click', () => confirmClearAll());
 document.querySelectorAll('.main-tab').forEach(btn => btn.addEventListener('click', () => switchMainTab(btn.dataset.tab)));
 
 // Resultat-knappar
@@ -297,14 +302,14 @@ const earlyYesBtn = getEl('earlyDecisionYes'); if (earlyYesBtn) earlyYesBtn.addE
 const earlyNoBtn  = getEl('earlyDecisionNo');  if (earlyNoBtn)  earlyNoBtn.addEventListener('click',  () => setEarlyDecision('no'));
 
 // Modal: knappar, ESC-tangent och focustrap
-const closeClearModalBtn=getEl('closeClearModalBtn'); if(closeClearModalBtn) closeClearModalBtn.addEventListener('click',closeClearModal);
-const executeClearAllBtn=getEl('executeClearAllBtn'); if(executeClearAllBtn) executeClearAllBtn.addEventListener('click',executeClearAll);
+const closeNewPatientModalBtn=getEl('closeNewPatientModalBtn'); if(closeNewPatientModalBtn) closeNewPatientModalBtn.addEventListener('click',closeNewPatientModal);
+const executeNewPatientBtn=getEl('executeNewPatientBtn'); if(executeNewPatientBtn) executeNewPatientBtn.addEventListener('click',executeClearAll);
 document.addEventListener('keydown', e => {
-  const m = getEl('clearModal');
+  const m = getEl('newPatientModal');
   if (!m || !m.classList.contains('visible')) return;
-  if (e.key === 'Escape') { e.preventDefault(); closeClearModal(); return; }
+  if (e.key === 'Escape') { e.preventDefault(); closeNewPatientModal(); return; }
   if (e.key === 'Tab') {
-    const focusable = [getEl('executeClearAllBtn'), getEl('closeClearModalBtn')].filter(Boolean);
+    const focusable = [getEl('executeNewPatientBtn'), getEl('closeNewPatientModalBtn')].filter(Boolean);
     if (focusable.length < 2) return;
     if (e.shiftKey && document.activeElement === focusable[0]) {
       e.preventDefault(); focusable[focusable.length - 1].focus();
@@ -369,6 +374,8 @@ window.addEventListener('focus',recalcOnDateChange);
 
 // Rensa vid pagehide (bfcache-säkerhet)
 window.addEventListener('pagehide',()=>{
+  for (let j = 0; j < calcDebounced.length; j++) calcDebounced[j]?.cancel();
+  calcLongtermDebounced.cancel();
   const ltPeriodCount = ltPeriods.length;
   clearAllMedStateData();
   resetPrescribePanel();

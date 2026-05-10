@@ -55,7 +55,7 @@ Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder
 - **Narkotikavarning** – identifierar narkotikaklassade preparat enligt LVFS 2011:10 och visar en badge (Förteckning II–V).
 - **Tidslinje** – visar hur stor del av receptperioden som förflutit.
 - **Mätvärden** med verktygstips (totalt förskrivet, slutdatum, snittförbrukning).
-- **Alerter** – varning vid låg/överförbrukning, tidig uthämtning, avvikande data.
+- **Alerter** – varning vid låg förbrukning, förhöjd förbrukning inom 7 dagar, tidig uthämtning, avvikande data.
 - **Kliniskt överstyrande** – vid överförbrukning eller för tidig begäran kan läkaren manuellt godkänna förnyelse (Ja/Nej).
 - **Svar till patient på svenska och engelska** – växla med en knapp, ingen översättningstjänst krävs.
 - **Journalanteckning** – anpassas efter förnyelsebeslut och klinisk bedömning.
@@ -166,7 +166,7 @@ Bör köras kvartalsvis eller vid större förändringar i FASS sortiment.
 >
 > Bedömning: Patienten begär förnyelse av Elvanse 50 mg. Senaste receptet utfärdades 2025-01-15 (totalt 300 doser, ordination 1 st/dag) och borde räcka till 2025-11-12. Beräknad snittförbrukning: 1,72 st/dag (beräknat på faktisk förbrukning…) – överstiger ordination. Receptet förnyas på klinisk indikation.
 >
-> Åtgärd: Nytt recept utfärdat. Svar skickat till patient via 1177.
+> Åtgärd: Nytt recept utfärdat (räcker t.o.m. 2025-12-15). Svar skickat till patient via 1177.
 
 ---
 

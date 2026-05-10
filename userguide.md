@@ -30,7 +30,7 @@ Vid start finns ett tomt läkemedelskort. Använd knappen **＋ Lägg till** i s
 
 | Fält | Beskrivning | Kommentar |
 |------|-------------|-----------|
-| **Läkemedel och styrka** | Namn och styrka exakt som på receptet, t.ex. `Elvanse 50 mg` | Styr FASS-länken |
+| **Läkemedel och styrka** | Namn och styrka exakt som på receptet, t.ex. `Elvanse 50 mg` | Autocomplete söker i FASS-databas. Styr FASS-länk och narkotikaklassning |
 | **Senaste recept** | Förskrivningsdatum (ÅÅÅÅ-MM-DD) | Autoformateras vid inmatning |
 | **Dos per dag** | Ordinerad dygnsdos i antal tabletter/kapslar | Kan vara decimalt, t.ex. `0,5` |
 | **Förpackningsstorlek (st)** | Antal tabletter/kapslar per förpackning | T.ex. `100` |
@@ -47,7 +47,7 @@ Vid överförbrukning eller för tidig förnyelse visas frågan **"Mot bakgrund 
 
 ### Steg 5: Kopiera texter
 
-Under resultatpanelen finns färdiga förslag för **Svar till patient** (svenska och engelska) och **Journalanteckning**. Klicka **📋 Kopiera text** och klistra in direkt i 1177 eller journalsystemet. Texterna är anpassade till kliniska scenariot och det beslut som tagits.
+Under resultatpanelen finns färdiga förslag för **Svar till patient** (svenska och engelska) och **Journalanteckning**. Växla mellan svensk och engelsk patienttext med språkknappen (🇸🇪/🇬🇧). Klicka **📋 Kopiera text** och klistra in direkt i 1177 eller journalsystemet. Texterna är anpassade till kliniska scenariot och det beslut som tagits.
 
 ---
 
@@ -123,11 +123,21 @@ Varningar visas vid:
 
 ## 4. Ny förskrivning
 
-När ett recept godkänts för förnyelse (grönt utfall eller manuellt godkänt) visas en panel för ny förskrivning:
+När ett recept godkänts för förnyelse (grönt utfall eller manuellt godkänt) visas en panel för ny förskrivning i högerkolumnen.
 
-1. Ange önskad förpackningsstorlek
-2. Välj antal månader **eller** ange ett specifikt slutdatum
-3. Verktyget beräknar exakt antal förpackningar att förskriva
+Panelen innehåller:
+
+1. **Periodväljare** – växla mellan **Månader** (förskriv för ett antal månader) eller **Datum** (förskriv till ett specifikt slutdatum) via knapparna högst upp.
+   - Månader: välj 1–12 månader från dropdown-listan
+   - Datum: ange ett specifikt slutdatum (ÅÅÅÅ-MM-DD)
+2. **Förpackningsstorlek** – förifylld från "Mängd per uttag" i formuläret, men kan ändras manuellt. Ange antal tabletter per förpackning.
+3. **Beräkning** – visar:
+   - Startdatum (när nuvarande recept löper ut)
+   - Antal förpackningar att förskriva (avrundat uppåt)
+   - Totalt antal tabletter och periodens längd
+   - Om nuvarande recept redan täcker hela perioden visas detta.
+
+Vid flera läkemedel visas en **sammanställning** högst upp i panelen med samtliga läkemedel som ska förskrivas. Klicka på en rad för att växla till det läkemedlet.
 
 ---
 
@@ -155,9 +165,17 @@ Fliken **📊 Långvarig förbrukning** är avsedd för analys av förbrukningsm
 
 **Ny patient** – klicka **Ny patient** under läkemedelslistan för att rensa alla kort och starta en ny patient. En bekräftelse krävs.
 
-**FASS** – klicka på FASS-länken bredvid läkemedelsnamnet för att öppna produktresumén i ny flik.
+**FASS** – klicka på FASS-länken bredvid läkemedelsnamnet för att öppna produktresumén i ny flik. Läkemedelsnamnet matchas automatiskt mot FASS-databasen för korrekt sökning.
 
-**Inaktivitetsskydd** – efter 4 minuters inaktivitet visas en varning. Om ingen åtgärd vidtas rensas all data efter ytterligare 60 sekunder. Skyddar patientuppgifter på delade datorer.
+**Narkotikaklassificering** – om läkemedlet är klassificerat som narkotika visas narkotikaklass (II–V) bredvid läkemedelsnamnet i formulärhuvudet. Baseras på FASS-databasen.
+
+**Inaktivitetsskydd** – efter 22 minuters inaktivitet visas en varning. Om ingen åtgärd vidtas rensas all data efter ytterligare 60 sekunder (23 min totalt). Skyddar patientuppgifter på delade datorer.
+
+**Autocomplete för läkemedel** – när du skriver i fältet "Läkemedel och styrka" visas en rullista med förslag från FASS-databasen, inklusive förpackningsstorlek och beredningsform. Välj ett förslag med musen eller markera med piltangenterna och bekräfta med Enter. Förpackningsstorleken fylls i automatiskt.
+
+**Tooltip-hjälp** – för de flesta fält och knappar visas en förklarande ruta vid hover eller fokus. Ger klinisk kontext utan att fylla gränssnittet med text.
+
+**Tillgänglighet** – verktyget har stöd för tangentbordsnavigation (Tab, piltangenter, Escape), skärmläsare (ARIA-label, aria-live, skip-link) och fokushantering vid modal och läkemedelsval.
 
 **Offline-användning** – verktyget fungerar helt utan internet efter att sidan laddats ned och filerna läggs i samma mapp. Starta `index.html` i en webbläsare.
 
@@ -187,4 +205,4 @@ Ja, upp till 8 läkemedelskort kan vara öppna parallellt. Patientbrev och journ
 
 *Verktyget är ett beslutsstöd — förskrivaren ansvarar alltid för kliniska beslut.*
 
-**Senast uppdaterat:** 2026-05-04
+**Senast uppdaterat:** 2026-05-10

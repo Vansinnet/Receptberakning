@@ -141,6 +141,13 @@ function assertContains(str, substr, label) {
     );
 }
 
+function assertNotContains(str, substr, label) {
+  if (String(str).includes(substr))
+    throw new Error(
+      `${label ? label + ': ' : ''}"${str}" innehåller "${substr}" men får inte göra det`
+    );
+}
+
 // Konstruera ett giltigt inputData utan att gå via DOM-beroende validateInputs.
 // daysSince styr pDate relativt MOCK_TODAY.
 function makeInput({
@@ -1518,6 +1525,92 @@ test('multi: overuse med remainingDoses → doser kvar nämns i journalen', () =
   }));
   const text = buildJournalText([], [], [{ name: 'Elvanse 50 mg', i: 0 }], 2);
   assertContains(text, '30 doser', 'kvarvarande doser ska nämnas i journalen');
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// buildPatientText / buildJournalText — prescribe-slutdatum
+// ═══════════════════════════════════════════════════════════
+
+group('prescribe-slutdatum i patientbrev och journal');
+
+test('patientbrev (sv) singleRenew med prescribeEnds → slutdatum i texten', () => {
+  setTestState(0, makeRenewState());
+  const text = buildPatientText('sv', [{ name: 'Elvanse 50 mg', i: 0 }], [], [], 1, { 0: '2026-12-10' });
+  assertContains(text, 'räcker till och med 2026-12-10', 'slutdatum ska anges för förnyat läkemedel');
+});
+
+test('patientbrev (sv) multiRenew med prescribeEnds → slutdatum per läkemedel', () => {
+  setTestState(0, makeRenewState({ medRaw: 'Sertralin 50 mg' }));
+  setTestState(1, makeRenewState({ medRaw: 'Voxra 300 mg' }));
+  const text = buildPatientText('sv', [
+    { name: 'Sertralin 50 mg', i: 0 },
+    { name: 'Voxra 300 mg',   i: 1 },
+  ], [], [], 2, { 0: '2026-12-10', 1: '2026-12-10' });
+  assertContains(text, 'Sertralin 50 mg: Vi förnyar ditt recept inom 2–3 arbetsdagar så att läkemedlet räcker till och med 2026-12-10', 'Sertralin-raden ska innehålla slutdatum');
+  assertContains(text, 'Voxra 300 mg: Vi förnyar ditt recept inom 2–3 arbetsdagar så att läkemedlet räcker till och med 2026-12-10', 'Voxra-raden ska innehålla slutdatum');
+});
+
+test('patientbrev (en) singleRenew med prescribeEnds → slutdatum i texten', () => {
+  setTestState(0, makeRenewState());
+  const text = buildPatientText('en', [{ name: 'Elvanse 50 mg', i: 0 }], [], [], 1, { 0: '2026-12-10' });
+  assertContains(text, 'lasts until 2026-12-10', 'slutdatum ska anges på engelska');
+});
+
+test('patientbrev (en) multiRenew med prescribeEnds → slutdatum per läkemedel', () => {
+  setTestState(0, makeRenewState({ medRaw: 'Sertralin 50 mg' }));
+  setTestState(1, makeRenewState({ medRaw: 'Voxra 300 mg' }));
+  const text = buildPatientText('en', [
+    { name: 'Sertralin 50 mg', i: 0 },
+    { name: 'Voxra 300 mg',   i: 1 },
+  ], [], [], 2, { 0: '2026-12-10', 1: '2026-12-10' });
+  assertContains(text, 'Sertralin 50 mg: We will renew your prescription within 2–3 working days so that the medication lasts until 2026-12-10', 'Engelsk Sertralin-rad med slutdatum');
+  assertContains(text, 'Voxra 300 mg: We will renew your prescription within 2–3 working days so that the medication lasts until 2026-12-10', 'Engelsk Voxra-rad med slutdatum');
+});
+
+test('patientbrev utan prescribeEnds → fallback utan datum (bakåtkompatibelt)', () => {
+  setTestState(0, makeRenewState());
+  const text = buildPatientText('sv', [{ name: 'Elvanse 50 mg', i: 0 }], [], [], 1);
+  assertNotContains(text, 'räcker till och med', 'utan prescribeEnds ska inget slutdatum anges');
+  assertContains(text, '2–3 arbetsdagar', 'grundtexten ska fortfarande finnas');
+});
+
+test('journal summering med prescribeEnds → slutdatum per läkemedel', () => {
+  setTestState(0, makeRenewState({ medRaw: 'Sertralin 50 mg' }));
+  setTestState(1, makeRenewState({ medRaw: 'Voxra 300 mg' }));
+  const text = buildJournalText(
+    [{ name: 'Sertralin 50 mg', i: 0 }, { name: 'Voxra 300 mg', i: 1 }],
+    [], [], 2,
+    { 0: '2026-12-10', 1: '2026-12-10' }
+  );
+  assertContains(text, 'Sertralin 50 mg fram till och med 2026-12-10', 'summeringen ska innehålla Sertralin med slutdatum');
+  assertContains(text, 'Voxra 300 mg fram till och med 2026-12-10', 'summeringen ska innehålla Voxra med slutdatum');
+});
+
+test('journal summering utan prescribeEnds → fallback utan datum (bakåtkompatibelt)', () => {
+  setTestState(0, makeRenewState({ medRaw: 'Elvanse 50 mg' }));
+  const text = buildJournalText([{ name: 'Elvanse 50 mg', i: 0 }], [], [], 1);
+  assertNotContains(text, 'fram till och med', 'utan prescribeEnds ska inget slutdatum i summering');
+});
+
+test('journal single toRenew med prescribeEnds → slutdatum i åtgärdsraden', () => {
+  setTestState(0, makeRenewState());
+  const text = buildJournalText([{ name: 'Elvanse 50 mg', i: 0 }], [], [], 1, { 0: '2026-12-10' });
+  assertContains(text, 'Åtgärd: Nytt recept utfärdat (räcker t.o.m. 2026-12-10)', 'åtgärdsraden ska innehålla slutdatum');
+});
+
+test('journal single toRenew (overuse) med prescribeEnds → slutdatum i åtgärdsraden', () => {
+  setTestState(0, makeRenewState({
+    medRaw:               'Elvanse 50 mg',
+    prescribedEndDateStr: '2025-01-01',
+    displayAvgStr:        '1.50 st/dag',
+  }));
+  const text = buildJournalText(
+    [{ name: 'Elvanse 50 mg', i: 0, earlyRenewal: 'overuse' }],
+    [], [], 1,
+    { 0: '2026-12-10' }
+  );
+  assertContains(text, 'Åtgärd: Nytt recept utfärdat (räcker t.o.m. 2026-12-10)', 'overuse-åtgärdsraden ska innehålla slutdatum');
 });
 
 

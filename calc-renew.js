@@ -249,10 +249,7 @@ function calcCore(inputData, prev) {
   const alerts = [];
   const consumptionPct         = (avgNum / inputData.dose) * 100;
   const overuseSupressedBy7day = !isOveruse && daysRemaining >= 0 && daysRemaining <= 7 && avgNum > inputData.dose * 1.10;
-  if (isOveruse) {
-    const daysNote = daysRemaining > 0 ? ` — ${daysRemaining} dagar kvar` : ` — förskrivningen är slut`;
-    alerts.push({ type: 'danger', title: 'Förbrukning överstiger ordination', message: `Snitt ${displayAvg} ${avgNote}${daysNote}. Gör en individuell bedömning.` });
-  } else if (overuseSupressedBy7day) {
+  if (overuseSupressedBy7day) {
     alerts.push({ type: 'warn', title: 'Förhöjd förbrukning noterad', message: `Snitt ${displayAvg} överstiger ordination med >10%, men medicinen beräknas ta slut inom 7 dagar. Förnyelse godkänd — notera förbrukningstakten.` });
   } else if (avgNum === 0) {
     alerts.push({ type: 'danger', title: 'Ingen förbrukning registrerad', message: 'Snitt 0 st/dag – patienten verkar inte ha tagit medicinen. Klinisk bedömning krävs.' });
@@ -364,13 +361,13 @@ const PATIENT_TEXT = {
     greeting:          'Hej,',
     closing:           'Vid frågor är du välkommen att kontakta oss via 1177.',
     multiIntro:        'Vi har tagit emot din förfrågan om receptförnyelse för följande läkemedel:',
-    singleRenew:       (name)         => `Vi har tagit emot din förfrågan om receptförnyelse för ${name} och kommer att förnya ditt recept inom 2–3 arbetsdagar. Du kan därefter hämta ut din medicin på valfritt apotek.`,
+    singleRenew:       (name, endDate) => `Vi har tagit emot din förfrågan om receptförnyelse för ${name} och kommer att förnya ditt recept inom 2–3 arbetsdagar${endDate ? ` så att läkemedlet räcker till och med ${endDate}` : ''}. Du kan därefter hämta ut din medicin på valfritt apotek.`,
     singleTooEarly:    (name, s)      => `Vi har tagit emot din förfrågan om receptförnyelse för ${name}. Enligt din ordination (${s.dose} st/dag) beräknas medicinen räcka till den ${s.prescribedEndDateStr}. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. Vänligen hör av dig igen runt den ${s.renewDateStr} så hjälper vi dig då med nytt recept.`,
     singleOveruse:     (name, s, c)   => `Vi har tagit emot din förfrågan om receptförnyelse för ${name}. Utifrån föregående recept beräknades medicinen räcka till den ${s.prescribedEndDateStr}. Vi har granskat förfrågan och kan tyvärr inte förnya receptet vid detta tillfälle. ${c}`,
     closingEndPast:    'Receptet kan nu förnyas. Kontakta oss igen om du vill ha ett nytt recept utfärdat.',
     closingContactPast:'Medicinen beräknas ta slut inom kort — vänligen hör av dig igen så hjälper vi dig.',
     closingFuture:     (s)            => `Vänligen hör av dig igen närmre den ${s.prescribedContactDateStr} så hjälper vi dig då.`,
-    multiRenew:        (name)         => `${name}: Vi förnyar ditt recept inom 2–3 arbetsdagar.`,
+    multiRenew:        (name, endDate) => `${name}: Vi förnyar ditt recept inom 2–3 arbetsdagar${endDate ? ` så att läkemedlet räcker till och med ${endDate}` : ''}.`,
     multiTooEarly:     (name, s)      => `${name}: Enligt din ordination beräknas medicinen räcka till ${s.prescribedEndDateStr} — vi kan därför inte förnya receptet ännu. Hör av dig runt ${s.renewDateStr}.`,
     multiOverusePast:  (name, s)      => `${name}: Beräknades räcka till ${s.prescribedEndDateStr}. Receptet kan nu förnyas — kontakta oss igen.`,
     multiOveruseNotPast:(name, s, c)  => `${name}: Beräknades räcka till ${s.prescribedEndDateStr} — kan tyvärr inte förnyas vid detta tillfälle. ${c}`,
@@ -381,13 +378,13 @@ const PATIENT_TEXT = {
     greeting:          'Hello,',
     closing:           'If you have questions, please contact us through 1177.',
     multiIntro:        'We have received your prescription renewal request for the following medications:',
-    singleRenew:       (name)         => `We have received your prescription renewal request for ${name} and will renew your prescription within 2–3 working days. You can then collect your medication at any pharmacy.`,
+    singleRenew:       (name, endDate) => `We have received your prescription renewal request for ${name} and will renew your prescription within 2–3 working days${endDate ? ` so that the medication lasts until ${endDate}` : ''}. You can then collect your medication at any pharmacy.`,
     singleTooEarly:    (name, s)      => `We have received your prescription renewal request for ${name}. Your medication is estimated to last until ${s.prescribedEndDateStr}. Please contact us again around ${s.renewDateStr} and we will help you then.`,
     singleOveruse:     (name, s, c)   => `We have received your prescription renewal request for ${name}. Based on the previous prescription, the medication was estimated to last until ${s.prescribedEndDateStr}. We have reviewed your request and are unfortunately unable to renew the prescription at this time. ${c}`,
     closingEndPast:    'Your prescription can now be renewed. Please contact us again if you would like a new prescription.',
     closingContactPast:'Your medication is expected to run out shortly — please contact us again and we will help you.',
     closingFuture:     (s)            => `Please contact us again closer to ${s.prescribedContactDateStr}.`,
-    multiRenew:        (name)         => `${name}: We will renew your prescription within 2–3 working days.`,
+    multiRenew:        (name, endDate) => `${name}: We will renew your prescription within 2–3 working days${endDate ? ` so that the medication lasts until ${endDate}` : ''}.`,
     multiTooEarly:     (name, s)      => `${name}: Based on your prescription, the medication is estimated to last until ${s.prescribedEndDateStr} — it is therefore too early to renew. Please contact us around ${s.renewDateStr}.`,
     multiOverusePast:  (name, s)      => `${name}: Based on the previous prescription, the medication was estimated to last until ${s.prescribedEndDateStr}. The prescription can now be renewed — please contact us again.`,
     multiOveruseNotPast:(name, s, c)  => `${name}: Based on the previous prescription, the medication was estimated to last until ${s.prescribedEndDateStr} — we are unfortunately unable to renew it at this time. ${c}`,
@@ -396,13 +393,13 @@ const PATIENT_TEXT = {
   },
 };
 
-function buildPatientText(lang, toRenew, tooEarly, overuse, validCount) {
+function buildPatientText(lang, toRenew, tooEarly, overuse, validCount, prescribeEnds = {}) {
   const t = PATIENT_TEXT[lang] || PATIENT_TEXT.sv;
   const lines = [t.greeting, ''];
 
   if (validCount === 1) {
     if (toRenew.length === 1) {
-      lines.push(t.singleRenew(toRenew[0].name), '', t.closing);
+      lines.push(t.singleRenew(toRenew[0].name, prescribeEnds[toRenew[0].i]), '', t.closing);
     } else if (tooEarly.length === 1) {
       const s = states[tooEarly[0].i];
       lines.push(t.singleTooEarly(tooEarly[0].name, s), '', t.closing);
@@ -418,8 +415,8 @@ function buildPatientText(lang, toRenew, tooEarly, overuse, validCount) {
     }
   } else {
     lines.push(t.multiIntro, '');
-    for (const { name } of toRenew) {
-      lines.push(t.multiRenew(name));
+    for (const { name, i } of toRenew) {
+      lines.push(t.multiRenew(name, prescribeEnds[i]));
     }
     for (const { name, i } of tooEarly) {
       lines.push(t.multiTooEarly(name, states[i]));
@@ -440,18 +437,20 @@ function buildPatientText(lang, toRenew, tooEarly, overuse, validCount) {
   return lines.join('\n');
 }
 
-function buildJournalText(toRenew, tooEarly, overuse, validCount) {
+function buildJournalText(toRenew, tooEarly, overuse, validCount, prescribeEnds = {}) {
   const lines = [];
 
   if (validCount === 1) {
     if (toRenew.length === 1) {
       const s = states[toRenew[0].i];
+      const endSuffix = prescribeEnds[toRenew[0].i] ? ` (räcker t.o.m. ${prescribeEnds[toRenew[0].i]})` : '';
+
       if (toRenew[0].earlyRenewal === 'overuse') {
         lines.push(
           'Kontaktorsak: Receptförnyelse via 1177.', '',
           `Bedömning: Patienten begär förnyelse av ${toRenew[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} doser, ordination ${s.dose} st/dag) och borde räcka till ${s.prescribedEndDateStr}.${remainingDosesNote(s)}`,
           `Beräknad snittförbrukning: ${s.displayAvgStr} ${s.avgNote} — överstiger ordination. Receptet förnyas på klinisk indikation efter individuell bedömning.`,
-          '', 'Åtgärd: Nytt recept utfärdat. Svar skickat till patient via 1177.'
+          '', `Åtgärd: Nytt recept utfärdat${endSuffix}. Svar skickat till patient via 1177.`
         );
       } else {
         const earlyNote = toRenew[0].earlyRenewal === 'tooEarly'
@@ -461,7 +460,7 @@ function buildJournalText(toRenew, tooEarly, overuse, validCount) {
           'Kontaktorsak: Receptförnyelse via 1177.', '',
           `Bedömning: Patienten begär förnyelse av ${toRenew[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} doser, ordination ${s.dose} st/dag) och beräknas räcka till ${s.prescribedEndDateStr}.${remainingDosesNote(s)}${earlyNote}`,
           `Förbrukning bedöms vara enligt ordination (snittförbrukning: ${s.displayAvgStr} ${s.avgNote}).`,
-          '', 'Åtgärd: Nytt recept utfärdat. Svar skickat till patient via 1177.'
+          '', `Åtgärd: Nytt recept utfärdat${endSuffix}. Svar skickat till patient via 1177.`
         );
       }
     } else if (tooEarly.length === 1) {
@@ -528,7 +527,10 @@ function buildJournalText(toRenew, tooEarly, overuse, validCount) {
     }
     lines.push(
       toRenew.length > 0
-        ? `Recept utfärdat för: ${toRenew.map(x => x.name).join(', ')}. Svar skickat via 1177.`
+        ? `Recept utfärdat för: ${toRenew.map(x => {
+            const ed = prescribeEnds[x.i];
+            return ed ? `${x.name} fram till och med ${ed}` : x.name;
+          }).join(', ')}. Svar skickat via 1177.`
         : 'Inga recept utfärdade. Svar skickat via 1177.'
     );
   }
@@ -557,9 +559,15 @@ function generateAndDistribute() {
     else                                                       toRenew.push({ name, i });
   }
 
-  const patientText   = buildPatientText('sv', toRenew, tooEarly, overuse, validCount);
-  const patientTextEn = buildPatientText('en', toRenew, tooEarly, overuse, validCount);
-  const journalText   = buildJournalText(toRenew, tooEarly, overuse, validCount);
+  const prescribeEnds = {};
+  for (const { i } of toRenew) {
+    const pr = calcPrescribeResult(i);
+    if (pr && pr.endDateStr) prescribeEnds[i] = pr.endDateStr;
+  }
+
+  const patientText   = buildPatientText('sv', toRenew, tooEarly, overuse, validCount, prescribeEnds);
+  const patientTextEn = buildPatientText('en', toRenew, tooEarly, overuse, validCount, prescribeEnds);
+  const journalText   = buildJournalText(toRenew, tooEarly, overuse, validCount, prescribeEnds);
 
   for (let i = 0; i < states.length; i++) {
     const s = states[i]; if (!s || !s.valid || s.calculable === false) continue;

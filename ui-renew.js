@@ -89,6 +89,25 @@ function updateFormHeader(i) {
     if (s.medRaw) { fassBtn.href = getFassUrl(s.medRaw); fassBtn.classList.remove('is-hidden'); }
     else fassBtn.classList.add('is-hidden');
   }
+  const narcBtn = _el('narcBtnForm');
+  if (narcBtn) {
+    let narcClass = '';
+    if (s.medRaw) {
+      const raw = s.medRaw.toLowerCase();
+      for (let d = 0; d < DRUG_LIST.length; d++) {
+        if (DRUG_LIST[d].name.toLowerCase() === raw) {
+          narcClass = DRUG_LIST[d].narc;
+          break;
+        }
+      }
+    }
+    if (narcClass) {
+      narcBtn.textContent = 'Narkotika klass ' + narcClass;
+      narcBtn.classList.remove('is-hidden');
+    } else {
+      narcBtn.classList.add('is-hidden');
+    }
+  }
 }
 
 function renderFormForMed(i) {

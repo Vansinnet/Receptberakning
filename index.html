@@ -82,7 +82,6 @@
             <option value="sakura">🌸 Körsbär</option>
           </select>
         </div>
-        <button id="clearAllBtn" class="btn btn-ghost">🔄 Återställ allt</button>
       </div>
     </div>
   </div>
@@ -96,6 +95,7 @@
 
       <!-- VÄNSTER: LÄKEMEDELSLISTA -->
       <aside class="med-sidebar" aria-label="Läkemedelslista">
+        <button id="newPatientBtn" class="btn btn-ghost">Ny patient</button>
         <div class="sidebar-header">
           <span class="sidebar-label">Läkemedel</span>
         </div>
@@ -120,12 +120,13 @@
             <div class="form-panel-actions">
               <button class="btn btn-ghost" id="clearCardBtn">Rensa</button>
               <a class="btn btn-ghost fass-link is-hidden" id="fassBtnForm" href="#" target="_blank" rel="noopener noreferrer" data-tooltip="Öppnar FASS produktresumé för detta läkemedel i ny flik.">FASS</a>
+              <button type="button" class="btn btn-ghost narc-btn is-hidden" id="narcBtnForm" disabled>Narkotika klass —</button>
             </div>
           </div>
 
           <div class="field">
             <label for="medInput" data-tooltip="Ange läkemedelsnamn och styrka exakt som på receptet, t.ex. 'Elvanse 50 mg'. Styr FASS-sökning.">Läkemedel och styrka</label>
-            <input id="medInput" type="text" placeholder="T.ex. Elvanse 50 mg" maxlength="100" lang="zxx" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-describedby="medInput-err">
+            <input id="medInput" type="text" placeholder="T.ex. Sertralin 50 mg" maxlength="100" lang="zxx" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-describedby="medInput-err">
             <span class="field-error-msg" id="medInput-err" aria-live="polite"></span>
           </div>
 
@@ -354,13 +355,13 @@
 </div>
 
 <!-- MODAL: rensa bekräftelse -->
-<div class="modal-overlay" id="clearModal">
-  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="clearModalTitle">
-    <h3 class="modal-title" id="clearModalTitle">⚠️ Återställ allt?</h3>
+<div class="modal-overlay" id="newPatientModal">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="newPatientModalTitle">
+    <h3 class="modal-title" id="newPatientModalTitle">⚠️ Ny patient?</h3>
     <p class="modal-text">Är du säker på att du vill rensa all inmatad data? Detta kan inte ångras.</p>
     <div class="modal-actions">
-      <button id="executeClearAllBtn" class="btn btn-danger">Återställ allt</button>
-      <button id="closeClearModalBtn" class="btn btn-ghost">Avbryt</button>
+      <button id="executeNewPatientBtn" class="btn btn-danger">Rensa och starta nytt</button>
+      <button id="closeNewPatientModalBtn" class="btn btn-ghost">Avbryt</button>
     </div>
   </div>
 </div>

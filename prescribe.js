@@ -373,9 +373,6 @@ function renderPrescribePanel(i) {
     pkgEl.value = prescribeState[i].packageSize;
   }
 
-  const durContainer = getEl('prescribeDuration');
-  if (durContainer && durContainer.children.length === 0) buildPrescribeDuration();
-
   renderPrescribeSummary();
 
   const summary = getEl('prescribeSummary');
@@ -388,6 +385,9 @@ function renderPrescribePanel(i) {
     if (inner) inner.textContent = '';
     return;
   }
+
+  const durContainer = getEl('prescribeDuration');
+  if (durContainer && durContainer.children.length === 0) buildPrescribeDuration();
 
   panel.classList.remove('is-hidden');
 

@@ -32,7 +32,7 @@ const ctx = vm.createContext({
 
 // Ladda källfiler i rätt beroenderordning
 ['utils.js', 'state.js', 'calc-renew.js', 'longterm.js',
- 'prescribe.js', 'ui-renew.js', 'app.js'].forEach(file => {
+ 'prescribe.js', 'drugs.js', 'ui-renew.js', 'app.js'].forEach(file => {
   vm.runInContext(
     fs.readFileSync(path.join(__dirname, file), 'utf8'),
     ctx

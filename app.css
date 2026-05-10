@@ -264,6 +264,11 @@ html, body {
 .btn-add-med:hover { background: var(--surface2); color: var(--text); border-style: solid; }
 .btn-add-med:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
+#newPatientBtn {
+  margin: 8px 8px 10px;
+  width: calc(100% - 16px);
+}
+
 /* ── Mitten: Formulär ── */
 .form-panel {
   width: var(--form-w);
@@ -547,6 +552,11 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   text-decoration: none;
 }
 .fass-link:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: var(--radius-md); }
+
+.narc-btn:disabled {
+  opacity: 1;
+  cursor: default;
+}
 
 /* Badges */
 .badge {
@@ -1044,6 +1054,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   .med-item { width: auto; }
   .sidebar-header { width: 100%; }
   .btn-add-med { margin: 6px 8px; }
+  #newPatientBtn { width: auto; margin: 6px 8px; }
   .form-panel { width: 100%;   border-inline-end: none; border-bottom: 1px solid var(--border); }
   .longterm-body { flex-direction: column; }
   .longterm-form-col { flex: none;   border-inline-end: none; border-bottom: 1px solid var(--border); }
