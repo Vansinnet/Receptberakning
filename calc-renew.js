@@ -30,10 +30,10 @@ function validateValues(medRaw, dateVal, doseRaw, amtRaw, refRaw, leftRaw) {
   if (refOutOfRange)    fieldErrors.refInput = 'Max 12 uttag stöds.';
   else if (refIsInvalid) fieldErrors.refInput = 'Ange ett heltal mellan 1 och 12.';
 
-  if (refOutOfRange) return { valid: false, reason: 'too_many_refs', fieldErrors };
-
   const pDate = dateVal ? parseDateUTC(dateVal) : null;
   if (dateVal && !pDate) fieldErrors.dateInput = 'Ogiltigt datum.';
+
+  if (refOutOfRange) return { valid: false, reason: 'too_many_refs', fieldErrors };
 
   const otherMissing = !medRaw || !dateVal || isNaN(dose) || doseIsInvalid || isNaN(amt) || amtIsInvalid || refIsInvalid || !refNum || refNum < 1;
   const hasFieldError = Object.values(fieldErrors).some(e => e !== '');
@@ -549,7 +549,7 @@ function generateAndDistribute() {
   const toRenew = [], tooEarly = [], overuse = [];
   for (let i = 0; i < states.length; i++) {
     const s = states[i]; if (!s || !s.valid || s.calculable === false) continue;
-    const name = s.medRaw || `Läkemedel ${i+1}`;
+    const name = stripManufacturer(s.medRaw) || s.medRaw || `Läkemedel ${i+1}`;
     if      (s.isOveruse  && s.earlyRenewalDecision === 'yes') toRenew.push({ name, i, earlyRenewal: 'overuse' });
     else if (s.isOveruse)                                      overuse.push({ name, i });
     else if (s.isTooEarly && s.earlyRenewalDecision === 'yes') toRenew.push({ name, i, earlyRenewal: 'tooEarly' });

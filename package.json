@@ -5,7 +5,9 @@
   "scripts": {
     "test": "node test-calc.js && node test-ui.js",
     "test:calc": "node test-calc.js",
-    "test:ui": "node test-ui.js"
+    "test:ui": "node test-ui.js",
+    "build:db": "node ../scripts/build-product-db.js",
+    "generate:drugs": "node ../scripts/generate-drugs.js"
   },
   "devDependencies": {
     "jsdom": "^25.0.1"

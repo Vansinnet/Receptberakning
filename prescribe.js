@@ -343,6 +343,8 @@ function resetPrescribePanel() {
   _prescribeMode = 'months';
   _prescribeMonths = 7;
   _prescribeEndDate = '';
+  const pd = getEl('prescribeDuration');
+  if (pd) pd.textContent = '';
 }
 
 /* Visa/dölj och initiera panelen för givet läkemedelsindex */
@@ -360,10 +362,9 @@ function renderPrescribePanel(i) {
     initPrescribeState(i, { packageSize: currentAmt, _lastAmt: currentAmt });
   } else {
     if (prescribeState[i]._lastAmt !== currentAmt && currentAmt !== '') {
-      prescribeState[i]._lastAmt = currentAmt;
-      prescribeState[i].packageSize = currentAmt;
+      applyPrescribeStatePatch(i, { _lastAmt: currentAmt, packageSize: currentAmt });
     } else if (prescribeState[i].packageSize === '') {
-      prescribeState[i].packageSize = currentAmt;
+      applyPrescribeStatePatch(i, { packageSize: currentAmt });
     }
   }
 

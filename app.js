@@ -98,7 +98,8 @@ function clearCurrentCard() {
 
     setActiveMed(Math.min(i, states.length - 1));
     resetPrescribePanel();
-  buildMedList();
+    resetMetricsCache();
+    buildMedList();
     renderFormForMed(activeMedIdx);
     renderResultForMed(activeMedIdx);
     generateAndDistribute();
@@ -206,6 +207,7 @@ if (formPanel) {
         e.target.value = v[0].toUpperCase() + v.slice(1);
         e.target.setSelectionRange(pos, pos);
       }
+      handleAcInput();
     }
     if (e.target.id === 'dateInput') {
       autoFormatDate(e.target);
@@ -235,6 +237,23 @@ if (formPanel) {
       setFieldError('dateInput', res.error);
     }
   }, true); // capture=true eftersom blur inte bubblar
+  document.addEventListener('click', function(e) {
+    var medInput = getEl('medInput');
+    var dropdown = getEl('autocompleteDropdown');
+    if (medInput && !medInput.contains(e.target) && dropdown && !dropdown.contains(e.target)) {
+      hideAutocomplete();
+    }
+  });
+  formPanel.addEventListener('keydown', e => {
+    if (e.target.id !== 'medInput') return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); navigateAutocomplete(1); return; }
+    if (e.key === 'ArrowUp')   { e.preventDefault(); navigateAutocomplete(-1); return; }
+    if (e.key === 'Escape')    { hideAutocomplete(); return; }
+    if (e.key === 'Enter' && _acState && _acState.visible && _acState.selectedIdx >= 0) {
+      e.preventDefault();
+      selectAutocompleteItem(_acState.selectedIdx);
+    }
+  });
   formPanel.addEventListener('change', e => {
     if (e.target.id==='dateInput') calc();
   });

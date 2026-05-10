@@ -110,6 +110,7 @@ function renderFormForMed(i) {
   ['medInput', 'dateInput', 'doseInput', 'amtInput', 'refInput', 'leftInput'].forEach(id => {
     setFieldError(id, '');
   });
+  hideAutocomplete();
 }
 
 function saveFormValues(i) {
@@ -306,4 +307,86 @@ function togglePatientLangResult() {
   if (!s || !s.patientTextEn) return;
   setMedUIPreference(activeMedIdx, 'patientLang', s.patientLang === 'en' ? 'sv' : 'en');
   switchResultTab('patient');
+}
+
+var _acState = { container: null, items: [], selectedIdx: -1, visible: false };
+
+function _ensureAcContainer() {
+  if (_acState.container) return _acState.container;
+  var medInput = _el('medInput');
+  if (!medInput) return null;
+  var container = el('div', { cls: 'autocomplete-dropdown is-hidden' });
+  container.id = 'autocompleteDropdown';
+  medInput.parentNode.insertBefore(container, medInput.nextSibling);
+  _acState.container = container;
+  return container;
+}
+
+function renderAutocomplete(results) {
+  var container = _ensureAcContainer();
+  if (!container) return;
+  container.textContent = '';
+  if (!results.length) { container.classList.add('is-hidden'); _acState.visible = false; return; }
+
+  _acState.items = results;
+  _acState.selectedIdx = -1;
+  for (var r = 0; r < results.length; r++) {
+    (function(idx) {
+      var drug = results[idx];
+      var item = el('div', { cls: 'autocomplete-item', dataset: { idx: String(idx) } });
+      item.appendChild(el('span', { cls: 'ac-drug-name', text: drug.name }));
+      item.appendChild(el('span', { cls: 'ac-drug-meta', text: drug.pkg + ' st \u00b7 ' + drug.form }));
+      item.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        selectAutocompleteItem(idx);
+      });
+      container.appendChild(item);
+    })(r);
+  }
+  container.classList.remove('is-hidden');
+  _acState.visible = true;
+}
+
+function hideAutocomplete() {
+  if (_acState.container) {
+    _acState.container.classList.add('is-hidden');
+  }
+  _acState.items = [];
+  _acState.selectedIdx = -1;
+  _acState.visible = false;
+}
+
+function selectAutocompleteItem(idx) {
+  if (idx < 0 || idx >= _acState.items.length) return;
+  var drug = _acState.items[idx];
+  var medInput = _el('medInput');
+  var amtInput = _el('amtInput');
+  if (medInput) medInput.value = drug.name;
+  if (amtInput) amtInput.value = String(drug.pkg);
+  hideAutocomplete();
+  saveFormValues(activeMedIdx);
+  ensureDebounce(activeMedIdx); calcDebounced[activeMedIdx]();
+}
+
+function navigateAutocomplete(dir) {
+  if (!_acState.visible || !_acState.items.length) return;
+  var container = _acState.container;
+  if (!container) return;
+  _acState.selectedIdx = Math.max(-1, Math.min(_acState.items.length - 1, _acState.selectedIdx + dir));
+  var items = container.querySelectorAll('.autocomplete-item');
+  for (var i = 0; i < items.length; i++) {
+    items[i].classList.toggle('active', i === _acState.selectedIdx);
+  }
+}
+
+function handleAcInput() {
+  var medInput = _el('medInput');
+  if (!medInput) return;
+  var q = medInput.value.trim();
+  var results = searchDrugs(q);
+  if (results.length > 0) {
+    renderAutocomplete(results);
+  } else {
+    hideAutocomplete();
+  }
 }

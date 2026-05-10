@@ -145,8 +145,34 @@ function extractDoseUnit(medRaw) {
 
 function getFassUrl(medRaw) {
   const url = `https://www.fass.se/LIF/result?query=${encodeURIComponent(medRaw.trim())}&userType=2`;
-  // Ursprungsvalidering: säkerställ att URL:en alltid pekar på fass.se (defense-in-depth)
   return url.startsWith('https://www.fass.se/') ? url : '#';
+}
+
+var _mfrRe;
+function buildMfrRe() {
+  if (_mfrRe) return _mfrRe;
+  var compounds = [
+    "Medical Valley", "Abacus Medicine", "EQL Pharma",
+    "G\\.L\\.\\s*Pharma", "1A Farma", "Omet Pharma", "Nordic Drugs"
+  ];
+  var singles = [
+    "STADA", "Sandoz", "Accord(?:pharma)?", "Teva", "Krka", "Ebb",
+    "Viatris", "Orion", "Actavis", "Zentiva", "Orifarm", "Bluefish",
+    "Glenmark", "Evolan", "APL", "ABECE", "Avansor", "Apofri",
+    "SUN", "Amarox", "Aurobindo", "Hexal", "HEXAL", "Alternova",
+    "Mylan", "Bijon", "Grindeks", "Newbury", "Jubilant", "Strides",
+    "Holsten", "Vitabalans", "Medartuum", "Abcur", "2care4",
+    "Amdipharm", "Brown", "Pfizer", "Xiromed", "Accordpharma", "Pilum",
+    "Rivopharm", "Novum", "Aristo", "Tillomed", "Waymade", "Baxter"
+  ];
+  var all = compounds.concat(singles);
+  _mfrRe = new RegExp("\\b(?:" + all.join("|") + ")\\b", "gi");
+  return _mfrRe;
+}
+
+function stripManufacturer(name) {
+  if (!name) return name;
+  return name.replace(buildMfrRe(), "").replace(/\s+/g, " ").trim();
 }
 
 function parseDateUTC(str) {

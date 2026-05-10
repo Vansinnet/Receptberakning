@@ -66,7 +66,7 @@
         </svg>
       </span>
       <span class="app-brand-name">Receptberäkning</span>
-      <span class="app-brand-date">uppdaterad 2026-05-09</span>
+      <span class="app-brand-date">uppdaterad 2026-05-10</span>
     </div>
     <div class="topbar-nav-row">
       <nav class="main-tabs" role="tablist">
@@ -125,7 +125,7 @@
 
           <div class="field">
             <label for="medInput" data-tooltip="Ange läkemedelsnamn och styrka exakt som på receptet, t.ex. 'Elvanse 50 mg'. Styr FASS-sökning.">Läkemedel och styrka</label>
-            <input id="medInput" type="text" placeholder="T.ex. Elvanse 50 mg" maxlength="100" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-describedby="medInput-err">
+            <input id="medInput" type="text" placeholder="T.ex. Elvanse 50 mg" maxlength="100" lang="zxx" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-describedby="medInput-err">
             <span class="field-error-msg" id="medInput-err" aria-live="polite"></span>
           </div>
 
@@ -368,6 +368,7 @@
 <div class="tooltip-bubble" id="tooltipBubble"></div>
 <script src="utils.js" defer></script>
 <script src="state.js" defer></script>
+<script src="drugs.js" defer></script>
 <script src="ui-renew.js" defer></script>
 <script src="calc-renew.js" defer></script>
 <script src="prescribe.js" defer></script>

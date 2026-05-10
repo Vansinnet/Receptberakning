@@ -212,7 +212,7 @@ function calcLongtermCore(medRaw, ordDose, rawPeriods) {
     hasOverlap,
     barPct:      Math.min(150, Math.max(0, consumptionPct)),
     fassUrl:     getFassUrl(medRaw),
-    journalText: `Aktuellt: Förbrukningsanalys av ${medRaw}.\n\nOrdinerad dos: ${ordDose} st/dag.\nAnalysperiod: ${periods.length} period(er), totalt ${totalDays} dagar.\n\nPerioder:\n${periodSummary}\n\nSammanlagd snittförbrukning: ${avgStr} (${consumptionPct.toFixed(1)}% av ordinerad dos).\n\nBedömning: [fyll i här]`,
+    journalText: `Aktuellt: Förbrukningsanalys av ${stripManufacturer(medRaw)}.\n\nOrdinerad dos: ${ordDose} st/dag.\nAnalysperiod: ${periods.length} period(er), totalt ${totalDays} dagar.\n\nPerioder:\n${periodSummary}\n\nSammanlagd snittförbrukning: ${avgStr} (${consumptionPct.toFixed(1)}% av ordinerad dos).\n\nBedömning: [fyll i här]`,
   };
 }
 

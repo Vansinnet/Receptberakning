@@ -31,7 +31,7 @@
   --code-bg: #f8fafc;
   --danger-bg: var(--red-bg); --danger-color: var(--red); --danger-border: var(--red-border); --danger-hover: var(--red-border);
   --sidebar-w: 178px;
-  --form-w: 296px;
+  --form-w: 360px;
 }
 
 [data-theme="dark"] {
@@ -473,7 +473,7 @@ html, body {
 /* ════════════════════════════════════════════
    GEMENSAMMA FORM-ELEMENT
    ════════════════════════════════════════════ */
-.field { margin-bottom: 10px; display: flex; flex-direction: column; }
+.field { margin-bottom: 10px; display: flex; flex-direction: column; position: relative; }
 .field label {
   display: block; font-size: 10px; font-weight: 700; color: var(--text-muted);
   margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.04em;
@@ -1081,6 +1081,51 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 }
 .skip-link:focus {
   top: 8px;
+}
+
+/* ── Autocomplete-dropdown ── */
+.autocomplete-dropdown {
+  position: absolute;
+  z-index: 200;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-top: none;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  box-shadow: var(--shadow-md);
+  max-height: 240px;
+  overflow-y: auto;
+  width: 100%;
+  margin-top: -1px;
+  /* Placera i förhållande till .field (position:relative krävs på föräldern) */
+}
+.autocomplete-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.1s;
+  border-bottom: 1px solid var(--border);
+}
+.autocomplete-item:last-child { border-bottom: none; }
+.autocomplete-item:hover,
+.autocomplete-item.active {
+  background: var(--primary-light);
+}
+.ac-drug-name {
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ac-drug-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* ── Screen-reader-only ── */
