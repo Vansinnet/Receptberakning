@@ -152,7 +152,8 @@ function generateDrugEntries(atcCode, products) {
       const entry = {
         name: `${nameBase} ${strength}`,
         pkg: pkg.quantity,
-        form: form
+        form: form,
+        nplId: prod.nplId
       };
       if (prod.narcoticClass && prod.narcoticClass !== "NO_NARCOTICS_CLASS") {
         entry.narc = prod.narcoticClass;
@@ -208,9 +209,9 @@ function generateDrugsJs(candidates) {
 
     for (const entry of sorted) {
       if (entry.narc) {
-        output += `  { name: ${JSON.stringify(entry.name)}, pkg: ${entry.pkg}, form: ${JSON.stringify(entry.form)}, narc: ${JSON.stringify(entry.narc)} },\n`;
+        output += `  { name: ${JSON.stringify(entry.name)}, pkg: ${entry.pkg}, form: ${JSON.stringify(entry.form)}, nplId: ${JSON.stringify(entry.nplId)}, narc: ${JSON.stringify(entry.narc)} },\n`;
       } else {
-        output += `  { name: ${JSON.stringify(entry.name)}, pkg: ${entry.pkg}, form: ${JSON.stringify(entry.form)} },\n`;
+        output += `  { name: ${JSON.stringify(entry.name)}, pkg: ${entry.pkg}, form: ${JSON.stringify(entry.form)}, nplId: ${JSON.stringify(entry.nplId)} },\n`;
       }
     }
 

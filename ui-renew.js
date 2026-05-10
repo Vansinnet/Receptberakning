@@ -85,22 +85,23 @@ function updateFormHeader(i) {
   const nameEl = _el('formMedName');
   if (nameEl) nameEl.textContent = s.medName || `Läkemedel ${i + 1}`;
   const fassBtn = _el('fassBtnForm');
-  if (fassBtn) {
-    if (s.medRaw) { fassBtn.href = getFassUrl(s.medRaw); fassBtn.classList.remove('is-hidden'); }
-    else fassBtn.classList.add('is-hidden');
-  }
   const narcBtn = _el('narcBtnForm');
-  if (narcBtn) {
-    let narcClass = '';
-    if (s.medRaw) {
-      const raw = s.medRaw.toLowerCase();
-      for (let d = 0; d < DRUG_LIST.length; d++) {
-        if (DRUG_LIST[d].name.toLowerCase() === raw) {
-          narcClass = DRUG_LIST[d].narc;
-          break;
-        }
+  let narcClass = '', nplId = s.nplId;
+  if (s.medRaw) {
+    const raw = s.medRaw.toLowerCase();
+    for (let d = 0; d < DRUG_LIST.length; d++) {
+      if (DRUG_LIST[d].name.toLowerCase() === raw) {
+        narcClass = DRUG_LIST[d].narc;
+        nplId = DRUG_LIST[d].nplId || nplId;
+        break;
       }
     }
+  }
+  if (fassBtn) {
+    if (s.medRaw) { fassBtn.href = getFassUrl(s.medRaw, nplId); fassBtn.classList.remove('is-hidden'); }
+    else fassBtn.classList.add('is-hidden');
+  }
+  if (narcBtn) {
     if (narcClass) {
       narcBtn.textContent = 'Narkotika klass ' + narcClass;
       narcBtn.classList.remove('is-hidden');
@@ -384,6 +385,7 @@ function selectAutocompleteItem(idx) {
   if (amtInput) amtInput.value = String(drug.pkg);
   hideAutocomplete();
   saveFormValues(activeMedIdx);
+  applyMedStatePatch(activeMedIdx, { nplId: drug.nplId || null });
   ensureDebounce(activeMedIdx); calcDebounced[activeMedIdx]();
 }
 

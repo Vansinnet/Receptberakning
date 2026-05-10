@@ -98,7 +98,7 @@ function clearLongterm() {
 const LT_OVER  = 1.10;
 const LT_UNDER = 0.80;
 
-function calcLongtermCore(medRaw, ordDose, rawPeriods) {
+function calcLongtermCore(medRaw, ordDose, rawPeriods, nplId) {
   const today = getToday();
   const periodErrors = [];
   const periods      = [];
@@ -211,7 +211,7 @@ function calcLongtermCore(medRaw, ordDose, rawPeriods) {
     alertMsg,
     hasOverlap,
     barPct:      Math.min(150, Math.max(0, consumptionPct)),
-    fassUrl:     getFassUrl(medRaw),
+    fassUrl:     getFassUrl(medRaw, nplId),
     journalText: `Aktuellt: Förbrukningsanalys av ${stripManufacturer(medRaw)}.\n\nOrdinerad dos: ${ordDose} st/dag.\nAnalysperiod: ${periods.length} period(er), totalt ${totalDays} dagar.\n\nPerioder:\n${periodSummary}\n\nSammanlagd snittförbrukning: ${avgStr} (${consumptionPct.toFixed(1)}% av ordinerad dos).\n\nBedömning: [fyll i här]`,
   };
 }
@@ -230,7 +230,14 @@ function calcLongterm() {
 
   let result;
   try {
-    result = calcLongtermCore(medRaw, ordDose, ltPeriods);
+    let nplId = null;
+    if (medRaw) {
+      const raw = medRaw.toLowerCase();
+      for (let d = 0; d < DRUG_LIST.length; d++) {
+        if (DRUG_LIST[d].name.toLowerCase() === raw) { nplId = DRUG_LIST[d].nplId; break; }
+      }
+    }
+    result = calcLongtermCore(medRaw, ordDose, ltPeriods, nplId);
   } catch (err) {
     console.error('calcLongtermCore:', err.message);
     showEl('lt-result', false);
