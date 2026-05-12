@@ -150,7 +150,7 @@ function generateDrugEntries(atcCode, products) {
       seen.add(key);
 
       const entry = {
-        name: `${nameBase} ${strength}`,
+        name: `${nameBase} ${strength}`.trim(),
         pkg: pkg.quantity,
         form: form,
         nplId: prod.nplId
