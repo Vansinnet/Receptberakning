@@ -7,6 +7,10 @@ function resetMetricsCache() {
   _lastMetricsKey = '';
 }
 
+function resetDomCache() {
+  Object.keys(_dom).forEach(k => delete _dom[k]);
+}
+
 function updateMedListStatuses() {
   const list = _el('medList');
   if (!list) return;
@@ -90,7 +94,7 @@ function updateFormHeader(i) {
   if (s.medRaw) {
     const raw = s.medRaw.toLowerCase();
     for (let d = 0; d < DRUG_LIST.length; d++) {
-      if (DRUG_LIST[d].name.toLowerCase() === raw) {
+      if (DRUG_LIST[d].name.toLowerCase().trim() === raw) {
         narcClass = DRUG_LIST[d].narc;
         nplId = DRUG_LIST[d].nplId || nplId;
         break;
@@ -116,7 +120,7 @@ function renderFormForMed(i) {
   const emptyState  = _el('formEmptyState');
   const formContent = _el('formContent');
   if (emptyState)  emptyState.classList.add('is-hidden');
-  if (formContent) formContent.classList.remove('is-hidden');
+  if (formContent) { formContent.classList.remove('is-hidden'); fadeIn(formContent); }
 
   updateFormHeader(i);
 
@@ -167,7 +171,7 @@ function renderResultForMed(i) {
   }
 
   if (emptyState)    emptyState.classList.add('is-hidden');
-  if (resultContent) resultContent.classList.remove('is-hidden');
+  if (resultContent) { resultContent.classList.remove('is-hidden'); fadeIn(resultContent); }
 
   /* Verdict */
   const vBox   = _el('verdictBox');
@@ -234,7 +238,7 @@ function renderResultForMed(i) {
   const earlyBox = _el('earlyDecisionBox');
   if (earlyBox) {
     if (s.isOveruse || s.isTooEarly) {
-      earlyBox.classList.remove('is-hidden');
+      earlyBox.classList.remove('is-hidden'); fadeIn(earlyBox);
       const yBtn = _el('earlyDecisionYes');
       const nBtn = _el('earlyDecisionNo');
       if (yBtn) yBtn.classList.toggle('selected', s.earlyRenewalDecision === 'yes');
@@ -249,6 +253,7 @@ function renderResultForMed(i) {
   if (copySection) {
     const hasCopy = !!(s.patientText || s.journalText);
     copySection.style.display       = hasCopy ? 'flex' : 'none';
+    if (hasCopy) fadeIn(copySection);
     copySection.style.flexDirection = hasCopy ? 'column' : '';
   }
 

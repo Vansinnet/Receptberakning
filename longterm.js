@@ -22,7 +22,7 @@ function buildPeriodElement(period, i) {
   row.appendChild(makeField(
     `lt-total-${i}`, 'Antal uttagna tabletter',
     'Totalt antal tabletter eller kapslar uttagna under perioden. Hämtas från apotekskvitto eller journaldokumentation.',
-    { type: 'number', placeholder: '100', min: '1' },
+    { type: 'number', placeholder: '100', min: '1', step: '1' },
     period.total
   ));
 
@@ -112,12 +112,12 @@ function calcLongtermCore(medRaw, ordDose, rawPeriods, nplId) {
     periodErrors.push({
       idx:        i,
       startError: !!(p.start !== '' && (!startDate || startDate > today)),
-      endError:   !!(p.end   !== '' && (!endDate   || (startDate && endDate <= startDate))),
-      totalError: !!(p.total !== '' && (isNaN(totalVal) || totalVal <= 0)),
+      endError:   !!(p.end   !== '' && (!endDate   || !startDate || endDate <= startDate)),
+      totalError: !!(p.total !== '' && (isNaN(totalVal) || totalVal <= 0 || !Number.isInteger(totalVal))),
       spanError:  false,
     });
 
-    if (startDate && endDate && !isNaN(totalVal) && totalVal > 0 && startDate < endDate) {
+    if (startDate && endDate && !isNaN(totalVal) && totalVal > 0 && Number.isInteger(totalVal) && startDate < endDate) {
       const days = getDaysDiff(endDate, startDate);
       if (days === 0 || days > 365 * 50) {
         // Perioden är felfri i sig men orimligt lång — markera start+slutdatum
@@ -234,7 +234,7 @@ function calcLongterm() {
     if (medRaw) {
       const raw = medRaw.toLowerCase();
       for (let d = 0; d < DRUG_LIST.length; d++) {
-        if (DRUG_LIST[d].name.toLowerCase() === raw) { nplId = DRUG_LIST[d].nplId; break; }
+        if (DRUG_LIST[d].name.toLowerCase().trim() === raw) { nplId = DRUG_LIST[d].nplId; break; }
       }
     }
     result = calcLongtermCore(medRaw, ordDose, ltPeriods, nplId);
@@ -262,7 +262,7 @@ function calcLongterm() {
     return;
   }
 
-  showEl('lt-result', true, 'flex');
+  showEl('lt-result', true, 'flex'); fadeIn(getEl('lt-result'));
 
   const resGridEl = getEl('lt-resGrid');
   if (resGridEl) {
@@ -287,7 +287,7 @@ function calcLongterm() {
     barEl.textContent = result.barPct > 20 ? `${result.consumptionPct.toFixed(0)}%` : '';
     barEl.setAttribute('aria-valuenow', String(Math.round(result.barPct)));
   }
-  const barSec = getEl('lt-bar-section'); if (barSec) barSec.classList.remove('is-hidden');
+  const barSec = getEl('lt-bar-section'); if (barSec) { barSec.classList.remove('is-hidden'); fadeIn(barSec); }
 
   const rowsContainer = getEl('lt-period-rows');
   if (rowsContainer) {
@@ -309,14 +309,14 @@ function calcLongterm() {
     });
     rowsContainer.appendChild(frag);
   }
-  const periodTab = getEl('lt-period-table-section'); if (periodTab) periodTab.classList.remove('is-hidden');
+  const periodTab = getEl('lt-period-table-section'); if (periodTab) { periodTab.classList.remove('is-hidden'); fadeIn(periodTab); }
 
   const lb = getEl('lt-fassBtn');
-  if (lb) { lb.href = result.fassUrl; lb.classList.remove('is-hidden'); }
+  if (lb) { lb.href = result.fassUrl; lb.classList.remove('is-hidden'); fadeIn(lb); }
 
   const copyBody = getEl('lt-copyBody');
   if (copyBody) copyBody.textContent = result.journalText;
-  showEl('lt-copySection', true);
+  showEl('lt-copySection', true); fadeIn(getEl('lt-copySection'));
 }
 
 function copyLtText() {

@@ -52,7 +52,7 @@ function calcPrescribeResult(i) {
 }
 
 function prescribeValidationHint(i, ps) {
-  if (!ps) return null;
+  if (!ps) return [];
 
   let pkgHint = null, dateHint = null;
 
@@ -80,11 +80,10 @@ function prescribeValidationHint(i, ps) {
     }
   }
 
-  // Returnera det allvarligaste felet (warn > info). Om båda är lika allvarliga,
-  // prioritera pkg eftersom det är primärfältet.
-  if (pkgHint && pkgHint.type === 'warn') return pkgHint;
-  if (dateHint && dateHint.type === 'warn') return dateHint;
-  return pkgHint || dateHint;
+  const hints = [];
+  if (pkgHint)  hints.push(pkgHint);
+  if (dateHint) hints.push(dateHint);
+  return hints;
 }
 
 /* Uppdatera enbart resultatrutan (bevarar fokus i inmatningsfält) */
@@ -123,6 +122,9 @@ function updatePrescribeResult(i) {
     }
   }
 
+  const nameEl = getEl('ps-med-name-' + i);
+  if (nameEl) nameEl.textContent = (states[i] || {}).medRaw || `Läkemedel ${i + 1}`;
+
   // Befintligt recept täcker redan hela perioden — inget nytt behöver förskrivas
   if (res && res.packages === 0 && res.totalDays === 0 && res.daysAlreadyCovered > 0) {
     const name = (states[i] || {}).medRaw || `Läkemedel ${i + 1}`;
@@ -152,13 +154,15 @@ function updatePrescribeResult(i) {
   }
 
   // Inget beräkningsresultat — visa kontextuell vägledning om indata är ofullständiga
-  const hint = prescribeValidationHint(i, prescribeState[i]);
-  if (hint) {
-    box.appendChild(buildAlertEl(hint.type, null, hint.msg));
-    if (hint.type === 'warn') {
-      if (hint.field === 'pkg')  toggleError(getEl('ps-pkg-'          + i), true);
-      if (hint.field === 'date') toggleError(getEl('ps-global-enddate'),     true);
-    }
+  const hints = prescribeValidationHint(i, prescribeState[i]);
+  if (hints.length > 0) {
+    hints.forEach(hint => {
+      box.appendChild(buildAlertEl(hint.type, null, hint.msg));
+      if (hint.type === 'warn') {
+        if (hint.field === 'pkg')  toggleError(getEl('ps-pkg-'          + i), true);
+        if (hint.field === 'date') toggleError(getEl('ps-global-enddate'),     true);
+      }
+    });
     renderPrescribeSummary();
   }
 }
@@ -238,7 +242,7 @@ function buildPrescribeInner(i) {
   try {
     inner.textContent = '';
 
-    inner.appendChild(el('div', { cls: 'prescribe-med-name', text: s.medRaw || `Läkemedel ${i+1}` }));
+    inner.appendChild(el('div', { cls: 'prescribe-med-name', text: s.medRaw || `Läkemedel ${i+1}`, attrs: { id: 'ps-med-name-' + i } }));
 
     const pkgInp = el('input', {
       attrs: { type: 'number', id: 'ps-pkg-' + i, min: '1', step: '1', placeholder: 'T.ex. 30' },
@@ -246,7 +250,7 @@ function buildPrescribeInner(i) {
     });
     pkgInp.addEventListener('input', () => { applyPrescribeStatePatch(i, { packageSize: pkgInp.value }); updatePrescribeResult(i); });
     const pkgDiv = el('div', { cls: 'field', style: 'margin-top:10px' });
-    pkgDiv.appendChild(el('label', { text: 'Förpackningsstorlek (st)', attrs: { for: 'ps-pkg-' + i, 'data-tooltip': 'Antal tabletter per förpackning. Beräkningen dividerar totalt antal tabletter med förpackningsstorleken för att bestämma hur många förpackningar som ska förskrivas.' } }));
+    pkgDiv.appendChild(el('label', { text: 'Förpackningsstorlek (tabletter)', attrs: { for: 'ps-pkg-' + i, 'data-tooltip': 'Antal tabletter per förpackning. Beräkningen dividerar totalt antal tabletter med förpackningsstorleken för att bestämma hur många förpackningar som ska förskrivas.' } }));
     pkgDiv.appendChild(pkgInp);
     inner.appendChild(pkgDiv);
 
@@ -354,9 +358,11 @@ function renderPrescribePanel(i) {
   const s = states[i] || {};
   const activeEligible = canRenewMed(i);
 
-  // Envägsspegel: amt → packageSize. Skrivs över varje gång amt ändras.
+  // AKTIVT VAL: Envägsspegel amt → packageSize. Skrivs över varje gång amt ändras.
   // Läkarens manuella värde i förskrivningspanelen är temporärt — nästa
   // gång Mängd per uttag ändras speglas det nya värdet in.
+  // Att "skydda" manuell inmatning skulle bryta envägsspegeln och ge inaktuella
+  // paketstorlekar som grund för förskrivningsberäkningen.
   const currentAmt = String(s.amt || '');
   if (!prescribeState[i]) {
     initPrescribeState(i, { packageSize: currentAmt, _lastAmt: currentAmt });
@@ -389,14 +395,14 @@ function renderPrescribePanel(i) {
   const durContainer = getEl('prescribeDuration');
   if (durContainer && durContainer.children.length === 0) buildPrescribeDuration();
 
-  panel.classList.remove('is-hidden');
+  panel.classList.remove('is-hidden'); fadeIn(panel);
 
   if (!activeEligible) {
     _prescribePanelBuiltFor = null;
     const inner = getEl('prescribeInner');
     if (inner) inner.textContent = '';
     return;
-  }
+ }
 
   if (_prescribePanelBuiltFor !== i) {
     _prescribePanelBuiltFor = i;

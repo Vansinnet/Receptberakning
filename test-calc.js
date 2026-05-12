@@ -319,6 +319,36 @@ test('avg >10 % men ≤7 dosdagar OCH ≤14 dagars receptperiod → suppressad (
   );
 });
 
+test('daysRemaining ≤ 7 men daysToPrescribedEnd > 14 → isOveruse=true, ingen suppression-alert', () => {
+  // AKTIVT VAL: daysToPrescribedEnd > 14-grenen i isOveruse-villkoret
+  // (rad 190) gör att patienter med få dosdagar kvar men lång kvarvarande
+  // receptperiod flaggas som överförbrukare. Suppression-alerten triggas
+  // endast vid !isOveruse, vilket gör att den inte visas här.
+  //
+  // Scenario: patienten har 5 doser kvar men receptperioden har 20 dagar
+  // kvar — förbrukningen har varit för snabb trots att medicinen tar slut
+  // snart. isOveruse=true, men "Förhöjd förbrukning noterad" uteblir.
+  // dose=1, amt=100, ref=1, daysSince=80, remaining=5
+  // total=100, totalDays=100; batchDuration=100, batchesDispensed=1, accessibleTotal=100
+  // remaining(5) < accessibleTotal → earlyPickup=false, calcBase=100
+  // consumed=100-5=95; avg=95/80≈1.19 > dose×1.10=1.10 → avg-överskridning ✓
+  // daysRemaining=5 ≤ 7; daysToPrescribedEnd=20 > 14 → isOveruse=true
+  // isTooEarly = !true && ... = false
+  const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 1, daysSince: 80, remaining: 5 }), NO_PREV);
+  assertEqual(r.isOveruse, true, 'isOveruse triggas av daysToPrescribedEnd > 14 trots daysRemaining ≤ 7');
+  assert(!r.alerts.some(a => a.title && a.title.includes('Förhöjd')),
+    'suppression-alert ska inte visas vid isOveruse=true — det är ett AKTIVT VAL');
+});
+
+test('daysSince = 1 → giltig beräkning', () => {
+  // Recept utfärdat igår: daysSince=1. batchesDispensed=min(3, floor(1/100)+1)=1.
+  // utan remaining: avgNum=300/1=300 >> 1.10 → isOveruse=true (daysRemaining=299>7).
+  const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 1 }), NO_PREV);
+  assertEqual(r.valid, true);
+  assertEqual(r.calculable, true, 'recept utfärdat igår ska vara beräkningsbart (daysSince ≥ 1)');
+  assertEqual(r.isOveruse, true, 'avgNum 300 >> 1.10 → isOveruse');
+});
+
 
 group('Kantfall: ref = 12 (max)');
 
@@ -393,6 +423,27 @@ test('tidig uthämtning (remaining > accessibleTotal) → earlyPickup-alert och 
     r.alerts.some(a => a.title && a.title.includes('uthämtning')),
     '"Tidig uthämtning"-alert saknas'
   );
+});
+
+test('remaining = accessibleTotal + 1 → tidig uthämtning, consumed ≥ 0', () => {
+  // daysSince=30; batchDuration=100, batchesDispensed=1, accessibleTotal=100
+  // remaining=101 > 100 → earlyPickup=true; minB=ceil(101/100)=2
+  // calcBase=min(2,3)*100=200; consumed=200-101=99; avg≈3.3 >> 1.10 → isOveruse
+  const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 30, remaining: 101 }), NO_PREV);
+  assertEqual(r.valid, true);
+  assert(r.alerts.some(a => a.title && a.title.includes('uthämtning')),
+    '"Tidig uthämtning"-alert ska visas');
+});
+
+test('remaining = accessibleTotal → consumed=0, avgNum=0, "Ingen förbrukning"', () => {
+  // daysSince=50; amt=100, ref=1 → total=100, batchDuration=100, batchesDispensed=1, accessibleTotal=100
+  // remaining=100 = accessibleTotal → earlyPickup=false, calcBase=100
+  // consumed=100-100=0, avgNum=0/50=0 → danger-alert "Ingen förbrukning registrerad"
+  const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 1, daysSince: 50, remaining: 100 }), NO_PREV);
+  assertEqual(r.isOveruse, false, 'avgNum=0 → ej isOveruse');
+  assertEqual(r.isTooEarly, true, '50 av 100 dagar kvar > 20%-tröskeln → isTooEarly');
+  assert(r.alerts.some(a => a.type === 'danger' && a.title.includes('Ingen förbrukning')),
+    '"Ingen förbrukning registrerad"-alert ska visas');
 });
 
 
@@ -687,39 +738,44 @@ test('isTooEarly + earlyRenewalDecision "yes" → true', () => {
 
 group('prescribeValidationHint — inmatningsgranskning');
 
-test('ps=null → null (ingen förskrivningspanel öppen)', () => {
+test('ps=null → tom array (ingen förskrivningspanel öppen)', () => {
   setTestState(0, {});
-  assertEqual(prescribeValidationHint(0, null), null);
+  const hints = prescribeValidationHint(0, null);
+  assertEqual(Array.isArray(hints), true);
+  assertEqual(hints.length, 0);
 });
 
 test('packageSize="" → info-hint (fältet inte ifyllt än)', () => {
   setTestState(0, {});
-  const h = prescribeValidationHint(0, { packageSize: '', mode: 'months', months: 3 });
-  assertEqual(h.type,  'info', 'tom sträng ska ge info, ej warn');
-  assertEqual(h.field, 'pkg');
+  const hints = prescribeValidationHint(0, { packageSize: '', mode: 'months', months: 3 });
+  assertEqual(hints.length, 1);
+  assertEqual(hints[0].type,  'info', 'tom sträng ska ge info, ej warn');
+  assertEqual(hints[0].field, 'pkg');
 });
 
 test('packageSize="0" → warn-hint (explicit ogiltigt värde)', () => {
   setTestState(0, {});
-  const h = prescribeValidationHint(0, { packageSize: '0', mode: 'months', months: 3 });
-  assertEqual(h.type,  'warn', 'noll ska ge warn, inte info');
-  assertEqual(h.field, 'pkg');
+  const hints = prescribeValidationHint(0, { packageSize: '0', mode: 'months', months: 3 });
+  assertEqual(hints.length, 1);
+  assertEqual(hints[0].type,  'warn', 'noll ska ge warn, inte info');
+  assertEqual(hints[0].field, 'pkg');
 });
 
-test('giltig packageSize, månadsläge → null (ingen datumgranskning i månadsläge)', () => {
+test('giltig packageSize, månadsläge → tom array (ingen datumgranskning i månadsläge)', () => {
   setTestState(0, {});
-  const h = prescribeValidationHint(0, { packageSize: '30', mode: 'months', months: 3, endDate: '' });
-  assertEqual(h, null);
+  const hints = prescribeValidationHint(0, { packageSize: '30', mode: 'months', months: 3, endDate: '' });
+  assertEqual(hints.length, 0);
 });
 
 test('datumläge, ogiltigt slutdatum → warn med field:"date"', () => {
   setTestState(0, { prescribedEndDateStr: '2025-06-01' }); // passerat → start = idag
   __setPrescribeGlobals('date', 7, 'fel-datum');
   setTestPS(0, { packageSize: '30' });
-  const h = prescribeValidationHint(0, { packageSize: '30' });
-  assertEqual(h.type,  'warn');
-  assertEqual(h.field, 'date');
-  assertContains(h.msg, 'giltigt datum');
+  const hints = prescribeValidationHint(0, { packageSize: '30' });
+  assertEqual(hints.length, 1);
+  assertEqual(hints[0].type,  'warn');
+  assertEqual(hints[0].field, 'date');
+  assertContains(hints[0].msg, 'giltigt datum');
 });
 
 test('datumläge, slutdatum före startdatum → warn', () => {
@@ -727,17 +783,18 @@ test('datumläge, slutdatum före startdatum → warn', () => {
   setTestState(0, { prescribedEndDateStr: '2025-06-01' });
   __setPrescribeGlobals('date', 7, daysAgo(5));
   setTestPS(0, { packageSize: '30' });
-  const h = prescribeValidationHint(0, { packageSize: '30' });
-  assertEqual(h.type,  'warn');
-  assertEqual(h.field, 'date');
-  assertContains(h.msg, 'efter');
+  const hints = prescribeValidationHint(0, { packageSize: '30' });
+  assertEqual(hints.length, 1);
+  assertEqual(hints[0].type,  'warn');
+  assertEqual(hints[0].field, 'date');
+  assertContains(hints[0].msg, 'efter');
 });
 
-test('datumläge, giltigt framtida slutdatum → null', () => {
+test('datumläge, giltigt framtida slutdatum → tom array', () => {
   __setPrescribeGlobals('date', 7, '2025-12-31');
   setTestState(0, { prescribedEndDateStr: '2025-06-01' });
-  const h = prescribeValidationHint(0, { packageSize: '30' });
-  assertEqual(h, null);
+  const hints = prescribeValidationHint(0, { packageSize: '30' });
+  assertEqual(hints.length, 0);
 });
 
 
@@ -922,6 +979,16 @@ test('läkemedelsnamn > 100 tecken → incomplete med fieldErrors.medInput', () 
   assert(r.fieldErrors.medInput !== '', 'fieldErrors.medInput ska vara satt');
 });
 
+test('ogiltigt datum "2025-02-30" → invalid_date (parseDateUTC roundtrip-check)', () => {
+  // parseDateUTC kontrollerar att Date-objektets UTC-komponenter matchar
+  // de parsade värdena. 2025-02-30 rullar över till 2025-03-02 i JavaScripts
+  // Date-konstruktor, vilket ger felmatch och returnerar null.
+  const r = validateValues('Testabol 10 mg', '2025-02-30', '1', '100', '1', '');
+  assertEqual(r.valid, false);
+  assertEqual(r.reason, 'invalid_date');
+  assert(r.fieldErrors.dateInput !== '', 'fieldErrors.dateInput ska vara satt för 30 februari');
+});
+
 
 // ═══════════════════════════════════════════════════════════
 // calcLongtermCore — spanError (ny fix)
@@ -957,6 +1024,17 @@ test('en giltig + en >50-årsperiod → den giltiga beräknas, den långa exklud
   assertEqual(r.valid, true, 'en giltig period finns → valid:true');
   assertEqual(r.periods.length, 1, 'bara den korta perioden ska inkluderas i beräkning');
   assertEqual(r.totalTablets, 90, 'totalTablets ska vara från den giltiga perioden');
+});
+
+test('calcLongtermCore: exakt 1 period → hasOverlap=false, valid=true', () => {
+  // Overlap-loopen på rad 139 körs endast vid periods.length > 1.
+  // Med exakt 1 period ska hasOverlap vara false och totalDays = periodens dagar.
+  const r = calcLongtermCore('Test 10 mg', 1, [makePeriod(90, 0, 90)], null);
+  assertEqual(r.valid, true);
+  assertEqual(r.hasOverlap, false);
+  assertEqual(r.totalDays, 90, 'totalDays ska vara periodens längd');
+  assertEqual(r.totalTablets, 90, 'totalTablets ska matcha inmatningen');
+  assertEqual(r.periods.length, 1, 'en period i resultatet');
 });
 
 
@@ -1077,6 +1155,34 @@ test('okänt språk faller tillbaka på svenska', () => {
   const textSv = buildPatientText('sv', [{ name: 'Elvanse 50 mg', i: 0 }], [], [], 1);
   const textXx = buildPatientText('xx', [{ name: 'Elvanse 50 mg', i: 0 }], [], [], 1);
   assertEqual(textSv, textXx, 'okänt språk ska ge samma text som svenska');
+});
+
+test('multi: toRenew=[] (alla i tooEarly/overuse) → multiIntro, inga förnyelser', () => {
+  // När inget läkemedel är godkänt för förnyelse ska patientbrevet fortfarande
+  // bekräfta mottagandet men inte påstå att något förnyas.
+  setTestState(0, makeRenewState({
+    medRaw:               'Elvanse 50 mg',
+    prescribedEndDateStr: '2025-12-31',
+    renewDateStr:         '2025-10-12',
+    daysToPrescribedEnd:  199,
+  }));
+  setTestState(1, makeRenewState({
+    medRaw:               'Melatonin 3 mg',
+    prescribedEndDateStr: '2025-09-01',
+    prescribedContactIsPast:  false,
+    prescribedContactDateStr: '2025-08-25',
+  }));
+  const text = buildPatientText(
+    'sv',
+    [],
+    [{ name: 'Elvanse 50 mg',  i: 0 }],
+    [{ name: 'Melatonin 3 mg', i: 1 }],
+    2
+  );
+  assertContains(text, 'Vi har tagit emot', 'brevet ska bekräfta mottagandet');
+  assertContains(text, 'Elvanse 50 mg',    'första läkemedlet ska nämnas');
+  assertContains(text, 'Melatonin 3 mg',   'andra läkemedlet ska nämnas');
+  assertNotContains(text, 'förnyar',        'inget läkemedel förnyas — ordet "förnyar" ska inte förekomma');
 });
 
 

@@ -66,7 +66,7 @@
         </svg>
       </span>
       <span class="app-brand-name">Receptberäkning</span>
-      <span class="app-brand-date">uppdaterad 2026-05-10</span>
+      <span class="app-brand-date">uppdaterad 2026-05-12</span>
     </div>
     <div class="topbar-nav-row">
       <nav class="main-tabs" role="tablist">
@@ -95,7 +95,6 @@
 
       <!-- VÄNSTER: LÄKEMEDELSLISTA -->
       <aside class="med-sidebar" aria-label="Läkemedelslista">
-        <button id="newPatientBtn" class="btn btn-ghost">Ny patient</button>
         <div class="sidebar-header">
           <span class="sidebar-label">Läkemedel</span>
         </div>
@@ -103,6 +102,7 @@
         <button id="addMedBtn" class="btn-add-med" aria-label="Lägg till läkemedel">
           <span>＋</span> Lägg till
         </button>
+        <button id="newPatientBtn" class="btn btn-ghost">Ny patient</button>
       </aside>
 
       <!-- MITTEN: FORMULÄR -->
@@ -143,7 +143,7 @@
               <span class="field-error-msg" id="doseInput-err" aria-live="polite"></span>
             </div>
             <div class="field">
-              <label for="amtInput" data-tooltip="Antal tabletter eller kapslar per förpackning (expediering). Totalt förskrivet = förpackningsstorlek × antal uttag.">Förpackningsstorlek (st)</label>
+              <label for="amtInput" data-tooltip="Antal tabletter eller kapslar per förpackning (expediering). Totalt förskrivet = förpackningsstorlek × antal uttag.">Förpackningsstorlek (tabletter)</label>
               <input id="amtInput" type="number" inputmode="numeric" placeholder="100" min="1" step="1" aria-describedby="amtInput-err">
               <span class="field-error-msg" id="amtInput-err" aria-live="polite"></span>
             </div>

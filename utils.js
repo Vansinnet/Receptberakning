@@ -89,6 +89,15 @@ function showEl(id, show, displayValue = 'block') {
   const e = getEl(id); if (e) e.style.display = show ? displayValue : 'none';
 }
 
+function fadeIn(el) {
+  if (!el) return;
+  el.classList.add('fade-in');
+  el.addEventListener('animationend', function handler() {
+    el.classList.remove('fade-in');
+    el.removeEventListener('animationend', handler);
+  });
+}
+
 function showToast(msg, durationMs = 3000) {
   // Ta bort eventuellt tidigare toast så att de inte staplas vid snabba anrop.
   const prev = document.querySelector('.toast-flash');

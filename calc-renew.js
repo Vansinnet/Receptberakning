@@ -33,27 +33,28 @@ function validateValues(medRaw, dateVal, doseRaw, amtRaw, refRaw, leftRaw) {
   const pDate = dateVal ? parseDateUTC(dateVal) : null;
   if (dateVal && !pDate) fieldErrors.dateInput = 'Ogiltigt datum.';
 
-  if (refOutOfRange) return { valid: false, reason: 'too_many_refs', fieldErrors };
-
-  const otherMissing = !medRaw || !dateVal || isNaN(dose) || doseIsInvalid || isNaN(amt) || amtIsInvalid || refIsInvalid || !refNum || refNum < 1;
-  const hasFieldError = Object.values(fieldErrors).some(e => e !== '');
-  if (otherMissing || !pDate || hasFieldError) {
-    // Bevara 'invalid_date' som reason om ENBART datumet är ogiltigt (övriga fält OK).
-    const reason = (!pDate && dateVal && !otherMissing && fieldErrors.medInput === '') ? 'invalid_date' : 'incomplete';
-    return { valid: false, reason, fieldErrors };
-  }
-
-  const ref   = refNum;
   const today = getToday();
-  if (pDate > today) {
+  if (pDate && pDate > today) {
     fieldErrors.dateInput = 'Datumet är satt i framtiden.';
-    return { valid: false, reason: 'invalid_date', fieldErrors };
   }
 
   const remaining    = leftRaw !== '' ? parseInt(leftRaw, 10) : null;
   const leftIsInvalid = leftRaw !== '' && (isNaN(remaining) || remaining < 0 || !Number.isInteger(Number(leftRaw)));
   if (leftIsInvalid) fieldErrors.leftInput = 'Ange ett heltal (0 eller fler), eller lämna tomt.';
-  if (leftIsInvalid) return { valid: false, reason: 'incomplete', fieldErrors };
+
+  if (refOutOfRange) return { valid: false, reason: 'too_many_refs', fieldErrors };
+
+  const otherMissing = !medRaw || !dateVal || isNaN(dose) || doseIsInvalid || isNaN(amt) || amtIsInvalid || refIsInvalid || !refNum || refNum < 1;
+  const hasFieldError = Object.values(fieldErrors).some(e => e !== '');
+  if (otherMissing || !pDate || hasFieldError || (pDate && pDate > today) || leftIsInvalid) {
+    // Bevara 'invalid_date' som reason om ENBART datumet är ogiltigt (övriga fält OK).
+    const dateOnly = (!pDate || (pDate && pDate > today)) && dateVal && !otherMissing && !leftIsInvalid;
+    const hasOtherFieldErrors = fieldErrors.medInput !== '' || fieldErrors.doseInput !== '' || fieldErrors.amtInput !== '' || fieldErrors.refInput !== '' || fieldErrors.leftInput !== '';
+    const reason = (dateOnly && !hasOtherFieldErrors) ? 'invalid_date' : 'incomplete';
+    return { valid: false, reason, fieldErrors };
+  }
+
+  const ref = refNum;
 
   return { valid: true, fieldErrors, medRaw, dateVal, pDate, amt, dose, ref, remaining, doseRaw, amtRaw, refRaw, leftRaw };
 }
@@ -181,8 +182,11 @@ function calcCore(inputData, prev) {
   const prescribedEndDate = new Date(inputData.pDate);
   prescribedEndDate.setUTCDate(prescribedEndDate.getUTCDate() + Math.round(totalDays));
   const daysToPrescribedEnd = getDaysDiff(prescribedEndDate, today);
-  // Överförbrukning om >10% över ordination OCH antingen mer än 7 dosdagar återstår
-  // ELLER receptperioden har mer än 14 dagar kvar (patienten har tagit slut för tidigt).
+  // AKTIVT VAL: daysToPrescribedEnd > 14 krävs för hasRemaining-fallet där daysRemaining
+  // = faktiska dosdagar (kan vara < 7) men ordinationen fortfarande har > 14 dagar kvar.
+  // Utan denna gren missar vi patienter som hämtat ut i förtid och förbrukat för snabbt.
+  // Vid !hasRemaining är daysRemaining === daysToPrescribedEnd och klausulen är redundant
+  // men bevaras för konsistens och tydlighet.
   const isOveruse  = avgNum > inputData.dose * 1.10 && (daysRemaining > 7 || daysToPrescribedEnd > 14);
   // isTooEarly baseras alltid på receptperiodens kvarvarande dagar, inte faktiska dosdagar.
   const isTooEarly = !isOveruse && daysToPrescribedEnd > Math.round(totalDays * 0.20);
@@ -364,6 +368,7 @@ const PATIENT_TEXT = {
     singleRenew:       (name, endDate) => `Vi har tagit emot din förfrågan om receptförnyelse för ${name} och kommer att förnya ditt recept inom 2–3 arbetsdagar${endDate ? ` så att läkemedlet räcker till och med ${endDate}` : ''}. Du kan därefter hämta ut din medicin på valfritt apotek.`,
     singleTooEarly:    (name, s)      => `Vi har tagit emot din förfrågan om receptförnyelse för ${name}. Enligt din ordination (${s.dose} st/dag) beräknas medicinen räcka till den ${s.prescribedEndDateStr}. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. Vänligen hör av dig igen runt den ${s.renewDateStr} så hjälper vi dig då med nytt recept.`,
     singleOveruse:     (name, s, c)   => `Vi har tagit emot din förfrågan om receptförnyelse för ${name}. Utifrån föregående recept beräknades medicinen räcka till den ${s.prescribedEndDateStr}. Vi har granskat förfrågan och kan tyvärr inte förnya receptet vid detta tillfälle. ${c}`,
+    singleOverusePast: (name, s)      => `Vi har tagit emot din förfrågan om receptförnyelse för ${name}. Utifrån föregående recept beräknades medicinen räcka till den ${s.prescribedEndDateStr}. Receptet kan nu förnyas — vänligen hör av dig igen så hjälper vi dig med nytt recept.`,
     closingEndPast:    'Receptet kan nu förnyas. Kontakta oss igen om du vill ha ett nytt recept utfärdat.',
     closingContactPast:'Medicinen beräknas ta slut inom kort — vänligen hör av dig igen så hjälper vi dig.',
     closingFuture:     (s)            => `Vänligen hör av dig igen närmre den ${s.prescribedContactDateStr} så hjälper vi dig då.`,
@@ -381,6 +386,7 @@ const PATIENT_TEXT = {
     singleRenew:       (name, endDate) => `We have received your prescription renewal request for ${name} and will renew your prescription within 2–3 working days${endDate ? ` so that the medication lasts until ${endDate}` : ''}. You can then collect your medication at any pharmacy.`,
     singleTooEarly:    (name, s)      => `We have received your prescription renewal request for ${name}. Your medication is estimated to last until ${s.prescribedEndDateStr}. Please contact us again around ${s.renewDateStr} and we will help you then.`,
     singleOveruse:     (name, s, c)   => `We have received your prescription renewal request for ${name}. Based on the previous prescription, the medication was estimated to last until ${s.prescribedEndDateStr}. We have reviewed your request and are unfortunately unable to renew the prescription at this time. ${c}`,
+    singleOverusePast: (name, s)      => `We have received your prescription renewal request for ${name}. Based on the previous prescription, the medication was estimated to last until ${s.prescribedEndDateStr}. The prescription can now be renewed — please contact us again for a new prescription.`,
     closingEndPast:    'Your prescription can now be renewed. Please contact us again if you would like a new prescription.',
     closingContactPast:'Your medication is expected to run out shortly — please contact us again and we will help you.',
     closingFuture:     (s)            => `Please contact us again closer to ${s.prescribedContactDateStr}.`,
@@ -406,12 +412,12 @@ function buildPatientText(lang, toRenew, tooEarly, overuse, validCount, prescrib
     } else if (overuse.length === 1) {
       const s = states[overuse[0].i];
       const prescribedEndPast = parseDateUTC(s.prescribedEndDateStr) < getToday();
-      const closing = prescribedEndPast
-        ? t.closingEndPast
-        : s.prescribedContactIsPast
-          ? t.closingContactPast
-          : t.closingFuture(s);
-      lines.push(t.singleOveruse(overuse[0].name, s, closing), '', t.closing);
+      if (prescribedEndPast) {
+        lines.push(t.singleOverusePast(overuse[0].name, s), '', t.closing);
+      } else {
+        const closing = s.prescribedContactIsPast ? t.closingContactPast : t.closingFuture(s);
+        lines.push(t.singleOveruse(overuse[0].name, s, closing), '', t.closing);
+      }
     }
   } else {
     lines.push(t.multiIntro, '');

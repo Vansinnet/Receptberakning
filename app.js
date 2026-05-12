@@ -154,7 +154,7 @@ function confirmClearAll(force=false) {
   const m = getEl('newPatientModal');
   if (!m) return;
   _newPatientModalTrigger = document.activeElement;
-  m.classList.add('visible');
+  m.classList.add('visible'); fadeIn(m);
   const btn = getEl('executeNewPatientBtn');
   if (btn) btn.focus();
 }
@@ -337,10 +337,12 @@ function recalcOnDateChange() {
     if (s.calculable === true) {
       // Återanvänd redan validerade värden — endast dagens datum har ändrats.
       // calcCore läser getToday() internt, inte via inputData.
+      const pDate = parseDateUTC(s.dateVal);
+      if (!pDate || !s.medRaw) continue;
       inputData = {
         valid: true, fieldErrors: {},
         medRaw: s.medRaw, dateVal: s.dateVal,
-        pDate: parseDateUTC(s.dateVal),
+        pDate,
         amt: s.amt, dose: s.dose,
         ref: s.refRaw ? parseInt(s.refRaw, 10) : (s.total && s.amt ? Math.round(s.total / s.amt) : 1),
         remaining: s.remainingDoses,
@@ -398,6 +400,9 @@ window.addEventListener('pagehide',()=>{
 window.addEventListener('pageshow',e=>{
   if(!e.persisted)return;
   _todayCache=null;
+  _addMedLocked=false;
+  _clearCardLocked=false;
+  resetDomCache();
   resetTimer();
   buildMedList();
   renderFormForMed(activeMedIdx);
