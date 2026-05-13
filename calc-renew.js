@@ -6,7 +6,7 @@ function validateDateField(val) {
   return { valid: true, error: '', pDate };
 }
 
-function validateValues(medRaw, dateVal, doseRaw, amtRaw, refRaw, leftRaw) {
+function validateValues(medRaw, dateVal, doseRaw, amtRaw, refRaw, leftRaw, doseIntervalRaw, doseUnitRaw, notCalculable) {
   const fieldErrors = { medInput: '', dateInput: '', doseInput: '', amtInput: '', refInput: '', leftInput: '' };
 
   if (medRaw.length > 100) {
@@ -38,9 +38,19 @@ function validateValues(medRaw, dateVal, doseRaw, amtRaw, refRaw, leftRaw) {
     fieldErrors.dateInput = 'Datumet är satt i framtiden.';
   }
 
-  const remaining    = leftRaw !== '' ? parseInt(leftRaw, 10) : null;
-  const leftIsInvalid = leftRaw !== '' && (isNaN(remaining) || remaining < 0 || !Number.isInteger(Number(leftRaw)));
-  if (leftIsInvalid) fieldErrors.leftInput = 'Ange ett heltal (0 eller fler), eller lämna tomt.';
+  // Kvarvarande mängd: heltal för diskreta enheter (st), decimaler tillåtna för volymer (ml, dos)
+  const doseUnit = doseUnitRaw || 'st';
+  const isDiscreteUnit = (doseUnit === 'st');
+  const remaining = leftRaw !== '' ? parseFloat(leftRaw) : null;
+  const leftIsInvalid = leftRaw !== '' && (
+    isNaN(remaining) || remaining < 0 ||
+    (isDiscreteUnit && !Number.isInteger(remaining))
+  );
+  if (leftIsInvalid) {
+    fieldErrors.leftInput = isDiscreteUnit
+      ? 'Ange ett heltal (0 eller fler), eller lämna tomt.'
+      : 'Ange ett tal (0 eller fler), eller lämna tomt.';
+  }
 
   if (refOutOfRange) return { valid: false, reason: 'too_many_refs', fieldErrors };
 
@@ -54,20 +64,28 @@ function validateValues(medRaw, dateVal, doseRaw, amtRaw, refRaw, leftRaw) {
     return { valid: false, reason, fieldErrors };
   }
 
+  const VALID_INTERVALS = [1, 7, 30];
+  const parsedInterval = parseInt(doseIntervalRaw, 10);
+  // AKTIVT VAL: ogiltiga intervalvärden faller tillbaka till 1 (per dag) utan att förkasta formuläret.
+  const doseInterval = VALID_INTERVALS.includes(parsedInterval) ? parsedInterval : 1;
+
   const ref = refNum;
 
-  return { valid: true, fieldErrors, medRaw, dateVal, pDate, amt, dose, ref, remaining, doseRaw, amtRaw, refRaw, leftRaw };
+  return { valid: true, fieldErrors, medRaw, dateVal, pDate, amt, dose, ref, remaining, doseRaw, amtRaw, refRaw, leftRaw, doseInterval, doseUnit, notCalculable: !!notCalculable };
 }
 
 function validateInputs() {
-  const medInput  = getEl('medInput');
-  const dateInput = getEl('dateInput');
-  const amtInput  = getEl('amtInput');
-  const doseInput = getEl('doseInput');
-  const refInput  = getEl('refInput');
-  const leftInput = getEl('leftInput');
+  const medInput           = getEl('medInput');
+  const dateInput          = getEl('dateInput');
+  const amtInput           = getEl('amtInput');
+  const doseInput          = getEl('doseInput');
+  const refInput           = getEl('refInput');
+  const leftInput          = getEl('leftInput');
+  const doseIntervalSelect = getEl('doseIntervalSelect');
   if (!medInput || !dateInput || !amtInput || !doseInput || !refInput)
     return { valid: false, reason: 'incomplete' };
+
+  const s = states[activeMedIdx] || {};
 
   const result = validateValues(
     medInput.value.trim(),
@@ -75,7 +93,10 @@ function validateInputs() {
     doseInput.value,
     amtInput.value,
     refInput.value.trim(),
-    leftInput ? leftInput.value.trim() : ''
+    leftInput ? leftInput.value.trim() : '',
+    doseIntervalSelect ? doseIntervalSelect.value : '1',
+    s.doseUnit || 'st',
+    s.notCalculable || false
   );
 
   for (const [id, msg] of Object.entries(result.fieldErrors)) setFieldError(id, msg);
@@ -101,6 +122,29 @@ function calcCore(inputData, prev) {
     };
   }
 
+  // Beredningar utan kvantifierbar dosering kan inte beräknas automatiskt.
+  if (inputData.notCalculable) {
+    return {
+      valid: true, calculable: false, isOveruse: false, isTooEarly: false,
+      verdictTitle: 'Beräkning ej tillämplig',
+      verdictSub:   'Denna beredningsform kan inte kvantifieras automatiskt. Klinisk bedömning krävs.',
+      metrics: [],
+      alerts:  [{ type: 'info', title: 'Manuell bedömning', message: 'Beredningsformen (t.ex. kräm, lösning för dialys) lämpar sig inte för automatisk förbrukningsberäkning.' }],
+      patientText: '', patientTextEn: '', journalText: '',
+      statusText: 'Ej tillämplig',
+    };
+  }
+
+  // Beräkna enhetsbeteckning för dos — används i displaytexter och journaltext.
+  const INTERVAL_LABELS = { 1: 'dag', 7: 'vecka', 30: 'månad' };
+  const doseInterval     = inputData.doseInterval || 1;
+  const doseUnit         = inputData.doseUnit     || 'st';
+  const intervalLabel    = INTERVAL_LABELS[doseInterval] || 'dag';
+  // doseUnitLabel = t.ex. "st/dag", "ml/dag", "st/vecka", "dos/månad"
+  const doseUnitLabel    = `${doseUnit}/${intervalLabel}`;
+  // Effektiv dygnsdos = förskriven dos normaliserad till per-dag-basis
+  const effectiveDailyDose = inputData.dose / doseInterval;
+
   const today     = getToday();
   const daysSince = getDaysDiff(today, inputData.pDate);
 
@@ -117,7 +161,7 @@ function calcCore(inputData, prev) {
   }
 
   const total     = inputData.amt * inputData.ref;
-  const totalDays = total / inputData.dose;
+  const totalDays = total / effectiveDailyDose;
 
   if (totalDays > 3650) {
     return {
@@ -133,7 +177,7 @@ function calcCore(inputData, prev) {
 
   const { remaining } = inputData;
   const hasRemaining   = remaining !== null && remaining !== undefined;
-  const batchDuration    = inputData.amt / inputData.dose;
+  const batchDuration    = inputData.amt / effectiveDailyDose;
   const batchesDispensed = Math.min(inputData.ref, Math.floor(daysSince / batchDuration) + 1);
   const accessibleTotal  = Math.min(total, batchesDispensed * inputData.amt);
 
@@ -165,14 +209,14 @@ function calcCore(inputData, prev) {
       return { valid: false, isOveruse: false, isTooEarly: false, statusText: 'Internt fel — kontrollera inmatningen.' };
     }
     avgNum        = consumed / daysSince;
-    daysRemaining = Math.floor(remaining / inputData.dose);
+    daysRemaining = Math.floor(remaining / effectiveDailyDose);
     endDate = new Date(today);
     endDate.setUTCDate(today.getUTCDate() + daysRemaining);
   } else {
     endDate = new Date(inputData.pDate);
     endDate.setUTCDate(endDate.getUTCDate() + Math.round(totalDays));
     daysRemaining = getDaysDiff(endDate, today);
-    // Utan uppgift om kvarvarande doser räknas på total (amt × ref), inte accessibleTotal:
+    // Utan uppgift om kvarvarande mängd räknas på total (amt × ref), inte accessibleTotal:
     // uttagsintervallet är inte alltid känt. Antagandet att alla förpackningar är uthämtade
     // undviker underskattning av förbrukningstakten (patientsäkerhet). Falskt positiva
     // "överförbrukning"-varningar tidigt i receptperioden hanteras via klinisk bedömning.
@@ -187,16 +231,21 @@ function calcCore(inputData, prev) {
   // Utan denna gren missar vi patienter som hämtat ut i förtid och förbrukat för snabbt.
   // Vid !hasRemaining är daysRemaining === daysToPrescribedEnd och klausulen är redundant
   // men bevaras för konsistens och tydlighet.
-  const isOveruse  = avgNum > inputData.dose * 1.10 && (daysRemaining > 7 || daysToPrescribedEnd > 14);
+  // AKTIVT VAL: isOveruse jämför avgNum (per dag) mot effectiveDailyDose, inte rådos.
+  // Vid vecko-/månadsintervall är effectiveDailyDose bråkdelen dos/interval,
+  // vilket ger samma proportionella 10%-gräns oavsett vald tidsperiod.
+  const isOveruse  = avgNum > effectiveDailyDose * 1.10 && (daysRemaining > 7 || daysToPrescribedEnd > 14);
   // isTooEarly baseras alltid på receptperiodens kvarvarande dagar, inte faktiska dosdagar.
   const isTooEarly = !isOveruse && daysToPrescribedEnd > Math.round(totalDays * 0.20);
 
-  const doseUnit = extractDoseUnit(inputData.medRaw);
-  let displayAvg = `${avgNum.toFixed(2)} st/dag`;
-  if (doseUnit) displayAvg += ` (${(avgNum * doseUnit.amount).toFixed(1)} ${doseUnit.unit}/dag)`;
+  // Omräkna daglig snittförbrukning till vald tidsperiod för display
+  const avgPerInterval  = avgNum * doseInterval;
+  const mgUnit          = extractDoseUnit(inputData.medRaw);
+  let displayAvg = `${avgPerInterval.toFixed(2)} ${doseUnitLabel}`;
+  if (mgUnit) displayAvg += ` (${(avgPerInterval * mgUnit.amount).toFixed(1)} ${mgUnit.unit}/${intervalLabel})`;
   const avgNote = hasRemaining
-    ? `(beräknat på faktisk förbrukning: ${calcBase - remaining} av ${calcBase} tillgängliga doser${earlyPickup ? ' – patienten kan ha hämtat ut uttag i förväg' : ''})`
-    : `(beräknat under antagandet att alla hittills tillgängliga doser är förbrukade)`;
+    ? `(beräknat på faktisk förbrukning: ${calcBase - remaining} av ${calcBase} tillgängliga ${doseUnit}${earlyPickup ? ' – patienten kan ha hämtat ut uttag i förväg' : ''})`
+    : `(beräknat under antagandet att alla hittills tillgängliga ${doseUnit} är förbrukade)`;
 
   // Återställ beslut om kliniska flaggor har ändrats sedan förra beräkningen
   const flagsChanged         = prev.isOveruse !== isOveruse || prev.isTooEarly !== isTooEarly;
@@ -215,14 +264,14 @@ function calcCore(inputData, prev) {
     : `OK – t.o.m ${fmtDate(prescribedEndDate)}`;
 
   const metrics = [
-    { label: 'Totalt förskrivet', value: `${total} st`, cls: '', tooltip: 'Mängd per uttag × antal uttag. Det totala antalet doser som förskrevs på receptet.' },
+    { label: 'Totalt förskrivet', value: `${total} ${doseUnit}`, cls: '', tooltip: `Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet.` },
     { label: 'Räcker t.o.m.', value: (() => {
         const note = daysToPrescribedEnd > 0 ? ` (${daysToPrescribedEnd} dagar kvar)`
           : daysToPrescribedEnd === 0 ? ' (tar slut idag)'
           : ` (slut sedan ${Math.abs(daysToPrescribedEnd)} dagar)`;
         return fmtDate(prescribedEndDate) + note;
-      })(), cls: endCls, tooltip: 'Beräknat datum då receptet tar slut vid ordinerad dos. Doser kvar används enbart för att beräkna snittförbrukning.' },
-    { label: 'Snittförbrukning', value: displayAvg, cls: isOveruse ? 'danger' : '', tooltip: 'Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dosdagar återstår eller receptperioden har mer än 14 dagar kvar.' },
+      })(), cls: endCls, tooltip: `Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning.` },
+    { label: 'Snittförbrukning', value: displayAvg, cls: isOveruse ? 'danger' : '', tooltip: `Genomsnittlig förbrukning per ${intervalLabel} sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar.` },
   ];
 
   let verdictTitle, verdictSub;
@@ -231,7 +280,7 @@ function calcCore(inputData, prev) {
     verdictSub   = 'Klinisk bedömning: förnyelse trots förhöjd förbrukning.';
   } else if (isOveruse) {
     verdictTitle = 'För tidig förnyelse – bedömning krävs';
-    verdictSub   = `Snitt ${avgNum.toFixed(2)} st/dag överstiger ordination med >10%.`;
+    verdictSub   = `Snitt ${avgPerInterval.toFixed(2)} ${doseUnitLabel} överstiger ordination med >10%.`;
   } else if (isTooEarly && earlyRenewalDecision === 'yes') {
     verdictTitle = 'OK – Förnya recept';
     verdictSub   = `Klinisk bedömning: förnyelse trots ${daysToPrescribedEnd} dagar kvar av receptperioden.`;
@@ -239,8 +288,8 @@ function calcCore(inputData, prev) {
     verdictTitle = `För tidigt – ${daysToPrescribedEnd} dagar kvar`;
     verdictSub   = 'Förbrukning OK. Kontakta vården närmre slutdatumet.';
   } else {
-    const consumptionPctOK = (avgNum / inputData.dose) * 100;
-    const consumptionNote  = `Snittförbrukning ${avgNum.toFixed(2)} st/dag (${consumptionPctOK.toFixed(1)}% av ordinerad dos, inom ±10%-gränsen).`;
+    const consumptionPctOK = (avgNum / effectiveDailyDose) * 100;
+    const consumptionNote  = `Snittförbrukning ${avgPerInterval.toFixed(2)} ${doseUnitLabel} (${consumptionPctOK.toFixed(1)}% av ordinerad dos, inom ±10%-gränsen).`;
     const remainingPct     = (daysToPrescribedEnd / totalDays * 100).toFixed(1);
     const daysNote = daysToPrescribedEnd <= 0
       ? 'Receptperioden är slut.'
@@ -251,22 +300,22 @@ function calcCore(inputData, prev) {
 
   // Alerts — byggs som strukturerade objekt, renderas via DOM (ingen innerHTML med användardata)
   const alerts = [];
-  const consumptionPct         = (avgNum / inputData.dose) * 100;
-  const overuseSupressedBy7day = !isOveruse && daysRemaining >= 0 && daysRemaining <= 7 && avgNum > inputData.dose * 1.10;
+  const consumptionPct         = (avgNum / effectiveDailyDose) * 100;
+  const overuseSupressedBy7day = !isOveruse && daysRemaining >= 0 && daysRemaining <= 7 && avgNum > effectiveDailyDose * 1.10;
   if (overuseSupressedBy7day) {
     alerts.push({ type: 'warn', title: 'Förhöjd förbrukning noterad', message: `Snitt ${displayAvg} överstiger ordination med >10%, men medicinen beräknas ta slut inom 7 dagar. Förnyelse godkänd — notera förbrukningstakten.` });
   } else if (avgNum === 0) {
-    alerts.push({ type: 'danger', title: 'Ingen förbrukning registrerad', message: 'Snitt 0 st/dag – patienten verkar inte ha tagit medicinen. Klinisk bedömning krävs.' });
+    alerts.push({ type: 'danger', title: 'Ingen förbrukning registrerad', message: `Snitt 0 ${doseUnitLabel} – patienten verkar inte ha tagit medicinen. Klinisk bedömning krävs.` });
   } else if (consumptionPct < 80) {
-    alerts.push({ type: 'warn', title: 'Låg förbrukning', message: `${avgNum.toFixed(2)} st/dag är ${(100 - consumptionPct).toFixed(1)}% under ordinerad dos. Överväg uppföljning.` });
+    alerts.push({ type: 'warn', title: 'Låg förbrukning', message: `${avgPerInterval.toFixed(2)} ${doseUnitLabel} är ${(100 - consumptionPct).toFixed(1)}% under ordinerad dos. Överväg uppföljning.` });
     if (isTooEarly) {
       alerts.push({ type: 'info', title: 'För tidigt att förnya', message: `Receptperioden löper ut om ${daysToPrescribedEnd} dagar (t.o.m. ${fmtDate(prescribedEndDate)}). Förnyelse rekommenderas närmre slutdatumet.` });
     }
   } else if (isTooEarly) {
     alerts.push({ type: 'info', title: 'För tidigt att förnya', message: `Receptperioden löper ut om ${daysToPrescribedEnd} dagar (t.o.m. ${fmtDate(prescribedEndDate)}). Förnyelse rekommenderas närmre slutdatumet.` });
   }
-  if (avgNum > inputData.dose * 2.5) {
-    alerts.push({ type: 'warn', title: 'Datakontroll', message: `Snitt ${avgNum.toFixed(2)} st/dag är mycket högt. Kontrollera kvarvarande doser.` });
+  if (avgNum > effectiveDailyDose * 2.5) {
+    alerts.push({ type: 'warn', title: 'Datakontroll', message: `Snitt ${avgPerInterval.toFixed(2)} ${doseUnitLabel} är mycket högt. Kontrollera kvarvarande mängd.` });
   }
   if (earlyPickup) {
     alerts.push({ type: 'info', title: 'Tidig uthämtning', message: 'Kvarvarande doser överstiger modellens förväntade tillgängliga mängd. Beräknas från minsta möjliga antal uttag.' });
@@ -297,6 +346,9 @@ function calcCore(inputData, prev) {
     medRaw:               inputData.medRaw,
     amt:                  inputData.amt,
     dose:                 inputData.dose,
+    doseInterval,
+    doseUnit,
+    doseUnitLabel,
     pDateStr:             fmtDate(inputData.pDate),
     total,
     remainingDoses:       hasRemaining ? remaining : null,
@@ -351,12 +403,13 @@ function calc(i = activeMedIdx, skipGenerate = false) {
 
 // === TEXTGENERERING ===
 
-// Återanvändbar hjälpare: notering om kvarvarande doser i journaltext.
+// Återanvändbar hjälpare: notering om kvarvarande mängd i journaltext.
 // Returnerar tom sträng om fältet inte är ifyllt.
 function remainingDosesNote(s, leading = ' ') {
   if (s.remainingDoses == null) return '';
+  const u = s.doseUnit || 'st';
   return s.daysRemaining > 0
-    ? `${leading}Vid förnyelse framkommer att patienten har ${s.remainingDoses} doser (${s.daysRemaining} dagar) kvar.`
+    ? `${leading}Vid förnyelse framkommer att patienten har ${s.remainingDoses} ${u} (${s.daysRemaining} dagar) kvar.`
     : `${leading}Vid förnyelse framkommer att patienten uppger att medicinen är slut.`;
 }
 
@@ -366,7 +419,7 @@ const PATIENT_TEXT = {
     closing:           'Vid frågor är du välkommen att kontakta oss via 1177.',
     multiIntro:        'Vi har tagit emot din förfrågan om receptförnyelse för följande läkemedel:',
     singleRenew:       (name, endDate) => `Vi har tagit emot din förfrågan om receptförnyelse för ${name} och kommer att förnya ditt recept inom 2–3 arbetsdagar${endDate ? ` så att läkemedlet räcker till och med ${endDate}` : ''}. Du kan därefter hämta ut din medicin på valfritt apotek.`,
-    singleTooEarly:    (name, s)      => `Vi har tagit emot din förfrågan om receptförnyelse för ${name}. Enligt din ordination (${s.dose} st/dag) beräknas medicinen räcka till den ${s.prescribedEndDateStr}. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. Vänligen hör av dig igen runt den ${s.renewDateStr} så hjälper vi dig då med nytt recept.`,
+    singleTooEarly:    (name, s)      => `Vi har tagit emot din förfrågan om receptförnyelse för ${name}. Enligt din ordination (${s.dose} ${s.doseUnitLabel || 'st/dag'}) beräknas medicinen räcka till den ${s.prescribedEndDateStr}. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. Vänligen hör av dig igen runt den ${s.renewDateStr} så hjälper vi dig då med nytt recept.`,
     singleOveruse:     (name, s, c)   => `Vi har tagit emot din förfrågan om receptförnyelse för ${name}. Utifrån föregående recept beräknades medicinen räcka till den ${s.prescribedEndDateStr}. Vi har granskat förfrågan och kan tyvärr inte förnya receptet vid detta tillfälle. ${c}`,
     singleOverusePast: (name, s)      => `Vi har tagit emot din förfrågan om receptförnyelse för ${name}. Utifrån föregående recept beräknades medicinen räcka till den ${s.prescribedEndDateStr}. Receptet kan nu förnyas — vänligen hör av dig igen så hjälper vi dig med nytt recept.`,
     closingEndPast:    'Receptet kan nu förnyas. Kontakta oss igen om du vill ha ett nytt recept utfärdat.',
@@ -384,7 +437,7 @@ const PATIENT_TEXT = {
     closing:           'If you have questions, please contact us through 1177.',
     multiIntro:        'We have received your prescription renewal request for the following medications:',
     singleRenew:       (name, endDate) => `We have received your prescription renewal request for ${name} and will renew your prescription within 2–3 working days${endDate ? ` so that the medication lasts until ${endDate}` : ''}. You can then collect your medication at any pharmacy.`,
-    singleTooEarly:    (name, s)      => `We have received your prescription renewal request for ${name}. Your medication is estimated to last until ${s.prescribedEndDateStr}. Please contact us again around ${s.renewDateStr} and we will help you then.`,
+    singleTooEarly:    (name, s)      => `We have received your prescription renewal request for ${name}. Based on your prescription (${s.dose} ${s.doseUnitLabel || 'st/dag'}), your medication is estimated to last until ${s.prescribedEndDateStr}. Please contact us again around ${s.renewDateStr} and we will help you then.`,
     singleOveruse:     (name, s, c)   => `We have received your prescription renewal request for ${name}. Based on the previous prescription, the medication was estimated to last until ${s.prescribedEndDateStr}. We have reviewed your request and are unfortunately unable to renew the prescription at this time. ${c}`,
     singleOverusePast: (name, s)      => `We have received your prescription renewal request for ${name}. Based on the previous prescription, the medication was estimated to last until ${s.prescribedEndDateStr}. The prescription can now be renewed — please contact us again for a new prescription.`,
     closingEndPast:    'Your prescription can now be renewed. Please contact us again if you would like a new prescription.',
@@ -454,7 +507,7 @@ function buildJournalText(toRenew, tooEarly, overuse, validCount, prescribeEnds 
       if (toRenew[0].earlyRenewal === 'overuse') {
         lines.push(
           'Kontaktorsak: Receptförnyelse via 1177.', '',
-          `Bedömning: Patienten begär förnyelse av ${toRenew[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} doser, ordination ${s.dose} st/dag) och borde räcka till ${s.prescribedEndDateStr}.${remainingDosesNote(s)}`,
+          `Bedömning: Patienten begär förnyelse av ${toRenew[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} ${s.doseUnit || 'st'}, ordination ${s.dose} ${s.doseUnitLabel || 'st/dag'}) och borde räcka till ${s.prescribedEndDateStr}.${remainingDosesNote(s)}`,
           `Beräknad snittförbrukning: ${s.displayAvgStr} ${s.avgNote} — överstiger ordination. Receptet förnyas på klinisk indikation efter individuell bedömning.`,
           '', `Åtgärd: Nytt recept utfärdat${endSuffix}. Svar skickat till patient via 1177.`
         );
@@ -464,7 +517,7 @@ function buildJournalText(toRenew, tooEarly, overuse, validCount, prescribeEnds 
           : '';
         lines.push(
           'Kontaktorsak: Receptförnyelse via 1177.', '',
-          `Bedömning: Patienten begär förnyelse av ${toRenew[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} doser, ordination ${s.dose} st/dag) och beräknas räcka till ${s.prescribedEndDateStr}.${remainingDosesNote(s)}${earlyNote}`,
+          `Bedömning: Patienten begär förnyelse av ${toRenew[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} ${s.doseUnit || 'st'}, ordination ${s.dose} ${s.doseUnitLabel || 'st/dag'}) och beräknas räcka till ${s.prescribedEndDateStr}.${remainingDosesNote(s)}${earlyNote}`,
           `Förbrukning bedöms vara enligt ordination (snittförbrukning: ${s.displayAvgStr} ${s.avgNote}).`,
           '', `Åtgärd: Nytt recept utfärdat${endSuffix}. Svar skickat till patient via 1177.`
         );
@@ -473,17 +526,18 @@ function buildJournalText(toRenew, tooEarly, overuse, validCount, prescribeEnds 
       const s = states[tooEarly[0].i];
       lines.push(
         'Kontaktorsak: Receptförnyelse via 1177.', '',
-        `Bedömning: Patienten begär förnyelse av ${tooEarly[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} doser, ordination ${s.dose} st/dag) och beräknas räcka till ${s.prescribedEndDateStr} (${s.daysToPrescribedEnd} dagar kvar).${remainingDosesNote(s)}`,
+        `Bedömning: Patienten begär förnyelse av ${tooEarly[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} ${s.doseUnit || 'st'}, ordination ${s.dose} ${s.doseUnitLabel || 'st/dag'}) och beräknas räcka till ${s.prescribedEndDateStr} (${s.daysToPrescribedEnd} dagar kvar).${remainingDosesNote(s)}`,
         `Förbrukning bedöms vara enligt ordination (snittförbrukning: ${s.displayAvgStr} ${s.avgNote}).`,
         '', 'Åtgärd: Ej förnyat — för tidigt. Svar skickat till patient via 1177.'
       );
     } else if (overuse.length === 1) {
       const s = states[overuse[0].i];
-      // Statusnot skiljer sig från remainingDosesNote: om doser saknas används
+      // Statusnot skiljer sig från remainingDosesNote: om kvarvarande saknas används
       // receptperiodens återstående dagar som fallback istället för tom sträng.
+      const u1 = s.doseUnit || 'st';
       const sn = s.remainingDoses != null
         ? (s.daysRemaining > 0
-            ? `Vid förnyelse framkommer att patienten har ${s.remainingDoses} doser (${s.daysRemaining} dagar) kvar.`
+            ? `Vid förnyelse framkommer att patienten har ${s.remainingDoses} ${u1} (${s.daysRemaining} dagar) kvar.`
             : 'Vid förnyelse framkommer att patienten uppger att medicinen är slut.')
         : (s.daysRemaining > 0
             ? `Aktuell förskrivning beräknas räcka ytterligare ${s.daysRemaining} dagar.`
@@ -493,7 +547,7 @@ function buildJournalText(toRenew, tooEarly, overuse, validCount, prescribeEnds 
         : 'Åtgärd: [Nytt recept utfärdat / Ej utfärdat — motivering]';
       lines.push(
         'Kontaktorsak: Receptförnyelse via 1177.', '',
-        `Bedömning: Patienten begär förnyelse av ${overuse[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} doser, ordination ${s.dose} st/dag) och borde räcka till ${s.prescribedEndDateStr}. ${sn} Beräknad snittförbrukning: ${s.displayAvgStr} ${s.avgNote}.`,
+        `Bedömning: Patienten begär förnyelse av ${overuse[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} ${s.doseUnit || 'st'}, ordination ${s.dose} ${s.doseUnitLabel || 'st/dag'}) och borde räcka till ${s.prescribedEndDateStr}. ${sn} Beräknad snittförbrukning: ${s.displayAvgStr} ${s.avgNote}.`,
         '', atgard
       );
     }
@@ -511,17 +565,18 @@ function buildJournalText(toRenew, tooEarly, overuse, validCount, prescribeEnds 
       const endInfo = earlyRenewal === 'overuse'
         ? `Borde räcka t.o.m. ${s.prescribedEndDateStr}. Snitt: ${s.displayAvgStr} — överstiger ordination.`
         : `Räcker t.o.m. ${s.prescribedEndDateStr}.${remNote} Snitt: ${s.displayAvgStr}.`;
-      lines.push(`${name}: Utfärdat ${s.pDateStr} (${s.total} doser, ${s.dose} st/dag). ${endInfo} ${atgardText}`, '');
+      lines.push(`${name}: Utfärdat ${s.pDateStr} (${s.total} ${s.doseUnit || 'st'}, ${s.dose} ${s.doseUnitLabel || 'st/dag'}). ${endInfo} ${atgardText}`, '');
     }
     for (const { name, i } of tooEarly) {
       const s = states[i];
-      lines.push(`${name}: Utfärdat ${s.pDateStr} (${s.total} doser, ${s.dose} st/dag). Räcker t.o.m. ${s.prescribedEndDateStr} (${s.daysToPrescribedEnd} dagar kvar). Snitt: ${s.displayAvgStr}. Åtgärd: Ej förnyat — för tidigt.`, '');
+      lines.push(`${name}: Utfärdat ${s.pDateStr} (${s.total} ${s.doseUnit || 'st'}, ${s.dose} ${s.doseUnitLabel || 'st/dag'}). Räcker t.o.m. ${s.prescribedEndDateStr} (${s.daysToPrescribedEnd} dagar kvar). Snitt: ${s.displayAvgStr}. Åtgärd: Ej förnyat — för tidigt.`, '');
     }
     for (const { name, i } of overuse) {
       const s = states[i];
-      const sn = s.remainingDoses != null
+      const u2 = s.doseUnit || 'st';
+      const sn2 = s.remainingDoses != null
         ? (s.daysRemaining > 0
-            ? `Vid förnyelse framkommer att patienten har ${s.remainingDoses} doser (${s.daysRemaining} dagar) kvar.`
+            ? `Vid förnyelse framkommer att patienten har ${s.remainingDoses} ${u2} (${s.daysRemaining} dagar) kvar.`
             : 'Vid förnyelse framkommer att patienten uppger att medicinen är slut.')
         : (s.daysRemaining > 0
             ? `Räcker ytterligare ${s.daysRemaining} dagar.`
@@ -529,7 +584,7 @@ function buildJournalText(toRenew, tooEarly, overuse, validCount, prescribeEnds 
       const atgard = s.earlyRenewalDecision === 'no'
         ? 'Åtgärd: Ej förnyat efter klinisk, individuell bedömning.'
         : 'Åtgärd: [Nytt recept utfärdat / Ej utfärdat — motivering]';
-      lines.push(`${name}: Utfärdat ${s.pDateStr} (${s.total} doser, ${s.dose} st/dag). Borde räcka t.o.m. ${s.prescribedEndDateStr}. ${sn} Snitt: ${s.displayAvgStr}. ${atgard}`, '');
+      lines.push(`${name}: Utfärdat ${s.pDateStr} (${s.total} ${s.doseUnit || 'st'}, ${s.dose} ${s.doseUnitLabel || 'st/dag'}). Borde räcka t.o.m. ${s.prescribedEndDateStr}. ${sn2} Snitt: ${s.displayAvgStr}. ${atgard}`, '');
     }
     lines.push(
       toRenew.length > 0
@@ -541,6 +596,60 @@ function buildJournalText(toRenew, tooEarly, overuse, validCount, prescribeEnds 
     );
   }
 
+  return lines.join('\n');
+}
+
+function buildNurseJournalText() {
+  const allMeds = [];
+  let hasOutsideLimits = false;
+
+  for (let i = 0; i < states.length; i++) {
+    const s = states[i];
+    if (!s || !s.valid || s.calculable === false) continue;
+    const name = stripManufacturer(s.medRaw) || s.medRaw || `Läkemedel ${i + 1}`;
+    const isOutside = (s.isOveruse || s.isTooEarly) && s.earlyRenewalDecision !== 'yes';
+    if (isOutside) hasOutsideLimits = true;
+    allMeds.push({ name, i, endDate: s.prescribedEndDateStr || '' });
+  }
+
+  if (allMeds.length === 0) return '';
+
+  const lines = [];
+  lines.push(`Patient önskar förnyelse av ${allMeds.map(m => m.name).join(', ')}.`);
+
+  if (allMeds.length === 1) {
+    const endStr = allMeds[0].endDate ? ` till och med ${allMeds[0].endDate}` : '';
+    const suffix = hasOutsideLimits ? ' utifrån tidigare förskrivning' : '';
+    lines.push(`Vid bedömningen bedöms patientens nuvarande ${allMeds[0].name} räcka${endStr}${suffix}.`);
+  } else {
+    const endParts = allMeds.map(m => {
+      const endStr = m.endDate ? ` till och med ${m.endDate}` : '';
+      return `${m.name} räcka${endStr}`;
+    });
+    const suffix = hasOutsideLimits ? ' utifrån tidigare förskrivning' : '';
+    lines.push(`Vid bedömningen bedöms patientens nuvarande ${endParts.join(' och ')}${suffix}.`);
+  }
+
+  const isType1 = !hasOutsideLimits && nurseVitalNormal && nurseFollowUpAdequate;
+
+  const missing = [];
+  if (!nurseVitalNormal) missing.push('vitalparametrar');
+  if (!nurseFollowUpAdequate) missing.push('medicinska uppföljning');
+
+  if (missing.length === 0) {
+    // AKTIVT VAL: "adekvata" skrivs alltid när båda är iklickade, oavsett
+    // hasOutsideLimits — sjuksköterskans bedömning ska dokumenteras separat
+    // från läkemedelstidpunkten. Annars utelämnas raden helt när ett läkemedel
+    // är utanför gränserna men parametrarna är normala.
+    lines.push('Patientens vitalparametrar och medicinska uppföljning bedöms adekvata.');
+  } else if (missing.length === 2) {
+    lines.push('Patientens vitalparametrar och medicinska uppföljning bedöms vara avvikande.');
+  } else {
+    const prefix = missing[0] === 'vitalparametrar' ? 'Patientens vitalparametrar' : 'Patientens medicinska uppföljning';
+    lines.push(`${prefix} bedöms vara avvikande.`);
+  }
+
+  lines.push('Lägger receptärendet till läkare för slutlig bedömning.');
   return lines.join('\n');
 }
 
@@ -563,6 +672,21 @@ function generateAndDistribute() {
     else if (s.isTooEarly && s.earlyRenewalDecision === 'yes') toRenew.push({ name, i, earlyRenewal: 'tooEarly' });
     else if (s.isTooEarly)                                     tooEarly.push({ name, i });
     else                                                       toRenew.push({ name, i });
+  }
+
+  if (nurseViewActive) {
+    const journalText = buildNurseJournalText();
+    for (let i = 0; i < states.length; i++) {
+      const s = states[i]; if (!s || !s.valid || s.calculable === false) continue;
+      applyMedStatePatch(i, {
+        patientText: '',
+        patientTextEn: '',
+        patientLang: s.patientLang || 'sv',
+        journalText,
+      });
+    }
+    renderResultForMed(activeMedIdx);
+    return;
   }
 
   const prescribeEnds = {};

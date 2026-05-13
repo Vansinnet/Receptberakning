@@ -20,8 +20,8 @@ function buildPeriodElement(period, i) {
   ));
 
   row.appendChild(makeField(
-    `lt-total-${i}`, 'Antal uttagna tabletter',
-    'Totalt antal tabletter eller kapslar uttagna under perioden. Hämtas från apotekskvitto eller journaldokumentation.',
+    `lt-total-${i}`, 'Antal uttagna enheter',
+    'Totalt antal enheter (tabletter, kapslar, ml, doser) uttagna under perioden. Hämtas från apotekskvitto eller journaldokumentation.',
     { type: 'number', placeholder: '100', min: '1', step: '1' },
     period.total
   ));
@@ -164,7 +164,7 @@ function calcLongtermCore(medRaw, ordDose, rawPeriods, nplId) {
   const overallAvg     = totalTablets / totalDays;
   const consumptionPct = (overallAvg / ordDose) * 100;
   const doseUnit       = extractDoseUnit(medRaw);
-  let avgStr = `${overallAvg.toFixed(2)} st/dag`;
+  let avgStr = `${overallAvg.toFixed(2)} enheter/dag`;
   if (doseUnit) avgStr += ` (${(overallAvg * doseUnit.amount).toFixed(1)} ${doseUnit.unit}/dag)`;
 
   // Per-period klassificering beräknas här så att UI:t slipper upprepa logiken
@@ -178,21 +178,21 @@ function calcLongtermCore(medRaw, ordDose, rawPeriods, nplId) {
   if (overallAvg > ordDose * LT_OVER) {
     overallStatus = 'over'; alertType = 'danger';
     alertTitle = 'Förbrukning överstiger ordination';
-    alertMsg   = `Snitt ${avgStr} är ${(consumptionPct - 100).toFixed(1)}% över ordinerad dos (${ordDose} st/dag). Gör en individuell klinisk bedömning.`;
+    alertMsg   = `Snitt ${avgStr} är ${(consumptionPct - 100).toFixed(1)}% över ordinerad dos (${ordDose} enheter/dag). Gör en individuell klinisk bedömning.`;
   } else if (overallAvg < ordDose * LT_UNDER) {
     overallStatus = 'under'; alertType = 'warn';
     alertTitle = 'Låg förbrukning';
-    alertMsg   = `Snitt ${avgStr} är ${(100 - consumptionPct).toFixed(1)}% under ordinerad dos (${ordDose} st/dag). Överväg om patienten tar medicinen som ordinerat.`;
+    alertMsg   = `Snitt ${avgStr} är ${(100 - consumptionPct).toFixed(1)}% under ordinerad dos (${ordDose} enheter/dag). Överväg om patienten tar medicinen som ordinerat.`;
   } else {
     overallStatus = 'ok'; alertType = 'ok';
     alertTitle = 'Förbrukning enligt ordination';
-    alertMsg   = `Snitt ${avgStr} är i linje med ordinerad dos (${ordDose} st/dag), avvikelse ${Math.abs(consumptionPct - 100).toFixed(1)}%.`;
+    alertMsg   = `Snitt ${avgStr} är i linje med ordinerad dos (${ordDose} enheter/dag), avvikelse ${Math.abs(consumptionPct - 100).toFixed(1)}%.`;
   }
 
   // Ingen "Period N:"-numrering i journalen — sorteringsordningen kan skilja sig
   // från inmatningsordningen efter överlappsdetektion. Datumintervallen är entydiga.
   const periodSummary = periods.map(p =>
-    `  ${fmtDate(p.startDate)}–${fmtDate(p.endDate)} (${p.days} dagar, ${p.total} tabletter, snitt ${p.avgPerDay.toFixed(2)} st/dag)`
+    `  ${fmtDate(p.startDate)}–${fmtDate(p.endDate)} (${p.days} dagar, ${p.total} enheter, snitt ${p.avgPerDay.toFixed(2)} enheter/dag)`
   ).join('\n');
 
   return {
@@ -212,7 +212,7 @@ function calcLongtermCore(medRaw, ordDose, rawPeriods, nplId) {
     hasOverlap,
     barPct:      Math.min(150, Math.max(0, consumptionPct)),
     fassUrl:     getFassUrl(medRaw, nplId),
-    journalText: `Aktuellt: Förbrukningsanalys av ${stripManufacturer(medRaw)}.\n\nOrdinerad dos: ${ordDose} st/dag.\nAnalysperiod: ${periods.length} period(er), totalt ${totalDays} dagar.\n\nPerioder:\n${periodSummary}\n\nSammanlagd snittförbrukning: ${avgStr} (${consumptionPct.toFixed(1)}% av ordinerad dos).\n\nBedömning: [fyll i här]`,
+    journalText: `Aktuellt: Förbrukningsanalys av ${stripManufacturer(medRaw)}.\n\nOrdinerad dos: ${ordDose} enheter/dag.\nAnalysperiod: ${periods.length} period(er), totalt ${totalDays} dagar.\n\nPerioder:\n${periodSummary}\n\nSammanlagd snittförbrukning: ${avgStr} (${consumptionPct.toFixed(1)}% av ordinerad dos).\n\nBedömning: [fyll i här]`,
   };
 }
 
@@ -270,9 +270,9 @@ function calcLongterm() {
     const frag = document.createDocumentFragment();
     buildResultRow(frag, 'Analyserade perioder',     `${result.periods.length} st`);
     buildResultRow(frag, 'Total analyslängd',        `${result.totalDays} dagar`);
-    buildResultRow(frag, 'Totalt uttagna tabletter', `${result.totalTablets} st`);
+    buildResultRow(frag, 'Totalt uttagna enheter', `${result.totalTablets}`);
     frag.appendChild(el('hr', { cls: 'divider' }));
-    buildResultRow(frag, 'Ordinerad dos',       `${result.ordDose} st/dag`);
+    buildResultRow(frag, 'Ordinerad dos',       `${result.ordDose} enheter/dag`);
     buildResultRow(frag, 'Snittförbrukning',    result.avgStr);
     buildResultRow(frag, 'Relativt ordination', `${result.consumptionPct.toFixed(1)}%`);
     resGridEl.appendChild(frag);
@@ -300,7 +300,7 @@ function calcLongterm() {
 
       const row = el('tr', { cls: 'period-row' });
       row.appendChild(el('td', { cls: 'period-cell',             text: `${fmtDate(p.startDate)} – ${fmtDate(p.endDate)} (${p.days}d)` }));
-      row.appendChild(el('td', { cls: 'period-cell mono ph-avg', text: `${p.avgPerDay.toFixed(2)} st/dag` }));
+      row.appendChild(el('td', { cls: 'period-cell mono ph-avg', text: `${p.avgPerDay.toFixed(2)}/dag` }));
       row.appendChild(el('td', { cls: 'period-cell mono',        text: `${pPct >= 100 ? '+' : ''}${(pPct - 100).toFixed(1)}%` }));
       const td4 = el('td', { cls: 'period-cell' });
       td4.appendChild(el('span', { cls: `badge ${badgeClass}`, text: badgeText }));

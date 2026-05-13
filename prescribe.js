@@ -48,7 +48,11 @@ function calcPrescribeResult(i) {
 
   const totalTablets = Math.ceil(totalDays * dose);
   const packages     = Math.ceil(totalTablets / packageSize);
-  return { startDate, startDateStr, daysAlreadyCovered, endDate, endDateStr: fmtDate(endDate), totalDays, totalTablets, packages, packageSize, dose };
+  const doseUnitVal  = s.doseUnit || 'st';
+  const ds           = UNIT_DISPLAY[doseUnitVal] || UNIT_DISPLAY.st;
+  const unitLabelLong  = ds.long;
+  const unitLabelShort = ds.short;
+  return { startDate, startDateStr, daysAlreadyCovered, endDate, endDateStr: fmtDate(endDate), totalDays, totalTablets, packages, packageSize, dose, doseUnit: doseUnitVal, unitLabelLong, unitLabelShort };
 }
 
 function prescribeValidationHint(i, ps) {
@@ -136,14 +140,14 @@ function updatePrescribeResult(i) {
   if (res && res.packages) {
     const numRow = el('div', { cls: 'prescribe-result-num-row' });
     numRow.appendChild(el('div', { cls: 'prescribe-result-packages', text: String(res.packages) }));
-    numRow.appendChild(el('div', { cls: 'prescribe-result-unit', text: res.packageSize > 0 ? `förp.  à ${res.packageSize} st` : 'förp.' }));
+    numRow.appendChild(el('div', { cls: 'prescribe-result-unit', text: res.packageSize > 0 ? `förp.  à ${res.packageSize} ${res.unitLabelShort}` : 'förp.' }));
 
     const wrap = el('div', { cls: 'prescribe-result' });
     wrap.appendChild(el('div', { cls: 'prescribe-result-label',   text: 'Antal förpackningar att förskriva',
       attrs: { 'data-tooltip': 'Antal förpackningar som krävs för att täcka den angivna perioden med den ordinerade dosen. Avrundas uppåt till hela förpackningar.' } }));
     wrap.appendChild(numRow);
-    wrap.appendChild(el('div', { cls: 'prescribe-result-details', text: `${res.totalTablets} tabletter ÷ ${res.packageSize} st/förp.`,
-      attrs: { 'data-tooltip': 'Totalt antal tabletter dividerat med förpackningsstorlek.' } }));
+    wrap.appendChild(el('div', { cls: 'prescribe-result-details', text: `${res.totalTablets} ${res.unitLabelLong} ÷ ${res.packageSize} ${res.unitLabelShort}/förp.`,
+      attrs: { 'data-tooltip': 'Totalt antal enheter dividerat med förpackningsstorlek.' } }));
     wrap.appendChild(el('div', { cls: 'prescribe-result-period',  text: `${res.startDateStr} – ${res.endDateStr}`,
       attrs: { 'data-tooltip': 'Period som den nya förskrivningen täcker.' } }));
     wrap.appendChild(el('div', { cls: 'prescribe-result-days',    text: `${res.totalDays} dagar`,
@@ -249,8 +253,10 @@ function buildPrescribeInner(i) {
       value: ps.packageSize || '',
     });
     pkgInp.addEventListener('input', () => { applyPrescribeStatePatch(i, { packageSize: pkgInp.value }); updatePrescribeResult(i); });
+    const ds         = UNIT_DISPLAY[s.doseUnit] || UNIT_DISPLAY.st;
+    const pkgLabelLong = ds.long;
     const pkgDiv = el('div', { cls: 'field', style: 'margin-top:10px' });
-    pkgDiv.appendChild(el('label', { text: 'Förpackningsstorlek (tabletter)', attrs: { for: 'ps-pkg-' + i, 'data-tooltip': 'Antal tabletter per förpackning. Beräkningen dividerar totalt antal tabletter med förpackningsstorleken för att bestämma hur många förpackningar som ska förskrivas.' } }));
+    pkgDiv.appendChild(el('label', { text: `Förpackningsstorlek (${pkgLabelLong})`, attrs: { for: 'ps-pkg-' + i, 'data-tooltip': `Antal ${pkgLabelLong} per förpackning. Beräkningen dividerar totalt antal ${pkgLabelLong} med förpackningsstorleken för att bestämma hur många förpackningar som ska förskrivas.` } }));
     pkgDiv.appendChild(pkgInp);
     inner.appendChild(pkgDiv);
 
@@ -289,7 +295,7 @@ function renderPrescribeSummary() {
     if (!ps || !canRenewMed(i)) continue;
     const res = calcPrescribeResult(i);
     const pkgs = res ? res.packages : 0;
-    items.push({ i, name: s.medRaw || `Läkemedel ${i + 1}`, packages: pkgs, pkgSize: parseFloat(ps.packageSize) || 0 });
+    items.push({ i, name: s.medRaw || `Läkemedel ${i + 1}`, packages: pkgs, pkgSize: parseFloat(ps.packageSize) || 0, unitLabelShort: (res ? res.unitLabelShort : 'st') });
     summaryKey += `${i}:${pkgs}:${ps.packageSize}:${_prescribeMonths}:${_prescribeEndDate}:${s.amt}:${s.dose}:${s.prescribedEndDateStr}:${activeMedIdx}|`;
   }
 
@@ -305,11 +311,11 @@ function renderPrescribeSummary() {
   box.style.display = 'block';
 
   const list = el('div', { cls: 'prescribe-summary-list' });
-  items.forEach(({ i, name, packages, pkgSize }) => {
+  items.forEach(({ i, name, packages, pkgSize, unitLabelShort }) => {
     const rightEl = el('span', { cls: 'prescribe-summary-right' });
     const calcDone = pkgSize > 0;
     rightEl.appendChild(el('span', { cls: 'prescribe-summary-pkg', text: calcDone ? `${packages} förp.` : '—' }));
-    if (pkgSize > 0) rightEl.appendChild(el('span', { cls: 'prescribe-summary-size', text: `à ${pkgSize} st` }));
+    if (pkgSize > 0) rightEl.appendChild(el('span', { cls: 'prescribe-summary-size', text: `à ${pkgSize} ${unitLabelShort}` }));
 
     const row = el('button', {
       cls:   'prescribe-summary-row' + (i === activeMedIdx ? ' active' : ''),
@@ -333,6 +339,8 @@ function renderPrescribeSummary() {
   }
 }
 
+const UNIT_DISPLAY = { st: { short: 'st', long: 'tabletter' }, ml: { short: 'ml', long: 'ml' }, dos: { short: 'dos', long: 'doser' } };
+
 // Håller koll på vilket index panelen senast byggdes för, så att vi
 // slipper riva och återbygga DOM:en (och tappa fokus) vid varje debounce-cykel.
 let _prescribePanelBuiltFor = null;
@@ -355,6 +363,7 @@ function resetPrescribePanel() {
 function renderPrescribePanel(i) {
   const panel = getEl('prescribePanel');
   if (!panel) return;
+  if (nurseViewActive) { panel.classList.add('is-hidden'); return; }
   const s = states[i] || {};
   const activeEligible = canRenewMed(i);
 

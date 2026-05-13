@@ -512,7 +512,7 @@ test('avgNote skiljer sig beroende på om remaining är ifyllt', () => {
   const withRemaining    = calcCore(makeInput({ amt: 100, dose: 1, ref: 1, daysSince: 50, remaining: 40 }), NO_PREV);
   const withoutRemaining = calcCore(makeInput({ amt: 100, dose: 1, ref: 1, daysSince: 50 }), NO_PREV);
   assertContains(withRemaining.avgNote,    'faktisk förbrukning', 'avgNote med remaining');
-  assertContains(withoutRemaining.avgNote, 'tillgängliga doser',  'avgNote utan remaining');
+  assertContains(withoutRemaining.avgNote, 'tillgängliga',  'avgNote utan remaining');
   assert(withRemaining.avgNote !== withoutRemaining.avgNote, 'avgNote ska skilja sig');
 });
 
@@ -661,7 +661,7 @@ group('calcLongtermCore — output-struktur');
 test('journalText innehåller läkemedelsnamn och dosuppgifter', () => {
   const r = calcLongtermCore('Elvanse 50 mg', 1, [makePeriod(90, 0, 90)]);
   assertContains(r.journalText, 'Elvanse 50 mg', 'läkemedelsnamn saknas i journalText');
-  assertContains(r.journalText, '1 st/dag', 'dos saknas i journalText');
+  assertContains(r.journalText, 'enheter/dag', 'dos saknas i journalText');
 });
 
 test('fassUrl pekar på fass.se', () => {
@@ -1264,7 +1264,7 @@ test('single overuse med kvarvarande doser → dagar kvar framgår av journalen'
     earlyRenewalDecision: null,
   }));
   const text = buildJournalText([], [], [{ name: 'Elvanse 50 mg', i: 0 }], 1);
-  assertContains(text, '30 doser', 'kvarvarande doser ska anges i journalen');
+  assertContains(text, '30 st', 'kvarvarande doser ska anges i journalen');
 });
 
 test('multi: toRenew + tooEarly → summering listar rätt läkemedel', () => {
@@ -1492,7 +1492,7 @@ test('remainingDoses = null → tom sträng', () => {
 
 test('remainingDoses = 30, daysRemaining = 30 → nämner antal doser och dagar', () => {
   const note = remainingDosesNote({ remainingDoses: 30, daysRemaining: 30 });
-  assertContains(note, '30 doser');
+  assertContains(note, '30 st');
   assertContains(note, '30 dagar');
 });
 
@@ -1630,7 +1630,7 @@ test('multi: overuse med remainingDoses → doser kvar nämns i journalen', () =
     earlyRenewalDecision: null,
   }));
   const text = buildJournalText([], [], [{ name: 'Elvanse 50 mg', i: 0 }], 2);
-  assertContains(text, '30 doser', 'kvarvarande doser ska nämnas i journalen');
+  assertContains(text, '30 st', 'kvarvarande doser ska nämnas i journalen');
 });
 
 

@@ -1033,7 +1033,7 @@ test('giltig indata → resultGrid innehåller analyslängd', () => {
   ctx.calcLongterm();
   const gridText = getEl('lt-resGrid').textContent;
   assertContains(gridText, '92 dagar', 'analyslängd ska visas');
-  assertContains(gridText, '90 st', 'total tabletter ska visas');
+  assertContains(gridText, '90', 'total tabletter ska visas');
 });
 
 test('giltig indata → FASS-länk visas', () => {

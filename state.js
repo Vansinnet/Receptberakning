@@ -11,6 +11,11 @@ let activeMedIdx   = 0;
 let prescribeState = {};
 let ltPeriods      = [{ start: oneYearAgoStr(), total: '', end: todayStr() }];
 
+/* Sjuksköterskevy */
+let nurseViewActive         = false;
+let nurseVitalNormal        = false;
+let nurseFollowUpAdequate   = false;
+
 // === AKTIVT LÄKEMEDEL ===
 
 function setActiveMed(i) {
@@ -43,6 +48,7 @@ function clearAllMedStateData() {
   prescribeState = {};
   activeMedIdx  = 0;
   ltPeriods     = ltPeriods.map(() => ({ start: '', total: '', end: '' }));
+  resetNurseState();
 }
 
 // === PRESCRIBESTATE[i] MUTATIONER ===
@@ -84,6 +90,27 @@ function resetAllMedState() {
   activeMedIdx   = 0;
   prescribeState = {};
   resetLtPeriods();
+  resetNurseState();
+}
+
+// === SJUKSKÖTERSKEVY ===
+
+function setNurseView(v) {
+  nurseViewActive = !!v;
+}
+
+function setNurseVitalNormal(v) {
+  nurseVitalNormal = !!v;
+}
+
+function setNurseFollowUpAdequate(v) {
+  nurseFollowUpAdequate = !!v;
+}
+
+function resetNurseState() {
+  nurseViewActive = false;
+  nurseVitalNormal = false;
+  nurseFollowUpAdequate = false;
 }
 
 // === LTPERIODS MUTATIONER ===

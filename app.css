@@ -448,6 +448,80 @@ html, body {
 [data-theme="dark"] .early-btn-yes.selected,
 [data-theme="dark"] .early-btn-no.selected  { color: var(--bg); }
 
+/* Knapp för vy-växling läkare/sjuksköterska */
+.btn-nurse-toggle {
+  padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+  cursor: pointer; border: 1px solid var(--border); background: var(--surface2);
+  color: var(--text-muted); transition: all 0.15s; white-space: nowrap;
+  font-family: inherit; flex-shrink: 0;
+}
+.btn-nurse-toggle[aria-pressed="true"] {
+  background: var(--primary-light); color: var(--primary);
+  border-color: var(--primary); box-shadow: var(--shadow-sm);
+}
+.btn-nurse-toggle:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.btn-nurse-toggle:hover { background: var(--clear-btn); color: var(--text); }
+
+/* Nurse-kolumn — mellan formulär och resultat */
+.nurse-col {
+  width: 240px;
+  flex-shrink: 0;
+  border-inline-end: 1px solid var(--border);
+  background: var(--surface);
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sjuksköterskebedömning */
+.nurse-assessment {
+  background: var(--primary-light);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: background 0.3s;
+}
+.nurse-assessment.done {
+  background: var(--green-bg);
+}
+
+.nurse-hint {
+  font-size: 10px;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+  margin-top: 2px;
+  font-style: italic;
+}
+.nurse-assessment-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+  opacity: 0.75;
+}
+.nurse-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 0;
+}
+.nurse-checkbox input[type="checkbox"] {
+  width: 16px; height: 16px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
 /* Copy-sektion */
 .copy-section {
   border: 1px solid var(--border); border-radius: var(--radius-md);
@@ -473,6 +547,13 @@ html, body {
   display: flex; justify-content: space-between; align-items: center;
   padding: 6px 10px; background: var(--surface2); border-top: 1px solid var(--border);
   flex-shrink: 0;
+}
+
+.copy-all-meds-label {
+  font-size: 10px; font-weight: 600; color: var(--primary);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  text-align: center; padding: 4px 8px;
+  background: var(--primary-light); border-bottom: 1px solid var(--border);
 }
 
 /* ════════════════════════════════════════════
@@ -510,6 +591,21 @@ html, body {
 .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: end; }
 .form-row-2-uneven { grid-template-columns: 1fr 1.5fr; }
 .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; align-items: end; }
+/* Dos-fältet: input + period-dropdown sida vid sida */
+.dose-input-row { display: flex; gap: 6px; align-items: stretch; }
+.dose-input-row input { flex: 1 1 0; min-width: 0; }
+.dose-input-row select {
+  flex: 0 0 auto; height: 34px; padding: 0 8px;
+  background: var(--input-bg); color: var(--text);
+  border: 1px solid var(--border-strong); border-radius: var(--radius-md);
+  font-size: 12px; font-family: inherit; outline: 2px solid transparent;
+  cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+}
+.dose-input-row select:focus {
+  border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light);
+  outline: none;
+}
 
 /* Se till att labels i sidoordnade fält tar samma höjd så input-fälten linjerar */
 .form-row-2 .field label,
@@ -1056,6 +1152,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   .btn-add-med { margin: 6px 8px; }
   #newPatientBtn { width: auto; margin: 6px 8px; }
   .form-panel { width: 100%;   border-inline-end: none; border-bottom: 1px solid var(--border); }
+  .nurse-col { width: 100%;   border-inline-end: none; border-bottom: 1px solid var(--border); }
   .longterm-body { flex-direction: column; }
   .longterm-form-col { flex: none;   border-inline-end: none; border-bottom: 1px solid var(--border); }
   .metrics { grid-template-columns: repeat(3, 1fr); }
@@ -1154,8 +1251,8 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 
 /* ── Fade-in animation ── */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .fade-in {

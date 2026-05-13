@@ -124,12 +124,13 @@ function renderFormForMed(i) {
 
   updateFormHeader(i);
 
-  const medInput  = _el('medInput');  if (medInput)  medInput.value  = s.medRaw  || '';
-  const dateInput = _el('dateInput'); if (dateInput) dateInput.value = s.dateVal || todayStr();
-  const doseInput = _el('doseInput'); if (doseInput) doseInput.value = s.doseRaw || '';
-  const amtInput  = _el('amtInput');  if (amtInput)  amtInput.value  = s.amtRaw  || '';
-  const refInput  = _el('refInput');  if (refInput)  refInput.value  = s.refRaw  || '';
-  const leftInput = _el('leftInput'); if (leftInput) leftInput.value = s.leftRaw || '';
+  const medInput           = _el('medInput');           if (medInput)           medInput.value           = s.medRaw  || '';
+  const dateInput          = _el('dateInput');          if (dateInput)          dateInput.value          = s.dateVal || todayStr();
+  const doseInput          = _el('doseInput');          if (doseInput)          doseInput.value          = s.doseRaw || '';
+  const amtInput           = _el('amtInput');           if (amtInput)           amtInput.value           = s.amtRaw  || '';
+  const refInput           = _el('refInput');           if (refInput)           refInput.value           = s.refRaw  || '';
+  const leftInput          = _el('leftInput');          if (leftInput)          leftInput.value          = s.leftRaw || '';
+  const doseIntervalSelect = _el('doseIntervalSelect'); if (doseIntervalSelect) doseIntervalSelect.value = String(s.doseInterval || 1);
 
   ['medInput', 'dateInput', 'doseInput', 'amtInput', 'refInput', 'leftInput'].forEach(id => {
     setFieldError(id, '');
@@ -138,21 +139,25 @@ function renderFormForMed(i) {
 }
 
 function saveFormValues(i) {
-  const medInputEl  = _el('medInput');
-  const dateInputEl = _el('dateInput');
-  const doseInputEl = _el('doseInput');
-  const amtInputEl  = _el('amtInput');
-  const refInputEl  = _el('refInput');
-  const leftInputEl = _el('leftInput');
+  const medInputEl           = _el('medInput');
+  const dateInputEl          = _el('dateInput');
+  const doseInputEl          = _el('doseInput');
+  const amtInputEl           = _el('amtInput');
+  const refInputEl           = _el('refInput');
+  const leftInputEl          = _el('leftInput');
+  const doseIntervalSelectEl = _el('doseIntervalSelect');
   if (!medInputEl || !dateInputEl || !doseInputEl || !amtInputEl || !refInputEl) return;
   const medRaw = medInputEl.value.trim();
+  const parsedInterval = parseInt(doseIntervalSelectEl ? doseIntervalSelectEl.value : '1', 10);
+  const doseInterval = [1, 7, 30].includes(parsedInterval) ? parsedInterval : 1;
   applyMedStatePatch(i, {
     medRaw,
-    dateVal: dateInputEl.value || todayStr(),
-    doseRaw: doseInputEl.value,
-    amtRaw:  amtInputEl.value,
-    refRaw:  refInputEl.value,
-    leftRaw: leftInputEl ? leftInputEl.value : '',
+    dateVal:      dateInputEl.value || todayStr(),
+    doseRaw:      doseInputEl.value,
+    amtRaw:       amtInputEl.value,
+    refRaw:       refInputEl.value,
+    leftRaw:      leftInputEl ? leftInputEl.value : '',
+    doseInterval,
     medName: medRaw || `Läkemedel ${i + 1}`,
   });
 }
@@ -162,6 +167,30 @@ function renderResultForMed(i) {
   const s             = states[i] || {};
   const emptyState    = _el('resultEmptyState');
   const resultContent = _el('resultContent');
+
+  /* Sjuksköterskebedömning — hanteras tidigt eftersom boxen ligger utanför resultContent */
+  const nurseCol = _el('nurseCol');
+  if (nurseCol) {
+    if (nurseViewActive) {
+      nurseCol.classList.remove('is-hidden'); fadeIn(nurseCol);
+      const vitalCheck = _el('nurseVitalCheck');
+      const followUpCheck = _el('nurseFollowUpCheck');
+      if (vitalCheck) vitalCheck.checked = nurseVitalNormal;
+      if (followUpCheck) followUpCheck.checked = nurseFollowUpAdequate;
+      const nurseBox = _el('nurseAssessmentBox');
+      if (nurseBox) nurseBox.classList.toggle('done', nurseVitalNormal && nurseFollowUpAdequate);
+    } else {
+      nurseCol.classList.add('is-hidden');
+    }
+  }
+
+  /* Tomtillståndstext anpassas per vy */
+  const emptyText = _el('resultEmptyText');
+  if (emptyText) {
+    emptyText.textContent = nurseViewActive
+      ? 'Fyll i läkemedelsuppgifterna för att generera journaltexten.'
+      : 'Resultatet visas här';
+  }
 
   if (!s.valid) {
     if (emptyState)    emptyState.classList.remove('is-hidden');
@@ -237,27 +266,47 @@ function renderResultForMed(i) {
   /* Beslutsfråga för tidig förnyelse */
   const earlyBox = _el('earlyDecisionBox');
   if (earlyBox) {
-    if (s.isOveruse || s.isTooEarly) {
+    if (nurseViewActive || (!s.isOveruse && !s.isTooEarly)) {
+      earlyBox.classList.add('is-hidden');
+    } else {
       earlyBox.classList.remove('is-hidden'); fadeIn(earlyBox);
       const yBtn = _el('earlyDecisionYes');
       const nBtn = _el('earlyDecisionNo');
       if (yBtn) yBtn.classList.toggle('selected', s.earlyRenewalDecision === 'yes');
       if (nBtn) nBtn.classList.toggle('selected', s.earlyRenewalDecision === 'no');
-    } else {
-      earlyBox.classList.add('is-hidden');
     }
+  }
+
+  /* Journalfliksetikett anpassas per vy */
+  const journalTab = document.querySelector('#copySection .copy-tab[data-tab="journal"]');
+  if (journalTab) {
+    journalTab.textContent = nurseViewActive ? 'Underlag till läkare' : 'Journalanteckning (förslag)';
   }
 
   /* Copy-sektion */
   const copySection = _el('copySection');
+  const copyBtn = _el('copyBtnResult');
   if (copySection) {
+    const patientTab = copySection.querySelector('.copy-tab[data-tab="patient"]');
+    if (patientTab) patientTab.classList.toggle('is-hidden', nurseViewActive);
     const hasCopy = !!(s.patientText || s.journalText);
     copySection.style.display       = hasCopy ? 'flex' : 'none';
     if (hasCopy) fadeIn(copySection);
     copySection.style.flexDirection = hasCopy ? 'column' : '';
+    if (copyBtn) {
+      copyBtn.classList.toggle('is-hidden', nurseViewActive && !s.journalText);
+      copyBtn.disabled = !!(nurseViewActive && !s.journalText);
+    }
+    const allMedsLabel = _el('nurseAllMedsLabel');
+    if (allMedsLabel) {
+      // Visas i båda vyerna när flera läkemedel hanteras — texten är samlad
+      // och distribueras identiskt till alla kort, så etiketten är lika relevant
+      // för läkaren som för sjuksköterskan.
+      allMedsLabel.classList.toggle('is-hidden', states.length <= 1 || !hasCopy);
+    }
   }
 
-  switchResultTab(states[i].activeTab || 'patient');
+  switchResultTab(nurseViewActive ? 'journal' : (states[i].activeTab || 'patient'));
   renderPrescribePanel(i);
 }
 
@@ -360,7 +409,8 @@ function renderAutocomplete(results) {
       var drug = results[idx];
       var item = el('div', { cls: 'autocomplete-item', dataset: { idx: String(idx) } });
       item.appendChild(el('span', { cls: 'ac-drug-name', text: drug.name }));
-      item.appendChild(el('span', { cls: 'ac-drug-meta', text: drug.pkg + ' st \u00b7 ' + drug.form }));
+      const unitDisplay = drug.notCalculable ? '\u26a0 ej ber\u00e4kningsbar' : (drug.pkg + ' ' + (drug.unit || 'st') + ' \u00b7 ' + drug.form);
+      item.appendChild(el('span', { cls: 'ac-drug-meta', text: unitDisplay }));
       item.addEventListener('mousedown', function(e) {
         e.preventDefault();
         selectAutocompleteItem(idx);
@@ -383,14 +433,21 @@ function hideAutocomplete() {
 
 function selectAutocompleteItem(idx) {
   if (idx < 0 || idx >= _acState.items.length) return;
-  var drug = _acState.items[idx];
+  var drug     = _acState.items[idx];
   var medInput = _el('medInput');
   var amtInput = _el('amtInput');
   if (medInput) medInput.value = drug.name;
   if (amtInput) amtInput.value = String(drug.pkg);
   hideAutocomplete();
   saveFormValues(activeMedIdx);
-  applyMedStatePatch(activeMedIdx, { nplId: drug.nplId || null });
+  // Sätt beredningsspecifika egenskaper från läkemedelsdatabasen i state.
+  // notCalculable = sant för beredningar som inte kan kvantifieras automatiskt.
+  // doseUnit påverkar validering av kvarvarande mängd och textgenerering.
+  applyMedStatePatch(activeMedIdx, {
+    nplId:         drug.nplId         || null,
+    doseUnit:      drug.unit          || 'st',
+    notCalculable: drug.notCalculable || false,
+  });
   ensureDebounce(activeMedIdx); calcDebounced[activeMedIdx]();
 }
 

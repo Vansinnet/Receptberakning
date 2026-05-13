@@ -153,8 +153,8 @@ function extractDoseUnit(medRaw) {
 }
 
 function getFassUrl(medRaw, nplId) {
-  if (nplId) return `https://www.fass.se/LIF/product?nplId=${nplId}&userType=2`;
-  const url = `https://www.fass.se/LIF/result?query=${encodeURIComponent(medRaw.trim())}&userType=2`;
+  if (nplId) return `https://www.fass.se/LIF/product?nplId=${nplId}&userType=0`;
+  const url = `https://www.fass.se/LIF/result?query=${encodeURIComponent(medRaw.trim())}&userType=0`;
   return url.startsWith('https://www.fass.se/') ? url : '#';
 }
 

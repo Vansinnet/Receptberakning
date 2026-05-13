@@ -66,13 +66,14 @@
         </svg>
       </span>
       <span class="app-brand-name">Receptberäkning</span>
-      <span class="app-brand-date">uppdaterad 2026-05-12</span>
+      <span class="app-brand-date">uppdaterad 2026-05-13</span>
     </div>
     <div class="topbar-nav-row">
       <nav class="main-tabs" role="tablist">
         <button class="main-tab active" role="tab" id="tab-renew" aria-selected="true" aria-controls="panel-renew" data-tab="renew">💊 Receptförnyelse</button>
         <button class="main-tab" role="tab" id="tab-longterm" aria-selected="false" aria-controls="panel-longterm" data-tab="longterm">📊 Långvarig förbrukning</button>
       </nav>
+      <button id="nurseViewToggle" class="btn-nurse-toggle" aria-pressed="false">🩺 Sjuksköterskevy</button>
       <div class="topbar-right">
         <div class="topbar-setting">
           <label for="themeSelect" class="topbar-setting-label">Tema</label>
@@ -138,12 +139,19 @@
 
           <div class="form-row-2 form-row-2-uneven">
             <div class="field">
-              <label for="doseInput" data-tooltip="Patientens ordinerade dygnsdos i antal tabletter/kapslar. Referensvärde för bedömning av förbrukningshastighet.">Dos per dag</label>
-              <input id="doseInput" type="text" inputmode="decimal" placeholder="T.ex. 1" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-describedby="doseInput-err">
+              <label for="doseInput" data-tooltip="Ordinerad dos per vald tidsperiod. Välj tidsperiod i listan till höger: per dag (tabletter, kapslar), per vecka (plåster, veckodepåer), per månad (månadsdepåer, implantat). Referensvärde för bedömning av förbrukningshastighet.">Dos (st / ml / mg)</label>
+              <div class="dose-input-row">
+                <input id="doseInput" type="text" inputmode="decimal" placeholder="1" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-describedby="doseInput-err">
+                <select id="doseIntervalSelect" aria-label="Tidsperiod för dos">
+                  <option value="1">per dag</option>
+                  <option value="7">per vecka</option>
+                  <option value="30">per månad</option>
+                </select>
+              </div>
               <span class="field-error-msg" id="doseInput-err" aria-live="polite"></span>
             </div>
             <div class="field">
-              <label for="amtInput" data-tooltip="Antal tabletter eller kapslar per förpackning (expediering). Totalt förskrivet = förpackningsstorlek × antal uttag.">Förpackningsstorlek (tabletter)</label>
+              <label for="amtInput" data-tooltip="Mängd per förpackning (expediering). Antal enheter för tabletter/kapslar, milliliter för vätskor. Totalt förskrivet = förpackningsstorlek × antal uttag.">Förpackningsstorlek</label>
               <input id="amtInput" type="number" inputmode="numeric" placeholder="100" min="1" step="1" aria-describedby="amtInput-err">
               <span class="field-error-msg" id="amtInput-err" aria-live="polite"></span>
             </div>
@@ -156,19 +164,35 @@
           </div>
 
           <div class="field field-optional">
-            <label for="leftInput" data-tooltip="Patientens egna uppgifter om kvarvarande doser. Ger exaktare beräkning av faktisk förbrukning jämfört med enbart receptdatum. Lämna tomt om medicinen är slut.">Doser kvar <span class="optional-tag">valfritt</span></label>
-            <input id="leftInput" type="number" inputmode="numeric" placeholder="Lämna tomt om medicinen är slut" min="0" step="1" aria-describedby="leftInput-err">
+            <label for="leftInput" data-tooltip="Patientens egna uppgifter om kvarvarande mängd (enheter, ml eller doser). Ger exaktare beräkning av faktisk förbrukning jämfört med enbart receptdatum. Lämna tomt om medicinen är slut.">Kvarvarande mängd <span class="optional-tag">valfritt</span></label>
+            <input id="leftInput" type="number" inputmode="decimal" placeholder="Lämna tomt om medicinen är slut" min="0" step="any" aria-describedby="leftInput-err">
             <span class="field-error-msg" id="leftInput-err" aria-live="polite"></span>
-            <span class="field-hint">Ger exakt snittberäkning om patienten har kvarvarande doser</span>
+            <span class="field-hint">Ger exaktare snittberäkning om patienten uppger kvarvarande mängd</span>
           </div>
         </div>
+      </section>
+
+      <!-- NURSE-KOLUMN: sjuksköterskebedömning -->
+      <section class="nurse-col is-hidden" id="nurseCol" aria-label="Sjuksköterskebedömning">
+          <div id="nurseAssessmentBox" class="nurse-assessment">
+            <div class="nurse-assessment-label">Sjuksköterskebedömning</div>
+            <label class="nurse-checkbox" data-tooltip="Blodtryck, puls, andningsfrekvens, saturation och medvetandegrad bedöms ligga inom normala referensintervall.">
+              <input type="checkbox" id="nurseVitalCheck">
+              Vitalparametrar bedöms normala
+            </label>
+            <label class="nurse-checkbox" data-tooltip="Patienten har erhållit planerad läkarkontakt, provtagning eller behandlingsutvärdering inom gällande vårdprograms ramar.">
+              <input type="checkbox" id="nurseFollowUpCheck">
+              Patienten bedöms ha erhållit adekvat medicinsk uppföljning
+            </label>
+            <span class="nurse-hint">Din bedömning inkluderas automatiskt i journaltexten.</span>
+          </div>
       </section>
 
       <!-- HÖGER: RESULTAT -->
       <section class="result-panel" id="resultPanel" aria-label="Beräkningsresultat">
         <div class="result-empty-state" id="resultEmptyState">
           <div class="empty-icon">📋</div>
-          <div>Resultatet visas här</div>
+          <div id="resultEmptyText">Resultatet visas här</div>
         </div>
         <div id="resultContent" class="is-hidden result-content">
           <!-- Verdict -->
@@ -218,6 +242,7 @@
               <button class="copy-tab"        role="tab" aria-selected="false" data-tab="journal">Journalanteckning (förslag)</button>
             </div>
             <div class="copy-body" id="copyBodyResult"></div>
+            <div class="copy-all-meds-label is-hidden" id="nurseAllMedsLabel">Täcker alla läkemedel</div>
             <div class="copy-footer">
               <button class="btn btn-ghost is-hidden" id="langBtnResult">🌐 English</button>
               <button class="btn btn-ghost" id="copyBtnResult">📋 Kopiera text</button>
@@ -255,7 +280,7 @@
           <!-- VÄNSTER: indata -->
           <div class="longterm-form-col">
             <div class="info-banner-lt" role="note">
-              Beräknar förbrukningsmönster över flera receptperioder. Ange en eller flera perioder med startdatum, antal uttagna tabletter och slutdatum.
+              Beräknar förbrukningsmönster över flera receptperioder. Ange en eller flera perioder med startdatum, antal uttagna enheter och slutdatum.
             </div>
 
             <div class="form-row-2">
@@ -264,7 +289,7 @@
                 <input id="lt-med" type="text" placeholder="T.ex. Elvanse 50 mg" maxlength="100" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
               </div>
               <div class="field">
-                <label for="lt-dose" data-tooltip="Patientens ordinerade dygnsdos. Används som referensvärde för att beräkna avvikelse i faktisk förbrukning per period.">Ordinerad dos (st/dag)</label>
+                <label for="lt-dose" data-tooltip="Patientens ordinerade dygnsdos i enheter per dag. Används som referensvärde för att beräkna avvikelse i faktisk förbrukning per period.">Ordinerad dos (enheter/dag)</label>
                 <input id="lt-dose" type="text" inputmode="decimal" placeholder="T.ex. 1" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
               </div>
             </div>
@@ -301,7 +326,7 @@
                 <thead>
                   <tr>
                     <th scope="col">Period</th>
-                    <th scope="col" class="ph-avg">Snitt st/dag</th>
+                    <th scope="col" class="ph-avg">Snitt/dag</th>
                     <th scope="col">Avvikelse</th>
                     <th scope="col">Status</th>
                   </tr>

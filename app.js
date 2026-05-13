@@ -176,6 +176,9 @@ function executeClearAll() {
   const pi = getEl('prescribeInner'); if (pi) pi.textContent = '';
   const ps = getEl('prescribeSummary'); if (ps) { ps.textContent = ''; ps.style.display = 'none'; }
   const pd = getEl('prescribeDuration'); if (pd) pd.textContent = '';
+  const nt = getEl('nurseViewToggle'); if (nt) { nt.textContent = '🩺 Sjuksköterskevy'; nt.setAttribute('aria-pressed', 'false'); }
+  const nv = getEl('nurseVitalCheck'); if (nv) nv.checked = false;
+  const nf = getEl('nurseFollowUpCheck'); if (nf) nf.checked = false;
   buildMedList();
   renderFormForMed(0);
   renderResultForMed(0);
@@ -272,6 +275,37 @@ const addMedBtn = getEl('addMedBtn'); if (addMedBtn) addMedBtn.addEventListener(
 const themeSelect = getEl('themeSelect'); if (themeSelect) themeSelect.addEventListener('change', e => applyTheme(e.target.value));
 const newPatientBtn = getEl('newPatientBtn'); if (newPatientBtn) newPatientBtn.addEventListener('click', () => confirmClearAll());
 document.querySelectorAll('.main-tab').forEach(btn => btn.addEventListener('click', () => switchMainTab(btn.dataset.tab)));
+
+// Sjuksköterskevy-toggle
+const nurseToggle = getEl('nurseViewToggle');
+function _toggleNurseView() {
+  setNurseView(!nurseViewActive);
+  if (nurseToggle) {
+    nurseToggle.textContent = nurseViewActive ? '👨‍⚕️ Läkarvy' : '🩺 Sjuksköterskevy';
+    nurseToggle.setAttribute('aria-pressed', String(nurseViewActive));
+  }
+  // När sjuksköterskevy stängs av: återställ alla korts aktiva flik till 'patient'.
+  // switchResultTab skriver 'journal' i activeTab på varje kort som besöks under
+  // nurse-läget — utan nollställning av samtliga kort kvarstår journalfliken när
+  // läkaren byter till ett kort som besöktes i nurse-läget.
+  if (!nurseViewActive) {
+    for (let _i = 0; _i < states.length; _i++) setMedUIPreference(_i, 'activeTab', 'patient');
+  }
+  generateAndDistribute();
+}
+if (nurseToggle) nurseToggle.addEventListener('click', _toggleNurseView);
+
+// Sjuksköterskebedömning-checkboxes
+const nurseVitalEl = getEl('nurseVitalCheck');
+if (nurseVitalEl) nurseVitalEl.addEventListener('change', () => {
+  setNurseVitalNormal(nurseVitalEl.checked);
+  generateAndDistribute();
+});
+const nurseFollowUpEl = getEl('nurseFollowUpCheck');
+if (nurseFollowUpEl) nurseFollowUpEl.addEventListener('change', () => {
+  setNurseFollowUpAdequate(nurseFollowUpEl.checked);
+  generateAndDistribute();
+});
 
 // Resultat-knappar
 const copyBtnResult = getEl('copyBtnResult'); if (copyBtnResult) copyBtnResult.addEventListener('click', copyResultText);
@@ -391,6 +425,9 @@ window.addEventListener('pagehide',()=>{
   const pi=getEl('prescribeInner');if(pi)pi.textContent='';
   const ps=getEl('prescribeSummary');if(ps){ps.textContent='';ps.style.display='none';}
   const pd=getEl('prescribeDuration');if(pd)pd.textContent='';
+  const nt=getEl('nurseViewToggle');if(nt){nt.textContent='🩺 Sjuksköterskevy';nt.setAttribute('aria-pressed','false');}
+  const nv=getEl('nurseVitalCheck');if(nv)nv.checked=false;
+  const nf=getEl('nurseFollowUpCheck');if(nf)nf.checked=false;
   for (let i = 0; i < ltPeriodCount; i++) {
     const se = getEl('lt-start-' + i); if (se) se.value = '';
     const te = getEl('lt-total-' + i); if (te) te.value = '';
