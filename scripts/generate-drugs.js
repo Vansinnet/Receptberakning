@@ -98,30 +98,6 @@ function cleanName(name) {
   return (name || "").replace(/®/g, "").trim();
 }
 
-function isLiquidOrTopicalDoseForm(doseForm, strength) {
-  if (strength && /\/ml/.test(strength)) return true;
-  if (strength && /\/g/.test(strength)) return true;
-  if (strength && /IE\/ml/.test(strength)) return true;
-  if (!doseForm) return false;
-  const lower = doseForm.toLowerCase();
-  const kw = [
-    "lösning", "injektion", "infusion", "droppar", "sirap",
-    "mixtur", "kräm", "salva", "liniment", "spray", "schampo",
-    "tuggummi", "plåster", "depotplåster", "depotinjektion",
-    "oral emulsion", "oralt pulver", "granulat", "pulver till",
-    "vagitorium", "suppositorium", "gel",
-    "munsköljvätska", "munhålegel", "dentalgel",
-    "rektalsuspension", "kutan", "vaginal",
-    "endosbehållare", "nässpray",
-    "ögondroppar", "örondroppar", "inhalationspulver",
-    "inhalationsspray"
-  ];
-  for (const k of kw) {
-    if (lower.includes(k)) return true;
-  }
-  return false;
-}
-
 function loadProductDb() {
   console.log("  Laddar produktdatabas...");
   if (!fs.existsSync(DB_FILE)) {
@@ -136,7 +112,8 @@ function generateDrugEntries(atcCode, products) {
   const seen = new Set();
 
   for (const prod of products) {
-    if (isLiquidOrTopicalDoseForm(prod.doseForm, prod.strength)) continue;
+    const unit = prod.unit || "st";
+    const notCalculable = prod.notCalculable || false;
 
     const nameBase = cleanName(prod.tradeName);
     const strength = prod.strength || "";
@@ -155,6 +132,8 @@ function generateDrugEntries(atcCode, products) {
         form: form,
         nplId: prod.nplId
       };
+      if (unit !== "st") entry.unit = unit;
+      if (notCalculable) entry.notCalculable = true;
       if (prod.narcoticClass && prod.narcoticClass !== "NO_NARCOTICS_CLASS") {
         entry.narc = prod.narcoticClass;
       }
@@ -183,6 +162,46 @@ function cleanForm(doseForm) {
   if (form.includes("kapsel")) return "Kapsel";
   if (form.includes("tablett")) return "Tablett";
 
+  if (form.includes("plåster")) return "Plåster";
+  if (form.includes("implantat")) return "Implantat";
+  if (form.includes("tuggummi")) return "Tuggummi";
+  if (form.includes("vagitorium")) return "Vagitorium";
+  if (form.includes("suppositorium")) return "Suppositorium";
+
+  if (form.includes("oral lösning")) return "Oral lösning";
+  if (form.includes("oral suspension")) return "Oral suspension";
+  if (form.includes("oral emulsion")) return "Oral emulsion";
+  if (form.includes("oral mixtur")) return "Oral mixtur";
+  if (form.includes("orala droppar")) return "Orala droppar";
+  if (form.includes("sirap")) return "Sirap";
+
+  if (form.includes("inhalationsspray")) return "Inhalationsspray";
+  if (form.includes("inhalationspulver")) return "Inhalationspulver";
+  if (form.includes("nässpray")) return "Nässpray";
+  if (form.includes("rektalskum")) return "Rektalskum";
+  if (form.includes("endosbehållare")) return "Endosbehållare";
+
+  if (form.includes("förfylld spruta")) return "Förfylld spruta";
+  if (form.includes("förfylld injektionspenna")) return "Injektionspenna";
+  if (form.includes("injektionsvätska")) return "Injektionsvätska";
+  if (form.includes("injektion")) return "Injektionsvätska";
+  if (form.includes("infusionsvätska")) return "Infusionsvätska";
+  if (form.includes("infusion")) return "Infusionsvätska";
+
+  if (form.includes("ögondroppar")) return "Ögondroppar";
+  if (form.includes("örondroppar")) return "Örondroppar";
+
+  if (form.includes("kutan lösning")) return "Kutan lösning";
+  if (form.includes("kutan spray")) return "Kutan spray";
+  if (form.includes("kutant skum")) return "Kutant skum";
+  if (form.includes("rektalsuspension")) return "Rektalsuspension";
+  if (form.includes("munsköljvätska")) return "Munsköljvätska";
+
+  if (form.includes("kräm")) return "Kräm";
+  if (form.includes("salva")) return "Salva";
+  if (form.includes("gel")) return "Gel";
+  if (form.includes("pasta")) return "Pasta";
+
   return doseForm;
 }
 
@@ -208,11 +227,16 @@ function generateDrugsJs(candidates) {
     const sorted = entries.sort((a, b) => a.name.localeCompare(b.name, "sv"));
 
     for (const entry of sorted) {
-      if (entry.narc) {
-        output += `  { name: ${JSON.stringify(entry.name)}, pkg: ${entry.pkg}, form: ${JSON.stringify(entry.form)}, nplId: ${JSON.stringify(entry.nplId)}, narc: ${JSON.stringify(entry.narc)} },\n`;
-      } else {
-        output += `  { name: ${JSON.stringify(entry.name)}, pkg: ${entry.pkg}, form: ${JSON.stringify(entry.form)}, nplId: ${JSON.stringify(entry.nplId)} },\n`;
-      }
+      const fields = [
+        `name: ${JSON.stringify(entry.name)}`,
+        `pkg: ${entry.pkg}`,
+        `form: ${JSON.stringify(entry.form)}`,
+        `nplId: ${JSON.stringify(entry.nplId)}`,
+      ];
+      if (entry.unit && entry.unit !== "st") fields.push(`unit: ${JSON.stringify(entry.unit)}`);
+      if (entry.notCalculable) fields.push(`notCalculable: true`);
+      if (entry.narc) fields.push(`narc: ${JSON.stringify(entry.narc)}`);
+      output += `  { ${fields.join(", ")} },\n`;
     }
 
     output += "\n";

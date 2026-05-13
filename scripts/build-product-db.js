@@ -7,29 +7,42 @@ const DATA_DIR = path.join(__dirname, "..", "data");
 const OUT_FILE = path.join(DATA_DIR, "product-db.json");
 const PROGRESS_FILE = path.join(DATA_DIR, "_crawl-progress.json");
 
-const LIQUID_FORM_KEYWORDS = [
-  "lösning", "injektion", "infusion", "droppar", "sirap",
-  "mixtur", "kräm", "salva", "liniment", "spray", "schampo",
-  "tuggummi", "plåster", "depotplåster", "depotinjektion",
-  "oral emulsion", "oralt pulver", "granulat", "pulver till",
-  "vagitorium", "suppositorium", "gel",
-  "munsköljvätska", "munhålegel", "dentalgel",
-  "rektalsuspension", "kutan", "vaginal",
-  "endosbehållare", "nässpray",
-  "ögondroppar", "örondroppar", "inhalationspulver",
-  "inhalationsspray"
-];
-
-function isLiquidOrTopical(doseForm, strength) {
-  if (strength && /\/ml/.test(strength)) return true;
-  if (strength && /\/g/.test(strength)) return true;
-  if (strength && /IE\/ml/.test(strength)) return true;
-  if (!doseForm) return false;
+function classifyDoseForm(doseForm, strength) {
+  if (!doseForm) return { unit: "st", notCalculable: false };
   const lower = doseForm.toLowerCase();
-  for (const kw of LIQUID_FORM_KEYWORDS) {
-    if (lower.includes(kw)) return true;
-  }
-  return false;
+
+  // notCalculable: krämer, salvor, pastor, gaser, dialysvätskor, schampo, badtillsats, pulver, beredningssatser
+  if (lower.includes("kräm") || lower.includes("salva") || lower.includes("liniment") || lower.includes("pasta")) return { unit: null, notCalculable: true };
+  if (lower.includes("gel") && !lower.includes("ögongel")) return { unit: null, notCalculable: true };
+  if (lower.includes("schampo") || lower.includes("badtillsats")) return { unit: null, notCalculable: true };
+  if (lower.includes("medicinsk gas") || lower.includes("dialysvätska") || lower.includes("hemodialys") || lower.includes("hemofiltration")) return { unit: null, notCalculable: true };
+  if (lower.includes("spädningsvätska") || lower.includes("spolvätska") || lower.includes("ögonsköljvätska")) return { unit: null, notCalculable: true };
+  if (lower.includes("inhalationsånga")) return { unit: null, notCalculable: true };
+  if (lower.includes("beredningssats")) return { unit: null, notCalculable: true };
+  if (lower.includes("puder")) return { unit: null, notCalculable: true };
+  if (strength && /\/g/.test(strength) && (lower.includes("kräm") || lower.includes("salva") || lower.includes("gel"))) return { unit: null, notCalculable: true };
+
+  // unit: "dos" — doserade enheter (puffar, sprutor, droppar)
+  if (lower.includes("inhalationsspray") || lower.includes("inhalationspulver")) return { unit: "dos", notCalculable: false };
+  if (lower.includes("förfylld spruta") || lower.includes("förfylld injektionspenna")) return { unit: "dos", notCalculable: false };
+  if (lower.includes("rektalskum")) return { unit: "dos", notCalculable: false };
+  if (lower.includes("nässpray")) return { unit: "dos", notCalculable: false };
+  if (lower.includes("endosbehållare")) return { unit: "dos", notCalculable: false };
+  if (lower.includes("ögondroppar") || lower.includes("örondroppar")) return { unit: "dos", notCalculable: false };
+  if (strength && /\/dos/.test(strength)) return { unit: "dos", notCalculable: false };
+
+  // unit: "ml" — volymmätta vätskor
+  if (lower.includes("oral lösning") || lower.includes("oral suspension") || lower.includes("oral emulsion") || lower.includes("oral mixtur")) return { unit: "ml", notCalculable: false };
+  if (lower.includes("orala droppar") || lower.includes("droppar")) return { unit: "ml", notCalculable: false };
+  if (lower.includes("sirap")) return { unit: "ml", notCalculable: false };
+  if ((lower.includes("injektion") || lower.includes("infusion")) && !lower.includes("förfylld")) return { unit: "ml", notCalculable: false };
+  if (lower.includes("kutan lösning") || lower.includes("kutan spray") || lower.includes("kutant skum")) return { unit: "ml", notCalculable: false };
+  if (lower.includes("rektalsuspension")) return { unit: "ml", notCalculable: false };
+  if (lower.includes("munsköljvätska")) return { unit: "ml", notCalculable: false };
+  if (strength && /\/ml/.test(strength) && !lower.includes("kräm") && !lower.includes("salva")) return { unit: "ml", notCalculable: false };
+
+  // unit: "st" — diskreta fasta enheter (tabletter, kapslar, plåster, implantat, tuggummi, suppar)
+  return { unit: "st", notCalculable: false };
 }
 
 function sleep(ms) {
@@ -131,7 +144,8 @@ function findProductHeader(obj, depth = 0) {
 
 function normalizeProduct(raw) {
   if (!raw || !raw.doseForm) return null;
-  if (isLiquidOrTopical(raw.doseForm, raw.strength)) return null;
+
+  const classification = classifyDoseForm(raw.doseForm, raw.strength);
 
   const tradeName = (raw.tradeName || "").replace(/®$/, "").trim();
   if (!tradeName) return null;
@@ -171,6 +185,8 @@ function normalizeProduct(raw) {
     doseForm: raw.doseForm,
     strength: raw.strength || "",
     narcoticClass: raw.narcoticClass || null,
+    unit: classification.unit,
+    notCalculable: classification.notCalculable,
     packages: packages
   };
 }

@@ -15,7 +15,7 @@
 Verktyget består av tre funktioner fördelade på två huvudflikar:
 
 ### 1. 💊 Receptförnyelse
-Läkaren matar in ordinationsinformation (läkemedel + styrka, senaste receptdatum, mängd per uttag, antal uttag och ordinerad dygnsdos). Verktyget beräknar patientens förbrukningstakt och bedömer om förnyelse är lämplig.
+Läkaren matar in ordinationsinformation (läkemedel + styrka, senaste receptdatum, mängd per uttag, antal uttag och ordinerad dos). Verktyget beräknar patientens förbrukningstakt och bedömer om förnyelse är lämplig.
 
 Baserat på beräkningen visas ett **utlåtande** med:
 - **OK att förnya** – förbrukning inom ±10 % av ordination, eller ≤20 % av receptperioden kvar.
@@ -35,7 +35,7 @@ Stöd för upp till **8 läkemedel** i samma session – en sammanhållen patien
 När förnyelse beviljas visas en panel för beräkning av nytt recept. Läkaren anger önskad förskrivningsperiod (1–12 månader eller slutdatum) – verktyget beräknar exakt antal förpackningar som behövs, med hänsyn till kvarvarande dagar på befintligt recept. En sammanfattande översikt visas när flera läkemedel förnyas samtidigt.
 
 ### 3. 📊 Långvarig förbrukning
-Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder). För varje period anges startdatum, antal uttagna tabletter och slutdatum. Verktyget beräknar:
+Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder). För varje period anges startdatum, antal uttagna enheter och slutdatum. Verktyget beräknar:
 - Snittförbrukning per dag i varje period.
 - Avvikelse i procent mot ordinerad dos.
 - Total snittförbrukning över alla perioder.
@@ -50,11 +50,14 @@ Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder
 - Stöd för upp till **8 läkemedel**.
 - **Autocomplete** för läkemedelsnamn – sök bland ~6 000 preparat ur FASS.
 - **Automatisk datumformatering** (ÅÅÅÅ-MM-DD).
-- **Valfritt fält för kvarvarande doser** – ger exakt snittberäkning i stället för worst‑case‑antagande.
+- **Dosintervall** – per dag, per vecka (t.ex. plåster, veckodepåer) eller per månad (t.ex. månadsdepåer, implantat).
+- **Dosenheter** – st (tabletter, kapslar, plåster), ml (orala lösningar, injektioner), doser (inhalatorer, nässprayer, ögondroppar, injektionspennor).
+- **Ej kvantifierbara beredningar** – krämer, salvor, dialysvätskor, gaser markeras för manuell bedömning.
+- **Valfritt fält för kvarvarande mängd** – ger exakt snittberäkning i stället för worst‑case‑antagande. Decimaler tillåtna för ml och doser.
 - **Direktlänk till FASS** för aktuellt läkemedel.
 - **Narkotikavarning** – identifierar narkotikaklassade preparat enligt LVFS 2011:10 och visar en badge (Förteckning II–V).
 - **Tidslinje** – visar hur stor del av receptperioden som förflutit.
-- **Mätvärden** med verktygstips (totalt förskrivet, slutdatum, snittförbrukning).
+- **Mätvärden** med verktygstips (totalt förskrivet, slutdatum, snittförbrukning i aktuell enhet).
 - **Alerter** – varning vid låg förbrukning, förhöjd förbrukning inom 7 dagar, tidig uthämtning, avvikande data.
 - **Kliniskt överstyrande** – vid överförbrukning eller för tidig begäran kan läkaren manuellt godkänna förnyelse (Ja/Nej).
 - **Svar till patient på svenska och engelska** – växla med en knapp, ingen översättningstjänst krävs.
@@ -64,6 +67,7 @@ Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder
 ### 📦 Nyförskrivning
 - Välj periodlängd via **månadsväljare** (1–12 månader) eller **angivet slutdatum**.
 - Beräknar exakt **antal förpackningar** med hänsyn till daglig dos, förpackningsstorlek och kvarvarande täckning från nuvarande recept.
+- **Dynamisk enhetsbeteckning** – förpackningsstorlek och resultat visas i rätt enhet (tabletter, ml eller doser) beroende på läkemedlets beredningsform.
 - Hanterar månadsövergångar korrekt (t.ex. 31 januari + 1 månad → 28 februari).
 - **Sammanfattande översikt** när flera läkemedel är aktuella för nyförskrivning.
 
@@ -96,7 +100,7 @@ Tre inbyggda teman som växlas direkt:
 - **Toastmeddelande** vid inaktivitet.
 - **Modal** för bekräftelse vid rensning av all data.
 - **Responsiv design** – anpassar sig för smalare skärmar (staplad vy).
-- **Validering** – dygnsdos 0,1–50 st/dag, förpackningsstorlek 1–10 000, antal uttag 1–12, strikt datumvalidering inklusive skottår.
+- **Validering** – dos 0,1–50 (oberoende enhet), mängd per uttag 1–10 000 (heltal för st, decimaler tillåtna för ml/doser), antal uttag 1–12, strikt datumvalidering inklusive skottår.
 
 ---
 
@@ -146,8 +150,10 @@ Läkemedelsdatabasen (`drugs.js`) byggs i två steg:
 ```
 FASS.se (~14 000 NPL-ID:n)
   └─ build:db → data/product-db.json
-       └─ generate:drugs → Kod/drugs.js (samtliga tabletter/kapslar)
+       └─ generate:drugs → Kod/drugs.js (samtliga beredningsformer)
 ```
+
+`build:db` använder `classifyDoseForm()` för att kategorisera varje produkt: kvantifierbara med enhetsnyckel (`st`, `ml`, `dos`) eller markerade som ej kvantifierbara (`notCalculable`). `generate:drugs` läser klassificeringen och genererar drug‑entrierna med rätt enhet och flagga.
 
 Bör köras kvartalsvis eller vid större förändringar i FASS sortiment.
 
