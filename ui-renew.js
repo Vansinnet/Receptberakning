@@ -3,6 +3,15 @@ function _el(id) { return _dom[id] || (_dom[id] = document.getElementById(id)); 
 
 let _lastMetricsKey = '';
 
+const _drugByName = (() => {
+  const m = new Map();
+  for (let i = 0; i < DRUG_LIST.length; i++) {
+    const key = DRUG_LIST[i].n.toLowerCase().trim();
+    if (!m.has(key)) m.set(key, DRUG_LIST[i]);
+  }
+  return m;
+})();
+
 function resetMetricsCache() {
   _lastMetricsKey = '';
 }
@@ -92,13 +101,10 @@ function updateFormHeader(i) {
   const narcBtn = _el('narcBtnForm');
   let narcClass = '', nplId = s.nplId;
   if (s.medRaw) {
-    const raw = s.medRaw.toLowerCase();
-    for (let d = 0; d < DRUG_LIST.length; d++) {
-      if (DRUG_LIST[d].name.toLowerCase().trim() === raw) {
-        narcClass = DRUG_LIST[d].narc;
-        nplId = DRUG_LIST[d].nplId || nplId;
-        break;
-      }
+    const drugEntry = _drugByName.get(s.medRaw.toLowerCase());
+    if (drugEntry) {
+      narcClass = drugEntry.r;
+      nplId = drugEntry.i || nplId;
     }
   }
   if (fassBtn) {
@@ -120,7 +126,7 @@ function renderFormForMed(i) {
   const emptyState  = _el('formEmptyState');
   const formContent = _el('formContent');
   if (emptyState)  emptyState.classList.add('is-hidden');
-  if (formContent) { formContent.classList.remove('is-hidden'); fadeIn(formContent); }
+  if (formContent) formContent.classList.remove('is-hidden');
 
   updateFormHeader(i);
 
@@ -149,7 +155,7 @@ function saveFormValues(i) {
   if (!medInputEl || !dateInputEl || !doseInputEl || !amtInputEl || !refInputEl) return;
   const medRaw = medInputEl.value.trim();
   const parsedInterval = parseInt(doseIntervalSelectEl ? doseIntervalSelectEl.value : '1', 10);
-  const doseInterval = [1, 7, 30].includes(parsedInterval) ? parsedInterval : 1;
+  const doseInterval = VALID_INTERVALS.includes(parsedInterval) ? parsedInterval : 1;
   applyMedStatePatch(i, {
     medRaw,
     dateVal:      dateInputEl.value || todayStr(),
@@ -172,7 +178,7 @@ function renderResultForMed(i) {
   const nurseCol = _el('nurseCol');
   if (nurseCol) {
     if (nurseViewActive) {
-      nurseCol.classList.remove('is-hidden'); fadeIn(nurseCol);
+      nurseCol.classList.remove('is-hidden');
       const vitalCheck = _el('nurseVitalCheck');
       const followUpCheck = _el('nurseFollowUpCheck');
       if (vitalCheck) vitalCheck.checked = nurseVitalNormal;
@@ -200,7 +206,7 @@ function renderResultForMed(i) {
   }
 
   if (emptyState)    emptyState.classList.add('is-hidden');
-  if (resultContent) { resultContent.classList.remove('is-hidden'); fadeIn(resultContent); }
+  if (resultContent) resultContent.classList.remove('is-hidden');
 
   /* Verdict */
   const vBox   = _el('verdictBox');
@@ -269,7 +275,7 @@ function renderResultForMed(i) {
     if (nurseViewActive || (!s.isOveruse && !s.isTooEarly)) {
       earlyBox.classList.add('is-hidden');
     } else {
-      earlyBox.classList.remove('is-hidden'); fadeIn(earlyBox);
+      earlyBox.classList.remove('is-hidden');
       const yBtn = _el('earlyDecisionYes');
       const nBtn = _el('earlyDecisionNo');
       if (yBtn) yBtn.classList.toggle('selected', s.earlyRenewalDecision === 'yes');
@@ -278,20 +284,19 @@ function renderResultForMed(i) {
   }
 
   /* Journalfliksetikett anpassas per vy */
-  const journalTab = document.querySelector('#copySection .copy-tab[data-tab="journal"]');
+  const copySection = _el('copySection');
+  const journalTab = copySection ? copySection.querySelector('.copy-tab[data-tab="journal"]') : null;
   if (journalTab) {
     journalTab.textContent = nurseViewActive ? 'Underlag till läkare' : 'Journalanteckning (förslag)';
   }
 
   /* Copy-sektion */
-  const copySection = _el('copySection');
   const copyBtn = _el('copyBtnResult');
   if (copySection) {
     const patientTab = copySection.querySelector('.copy-tab[data-tab="patient"]');
     if (patientTab) patientTab.classList.toggle('is-hidden', nurseViewActive);
     const hasCopy = !!(s.patientText || s.journalText);
     copySection.style.display       = hasCopy ? 'flex' : 'none';
-    if (hasCopy) fadeIn(copySection);
     copySection.style.flexDirection = hasCopy ? 'column' : '';
     if (copyBtn) {
       copyBtn.classList.toggle('is-hidden', nurseViewActive && !s.journalText);
@@ -383,13 +388,13 @@ function togglePatientLangResult() {
   switchResultTab('patient');
 }
 
-var _acState = { container: null, items: [], selectedIdx: -1, visible: false };
+let _acState = { container: null, items: [], selectedIdx: -1, visible: false };
 
 function _ensureAcContainer() {
   if (_acState.container) return _acState.container;
-  var medInput = _el('medInput');
+  let medInput = _el('medInput');
   if (!medInput) return null;
-  var container = el('div', { cls: 'autocomplete-dropdown is-hidden' });
+  let container = el('div', { cls: 'autocomplete-dropdown is-hidden' });
   container.id = 'autocompleteDropdown';
   medInput.parentNode.insertBefore(container, medInput.nextSibling);
   _acState.container = container;
@@ -397,26 +402,24 @@ function _ensureAcContainer() {
 }
 
 function renderAutocomplete(results) {
-  var container = _ensureAcContainer();
+  let container = _ensureAcContainer();
   if (!container) return;
   container.textContent = '';
   if (!results.length) { container.classList.add('is-hidden'); _acState.visible = false; return; }
 
   _acState.items = results;
   _acState.selectedIdx = -1;
-  for (var r = 0; r < results.length; r++) {
-    (function(idx) {
-      var drug = results[idx];
-      var item = el('div', { cls: 'autocomplete-item', dataset: { idx: String(idx) } });
-      item.appendChild(el('span', { cls: 'ac-drug-name', text: drug.name }));
-      const unitDisplay = drug.notCalculable ? '\u26a0 ej ber\u00e4kningsbar' : (drug.pkg + ' ' + (drug.unit || 'st') + ' \u00b7 ' + drug.form);
-      item.appendChild(el('span', { cls: 'ac-drug-meta', text: unitDisplay }));
-      item.addEventListener('mousedown', function(e) {
-        e.preventDefault();
-        selectAutocompleteItem(idx);
-      });
-      container.appendChild(item);
-    })(r);
+  for (let r = 0; r < results.length; r++) {
+    const drug = results[r];
+    const item = el('div', { cls: 'autocomplete-item', dataset: { idx: String(r) } });
+    item.appendChild(el('span', { cls: 'ac-drug-name', text: drug.n }));
+    const unitDisplay = drug.c ? '\u26a0 ej ber\u00e4kningsbar' : (drug.p + ' ' + (drug.u || 'st') + ' \u00b7 ' + drug.f);
+    item.appendChild(el('span', { cls: 'ac-drug-meta', text: unitDisplay }));
+    item.addEventListener('mousedown', function(e) {
+      e.preventDefault();
+      selectAutocompleteItem(r);
+    });
+    container.appendChild(item);
   }
   container.classList.remove('is-hidden');
   _acState.visible = true;
@@ -433,40 +436,37 @@ function hideAutocomplete() {
 
 function selectAutocompleteItem(idx) {
   if (idx < 0 || idx >= _acState.items.length) return;
-  var drug     = _acState.items[idx];
-  var medInput = _el('medInput');
-  var amtInput = _el('amtInput');
-  if (medInput) medInput.value = drug.name;
-  if (amtInput) amtInput.value = String(drug.pkg);
+  const drug     = _acState.items[idx];
+  const medInput = _el('medInput');
+  const amtInput = _el('amtInput');
+  if (medInput) medInput.value = drug.n;
+  if (amtInput) amtInput.value = String(drug.p);
   hideAutocomplete();
   saveFormValues(activeMedIdx);
-  // Sätt beredningsspecifika egenskaper från läkemedelsdatabasen i state.
-  // notCalculable = sant för beredningar som inte kan kvantifieras automatiskt.
-  // doseUnit påverkar validering av kvarvarande mängd och textgenerering.
   applyMedStatePatch(activeMedIdx, {
-    nplId:         drug.nplId         || null,
-    doseUnit:      drug.unit          || 'st',
-    notCalculable: drug.notCalculable || false,
+    nplId:         drug.i || null,
+    doseUnit:      drug.u || 'st',
+    notCalculable: drug.c || false,
   });
   ensureDebounce(activeMedIdx); calcDebounced[activeMedIdx]();
 }
 
 function navigateAutocomplete(dir) {
   if (!_acState.visible || !_acState.items.length) return;
-  var container = _acState.container;
+  const container = _acState.container;
   if (!container) return;
   _acState.selectedIdx = Math.max(-1, Math.min(_acState.items.length - 1, _acState.selectedIdx + dir));
-  var items = container.querySelectorAll('.autocomplete-item');
-  for (var i = 0; i < items.length; i++) {
+  const items = container.querySelectorAll('.autocomplete-item');
+  for (let i = 0; i < items.length; i++) {
     items[i].classList.toggle('active', i === _acState.selectedIdx);
   }
 }
 
 function handleAcInput() {
-  var medInput = _el('medInput');
+  const medInput = _el('medInput');
   if (!medInput) return;
-  var q = medInput.value.trim();
-  var results = searchDrugs(q);
+  const q = medInput.value.trim();
+  const results = searchDrugs(q);
   if (results.length > 0) {
     renderAutocomplete(results);
   } else {

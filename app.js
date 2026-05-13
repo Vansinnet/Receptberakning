@@ -41,22 +41,22 @@ function resetTimer(isUserEvent=false) {
   clearTimeout(warnTimer); clearTimeout(clearTimer); clearInterval(countdownInt);
   const toast = getEl('toast'), toastCount = getEl('toastCount');
   if (toast) toast.classList.remove('visible');
-  // 23 min inaktivitet innan rensning (varning vid 22 min). Förlängd tid eftersom
-  // läkare ofta avbryts av kollegor, telefonsamtal eller akuta situationer —
-  // och flera samtidiga läkemedel (max 8) kräver längre tid för genomgång.
+  const WARN_MS = 22 * 60 * 1000;
+  const CLEAR_MS = 23 * 60 * 1000;
+  const COUNTDOWN_SEC = 60;
   warnTimer = setTimeout(() => {
-    let s = 60;
+    let s = COUNTDOWN_SEC;
     if (!toast||!toastCount) return;
     toastCount.textContent = String(s); toast.classList.add('visible');
     countdownInt = setInterval(() => {
       s--; if (toastCount) toastCount.textContent = String(s);
       if (s<=0) clearInterval(countdownInt);
     }, 1000);
-  }, 22*60*1000);
+  }, WARN_MS);
   clearTimer = setTimeout(() => {
     clearInterval(countdownInt); if (toast) toast.classList.remove('visible');
     confirmClearAll(true);
-  }, 23*60*1000);
+  }, CLEAR_MS);
 }
 
 /* Lägg till / ta bort läkemedel */
@@ -154,7 +154,7 @@ function confirmClearAll(force=false) {
   const m = getEl('newPatientModal');
   if (!m) return;
   _newPatientModalTrigger = document.activeElement;
-  m.classList.add('visible'); fadeIn(m);
+  m.classList.add('visible');
   const btn = getEl('executeNewPatientBtn');
   if (btn) btn.focus();
 }
@@ -246,8 +246,8 @@ if (formPanel) {
     }
   }, true); // capture=true eftersom blur inte bubblar
   document.addEventListener('click', function(e) {
-    var medInput = getEl('medInput');
-    var dropdown = getEl('autocompleteDropdown');
+    const medInput = getEl('medInput');
+    const dropdown = getEl('autocompleteDropdown');
     if (medInput && !medInput.contains(e.target) && dropdown && !dropdown.contains(e.target)) {
       hideAutocomplete();
     }
@@ -422,6 +422,9 @@ window.addEventListener('pagehide',()=>{
   const lm=getEl('lt-med');if(lm)lm.value='';
   const ld=getEl('lt-dose');if(ld)ld.value='';
   const lc=getEl('lt-copyBody');if(lc)lc.textContent='';
+  ['lt-result','lt-copySection','lt-bar-section','lt-period-table-section'].forEach(id=>{
+    const e=getEl(id);if(e)e.style.display='none';
+  });
   const pi=getEl('prescribeInner');if(pi)pi.textContent='';
   const ps=getEl('prescribeSummary');if(ps){ps.textContent='';ps.style.display='none';}
   const pd=getEl('prescribeDuration');if(pd)pd.textContent='';

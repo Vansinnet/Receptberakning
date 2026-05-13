@@ -232,10 +232,8 @@ function calcLongterm() {
   try {
     let nplId = null;
     if (medRaw) {
-      const raw = medRaw.toLowerCase();
-      for (let d = 0; d < DRUG_LIST.length; d++) {
-        if (DRUG_LIST[d].name.toLowerCase().trim() === raw) { nplId = DRUG_LIST[d].nplId; break; }
-      }
+      const drugEntry = _drugByName.get(medRaw.toLowerCase());
+      if (drugEntry) nplId = drugEntry.i;
     }
     result = calcLongtermCore(medRaw, ordDose, ltPeriods, nplId);
   } catch (err) {
@@ -262,7 +260,7 @@ function calcLongterm() {
     return;
   }
 
-  showEl('lt-result', true, 'flex'); fadeIn(getEl('lt-result'));
+  showEl('lt-result', true, 'flex');
 
   const resGridEl = getEl('lt-resGrid');
   if (resGridEl) {
@@ -287,7 +285,7 @@ function calcLongterm() {
     barEl.textContent = result.barPct > 20 ? `${result.consumptionPct.toFixed(0)}%` : '';
     barEl.setAttribute('aria-valuenow', String(Math.round(result.barPct)));
   }
-  const barSec = getEl('lt-bar-section'); if (barSec) { barSec.classList.remove('is-hidden'); fadeIn(barSec); }
+  const barSec = getEl('lt-bar-section'); if (barSec) barSec.classList.remove('is-hidden');
 
   const rowsContainer = getEl('lt-period-rows');
   if (rowsContainer) {
@@ -309,14 +307,14 @@ function calcLongterm() {
     });
     rowsContainer.appendChild(frag);
   }
-  const periodTab = getEl('lt-period-table-section'); if (periodTab) { periodTab.classList.remove('is-hidden'); fadeIn(periodTab); }
+  const periodTab = getEl('lt-period-table-section'); if (periodTab) periodTab.classList.remove('is-hidden');
 
   const lb = getEl('lt-fassBtn');
-  if (lb) { lb.href = result.fassUrl; lb.classList.remove('is-hidden'); fadeIn(lb); }
+  if (lb) { lb.href = result.fassUrl; lb.classList.remove('is-hidden'); }
 
   const copyBody = getEl('lt-copyBody');
   if (copyBody) copyBody.textContent = result.journalText;
-  showEl('lt-copySection', true); fadeIn(getEl('lt-copySection'));
+  showEl('lt-copySection', true);
 }
 
 function copyLtText() {

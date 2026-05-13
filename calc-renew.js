@@ -1,3 +1,9 @@
+const OVERUSE_THRESHOLD = 1.10;
+const EARLY_RENEWAL_THRESHOLD = 0.20;
+const OVERUSE_SUPPRESSION_DAYS = 7;
+const OVERUSE_MIN_RECEPT_DAYS = 14;
+const VERY_HIGH_CONSUMPTION_MULTIPLIER = 2.5;
+
 function validateDateField(val) {
   if (!val) return { valid: true, error: '' };
   const pDate = parseDateUTC(val);
@@ -64,9 +70,7 @@ function validateValues(medRaw, dateVal, doseRaw, amtRaw, refRaw, leftRaw, doseI
     return { valid: false, reason, fieldErrors };
   }
 
-  const VALID_INTERVALS = [1, 7, 30];
   const parsedInterval = parseInt(doseIntervalRaw, 10);
-  // AKTIVT VAL: ogiltiga intervalvärden faller tillbaka till 1 (per dag) utan att förkasta formuläret.
   const doseInterval = VALID_INTERVALS.includes(parsedInterval) ? parsedInterval : 1;
 
   const ref = refNum;
@@ -226,6 +230,8 @@ function calcCore(inputData, prev) {
   const prescribedEndDate = new Date(inputData.pDate);
   prescribedEndDate.setUTCDate(prescribedEndDate.getUTCDate() + Math.round(totalDays));
   const daysToPrescribedEnd = getDaysDiff(prescribedEndDate, today);
+  const prescribedEndDateStr = fmtDate(prescribedEndDate);
+  const pDateStr = fmtDate(inputData.pDate);
   // AKTIVT VAL: daysToPrescribedEnd > 14 krävs för hasRemaining-fallet där daysRemaining
   // = faktiska dosdagar (kan vara < 7) men ordinationen fortfarande har > 14 dagar kvar.
   // Utan denna gren missar vi patienter som hämtat ut i förtid och förbrukat för snabbt.
@@ -234,9 +240,9 @@ function calcCore(inputData, prev) {
   // AKTIVT VAL: isOveruse jämför avgNum (per dag) mot effectiveDailyDose, inte rådos.
   // Vid vecko-/månadsintervall är effectiveDailyDose bråkdelen dos/interval,
   // vilket ger samma proportionella 10%-gräns oavsett vald tidsperiod.
-  const isOveruse  = avgNum > effectiveDailyDose * 1.10 && (daysRemaining > 7 || daysToPrescribedEnd > 14);
+  const isOveruse  = avgNum > effectiveDailyDose * OVERUSE_THRESHOLD && (daysRemaining > OVERUSE_SUPPRESSION_DAYS || daysToPrescribedEnd > OVERUSE_MIN_RECEPT_DAYS);
   // isTooEarly baseras alltid på receptperiodens kvarvarande dagar, inte faktiska dosdagar.
-  const isTooEarly = !isOveruse && daysToPrescribedEnd > Math.round(totalDays * 0.20);
+  const isTooEarly = !isOveruse && daysToPrescribedEnd > Math.round(totalDays * EARLY_RENEWAL_THRESHOLD);
 
   // Omräkna daglig snittförbrukning till vald tidsperiod för display
   const avgPerInterval  = avgNum * doseInterval;
@@ -251,7 +257,7 @@ function calcCore(inputData, prev) {
   const flagsChanged         = prev.isOveruse !== isOveruse || prev.isTooEarly !== isTooEarly;
   const earlyRenewalDecision = flagsChanged ? null : (prev.earlyRenewalDecision || null);
 
-  const earlyThreshold = Math.round(totalDays * 0.20);
+  const earlyThreshold = Math.round(totalDays * EARLY_RENEWAL_THRESHOLD);
   const tlPct  = Math.min(100, Math.max(0, (daysSince / totalDays) * 100));
   // endCls och "Räcker t.o.m." baseras alltid på prescribedEndDate (ordinerad takt),
   // oavsett om läkaren fyllt i faktiska kvarvarande doser.
@@ -261,7 +267,7 @@ function calcCore(inputData, prev) {
     : isOveruse    ? 'För tidig förnyelse'
     : isTooEarly   && earlyRenewalDecision === 'yes' ? 'OK – förnyas tidigt'
     : isTooEarly   ? `För tidigt — ${daysToPrescribedEnd}d kvar`
-    : `OK – t.o.m ${fmtDate(prescribedEndDate)}`;
+    : `OK – t.o.m ${prescribedEndDateStr}`;
 
   const metrics = [
     { label: 'Totalt förskrivet', value: `${total} ${doseUnit}`, cls: '', tooltip: `Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet.` },
@@ -269,7 +275,7 @@ function calcCore(inputData, prev) {
         const note = daysToPrescribedEnd > 0 ? ` (${daysToPrescribedEnd} dagar kvar)`
           : daysToPrescribedEnd === 0 ? ' (tar slut idag)'
           : ` (slut sedan ${Math.abs(daysToPrescribedEnd)} dagar)`;
-        return fmtDate(prescribedEndDate) + note;
+        return prescribedEndDateStr + note;
       })(), cls: endCls, tooltip: `Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning.` },
     { label: 'Snittförbrukning', value: displayAvg, cls: isOveruse ? 'danger' : '', tooltip: `Genomsnittlig förbrukning per ${intervalLabel} sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar.` },
   ];
@@ -301,7 +307,7 @@ function calcCore(inputData, prev) {
   // Alerts — byggs som strukturerade objekt, renderas via DOM (ingen innerHTML med användardata)
   const alerts = [];
   const consumptionPct         = (avgNum / effectiveDailyDose) * 100;
-  const overuseSupressedBy7day = !isOveruse && daysRemaining >= 0 && daysRemaining <= 7 && avgNum > effectiveDailyDose * 1.10;
+  const overuseSupressedBy7day = !isOveruse && daysRemaining >= 0 && daysRemaining <= OVERUSE_SUPPRESSION_DAYS && avgNum > effectiveDailyDose * OVERUSE_THRESHOLD;
   if (overuseSupressedBy7day) {
     alerts.push({ type: 'warn', title: 'Förhöjd förbrukning noterad', message: `Snitt ${displayAvg} överstiger ordination med >10%, men medicinen beräknas ta slut inom 7 dagar. Förnyelse godkänd — notera förbrukningstakten.` });
   } else if (avgNum === 0) {
@@ -309,12 +315,12 @@ function calcCore(inputData, prev) {
   } else if (consumptionPct < 80) {
     alerts.push({ type: 'warn', title: 'Låg förbrukning', message: `${avgPerInterval.toFixed(2)} ${doseUnitLabel} är ${(100 - consumptionPct).toFixed(1)}% under ordinerad dos. Överväg uppföljning.` });
     if (isTooEarly) {
-      alerts.push({ type: 'info', title: 'För tidigt att förnya', message: `Receptperioden löper ut om ${daysToPrescribedEnd} dagar (t.o.m. ${fmtDate(prescribedEndDate)}). Förnyelse rekommenderas närmre slutdatumet.` });
+      alerts.push({ type: 'info', title: 'För tidigt att förnya', message: `Receptperioden löper ut om ${daysToPrescribedEnd} dagar (t.o.m. ${prescribedEndDateStr}). Förnyelse rekommenderas närmre slutdatumet.` });
     }
   } else if (isTooEarly) {
-    alerts.push({ type: 'info', title: 'För tidigt att förnya', message: `Receptperioden löper ut om ${daysToPrescribedEnd} dagar (t.o.m. ${fmtDate(prescribedEndDate)}). Förnyelse rekommenderas närmre slutdatumet.` });
+    alerts.push({ type: 'info', title: 'För tidigt att förnya', message: `Receptperioden löper ut om ${daysToPrescribedEnd} dagar (t.o.m. ${prescribedEndDateStr}). Förnyelse rekommenderas närmre slutdatumet.` });
   }
-  if (avgNum > effectiveDailyDose * 2.5) {
+  if (avgNum > effectiveDailyDose * VERY_HIGH_CONSUMPTION_MULTIPLIER) {
     alerts.push({ type: 'warn', title: 'Datakontroll', message: `Snitt ${avgPerInterval.toFixed(2)} ${doseUnitLabel} är mycket högt. Kontrollera kvarvarande mängd.` });
   }
   if (earlyPickup) {
@@ -341,7 +347,7 @@ function calcCore(inputData, prev) {
     isOveruse, isTooEarly, earlyRenewalDecision,
     statusText, verdictTitle, verdictSub,
     metrics, alerts,
-    tlPct, tlStart: fmtDate(inputData.pDate), tlEnd: fmtDate(prescribedEndDate),
+    tlPct, tlStart: pDateStr, tlEnd: prescribedEndDateStr,
     earlyThreshold,
     medRaw:               inputData.medRaw,
     amt:                  inputData.amt,
@@ -349,11 +355,11 @@ function calcCore(inputData, prev) {
     doseInterval,
     doseUnit,
     doseUnitLabel,
-    pDateStr:             fmtDate(inputData.pDate),
+    pDateStr,
     total,
     remainingDoses:       hasRemaining ? remaining : null,
     endDateStr:           fmtDate(endDate),
-    prescribedEndDateStr: fmtDate(prescribedEndDate),
+    prescribedEndDateStr,
     daysRemaining,
     daysToPrescribedEnd,
     displayAvgStr:        displayAvg,
@@ -390,6 +396,7 @@ function calc(i = activeMedIdx, skipGenerate = false) {
   }
 
   applyMedStatePatch(i, derived);
+  if (inputData.medRaw) { applyMedStatePatch(i, { medNameStripped: stripManufacturer(inputData.medRaw) || inputData.medRaw }); }
 
   // UI-preferenser sätts efter en fullständig lyckad beräkning
   if (derived.valid && derived.calculable !== false) {
@@ -606,7 +613,7 @@ function buildNurseJournalText() {
   for (let i = 0; i < states.length; i++) {
     const s = states[i];
     if (!s || !s.valid || s.calculable === false) continue;
-    const name = stripManufacturer(s.medRaw) || s.medRaw || `Läkemedel ${i + 1}`;
+    const name = s.medNameStripped || s.medRaw || `Läkemedel ${i + 1}`;
     const isOutside = (s.isOveruse || s.isTooEarly) && s.earlyRenewalDecision !== 'yes';
     if (isOutside) hasOutsideLimits = true;
     allMeds.push({ name, i, endDate: s.prescribedEndDateStr || '' });
@@ -666,7 +673,7 @@ function generateAndDistribute() {
   const toRenew = [], tooEarly = [], overuse = [];
   for (let i = 0; i < states.length; i++) {
     const s = states[i]; if (!s || !s.valid || s.calculable === false) continue;
-    const name = stripManufacturer(s.medRaw) || s.medRaw || `Läkemedel ${i+1}`;
+    const name = s.medNameStripped || s.medRaw || `Läkemedel ${i+1}`;
     if      (s.isOveruse  && s.earlyRenewalDecision === 'yes') toRenew.push({ name, i, earlyRenewal: 'overuse' });
     else if (s.isOveruse)                                      overuse.push({ name, i });
     else if (s.isTooEarly && s.earlyRenewalDecision === 'yes') toRenew.push({ name, i, earlyRenewal: 'tooEarly' });
@@ -691,8 +698,12 @@ function generateAndDistribute() {
 
   const prescribeEnds = {};
   for (const { i } of toRenew) {
-    const pr = calcPrescribeResult(i);
-    if (pr && pr.endDateStr) prescribeEnds[i] = pr.endDateStr;
+    try {
+      const pr = calcPrescribeResult(i);
+      if (pr && pr.endDateStr) prescribeEnds[i] = pr.endDateStr;
+    } catch (err) {
+      console.error('[calcPrescribeResult]', err.message || err);
+    }
   }
 
   const patientText   = buildPatientText('sv', toRenew, tooEarly, overuse, validCount, prescribeEnds);

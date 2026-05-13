@@ -1,8 +1,27 @@
 const fs = require("fs");
 const path = require("path");
+const https = require("node:https");
+const dns = require("node:dns");
 
-const CONCURRENCY = 10;
-const DELAY_MS = 100;
+const CONCURRENCY = 30;
+const DELAY_MS = 50;
+dns.setDefaultResultOrder("ipv4first");
+
+const KEEP_ALIVE_AGENT = new https.Agent({
+  keepAlive: true,
+  keepAliveMsecs: 30_000,
+  maxSockets: CONCURRENCY,
+  maxFreeSockets: 10,
+  timeout: 60_000,
+});
+
+const FETCH_OPTS = {
+  agent: KEEP_ALIVE_AGENT,
+  headers: {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "Accept": "text/html,application/xhtml+xml",
+  },
+};
 const DATA_DIR = path.join(__dirname, "..", "data");
 const OUT_FILE = path.join(DATA_DIR, "product-db.json");
 const PROGRESS_FILE = path.join(DATA_DIR, "_crawl-progress.json");
@@ -52,7 +71,7 @@ function sleep(ms) {
 async function fetchWithRetry(url, retries = 1) {
   for (let i = 0; i <= retries; i++) {
     try {
-      const res = await fetch(url);
+      const res = await fetch(url, FETCH_OPTS);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.text();
     } catch (e) {
@@ -255,7 +274,7 @@ async function main() {
     if (i + CONCURRENCY < remaining.length) {
       const pct = Math.round((completed / total) * 100);
       process.stdout.write(`\r  ${completed}/${total} (${pct}%)   `);
-      saveProgress(progress);
+      if ((i / CONCURRENCY) % 5 === 0) saveProgress(progress);
       await sleep(DELAY_MS);
     }
   }

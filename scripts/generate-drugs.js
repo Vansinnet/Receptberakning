@@ -219,7 +219,7 @@ function generateDrugsJs(candidates) {
 
   const sections = Object.entries(groups).sort((a, b) => a[0].localeCompare(b[0], "sv"));
 
-  let output = "var DRUG_LIST = [\n";
+  let output = "const DRUG_LIST = [\n";
 
   for (const [label, entries] of sections) {
     output += `  // === ${label} ===\n`;
@@ -228,14 +228,14 @@ function generateDrugsJs(candidates) {
 
     for (const entry of sorted) {
       const fields = [
-        `name: ${JSON.stringify(entry.name)}`,
-        `pkg: ${entry.pkg}`,
-        `form: ${JSON.stringify(entry.form)}`,
-        `nplId: ${JSON.stringify(entry.nplId)}`,
+        `n: ${JSON.stringify(entry.name)}`,
+        `p: ${entry.pkg}`,
+        `f: ${JSON.stringify(entry.form)}`,
+        `i: ${JSON.stringify(entry.nplId)}`,
       ];
-      if (entry.unit && entry.unit !== "st") fields.push(`unit: ${JSON.stringify(entry.unit)}`);
-      if (entry.notCalculable) fields.push(`notCalculable: true`);
-      if (entry.narc) fields.push(`narc: ${JSON.stringify(entry.narc)}`);
+      if (entry.unit && entry.unit !== "st") fields.push(`u: ${JSON.stringify(entry.unit)}`);
+      if (entry.notCalculable) fields.push(`c: true`);
+      if (entry.narc) fields.push(`r: ${JSON.stringify(entry.narc)}`);
       output += `  { ${fields.join(", ")} },\n`;
     }
 
@@ -248,7 +248,7 @@ function generateDrugsJs(candidates) {
   output += "  var q = query.toLowerCase().trim();\n";
   output += "  var results = [];\n";
   output += "  for (var i = 0; i < DRUG_LIST.length; i++) {\n";
-  output += "    if (DRUG_LIST[i].name.toLowerCase().indexOf(q) === 0) {\n";
+  output += "    if (DRUG_LIST[i].n.toLowerCase().indexOf(q) === 0) {\n";
   output += "      results.push(DRUG_LIST[i]);\n";
   output += "      if (results.length >= 10) break;\n";
   output += "    }\n";
@@ -279,7 +279,7 @@ function main() {
   const content = generateDrugsJs(productDb);
   fs.writeFileSync(OUT_FILE, content, "utf8");
 
-  const entryCount = content.split("\n").filter(l => l.includes("name:")).length;
+  const entryCount = content.split("\n").filter(l => l.includes("n:")).length;
   console.log(`  ${entryCount} läkemedelsentries genererade`);
   console.log(`  Skrivet till ${OUT_FILE}\n`);
 

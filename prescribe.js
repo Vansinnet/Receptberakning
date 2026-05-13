@@ -404,7 +404,7 @@ function renderPrescribePanel(i) {
   const durContainer = getEl('prescribeDuration');
   if (durContainer && durContainer.children.length === 0) buildPrescribeDuration();
 
-  panel.classList.remove('is-hidden'); fadeIn(panel);
+  panel.classList.remove('is-hidden');
 
   if (!activeEligible) {
     _prescribePanelBuiltFor = null;

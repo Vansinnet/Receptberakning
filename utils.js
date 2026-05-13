@@ -1,5 +1,6 @@
 const VALID_THEMES     = new Set(['dark','klinisk','sakura']);
 const SAFE_ALERT_TYPES = new Set(['danger','warn','info','ok']);
+const VALID_INTERVALS  = [1, 7, 30];
 
 
 function debounce(fn, wait = 120) {
@@ -89,15 +90,6 @@ function showEl(id, show, displayValue = 'block') {
   const e = getEl(id); if (e) e.style.display = show ? displayValue : 'none';
 }
 
-function fadeIn(el) {
-  if (!el) return;
-  el.classList.add('fade-in');
-  el.addEventListener('animationend', function handler() {
-    el.classList.remove('fade-in');
-    el.removeEventListener('animationend', handler);
-  });
-}
-
 function showToast(msg, durationMs = 3000) {
   // Ta bort eventuellt tidigare toast så att de inte staplas vid snabba anrop.
   const prev = document.querySelector('.toast-flash');
@@ -114,8 +106,7 @@ function showToast(msg, durationMs = 3000) {
 
 /* Datumverktyg */
 function todayStr() {
-  const n = new Date();
-  return `${n.getUTCFullYear()}-${String(n.getUTCMonth()+1).padStart(2,'0')}-${String(n.getUTCDate()).padStart(2,'0')}`;
+  return fmtDate(getToday());
 }
 
 function oneYearAgoStr() {
@@ -158,14 +149,14 @@ function getFassUrl(medRaw, nplId) {
   return url.startsWith('https://www.fass.se/') ? url : '#';
 }
 
-var _mfrRe;
+let _mfrRe;
 function buildMfrRe() {
   if (_mfrRe) return _mfrRe;
-  var compounds = [
+  let compounds = [
     "Medical Valley", "Abacus Medicine", "EQL Pharma",
     "G\\.L\\.\\s*Pharma", "1A Farma", "Omet Pharma", "Nordic Drugs"
   ];
-  var singles = [
+  let singles = [
     "STADA", "Sandoz", "Accord(?:pharma)?", "Teva", "Krka", "Ebb",
     "Viatris", "Orion", "Actavis", "Zentiva", "Orifarm", "Bluefish",
     "Glenmark", "Evolan", "APL", "ABECE", "Avansor", "Apofri",
@@ -175,7 +166,7 @@ function buildMfrRe() {
     "Amdipharm", "Brown", "Pfizer", "Xiromed", "Accordpharma", "Pilum",
     "Rivopharm", "Novum", "Aristo", "Tillomed", "Waymade", "Baxter"
   ];
-  var all = compounds.concat(singles);
+  const all = compounds.concat(singles);
   _mfrRe = new RegExp("\\b(?:" + all.join("|") + ")\\b", "gi");
   return _mfrRe;
 }
