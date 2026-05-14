@@ -108,6 +108,7 @@ function clearCurrentCard() {
   }
 
   // Enda kvarvarande läkemedel — nollställ formuläret
+  calcDebounced[i]?.cancel();
   setMedState(i, { activeTab:'patient', patientLang:'sv' });
   initPrescribeState(i, null);
   resetPrescribePanel();
@@ -223,7 +224,7 @@ if (formPanel) {
         var inputVal = e.target.value.trim().toLowerCase();
         var acPrefix = s._acDrugName.toLowerCase().substring(0, inputVal.length);
         if (inputVal.length === 0 || inputVal !== acPrefix) {
-          applyMedStatePatch(activeMedIdx, { atcCode: null, _acDrugName: null });
+          applyMedStatePatch(activeMedIdx, { atcCode: null, _acDrugName: null, doseUnit: null, notCalculable: null, nplId: null });
           checkAllInteractions();
         }
       }
@@ -422,12 +423,14 @@ function recalcOnDateChange() {
   const doseEl = getEl('lt-dose');
   if (doseEl && doseEl.value) calcLongterm();
 }
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden) recalcOnDateChange(); });
-window.addEventListener('focus',recalcOnDateChange);
+const _recalcOnDate = debounce(recalcOnDateChange, 50);
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) _recalcOnDate(); });
+window.addEventListener('focus',_recalcOnDate);
 
 // Rensa vid pagehide (bfcache-säkerhet)
 window.addEventListener('pagehide',()=>{
   for (let j = 0; j < calcDebounced.length; j++) calcDebounced[j]?.cancel();
+  _recalcOnDate.cancel();
   calcLongtermDebounced.cancel();
   const ltPeriodCount = ltPeriods.length;
   clearAllMedStateData();
@@ -456,6 +459,8 @@ window.addEventListener('pagehide',()=>{
 });
 window.addEventListener('pageshow',e=>{
   if(!e.persisted)return;
+  _recalcOnDate.cancel();
+  calcDebounced.length = 0;
   _todayCache=null;
   _addMedLocked=false;
   _clearCardLocked=false;

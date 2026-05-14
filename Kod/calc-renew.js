@@ -152,7 +152,7 @@ function calcCore(inputData, prev) {
   const today     = getToday();
   const daysSince = getDaysDiff(today, inputData.pDate);
 
-  if (daysSince === 0) {
+  if (daysSince <= 0) {
     return {
       valid: true, calculable: false,
       isOveruse: false, isTooEarly: false,
