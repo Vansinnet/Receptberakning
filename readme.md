@@ -12,7 +12,7 @@
 
 ## Vad gör verktyget?
 
-Verktyget består av tre funktioner fördelade på två huvudflikar:
+Verktyget består av två huvudflikar:
 
 ### 1. 💊 Receptförnyelse
 Läkaren matar in ordinationsinformation (läkemedel + styrka, senaste receptdatum, mängd per uttag, antal uttag och ordinerad dos). Verktyget beräknar patientens förbrukningstakt och bedömer om förnyelse är lämplig.
@@ -31,23 +31,11 @@ För varje läkemedel genereras direkt:
 
 Stöd för upp till **8 läkemedel** i samma session – en sammanhållen patienttext och journalanteckning skapas för alla.
 
-### 2. 📦 Nyförskrivning
-När förnyelse beviljas visas en panel för beräkning av nytt recept. Läkaren anger önskad förskrivningsperiod (1–12 månader eller slutdatum) – verktyget beräknar exakt antal förpackningar som behövs, med hänsyn till kvarvarande dagar på befintligt recept. En sammanfattande översikt visas när flera läkemedel förnyas samtidigt.
+Vid flera läkemedel analyseras automatiskt **läkemedelsinteraktioner** — 77 regler baserade på ATC-koder som varnar för bland annat serotonergt syndrom, blödningsrisk, QT-förlängning och dubbelbehandling. Varningarna graderas som danger (röd) eller warn (gul) och visas ovanför beräkningsresultatet.
 
-### 4. ⚠️ Interaktionsvarningar
-Verktyget analyserar automatiskt alla läkemedel i sessionen för kända läkemedelsinteraktioner baserat på ATC-koder. 77 regler fördelade på 9 kategorier:
-- **Serotonergt syndrom** – SSRI/SNRI + MAO-hämmare/tramadol/metadon/triptaner/linezolid
-- **Blödningsrisk** – warfarin/NOAK + NSAID/SSRI/antibiotika (metronidazol, flukonazol, ciprofloxacin)
-- **Hyperkalemi** – ACE/ARB + spironolakton/kaliumtillskott/trimetoprim
-- **Bradykardi/AV-block** – betablockerare + verapamil/diltiazem, digoxin + amiodaron/verapamil
-- **Smal terapeutisk bredd** – litium/MTX/azatioprin + interagerande läkemedel
-- **CYP-interaktioner** – statiner + makrolider/azol-antimykotika/amlodipin, klopidogrel + PPI, tamoxifen + SSRI/SNRI
-- **QT-förlängning** – citalopram/escitalopram/metadon + amiodaron/fluorokinoloner
-- **Triple whammy** – NSAID + ACE/ARB + diuretika (akut njursvikt)
-- **Psykofarmaka** – klozapin + fluvoxamin, karbamazepin + p-piller/antipsykotika/lamotrigin, kodein + CYP2D6-hämmare
-- **Övriga** – kortikosteroider + NSAID, ciklosporin + NSAID, ciprofloxacin + teofyllin/tizanidin med flera
+När förnyelse beviljas visas en **nyförskrivningspanel** — läkaren anger förskrivningsperiod (1–12 månader eller slutdatum) och verktyget beräknar exakt antal förpackningar med hänsyn till kvarvarande dagar på befintligt recept.
 
-Varningarna visas ovanför beräkningsresultatet och graderas som **danger** (röd) eller **warn** (gul).
+### 2. 📊 Långvarig förbrukning
 Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder). För varje period anges startdatum, antal uttagna enheter och slutdatum. Verktyget beräknar:
 - Snittförbrukning per dag i varje period.
 - Avvikelse i procent mot ordinerad dos.
@@ -75,7 +63,7 @@ Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder
 - **Kliniskt överstyrande** – vid överförbrukning eller för tidig begäran kan läkaren manuellt godkänna förnyelse (Ja/Nej).
 - **Svar till patient på svenska och engelska** – växla med en knapp, ingen översättningstjänst krävs.
 - **Journalanteckning** – anpassas efter förnyelsebeslut och klinisk bedömning.
-- **Interaktionsvarningar** – 77 regler för läkemedelsinteraktioner. Varningar visas ovanför resultatet med severity (danger/warn), titel, beskrivning och åtgärdsrekommendation.
+- **Interaktionsvarningar** – 77 regler fördelade på 10 kategorier: serotonergt syndrom, blödningsrisk, hyperkalemi, bradykardi/AV-block, smal terapeutisk bredd, CYP-interaktioner, QT-förlängning, triple whammy, psykofarmaka och övriga. Varningarna graderas danger/warn med beskrivning och åtgärdsrekommendation.
 - **Kopieringsknappar** – för snabb inklistring i journalsystem/1177.
 
 ### 📦 Nyförskrivning
@@ -136,7 +124,6 @@ Tre inbyggda teman som växlas direkt:
   - `ui-renew.js` – UI-rendering för receptförnyelse (sidebar, formulär, resultatpanel, autocomplete, interaktionsvarningar)
   - `prescribe.js` – beräkningskärna och UI för nyförskrivning
   - `longterm.js` – långvarig förbrukning (beräkning + UI)
-  - `drugs.js` – läkemedelsdatabas (~6 000 preparat)
 - Fungerar **helt offline** – öppna bara `index.html` i en webbläsare.
 - **Standardiserad datumhantering** – alla datum hanteras som UTC för att undvika tidszonsproblem.
 - **Rena beräkningsfunktioner** (`calcCore`, `calcLongtermCore`, `calcPrescribeResult`) saknar DOM-beroenden. DOM-skal läser fält, anropar kärnan, renderar resultat.
