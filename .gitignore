@@ -1,0 +1,10 @@
+# Byggartefakter
+app.min.css
+node_modules/
+
+# Rådata från FASS-crawl
+data/
+
+# OS-filer
+.DS_Store
+Thumbs.db

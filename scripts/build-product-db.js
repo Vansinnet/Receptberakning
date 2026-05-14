@@ -30,7 +30,7 @@ function classifyDoseForm(doseForm, strength) {
   if (!doseForm) return { unit: "st", notCalculable: false };
   const lower = doseForm.toLowerCase();
 
-  // notCalculable: krämer, salvor, pastor, gaser, dialysvätskor, schampo, badtillsats, pulver, beredningssatser
+  // notCalculable: krämer, salvor, pastor, gaser, dialysvätskor, schampo, badtillsats, granulat, pulver
   if (lower.includes("kräm") || lower.includes("salva") || lower.includes("liniment") || lower.includes("pasta")) return { unit: null, notCalculable: true };
   if (lower.includes("gel") && !lower.includes("ögongel")) return { unit: null, notCalculable: true };
   if (lower.includes("schampo") || lower.includes("badtillsats")) return { unit: null, notCalculable: true };
@@ -39,15 +39,17 @@ function classifyDoseForm(doseForm, strength) {
   if (lower.includes("inhalationsånga")) return { unit: null, notCalculable: true };
   if (lower.includes("beredningssats")) return { unit: null, notCalculable: true };
   if (lower.includes("puder")) return { unit: null, notCalculable: true };
-  if (strength && /\/g/.test(strength) && (lower.includes("kräm") || lower.includes("salva") || lower.includes("gel"))) return { unit: null, notCalculable: true };
+  if (lower.includes("granulat")) return { unit: null, notCalculable: true };
+  if (strength && /\/g/.test(strength)) return { unit: null, notCalculable: true };
 
-  // unit: "dos" — doserade enheter (puffar, sprutor, droppar)
+  // unit: "dos" — doserade enheter (puffar, sprutor, sprayer, droppar)
   if (lower.includes("inhalationsspray") || lower.includes("inhalationspulver")) return { unit: "dos", notCalculable: false };
   if (lower.includes("förfylld spruta") || lower.includes("förfylld injektionspenna")) return { unit: "dos", notCalculable: false };
   if (lower.includes("rektalskum")) return { unit: "dos", notCalculable: false };
   if (lower.includes("nässpray")) return { unit: "dos", notCalculable: false };
   if (lower.includes("endosbehållare")) return { unit: "dos", notCalculable: false };
-  if (lower.includes("ögondroppar") || lower.includes("örondroppar")) return { unit: "dos", notCalculable: false };
+  if (lower.includes("ögondroppar") || lower.includes("örondroppar") || lower.includes("ögongel")) return { unit: "dos", notCalculable: false };
+  if (lower.includes("spray") && !lower.includes("kutan")) return { unit: "dos", notCalculable: false };
   if (strength && /\/dos/.test(strength)) return { unit: "dos", notCalculable: false };
 
   // unit: "ml" — volymmätta vätskor
@@ -55,7 +57,7 @@ function classifyDoseForm(doseForm, strength) {
   if (lower.includes("orala droppar") || lower.includes("droppar")) return { unit: "ml", notCalculable: false };
   if (lower.includes("sirap")) return { unit: "ml", notCalculable: false };
   if ((lower.includes("injektion") || lower.includes("infusion")) && !lower.includes("förfylld")) return { unit: "ml", notCalculable: false };
-  if (lower.includes("kutan lösning") || lower.includes("kutan spray") || lower.includes("kutant skum")) return { unit: "ml", notCalculable: false };
+  if (lower.includes("kutan") || lower.includes("kutant")) return { unit: "ml", notCalculable: false };
   if (lower.includes("rektalsuspension")) return { unit: "ml", notCalculable: false };
   if (lower.includes("munsköljvätska")) return { unit: "ml", notCalculable: false };
   if (strength && /\/ml/.test(strength) && !lower.includes("kräm") && !lower.includes("salva")) return { unit: "ml", notCalculable: false };

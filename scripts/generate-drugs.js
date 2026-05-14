@@ -130,7 +130,8 @@ function generateDrugEntries(atcCode, products) {
         name: `${nameBase} ${strength}`.trim(),
         pkg: pkg.quantity,
         form: form,
-        nplId: prod.nplId
+        nplId: prod.nplId,
+        atc: atcCode
       };
       if (unit !== "st") entry.unit = unit;
       if (notCalculable) entry.notCalculable = true;
@@ -155,8 +156,9 @@ function cleanForm(doseForm) {
   if (form.includes("resoriblett")) return "Resoriblett";
   if (form.includes("tuggtablett")) return "Tuggtablett";
   if (form.includes("brustablett")) return "Brustablett";
-  if (form.includes("munlöslig")) return "Munsönderfallande";
+  if (form.includes("munlöslig") || form.includes("munsönderfallande")) return "Munsönderfallande";
   if (form.includes("smälttablett")) return "Smälttablett";
+  if (form.includes("sublingual")) return "Sublingual tablett";
   if (form.includes("kapsel") && form.includes("hård")) return "Kapsel";
   if (form.includes("kapsel") && form.includes("mjuk")) return "Mjuk kapsel";
   if (form.includes("kapsel")) return "Kapsel";
@@ -232,6 +234,7 @@ function generateDrugsJs(candidates) {
         `p: ${entry.pkg}`,
         `f: ${JSON.stringify(entry.form)}`,
         `i: ${JSON.stringify(entry.nplId)}`,
+        `a: ${JSON.stringify(entry.atc)}`,
       ];
       if (entry.unit && entry.unit !== "st") fields.push(`u: ${JSON.stringify(entry.unit)}`);
       if (entry.notCalculable) fields.push(`c: true`);
