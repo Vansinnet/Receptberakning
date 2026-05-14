@@ -2,6 +2,8 @@
 
 Detta verktyg är ett kliniskt beslutsstöd avsett att användas av legitimerad sjukvårdspersonal som ett hjälpmedel vid handläggning av receptförnyelser.
 
+All patientdata stannar i webbläsarens arbetsminne — ingen data skickas till eller lagras på någon server.
+
 ## Inget medicinskt ansvar
 
 Verktyget ersätter inte medicinsk utbildning, kliniskt omdöme eller professionellt ansvar. Alla beslut om receptförnyelse, dosering eller annan läkemedelshantering fattas uteslutande av den behandlande läkaren eller annan behörig förskrivare.
@@ -18,4 +20,4 @@ Verktyget tillhandahålls i befintligt skick utan några garantier om korrekthet
 
 ---
 
-*Detta verktyg är inte ett medicinskt CE-märkt hjälpmedel och är inte godkänt av någon tillsynsmyndighet.*
+*Verktyget tillhandahålls som öppen källkod utan CE-märkning. Den som använder verktyget i klinisk verksamhet ansvarar själv för att säkerställa att användningen uppfyller tillämpliga regulatoriska krav.*
