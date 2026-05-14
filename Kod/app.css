@@ -322,6 +322,7 @@ html, body {
 }
 
 #interactionAlerts {
+  order: -1;                  /* alltid överst i kolumnen även före beräkning */
   width: 100%;
   max-width: 860px;
   padding: 14px 16px 0;      /* samma sidopadding som result-content, topp separat */
