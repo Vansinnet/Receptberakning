@@ -393,11 +393,17 @@ function recalcOnDateChange() {
         remaining: s.remainingDoses,
         doseRaw: s.doseRaw, amtRaw: s.amtRaw,
         refRaw: s.refRaw, leftRaw: s.leftRaw || '',
+        doseInterval: s.doseInterval || 1,
+        doseUnit:     s.doseUnit     || 'st',
+        notCalculable: s.notCalculable || false,
       };
     } else {
       inputData = validateValues(
         s.medRaw || '', s.dateVal || '', s.doseRaw || '',
-        s.amtRaw || '', s.refRaw || '', s.leftRaw || ''
+        s.amtRaw || '', s.refRaw || '', s.leftRaw || '',
+        String(s.doseInterval || 1),
+        s.doseUnit || 'st',
+        s.notCalculable || false
       );
     }
     if (!inputData.valid) continue;
