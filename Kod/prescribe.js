@@ -39,14 +39,16 @@ function calcPrescribeResult(i) {
     if (ed && ed > startDate) { endDate = ed; totalDays = getDaysDiff(ed, startDate); }
   }
 
-  const dose        = s.dose || 0;
-  const packageSize = parseFloat(ps.packageSize) || 0;
+  const dose            = s.dose || 0;
+  const doseInterval    = s.doseInterval || 1;
+  const effectiveDose   = dose / doseInterval;
+  const packageSize     = parseFloat(ps.packageSize) || 0;
 
   if (!totalDays || !dose || packageSize <= 0) {
     return { startDate, startDateStr, daysAlreadyCovered, endDate: null, totalDays: 0, totalTablets: 0, packages: 0 };
   }
 
-  const totalTablets = Math.ceil(totalDays * dose);
+  const totalTablets = Math.ceil(totalDays * effectiveDose);
   const packages     = Math.ceil(totalTablets / packageSize);
   const doseUnitVal  = s.doseUnit || 'st';
   const ds           = UNIT_DISPLAY[doseUnitVal] || UNIT_DISPLAY.st;
@@ -298,7 +300,7 @@ function renderPrescribeSummary() {
     const res = calcPrescribeResult(i);
     const pkgs = res ? res.packages : 0;
     items.push({ i, name: s.medRaw || `Läkemedel ${i + 1}`, packages: pkgs, pkgSize: parseFloat(ps.packageSize) || 0, unitLabelShort: (res ? res.unitLabelShort : 'st') });
-    summaryKey += `${i}:${pkgs}:${ps.packageSize}:${_prescribeMonths}:${_prescribeEndDate}:${s.amt}:${s.dose}:${s.prescribedEndDateStr}:${activeMedIdx}|`;
+    summaryKey += `${i}:${s.medRaw}:${pkgs}:${ps.packageSize}:${_prescribeMonths}:${_prescribeEndDate}:${s.amt}:${s.dose}:${s.prescribedEndDateStr}:${activeMedIdx}|`;
   }
 
   if (items.length < 2) {

@@ -307,8 +307,8 @@ function calcCore(inputData, prev) {
   // Alerts — byggs som strukturerade objekt, renderas via DOM (ingen innerHTML med användardata)
   const alerts = [];
   const consumptionPct         = (avgNum / effectiveDailyDose) * 100;
-  const overuseSupressedBy7day = !isOveruse && daysRemaining >= 0 && daysRemaining <= OVERUSE_SUPPRESSION_DAYS && avgNum > effectiveDailyDose * OVERUSE_THRESHOLD;
-  if (overuseSupressedBy7day) {
+  const overuseSuppressedBy7day = !isOveruse && daysRemaining >= 0 && daysRemaining <= OVERUSE_SUPPRESSION_DAYS && avgNum > effectiveDailyDose * OVERUSE_THRESHOLD;
+  if (overuseSuppressedBy7day) {
     alerts.push({ type: 'warn', title: 'Förhöjd förbrukning noterad', message: `Snitt ${displayAvg} överstiger ordination med >10%, men medicinen beräknas ta slut inom 7 dagar. Förnyelse godkänd — notera förbrukningstakten.` });
   } else if (avgNum === 0) {
     alerts.push({ type: 'danger', title: 'Ingen förbrukning registrerad', message: `Snitt 0 ${doseUnitLabel} – patienten verkar inte ha tagit medicinen. Klinisk bedömning krävs.` });

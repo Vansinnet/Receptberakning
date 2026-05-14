@@ -269,6 +269,108 @@ test('fluorokinoloner + NSAID \u2192 warn (kramptr\u00f6skel)', function() {
   assert(result[0].t.indexOf('kramptr\u00f6skel') >= 0, 'titeln ska n\u00e4mna kramptr\u00f6skel');
 });
 
+// ===== FAS 1\u20133 \u2014 kliniskt viktiga interaktioner =====
+group('FAS 1\u20133 \u2014 kliniskt viktiga interaktioner');
+
+test('karbamazepin + warfarin \u2192 danger (minskad warfarineffekt)', function() {
+  var result = CHECK_INTERACTIONS([
+    { i: 0, a: 'N03AF01' },  // karbamazepin
+    { i: 1, a: 'B01AA03' },  // warfarin
+  ]);
+  assert(result.length >= 1);
+  assert(result[0].s === 'danger');
+  assert(result[0].t.indexOf('warfarin') >= 0, 'titeln ska n\u00e4mna warfarin');
+});
+
+test('karbamazepin + DOAC (rivaroxaban) \u2192 danger', function() {
+  var result = CHECK_INTERACTIONS([
+    { i: 0, a: 'N03AF01' },  // karbamazepin
+    { i: 1, a: 'B01AF01' },  // rivaroxaban
+  ]);
+  assert(result.length >= 1);
+  assert(result[0].s === 'danger');
+  assert(result[0].t.indexOf('DOAC') >= 0, 'titeln ska n\u00e4mna DOAC');
+});
+
+test('amiodaron + betablockerare \u2192 danger (bradykardi/AV-block)', function() {
+  var result = CHECK_INTERACTIONS([
+    { i: 0, a: 'C01BD01' },  // amiodaron
+    { i: 1, a: 'C07AA05' },  // propranolol
+  ]);
+  assert(result.length >= 1);
+  assert(result[0].s === 'danger');
+});
+
+test('amiodaron + simvastatin \u2192 danger (rabdomyolysrisk)', function() {
+  var result = CHECK_INTERACTIONS([
+    { i: 0, a: 'C01BD01' },  // amiodaron
+    { i: 1, a: 'C10AA01' },  // simvastatin
+  ]);
+  assert(result.length >= 1);
+  assert(result[0].s === 'danger');
+  assert(result[0].t.indexOf('rabdomyolys') >= 0, 'titeln ska n\u00e4mna rabdomyolys');
+});
+
+test('metformin + jodkontrast \u2192 danger (laktatacidos)', function() {
+  var result = CHECK_INTERACTIONS([
+    { i: 0, a: 'A10BA02' },  // metformin
+    { i: 1, a: 'V08AB02' },  // iohexol (jodkontrast)
+  ]);
+  assert(result.length >= 1);
+  assert(result[0].s === 'danger');
+  assert(result[0].t.indexOf('laktatacidos') >= 0, 'titeln ska n\u00e4mna laktatacidos');
+});
+
+test('valproat + karbapenem (meropenem) \u2192 danger (recidivrisk)', function() {
+  var result = CHECK_INTERACTIONS([
+    { i: 0, a: 'N03AG01' },  // valproat
+    { i: 1, a: 'J01DH02' },  // meropenem
+  ]);
+  assert(result.length >= 1);
+  assert(result[0].s === 'danger');
+  assert(result[0].t.indexOf('recidiv') >= 0, 'titeln ska n\u00e4mna recidiv');
+});
+
+test('makrolider (klaritromycin) + warfarin \u2192 danger (INR-stegring)', function() {
+  var result = CHECK_INTERACTIONS([
+    { i: 0, a: 'J01FA09' },  // klaritromycin
+    { i: 1, a: 'B01AA03' },  // warfarin
+  ]);
+  assert(result.length >= 1);
+  assert(result[0].s === 'danger');
+  assert(result[0].t.indexOf('INR') >= 0, 'titeln ska n\u00e4mna INR');
+});
+
+test('klopidogrel + omeprazol \u2192 warn (minskad effekt)', function() {
+  var result = CHECK_INTERACTIONS([
+    { i: 0, a: 'B01AC04' },  // klopidogrel
+    { i: 1, a: 'A02BC01' },  // omeprazol
+  ]);
+  assert(result.length >= 1);
+  assert(result[0].s === 'warn');
+  assert(result[0].t.indexOf('klopidogrel') >= 0, 'titeln ska n\u00e4mna klopidogrel');
+});
+
+test('litium + NSAID \u2192 danger (intoxikationsrisk)', function() {
+  var result = CHECK_INTERACTIONS([
+    { i: 0, a: 'N05AN01' },  // litium
+    { i: 1, a: 'M01AE01' },  // ibuprofen
+  ]);
+  assert(result.length >= 1);
+  assert(result[0].s === 'danger');
+  assert(result[0].t.indexOf('litium') >= 0, 'titeln ska n\u00e4mna litium');
+});
+
+test('tamoxifen + paroxetin \u2192 danger (recidivrisk br\u00f6stcancer)', function() {
+  var result = CHECK_INTERACTIONS([
+    { i: 0, a: 'L02BA01' },  // tamoxifen
+    { i: 1, a: 'N06AB05' },  // paroxetin
+  ]);
+  assert(result.length >= 1);
+  assert(result[0].s === 'danger');
+  assert(result[0].t.indexOf('tamoxifen') >= 0, 'titeln ska n\u00e4mna tamoxifen');
+});
+
 // ===== Dedup =====
 group('Deduplicering');
 

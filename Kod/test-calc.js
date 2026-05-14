@@ -895,6 +895,26 @@ test('datumläge: fraktionell dos (0,5 st/dag) → korrekt tabletträkning', () 
   assertEqual(r.packages,      1);
 });
 
+test('veckodos (doseInterval=7) → korrekt totalTablets', () => {
+  // 92 dagar × 1 dos/vecka = ceil(92 × 1 / 7) = ceil(13.14) = 14 tabletter; 14 ÷ 10 = 2 förp
+  setTestState(0, { dose: 1, doseInterval: 7, prescribedEndDateStr: '2025-06-01' });
+  __setPrescribeGlobals('months', 3, '');
+  setTestPS(0, { packageSize: '10' });
+  const r = calcPrescribeResult(0);
+  assertEqual(r.totalTablets, 14, '92 dagar, 1/vecka → 14 tabletter');
+  assertEqual(r.packages,      2, 'ceil(14 ÷ 10) = 2 förp');
+});
+
+test('månadsdos (doseInterval=30) → korrekt totalTablets', () => {
+  // 92 dagar × 1 dos/månad = ceil(92 × 1 / 30) = ceil(3.07) = 4 tabletter; 4 ÷ 10 = 1 förp
+  setTestState(0, { dose: 1, doseInterval: 30, prescribedEndDateStr: '2025-06-01' });
+  __setPrescribeGlobals('months', 3, '');
+  setTestPS(0, { packageSize: '10' });
+  const r = calcPrescribeResult(0);
+  assertEqual(r.totalTablets,  4, '92 dagar, 1/månad → 4 tabletter');
+  assertEqual(r.packages,      1, 'ceil(4 ÷ 10) = 1 förp');
+});
+
 test('packageSize=0 → packages=0', () => {
   setTestState(0, { dose: 1, prescribedEndDateStr: '2025-06-01' });
   setTestPS(0, { mode: 'months', months: 3, packageSize: '0', endDate: '' });
