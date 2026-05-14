@@ -34,7 +34,20 @@ Stöd för upp till **8 läkemedel** i samma session – en sammanhållen patien
 ### 2. 📦 Nyförskrivning
 När förnyelse beviljas visas en panel för beräkning av nytt recept. Läkaren anger önskad förskrivningsperiod (1–12 månader eller slutdatum) – verktyget beräknar exakt antal förpackningar som behövs, med hänsyn till kvarvarande dagar på befintligt recept. En sammanfattande översikt visas när flera läkemedel förnyas samtidigt.
 
-### 3. 📊 Långvarig förbrukning
+### 4. ⚠️ Interaktionsvarningar
+Verktyget analyserar automatiskt alla läkemedel i sessionen för kända läkemedelsinteraktioner baserat på ATC-koder. 77 regler fördelade på 9 kategorier:
+- **Serotonergt syndrom** – SSRI/SNRI + MAO-hämmare/tramadol/metadon/triptaner/linezolid
+- **Blödningsrisk** – warfarin/NOAK + NSAID/SSRI/antibiotika (metronidazol, flukonazol, ciprofloxacin)
+- **Hyperkalemi** – ACE/ARB + spironolakton/kaliumtillskott/trimetoprim
+- **Bradykardi/AV-block** – betablockerare + verapamil/diltiazem, digoxin + amiodaron/verapamil
+- **Smal terapeutisk bredd** – litium/MTX/azatioprin + interagerande läkemedel
+- **CYP-interaktioner** – statiner + makrolider/azol-antimykotika/amlodipin, klopidogrel + PPI, tamoxifen + SSRI/SNRI
+- **QT-förlängning** – citalopram/escitalopram/metadon + amiodaron/fluorokinoloner
+- **Triple whammy** – NSAID + ACE/ARB + diuretika (akut njursvikt)
+- **Psykofarmaka** – klozapin + fluvoxamin, karbamazepin + p-piller/antipsykotika/lamotrigin, kodein + CYP2D6-hämmare
+- **Övriga** – kortikosteroider + NSAID, ciklosporin + NSAID, ciprofloxacin + teofyllin/tizanidin med flera
+
+Varningarna visas ovanför beräkningsresultatet och graderas som **danger** (röd) eller **warn** (gul).
 Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder). För varje period anges startdatum, antal uttagna enheter och slutdatum. Verktyget beräknar:
 - Snittförbrukning per dag i varje period.
 - Avvikelse i procent mot ordinerad dos.
@@ -62,6 +75,7 @@ Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder
 - **Kliniskt överstyrande** – vid överförbrukning eller för tidig begäran kan läkaren manuellt godkänna förnyelse (Ja/Nej).
 - **Svar till patient på svenska och engelska** – växla med en knapp, ingen översättningstjänst krävs.
 - **Journalanteckning** – anpassas efter förnyelsebeslut och klinisk bedömning.
+- **Interaktionsvarningar** – 77 regler för läkemedelsinteraktioner. Varningar visas ovanför resultatet med severity (danger/warn), titel, beskrivning och åtgärdsrekommendation.
 - **Kopieringsknappar** – för snabb inklistring i journalsystem/1177.
 
 ### 📦 Nyförskrivning
@@ -70,6 +84,9 @@ Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder
 - **Dynamisk enhetsbeteckning** – förpackningsstorlek och resultat visas i rätt enhet (tabletter, ml eller doser) beroende på läkemedlets beredningsform.
 - Hanterar månadsövergångar korrekt (t.ex. 31 januari + 1 månad → 28 februari).
 - **Sammanfattande översikt** när flera läkemedel är aktuella för nyförskrivning.
+
+### 🩺 Sjuksköterskebedömning
+Valfri kolumn som möjliggör dokumentation av sjuksköterskans kliniska bedömning (vitalparametrar, uppföljning och ordinationsorsak). Bedömningen inkluderas automatiskt i journaltexten.
 
 ### 📊 Långvarig förbrukning
 - **Upp till 10 perioder** – lägg till/ta bort efter behov.
@@ -114,7 +131,9 @@ Tre inbyggda teman som växlas direkt:
   - `utils.js` – DOM-hjälpare, datumverktyg, toast, kopiering
   - `state.js` – centraliserad tillståndshantering
   - `calc-renew.js` – beräkningskärna och textgenerering för receptförnyelse
-  - `ui-renew.js` – UI-rendering för receptförnyelse (sidebar, formulär, resultatpanel, autocomplete)
+  - `drugs.js` – läkemedelsdatabas (~6 000 preparat)
+  - `interactions.js` – 77 interaktionsregler (handskrivna, ATC-baserade)
+  - `ui-renew.js` – UI-rendering för receptförnyelse (sidebar, formulär, resultatpanel, autocomplete, interaktionsvarningar)
   - `prescribe.js` – beräkningskärna och UI för nyförskrivning
   - `longterm.js` – långvarig förbrukning (beräkning + UI)
   - `drugs.js` – läkemedelsdatabas (~6 000 preparat)
@@ -131,15 +150,18 @@ Tre inbyggda teman som växlas direkt:
 
 **Utveckling:**
 ```bash
-npm test              # Kör alla tester (calc + UI)
-npm run test:calc     # Endast beräkningslogik
-npm run test:ui       # Endast UI-rendering
-npm run build:db      # Crawla FASS och bygg product-db.json (~45 min)
-npm run generate:drugs # Generera drugs.js från product-db.json (~1 min)
+npm test                  # Kör alla tester (calc + interactions + UI)
+npm run test:calc         # Endast beräkningslogik
+npm run test:interactions # Endast interaktionsmatchningsmotor
+npm run test:ui           # Endast UI-rendering
+npm run build:css          # Minifiera app.css → app.min.css
+npm run build:db           # Crawla FASS och bygg product-db.json (~45 min)
+npm run generate:drugs     # Generera drugs.js från product-db.json (~1 min)
 ```
 
 **Driftsätt online:**
-Ladda upp samtliga filer i `Kod/` till valfri statisk webbserver, t.ex. Cloudflare Pages. `_headers`-filen konfigurerar säkerhetsheaders (CSP, HSTS, COOP/COEP/CORP).
+Ladda upp samtliga filer i `Kod/` till valfri statisk webbserver.
+För **Cloudflare Pages**: ställ in publish directory till **`Kod/`**. `_headers`-filen konfigurerar säkerhetsheaders (CSP, HSTS, COOP/COEP/CORP).
 
 ---
 
