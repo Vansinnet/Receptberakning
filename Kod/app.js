@@ -219,13 +219,19 @@ if (formPanel) {
         e.target.setSelectionRange(pos, pos);
       }
       handleAcInput();
-      var s = states[activeMedIdx];
-      if (s && s._acDrugName) {
-        var inputVal = e.target.value.trim().toLowerCase();
-        var acPrefix = s._acDrugName.toLowerCase().substring(0, inputVal.length);
-        if (inputVal.length === 0 || inputVal !== acPrefix) {
-          applyMedStatePatch(activeMedIdx, { atcCode: null, _acDrugName: null, doseUnit: null, notCalculable: null, nplId: null });
-          checkAllInteractions();
+      var inputVal = e.target.value.trim();
+      if (!inputVal) {
+        applyMedStatePatch(activeMedIdx, { atcCode: null, _acDrugName: null, doseUnit: null, notCalculable: null, nplId: null });
+        checkAllInteractions();
+      } else {
+        var s = states[activeMedIdx];
+        if (s && s._acDrugName) {
+          var lowerVal = inputVal.toLowerCase();
+          var acPrefix = s._acDrugName.toLowerCase().substring(0, lowerVal.length);
+          if (lowerVal !== acPrefix) {
+            applyMedStatePatch(activeMedIdx, { atcCode: null, _acDrugName: null, doseUnit: null, notCalculable: null, nplId: null });
+            checkAllInteractions();
+          }
         }
       }
     }

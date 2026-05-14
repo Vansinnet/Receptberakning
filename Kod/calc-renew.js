@@ -47,7 +47,7 @@ function validateValues(medRaw, dateVal, doseRaw, amtRaw, refRaw, leftRaw, doseI
   // Kvarvarande mängd: heltal för diskreta enheter (st), decimaler tillåtna för volymer (ml, dos)
   const doseUnit = doseUnitRaw || 'st';
   const isDiscreteUnit = (doseUnit === 'st');
-  const remaining = leftRaw !== '' ? parseFloat(leftRaw) : null;
+  const remaining = leftRaw !== '' ? parseFloat(leftRaw.replace(',', '.')) : null;
   const leftIsInvalid = leftRaw !== '' && (
     isNaN(remaining) || remaining < 0 ||
     (isDiscreteUnit && !Number.isInteger(remaining))

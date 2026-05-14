@@ -157,6 +157,9 @@ function makeInput({
   ref       = 3,
   remaining = null,   // null = fältet lämnat tomt
   medRaw    = 'Testabol 10 mg',
+  doseInterval = 1,   // default = daglig dosering
+  doseUnit     = 'st',
+  notCalculable = false,
 } = {}) {
   const today = new Date(MOCK_TODAY_MS);
   const pDate = new Date(today.getTime() - daysSince * 86400000);
@@ -172,6 +175,9 @@ function makeInput({
     amtRaw:   String(amt),
     refRaw:   String(ref),
     leftRaw:  remaining !== null ? String(remaining) : '',
+    doseInterval,
+    doseUnit,
+    notCalculable,
   };
 }
 
@@ -371,6 +377,44 @@ test('ref=12, tidigt i perioden → isTooEarly', () => {
   const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 12, daysSince: 30, remaining: 1170 }), NO_PREV);
   assertEqual(r.isTooEarly, true);
   assertEqual(r.isOveruse, false);
+});
+
+// ===== calcCore med doseInterval =====
+group('calcCore med doseInterval');
+
+test('veckodos (doseInterval=7), förbrukning inom gräns → OK', () => {
+  // amt=30, ref=1, dose=1/vecka, remaining=5, daysSince=180
+  // total=30, accessibleTotal=30, consumed=25, avgNum=25/180=0.139
+  // effectiveDailyDose=1/7≈0.143
+  // consumptionPct=0.139/0.143=97.2% → ej overuse (0.139 < 0.143×1.10=0.157)
+  // totalDays=30/0.143=210, daysToPrescribedEnd=30, earlyThreshold=42 → ej for tidigt
+  const r = calcCore(makeInput({ dose:1, doseInterval:7, amt:30, ref:1, remaining:5, daysSince:180 }), NO_PREV);
+  assert(r.valid);
+  assert(!r.isOveruse, '97% forbrukning ska inte vara overforbrukning');
+  assert(!r.isTooEarly, '30 dagar kvar < 42 troskel -> inte for tidigt');
+  assertEqual(r.statusText.indexOf('OK'), 0, 'statusText ska borja med OK');
+});
+
+test('veckodos (doseInterval=7) → displayAvgStr innehaller st/vecka', () => {
+  const r = calcCore(makeInput({ dose:1, doseInterval:7, amt:30, ref:1, remaining:5, daysSince:180 }), NO_PREV);
+  assertContains(r.displayAvgStr, 'st/vecka');
+});
+
+test('manadsdos (doseInterval=30), forbrukning inom grans → OK', () => {
+  // amt=30, ref=1, dose=1/manad, remaining=28, daysSince=60
+  // total=30, accessibleTotal=30, consumed=2, avgNum=2/60=0.033
+  // effectiveDailyDose=1/30≈0.033 → 100% consumption → ej overuse
+  // totalDays=30/0.033=900, daysToPrescribedEnd=840, earlyThreshold=180 → for tidigt
+  const r = calcCore(makeInput({ dose:1, doseInterval:30, amt:30, ref:1, remaining:28, daysSince:60 }), NO_PREV);
+  assert(r.valid);
+  assert(!r.isOveruse, '100% forbrukning ska inte vara overforbrukning');
+  // At 6% of period (60/900), definition too early
+  assert(r.isTooEarly, '6% av perioden -> for tidigt');
+});
+
+test('manadsdos (doseInterval=30) → displayAvgStr innehaller st/m\u00e5nad', () => {
+  const r = calcCore(makeInput({ dose:1, doseInterval:30, amt:30, ref:1, remaining:28, daysSince:60 }), NO_PREV);
+  assertContains(r.displayAvgStr, 'st/m\u00e5nad');
 });
 
 
