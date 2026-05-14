@@ -106,7 +106,8 @@ function updateFormHeader(i) {
     const drugEntry = _drugByName.get(s.medRaw.toLowerCase());
     if (drugEntry) {
       narcClass = drugEntry.r;
-      nplId = drugEntry.i || nplId;
+      // Bevara autocomplete NPL-ID om det finns — Map:et är bara fallback för manuell inmatning.
+      if (!nplId) nplId = drugEntry.i;
     }
   }
   if (fassBtn) {

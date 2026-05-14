@@ -111,7 +111,7 @@ function todayStr() {
 
 function oneYearAgoStr() {
   const n = new Date();
-  const d = new Date(Date.UTC(n.getUTCFullYear()-1, n.getUTCMonth(), n.getUTCDate()));
+  const d = new Date(Date.UTC(n.getFullYear()-1, n.getMonth(), n.getDate()));
   return fmtDate(d);
 }
 
@@ -122,9 +122,9 @@ function fmtDate(d) {
 let _todayCache = null, _todayCacheKey = '';
 function getToday() {
   const n = new Date();
-  const key = `${n.getUTCFullYear()}-${n.getUTCMonth()}-${n.getUTCDate()}`;
+  const key = `${n.getFullYear()}-${n.getMonth()}-${n.getDate()}`;
   if (_todayCache && _todayCacheKey === key) return _todayCache;
-  _todayCache = new Date(Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate()));
+  _todayCache = new Date(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()));
   _todayCacheKey = key;
   return _todayCache;
 }

@@ -129,8 +129,10 @@ function updatePrescribeResult(i) {
   const nameEl = getEl('ps-med-name-' + i);
   if (nameEl) nameEl.textContent = (states[i] || {}).medRaw || `Läkemedel ${i + 1}`;
 
-  // Befintligt recept täcker redan hela perioden — inget nytt behöver förskrivas
-  if (res && res.packages === 0 && res.totalDays === 0 && res.daysAlreadyCovered > 0) {
+  // Befintligt recept täcker redan hela perioden — inget nytt behöver förskrivas.
+  // Guard: vid ogiltigt datum är totalDays=0 och daysAlreadyCovered>0, men "täcker redan" är missvisande.
+  const isDateValid = _prescribeMode !== 'date' || !!parseDateUTC(_prescribeEndDate);
+  if (res && res.packages === 0 && res.totalDays === 0 && res.daysAlreadyCovered > 0 && isDateValid) {
     const name = (states[i] || {}).medRaw || `Läkemedel ${i + 1}`;
     box.appendChild(el('div', { cls: 'prescribe-result-covered', text: `Nuvarande recept för ${name} täcker redan hela perioden.` }));
     renderPrescribeSummary();

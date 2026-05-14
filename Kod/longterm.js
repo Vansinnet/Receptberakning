@@ -230,6 +230,9 @@ function calcLongterm() {
 
   let result;
   try {
+    // AKTIVT VAL: _drugByName returnerar första matchande entryn per namn.
+    // För ~14 läkemedel med samma namn men olika NPL-ID (t.ex. öron- vs ögondroppar)
+    // kan FASS-länken peka på fel produkt. Påverkar endast länken, inte beräkningen.
     let nplId = null;
     if (medRaw) {
       const drugEntry = _drugByName.get(medRaw.toLowerCase());
