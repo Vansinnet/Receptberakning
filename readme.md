@@ -1,4 +1,4 @@
-# Receptberäkning
+﻿# Receptberäkning
 
 > Kliniskt beslutsstöd för läkare vid handläggning av receptförnyelser via 1177, nyförskrivning samt analys av långvarig förbrukning.
 
