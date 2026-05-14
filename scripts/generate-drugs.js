@@ -263,12 +263,7 @@ function generateDrugsJs(candidates) {
 }
 
 function updateIndexDate() {
-  if (!fs.existsSync(INDEX_FILE)) return;
-  const today = new Date().toISOString().split("T")[0];
-  let html = fs.readFileSync(INDEX_FILE, "utf8");
-  html = html.replace(/uppdaterad \d{4}-\d{2}-\d{2}/, `uppdaterad ${today}`);
-  fs.writeFileSync(INDEX_FILE, html);
-  console.log(`  Datum i index.html uppdaterat till ${today}`);
+  console.log(`  Versionsnummer hanteras separat vid commit.`);
 }
 
 function main() {
