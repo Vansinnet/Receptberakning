@@ -1,193 +1,193 @@
-# Receptber├ñkning
+# Receptberäkning
 
-> Kliniskt beslutsst├Âd f├Âr l├ñkare vid handl├ñggning av receptf├Ârnyelser via 1177, nyf├Ârskrivning samt analys av l├Ñngvarig f├Ârbrukning.
+> Kliniskt beslutsstöd för läkare vid handläggning av receptförnyelser via 1177, nyförskrivning samt analys av långvarig förbrukning.
 
 **Live:** [receptberakning.pages.dev](https://receptberakning.pages.dev/)
 
 ---
 
-> **Observera:** Verktyget ├ñr endast ett beslutsst├Âd. Sjukv├Ñrdspersonal ska alltid anv├ñnda sitt kliniska omd├Âme. Genererade texter ├ñr f├Ârslag baserade p├Ñ matematiska ber├ñkningar och kan beh├Âva justeras utifr├Ñn patientens unika situation.
+> **Observera:** Verktyget är endast ett beslutsstöd. Sjukvårdspersonal ska alltid använda sitt kliniska omdöme. Genererade texter är förslag baserade på matematiska beräkningar och kan behöva justeras utifrån patientens unika situation.
 
 ---
 
-## Vad g├Âr verktyget?
+## Vad gör verktyget?
 
-Verktyget best├Ñr av tre funktioner f├Ârdelade p├Ñ tv├Ñ huvudflikar:
+Verktyget består av tre funktioner fördelade på två huvudflikar:
 
-### 1. ­ƒÆè Receptf├Ârnyelse
-L├ñkaren matar in ordinationsinformation (l├ñkemedel + styrka, senaste receptdatum, m├ñngd per uttag, antal uttag och ordinerad dos). Verktyget ber├ñknar patientens f├Ârbrukningstakt och bed├Âmer om f├Ârnyelse ├ñr l├ñmplig.
+### 1. 💊 Receptförnyelse
+Läkaren matar in ordinationsinformation (läkemedel + styrka, senaste receptdatum, mängd per uttag, antal uttag och ordinerad dos). Verktyget beräknar patientens förbrukningstakt och bedömer om förnyelse är lämplig.
 
-Baserat p├Ñ ber├ñkningen visas ett **utl├Ñtande** med:
-- **OK att f├Ârnya** ÔÇô f├Ârbrukning inom ┬▒10 % av ordination, eller Ôëñ20 % av receptperioden kvar.
-- **F├Âr tidigt att f├Ârnya** ÔÇô normal f├Ârbrukning men mer ├ñn 20 % av receptperioden kvar.
-- **├ûverf├Ârbrukning** ÔÇô snittf├Ârbrukning >10 % ├Âver ordinerad dos och (mer ├ñn 7 dosdagar kvar *eller* mer ├ñn 14 perioddagar kvar).
+Baserat på beräkningen visas ett **utlåtande** med:
+- **OK att förnya** – förbrukning inom ±10 % av ordination, eller ≤20 % av receptperioden kvar.
+- **För tidigt att förnya** – normal förbrukning men mer än 20 % av receptperioden kvar.
+- **Överförbrukning** – snittförbrukning >10 % över ordinerad dos och (mer än 7 dosdagar kvar *eller* mer än 14 perioddagar kvar).
 
-F├Âr ├Âverf├Ârbrukning eller f├Âr tidig f├Ârnyelse kan l├ñkaren **aktivt ├Âverstyra** via knapparna **Ja, f├Ârnya** / **Nej, avsl├Ñ**. Detta p├Ñverkar b├Ñde statusf├ñrg, sidomeny och de genererade texterna.
+För överförbrukning eller för tidig förnyelse kan läkaren **aktivt överstyra** via knapparna **Ja, förnya** / **Nej, avslå**. Detta påverkar både statusfärg, sidomeny och de genererade texterna.
 
-F├Âr varje l├ñkemedel genereras direkt:
-- **Svar till patient (svenska)** ÔÇô redo att skickas via 1177.
-- **Svar till patient (engelska)** ÔÇô v├ñxla med en knapp.
-- **Journalanteckning (f├Ârslag)** ÔÇô anpassad efter bed├Âmningen.
+För varje läkemedel genereras direkt:
+- **Svar till patient (svenska)** – redo att skickas via 1177.
+- **Svar till patient (engelska)** – växla med en knapp.
+- **Journalanteckning (förslag)** – anpassad efter bedömningen.
 
-St├Âd f├Âr upp till **8 l├ñkemedel** i samma session ÔÇô en sammanh├Ñllen patienttext och journalanteckning skapas f├Âr alla.
+Stöd för upp till **8 läkemedel** i samma session – en sammanhållen patienttext och journalanteckning skapas för alla.
 
-### 2. ­ƒôª Nyf├Ârskrivning
-N├ñr f├Ârnyelse beviljas visas en panel f├Âr ber├ñkning av nytt recept. L├ñkaren anger ├Ânskad f├Ârskrivningsperiod (1ÔÇô12 m├Ñnader eller slutdatum) ÔÇô verktyget ber├ñknar exakt antal f├Ârpackningar som beh├Âvs, med h├ñnsyn till kvarvarande dagar p├Ñ befintligt recept. En sammanfattande ├Âversikt visas n├ñr flera l├ñkemedel f├Ârnyas samtidigt.
+### 2. 📦 Nyförskrivning
+När förnyelse beviljas visas en panel för beräkning av nytt recept. Läkaren anger önskad förskrivningsperiod (1–12 månader eller slutdatum) – verktyget beräknar exakt antal förpackningar som behövs, med hänsyn till kvarvarande dagar på befintligt recept. En sammanfattande översikt visas när flera läkemedel förnyas samtidigt.
 
-### 3. ­ƒôè L├Ñngvarig f├Ârbrukning
-Analysera f├Ârbrukningsm├Ânster ├Âver flera receptperioder (upp till 10 perioder). F├Âr varje period anges startdatum, antal uttagna enheter och slutdatum. Verktyget ber├ñknar:
-- Snittf├Ârbrukning per dag i varje period.
+### 3. 📊 Långvarig förbrukning
+Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder). För varje period anges startdatum, antal uttagna enheter och slutdatum. Verktyget beräknar:
+- Snittförbrukning per dag i varje period.
 - Avvikelse i procent mot ordinerad dos.
-- Total snittf├Ârbrukning ├Âver alla perioder.
-- Visuell stapel och status (├ûver / OK / Under).
+- Total snittförbrukning över alla perioder.
+- Visuell stapel och status (Över / OK / Under).
 - Genererad journalanteckning med sammanfattning.
 
 ---
 
 ## Funktioner i detalj
 
-### Ô£à Receptf├Ârnyelse
-- St├Âd f├Âr upp till **8 l├ñkemedel**.
-- **Autocomplete** f├Âr l├ñkemedelsnamn ÔÇô s├Âk bland ~6 000 preparat ur FASS.
-- **Automatisk datumformatering** (├à├à├à├à-MM-DD).
-- **Dosintervall** ÔÇô per dag, per vecka (t.ex. pl├Ñster, veckodep├Ñer) eller per m├Ñnad (t.ex. m├Ñnadsdep├Ñer, implantat).
-- **Dosenheter** ÔÇô st (tabletter, kapslar, pl├Ñster), ml (orala l├Âsningar, injektioner), doser (inhalatorer, n├ñssprayer, ├Âgondroppar, injektionspennor).
-- **Ej kvantifierbara beredningar** ÔÇô kr├ñmer, salvor, dialysv├ñtskor, gaser markeras f├Âr manuell bed├Âmning.
-- **Valfritt f├ñlt f├Âr kvarvarande m├ñngd** ÔÇô ger exakt snittber├ñkning i st├ñllet f├Âr worstÔÇæcaseÔÇæantagande. Decimaler till├Ñtna f├Âr ml och doser.
-- **Direktl├ñnk till FASS** f├Âr aktuellt l├ñkemedel.
-- **Narkotikavarning** ÔÇô identifierar narkotikaklassade preparat enligt LVFS 2011:10 och visar en badge (F├Ârteckning IIÔÇôV).
-- **Tidslinje** ÔÇô visar hur stor del av receptperioden som f├Ârflutit.
-- **M├ñtv├ñrden** med verktygstips (totalt f├Ârskrivet, slutdatum, snittf├Ârbrukning i aktuell enhet).
-- **Alerter** ÔÇô varning vid l├Ñg f├Ârbrukning, f├Ârh├Âjd f├Ârbrukning inom 7 dagar, tidig uth├ñmtning, avvikande data.
-- **Kliniskt ├Âverstyrande** ÔÇô vid ├Âverf├Ârbrukning eller f├Âr tidig beg├ñran kan l├ñkaren manuellt godk├ñnna f├Ârnyelse (Ja/Nej).
-- **Svar till patient p├Ñ svenska och engelska** ÔÇô v├ñxla med en knapp, ingen ├Âvers├ñttningstj├ñnst kr├ñvs.
-- **Journalanteckning** ÔÇô anpassas efter f├Ârnyelsebeslut och klinisk bed├Âmning.
-- **Kopieringsknappar** ÔÇô f├Âr snabb inklistring i journalsystem/1177.
+### ✅ Receptförnyelse
+- Stöd för upp till **8 läkemedel**.
+- **Autocomplete** för läkemedelsnamn – sök bland ~6 000 preparat ur FASS.
+- **Automatisk datumformatering** (ÅÅÅÅ-MM-DD).
+- **Dosintervall** – per dag, per vecka (t.ex. plåster, veckodepåer) eller per månad (t.ex. månadsdepåer, implantat).
+- **Dosenheter** – st (tabletter, kapslar, plåster), ml (orala lösningar, injektioner), doser (inhalatorer, nässprayer, ögondroppar, injektionspennor).
+- **Ej kvantifierbara beredningar** – krämer, salvor, dialysvätskor, gaser markeras för manuell bedömning.
+- **Valfritt fält för kvarvarande mängd** – ger exakt snittberäkning i stället för worst‑case‑antagande. Decimaler tillåtna för ml och doser.
+- **Direktlänk till FASS** för aktuellt läkemedel.
+- **Narkotikavarning** – identifierar narkotikaklassade preparat enligt LVFS 2011:10 och visar en badge (Förteckning II–V).
+- **Tidslinje** – visar hur stor del av receptperioden som förflutit.
+- **Mätvärden** med verktygstips (totalt förskrivet, slutdatum, snittförbrukning i aktuell enhet).
+- **Alerter** – varning vid låg förbrukning, förhöjd förbrukning inom 7 dagar, tidig uthämtning, avvikande data.
+- **Kliniskt överstyrande** – vid överförbrukning eller för tidig begäran kan läkaren manuellt godkänna förnyelse (Ja/Nej).
+- **Svar till patient på svenska och engelska** – växla med en knapp, ingen översättningstjänst krävs.
+- **Journalanteckning** – anpassas efter förnyelsebeslut och klinisk bedömning.
+- **Kopieringsknappar** – för snabb inklistring i journalsystem/1177.
 
-### ­ƒôª Nyf├Ârskrivning
-- V├ñlj periodl├ñngd via **m├Ñnadsv├ñljare** (1ÔÇô12 m├Ñnader) eller **angivet slutdatum**.
-- Ber├ñknar exakt **antal f├Ârpackningar** med h├ñnsyn till daglig dos, f├Ârpackningsstorlek och kvarvarande t├ñckning fr├Ñn nuvarande recept.
-- **Dynamisk enhetsbeteckning** ÔÇô f├Ârpackningsstorlek och resultat visas i r├ñtt enhet (tabletter, ml eller doser) beroende p├Ñ l├ñkemedlets beredningsform.
-- Hanterar m├Ñnads├Âverg├Ñngar korrekt (t.ex. 31 januari + 1 m├Ñnad ÔåÆ 28 februari).
-- **Sammanfattande ├Âversikt** n├ñr flera l├ñkemedel ├ñr aktuella f├Âr nyf├Ârskrivning.
+### 📦 Nyförskrivning
+- Välj periodlängd via **månadsväljare** (1–12 månader) eller **angivet slutdatum**.
+- Beräknar exakt **antal förpackningar** med hänsyn till daglig dos, förpackningsstorlek och kvarvarande täckning från nuvarande recept.
+- **Dynamisk enhetsbeteckning** – förpackningsstorlek och resultat visas i rätt enhet (tabletter, ml eller doser) beroende på läkemedlets beredningsform.
+- Hanterar månadsövergångar korrekt (t.ex. 31 januari + 1 månad → 28 februari).
+- **Sammanfattande översikt** när flera läkemedel är aktuella för nyförskrivning.
 
-### ­ƒôè L├Ñngvarig f├Ârbrukning
-- **Upp till 10 perioder** ÔÇô l├ñgg till/ta bort efter behov.
-- F├Ârvalda datum: start = ett ├Ñr tillbaka, slut = idag.
+### 📊 Långvarig förbrukning
+- **Upp till 10 perioder** – lägg till/ta bort efter behov.
+- Förvalda datum: start = ett år tillbaka, slut = idag.
 - Validering av datum (start < slut, inga framtida datum).
-- Hanterar **├Âverlappande perioder** via datumunion f├Âr korrekt totaldygnsber├ñkning.
-- **Stapeldiagram** ÔÇô relativ f├Ârbrukning (0ÔÇô150 % av ordination).
-- **Periodtabell** ÔÇô visar snitt/dag, avvikelse % och badge.
-- **Journalanteckning** ÔÇô sammanfattar alla perioder och total snittf├Ârbrukning.
+- Hanterar **överlappande perioder** via datumunion för korrekt totaldygnsberäkning.
+- **Stapeldiagram** – relativ förbrukning (0–150 % av ordination).
+- **Periodtabell** – visar snitt/dag, avvikelse % och badge.
+- **Journalanteckning** – sammanfattar alla perioder och total snittförbrukning.
 
-### ­ƒöÆ Integritet och s├ñkerhet
-- All patientdata stannar **enbart i webbl├ñsarens minne** ÔÇô skickas aldrig till n├Ñgon server.
-- **Automatisk rensning** efter 23 minuters inaktivitet (varning efter 22 min) ÔÇô anpassat f├Âr delade kliniska datorer.
-- Endast temainst├ñllningen sparas i `localStorage`.
-- **Content Security Policy** blockerar alla externa n├ñtverksanrop.
-- **Inga externa bibliotek** ÔÇô ren HTML/CSS/JavaScript.
-- **Trusted Types** enforced f├Âr skydd mot DOM-baserade XSS-attacker.
-- Data rensas vid `pagehide` (bfcache-s├ñkerhet).
+### 🔒 Integritet och säkerhet
+- All patientdata stannar **enbart i webbläsarens minne** – skickas aldrig till någon server.
+- **Automatisk rensning** efter 23 minuters inaktivitet (varning efter 22 min) – anpassat för delade kliniska datorer.
+- Endast temainställningen sparas i `localStorage`.
+- **Content Security Policy** blockerar alla externa nätverksanrop.
+- **Inga externa bibliotek** – ren HTML/CSS/JavaScript.
+- **Trusted Types** enforced för skydd mot DOM-baserade XSS-attacker.
+- Data rensas vid `pagehide` (bfcache-säkerhet).
 
-### ­ƒÄ¿ Utseende
-Tre inbyggda teman som v├ñxlas direkt:
-- **­ƒ®║ Klinisk** (standard) ÔÇô lugn gr├Ân/teal-bas.
-- **­ƒîÖ M├Ârkt** ÔÇô h├Âg kontrast, m├Ârk bakgrund.
-- **­ƒî© K├Ârsb├ñr** ÔÇô varmt rosa tema med mjuka accenter.
+### 🎨 Utseende
+Tre inbyggda teman som växlas direkt:
+- **🩺 Klinisk** (standard) – lugn grön/teal-bas.
+- **🌙 Mörkt** – hög kontrast, mörk bakgrund.
+- **🌸 Körsbär** – varmt rosa tema med mjuka accenter.
 
-### ­ƒº░ ├ûvrigt
-- **Verktygstips** (`data-tooltip`) f├Âr n├ñstan alla inmatningsf├ñlt och m├ñtv├ñrden.
+### 🧰 Övrigt
+- **Verktygstips** (`data-tooltip`) för nästan alla inmatningsfält och mätvärden.
 - **Toastmeddelande** vid inaktivitet.
-- **Modal** f├Âr bekr├ñftelse vid rensning av all data.
-- **Responsiv design** ÔÇô anpassar sig f├Âr smalare sk├ñrmar (staplad vy).
-- **Validering** ÔÇô dos 0,1ÔÇô50 (oberoende enhet), m├ñngd per uttag 1ÔÇô10 000 (heltal f├Âr st, decimaler till├Ñtna f├Âr ml/doser), antal uttag 1ÔÇô12, strikt datumvalidering inklusive skott├Ñr.
+- **Modal** för bekräftelse vid rensning av all data.
+- **Responsiv design** – anpassar sig för smalare skärmar (staplad vy).
+- **Validering** – dos 0,1–50 (oberoende enhet), mängd per uttag 1–10 000 (heltal för st, decimaler tillåtna för ml/doser), antal uttag 1–12, strikt datumvalidering inklusive skottår.
 
 ---
 
 ## Teknisk information
 
-- **Ren HTML/CSS/JavaScript** ÔÇô inga ramverk, inga externa beroenden i produktion.
-- **Modul├ñr arkitektur** (alla filer i `Kod/`):
-  - `index.html` ÔÇô applikationsskal
-  - `app.css` ÔÇô all stilmall (tre teman, responsiv design)
-  - `app.js` ÔÇô orkestrering (eventlyssnare, temahantering, inaktivitetstimer)
-  - `utils.js` ÔÇô DOM-hj├ñlpare, datumverktyg, toast, kopiering
-  - `state.js` ÔÇô centraliserad tillst├Ñndshantering
-  - `calc-renew.js` ÔÇô ber├ñkningsk├ñrna och textgenerering f├Âr receptf├Ârnyelse
-  - `ui-renew.js` ÔÇô UI-rendering f├Âr receptf├Ârnyelse (sidebar, formul├ñr, resultatpanel, autocomplete)
-  - `prescribe.js` ÔÇô ber├ñkningsk├ñrna och UI f├Âr nyf├Ârskrivning
-  - `longterm.js` ÔÇô l├Ñngvarig f├Ârbrukning (ber├ñkning + UI)
-  - `drugs.js` ÔÇô l├ñkemedelsdatabas (~6 000 preparat)
-- Fungerar **helt offline** ÔÇô ├Âppna bara `index.html` i en webbl├ñsare.
-- **Standardiserad datumhantering** ÔÇô alla datum hanteras som UTC f├Âr att undvika tidszonsproblem.
-- **Rena ber├ñkningsfunktioner** (`calcCore`, `calcLongtermCore`, `calcPrescribeResult`) saknar DOM-beroenden. DOM-skal l├ñser f├ñlt, anropar k├ñrnan, renderar resultat.
+- **Ren HTML/CSS/JavaScript** – inga ramverk, inga externa beroenden i produktion.
+- **Modulär arkitektur** (alla filer i `Kod/`):
+  - `index.html` – applikationsskal
+  - `app.css` – all stilmall (tre teman, responsiv design)
+  - `app.js` – orkestrering (eventlyssnare, temahantering, inaktivitetstimer)
+  - `utils.js` – DOM-hjälpare, datumverktyg, toast, kopiering
+  - `state.js` – centraliserad tillståndshantering
+  - `calc-renew.js` – beräkningskärna och textgenerering för receptförnyelse
+  - `ui-renew.js` – UI-rendering för receptförnyelse (sidebar, formulär, resultatpanel, autocomplete)
+  - `prescribe.js` – beräkningskärna och UI för nyförskrivning
+  - `longterm.js` – långvarig förbrukning (beräkning + UI)
+  - `drugs.js` – läkemedelsdatabas (~6 000 preparat)
+- Fungerar **helt offline** – öppna bara `index.html` i en webbläsare.
+- **Standardiserad datumhantering** – alla datum hanteras som UTC för att undvika tidszonsproblem.
+- **Rena beräkningsfunktioner** (`calcCore`, `calcLongtermCore`, `calcPrescribeResult`) saknar DOM-beroenden. DOM-skal läser fält, anropar kärnan, renderar resultat.
 
 ---
 
-## Kom ig├Ñng
+## Kom igång
 
 **Lokalt:**
-├ûppna `Kod/index.html` i valfri webbl├ñsare ÔÇô ingen installation beh├Âvs.
+Öppna `Kod/index.html` i valfri webbläsare – ingen installation behövs.
 
 **Utveckling:**
 ```bash
-npm test              # K├Âr alla tester (calc + UI)
-npm run test:calc     # Endast ber├ñkningslogik
+npm test              # Kör alla tester (calc + UI)
+npm run test:calc     # Endast beräkningslogik
 npm run test:ui       # Endast UI-rendering
 npm run build:db      # Crawla FASS och bygg product-db.json (~45 min)
-npm run generate:drugs # Generera drugs.js fr├Ñn product-db.json (~1 min)
+npm run generate:drugs # Generera drugs.js från product-db.json (~1 min)
 ```
 
-**Drifts├ñtt online:**
-Ladda upp samtliga filer i `Kod/` till valfri statisk webbserver, t.ex. Cloudflare Pages. `_headers`-filen konfigurerar s├ñkerhetsheaders (CSP, HSTS, COOP/COEP/CORP).
+**Driftsätt online:**
+Ladda upp samtliga filer i `Kod/` till valfri statisk webbserver, t.ex. Cloudflare Pages. `_headers`-filen konfigurerar säkerhetsheaders (CSP, HSTS, COOP/COEP/CORP).
 
 ---
 
 ## Datapipeline
 
-L├ñkemedelsdatabasen (`drugs.js`) byggs i tv├Ñ steg:
+Läkemedelsdatabasen (`drugs.js`) byggs i två steg:
 
 ```
 FASS.se (~14 000 NPL-ID:n)
-  ÔööÔöÇ build:db ÔåÆ data/product-db.json
-       ÔööÔöÇ generate:drugs ÔåÆ Kod/drugs.js (samtliga beredningsformer)
+  └─ build:db → data/product-db.json
+       └─ generate:drugs → Kod/drugs.js (samtliga beredningsformer)
 ```
 
-`build:db` anv├ñnder `classifyDoseForm()` f├Âr att kategorisera varje produkt: kvantifierbara med enhetsnyckel (`st`, `ml`, `dos`) eller markerade som ej kvantifierbara (`notCalculable`). `generate:drugs` l├ñser klassificeringen och genererar drugÔÇæentrierna med r├ñtt enhet och flagga.
+`build:db` använder `classifyDoseForm()` för att kategorisera varje produkt: kvantifierbara med enhetsnyckel (`st`, `ml`, `dos`) eller markerade som ej kvantifierbara (`notCalculable`). `generate:drugs` läser klassificeringen och genererar drug‑entrierna med rätt enhet och flagga.
 
-B├Âr k├Âras kvartalsvis eller vid st├Ârre f├Âr├ñndringar i FASS sortiment.
-
----
-
-## Genererade texter ÔÇô exempel
-
-**OK att f├Ârnya ÔÇô svar till patient (sv)**
-> Vi har tagit emot din beg├ñran p├Ñ Elvanse 50 mg och kommer att f├Ârnya ditt recept inom 2ÔÇô3 arbetsdagar. Du kan d├ñrefter h├ñmta ut din medicin p├Ñ valfritt apotek.
-
-**F├Âr tidigt ÔÇô svar till patient (sv)**
-> Vi har tagit emot din f├Ârfr├Ñgan om receptf├Ârnyelse f├Âr Elvanse 50 mg. Enligt din ordination (1 st/dag) ber├ñknas medicinen r├ñcka till den 2025-06-14. Eftersom det datumet inte ├ñnnu har passerat kan vi inte f├Ârnya receptet just nu. V├ñnligen h├Âr av dig igen runt den 2025-06-07 s├Ñ hj├ñlper vi dig d├Ñ med nytt recept.
-
-**├ûverf├Ârbrukning ÔÇô journalanteckning (efter klinisk bed├Âmning)**
-> Kontaktorsak: Receptf├Ârnyelse via 1177.
->
-> Bed├Âmning: Patienten beg├ñr f├Ârnyelse av Elvanse 50 mg. Senaste receptet utf├ñrdades 2025-01-15 (totalt 300 doser, ordination 1 st/dag) och borde r├ñcka till 2025-11-12. Ber├ñknad snittf├Ârbrukning: 1,72 st/dag (ber├ñknat p├Ñ faktisk f├ÂrbrukningÔÇª) ÔÇô ├Âverstiger ordination. Receptet f├Ârnyas p├Ñ klinisk indikation.
->
-> ├àtg├ñrd: Nytt recept utf├ñrdat (r├ñcker t.o.m. 2025-12-15). Svar skickat till patient via 1177.
+Bör köras kvartalsvis eller vid större förändringar i FASS sortiment.
 
 ---
 
-## Licens och anv├ñndningsvillkor
+## Genererade texter – exempel
 
-Copyright (C) 2026 Vansinnet. Alla r├ñttigheter f├Ârbeh├Ñllna.
+**OK att förnya – svar till patient (sv)**
+> Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt recept inom 2–3 arbetsdagar. Du kan därefter hämta ut din medicin på valfritt apotek.
 
-Detta verktyg ├ñr publicerat med ├Âppen k├ñllkod f├Âr att m├Âjligg├Âra transparens, klinisk granskning och bidrag fr├Ñn communityt. F├Âr anv├ñndning g├ñller f├Âljande:
+**För tidigt – svar till patient (sv)**
+> Vi har tagit emot din förfrågan om receptförnyelse för Elvanse 50 mg. Enligt din ordination (1 st/dag) beräknas medicinen räcka till den 2025-06-14. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. Vänligen hör av dig igen runt den 2025-06-07 så hjälper vi dig då med nytt recept.
 
-* **Privatpersoner/Enskilda l├ñkare:** Du f├Ñr anv├ñnda verktyget fritt f├Âr personligt bruk och enskild klinisk handl├ñggning.
-* **V├Ñrdf├Âretag och kommersiella akt├Ârer:** Det ├ñr **inte till├Ñtet** att implementera, distribuera eller anv├ñnda detta verktyg systematiskt inom vinstdrivande verksamhet eller kommersiella system utan uttryckligt skriftligt medgivande fr├Ñn upphovsmannen.
+**Överförbrukning – journalanteckning (efter klinisk bedömning)**
+> Kontaktorsak: Receptförnyelse via 1177.
+>
+> Bedömning: Patienten begär förnyelse av Elvanse 50 mg. Senaste receptet utfärdades 2025-01-15 (totalt 300 doser, ordination 1 st/dag) och borde räcka till 2025-11-12. Beräknad snittförbrukning: 1,72 st/dag (beräknat på faktisk förbrukning…) – överstiger ordination. Receptet förnyas på klinisk indikation.
+>
+> Åtgärd: Nytt recept utfärdat (räcker t.o.m. 2025-12-15). Svar skickat till patient via 1177.
 
-F├Âr tillst├Ñnd eller fr├Ñgor om kommersiell licensiering, v├ñnligen kontakta mig via GitHub.
+---
+
+## Licens och användningsvillkor
+
+Copyright (C) 2026 Vansinnet. Alla rättigheter förbehållna.
+
+Detta verktyg är publicerat med öppen källkod för att möjliggöra transparens, klinisk granskning och bidrag från communityt. För användning gäller följande:
+
+* **Privatpersoner/Enskilda läkare:** Du får använda verktyget fritt för personligt bruk och enskild klinisk handläggning.
+* **Vårdföretag och kommersiella aktörer:** Det är **inte tillåtet** att implementera, distribuera eller använda detta verktyg systematiskt inom vinstdrivande verksamhet eller kommersiella system utan uttryckligt skriftligt medgivande från upphovsmannen.
+
+För tillstånd eller frågor om kommersiell licensiering, vänligen kontakta mig via GitHub.
 
 ---
 
 ## Friskrivning (Disclaimer)
-Verktyget tillhandah├Ñlls "i befintligt skick" utan garantier. Skaparen tar inget ansvar f├Âr medicinska beslut eller tekniska fel. Det kliniska ansvaret vilar alltid p├Ñ den f├Ârskrivande l├ñkaren.
+Verktyget tillhandahålls "i befintligt skick" utan garantier. Skaparen tar inget ansvar för medicinska beslut eller tekniska fel. Det kliniska ansvaret vilar alltid på den förskrivande läkaren.
