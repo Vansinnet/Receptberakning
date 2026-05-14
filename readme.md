@@ -1,12 +1,12 @@
 ﻿# Receptberäkning
 
-> Kliniskt beslutsstöd för läkare vid handläggning av receptförnyelser via 1177, nyförskrivning samt analys av långvarig förbrukning.
+> Beräkningshjälpmedel för läkare vid handläggning av receptförnyelser via 1177, nyförskrivning samt analys av långvarig förbrukning.
 
 **Live:** [receptberakning.pages.dev](https://receptberakning.pages.dev/)
 
 ---
 
-> **Observera:** Verktyget är endast ett beslutsstöd. Sjukvårdspersonal ska alltid använda sitt kliniska omdöme. Genererade texter är förslag baserade på matematiska beräkningar och kan behöva justeras utifrån patientens unika situation.
+> **Observera:** Verktyget är endast ett beräkningshjälpmedel. Sjukvårdspersonal ska alltid använda sitt kliniska omdöme. Genererade texter är förslag baserade på matematiska beräkningar och kan behöva justeras utifrån patientens unika situation.
 
 ---
 

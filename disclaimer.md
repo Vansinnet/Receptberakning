@@ -1,6 +1,6 @@
 # Ansvarsfriskrivning
 
-Detta verktyg är ett kliniskt beslutsstöd avsett att användas av legitimerad sjukvårdspersonal som ett hjälpmedel vid handläggning av receptförnyelser.
+Detta verktyg är ett beräkningshjälpmedel avsett att användas av legitimerad sjukvårdspersonal som ett hjälpmedel vid handläggning av receptförnyelser.
 
 All patientdata stannar i webbläsarens arbetsminne — ingen data skickas till eller lagras på någon server.
 
