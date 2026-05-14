@@ -8,3 +8,6 @@ data/
 # OS-filer
 .DS_Store
 Thumbs.db
+
+# Lokala utvecklingsfiler (ska aldrig checkas in)
+AGENTS.md
