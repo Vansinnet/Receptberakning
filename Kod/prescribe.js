@@ -213,10 +213,13 @@ function buildPrescribeDuration() {
 
   const toggleDiv = el('div', { cls: 'prescribe-mode-toggle' });
   ['months', 'date'].forEach(mode => {
+    const tooltip = mode === 'months'
+      ? 'Välj period i hela månader — befintlig recepttid räknas av automatiskt.'
+      : 'Välj ett specifikt slutdatum för förskrivningen.';
     const btn = el('button', {
       cls:   'prescribe-mode-btn' + (_prescribeMode === mode ? ' active' : ''),
       text:  mode === 'months' ? 'Månader' : 'Datum',
-      attrs: { type: 'button' },
+      attrs: { type: 'button', 'data-tooltip': tooltip },
       dataset: { mode },
     });
     btn.addEventListener('click', () => {

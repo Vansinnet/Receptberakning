@@ -41,7 +41,7 @@ function buildPeriodElement(period, i) {
       cls:   'btn btn-ghost',
       style: 'font-size:11px;margin-bottom:8px',
       text:  `✕ Ta bort period ${i + 1}`,
-      attrs: { type: 'button', 'data-action': 'remove-period', 'data-idx': String(i) },
+      attrs: { type: 'button', 'data-action': 'remove-period', 'data-idx': String(i), 'data-tooltip': 'Ta bort denna period från analysen.' },
     }));
   }
 
@@ -269,13 +269,13 @@ function calcLongterm() {
   if (resGridEl) {
     resGridEl.textContent = '';
     const frag = document.createDocumentFragment();
-    buildResultRow(frag, 'Analyserade perioder',     `${result.periods.length} st`);
-    buildResultRow(frag, 'Total analyslängd',        `${result.totalDays} dagar`);
-    buildResultRow(frag, 'Totalt uttagna enheter', `${result.totalTablets}`);
+    buildResultRow(frag, 'Analyserade perioder',     `${result.periods.length} st`,     null, 'Antal perioder som ingår i analysen.');
+    buildResultRow(frag, 'Total analyslängd',        `${result.totalDays} dagar`,       null, 'Sammanlagd tid som analysen täcker, i dagar.');
+    buildResultRow(frag, 'Totalt uttagna enheter', `${result.totalTablets}`,            null, 'Totalt antal enheter uttagna under analysperioden.');
     frag.appendChild(el('hr', { cls: 'divider' }));
-    buildResultRow(frag, 'Ordinerad dos',       `${result.ordDose} enheter/dag`);
-    buildResultRow(frag, 'Snittförbrukning',    result.avgStr);
-    buildResultRow(frag, 'Relativt ordination', `${result.consumptionPct.toFixed(1)}%`);
+    buildResultRow(frag, 'Ordinerad dos',       `${result.ordDose} enheter/dag`,        null, 'Ordinerad dygnsdos som referensvärde.');
+    buildResultRow(frag, 'Snittförbrukning',    result.avgStr,                          null, 'Genomsnittlig faktisk förbrukning per dag.');
+    buildResultRow(frag, 'Relativt ordination', `${result.consumptionPct.toFixed(1)}%`, null, 'Förbrukning i procent av ordinerad dos — 100% = enligt ordination.');
     resGridEl.appendChild(frag);
   }
 
@@ -286,6 +286,7 @@ function calcLongterm() {
     barEl.style.width = `${(result.barPct / 150) * 100}%`;
     barEl.className   = `consumption-bar ${result.overallStatus}`;
     barEl.textContent = result.barPct > 20 ? `${result.consumptionPct.toFixed(0)}%` : '';
+    barEl.setAttribute('data-tooltip', `Förbrukning relativt ordination — ${result.consumptionPct.toFixed(0)}% av ordinerad dos.`);
     barEl.setAttribute('aria-valuenow', String(Math.round(result.barPct)));
   }
   const barSec = getEl('lt-bar-section'); if (barSec) barSec.classList.remove('is-hidden');

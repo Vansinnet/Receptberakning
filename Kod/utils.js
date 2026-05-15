@@ -190,8 +190,10 @@ function parseDateUTC(str) {
 }
 
 /* Resultattabell-rad */
-function buildResultRow(frag, label, valueText, badgeNode=null) {
-  const rk = el('span', { cls: 'rk', text: label });
+function buildResultRow(frag, label, valueText, badgeNode=null, tooltip=null) {
+  const attrs = { cls: 'rk', text: label };
+  if (tooltip) attrs['data-tooltip'] = tooltip;
+  const rk = el('span', attrs);
   const rv = el('span', { cls: 'rv', text: valueText });
   if (badgeNode) { rv.appendChild(document.createTextNode(' ')); rv.appendChild(badgeNode); }
   frag.appendChild(rk);

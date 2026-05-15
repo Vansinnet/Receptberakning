@@ -66,14 +66,14 @@
         </svg>
       </span>
       <span class="app-brand-name">Receptberäkning</span>
-      <span class="app-brand-date">v1.16</span>
+      <span class="app-brand-date">v1.17</span>
     </div>
     <div class="topbar-nav-row">
       <nav class="main-tabs" role="tablist">
-        <button class="main-tab active" role="tab" id="tab-renew" aria-selected="true" aria-controls="panel-renew" data-tab="renew">💊 Receptförnyelse</button>
-        <button class="main-tab" role="tab" id="tab-longterm" aria-selected="false" aria-controls="panel-longterm" data-tab="longterm">📊 Långvarig förbrukning</button>
+        <button class="main-tab active" role="tab" id="tab-renew" aria-selected="true" aria-controls="panel-renew" data-tab="renew" data-tooltip="Beräkna förbrukning och avgör om receptet kan förnyas.">💊 Receptförnyelse</button>
+        <button class="main-tab" role="tab" id="tab-longterm" aria-selected="false" aria-controls="panel-longterm" data-tab="longterm" data-tooltip="Analysera förbrukningsmönster över flera receptperioder.">📊 Långvarig förbrukning</button>
       </nav>
-      <button id="nurseViewToggle" class="btn-nurse-toggle" aria-pressed="false">🩺 Sjuksköterskevy</button>
+      <button id="nurseViewToggle" class="btn-nurse-toggle" aria-pressed="false" data-tooltip="Växla till sjuksköterskans dokumentationsvy med bedömningsformulär.">🩺 Sjuksköterskevy</button>
       <div class="topbar-right">
         <div class="topbar-setting">
           <label for="themeSelect" class="topbar-setting-label">Tema</label>
@@ -100,10 +100,10 @@
           <span class="sidebar-label">Läkemedel</span>
         </div>
         <div class="med-list" id="medList" role="list"></div>
-        <button id="addMedBtn" class="btn-add-med" aria-label="Lägg till läkemedel">
+        <button id="addMedBtn" class="btn-add-med" aria-label="Lägg till läkemedel" data-tooltip="Lägg till ett nytt läkemedel för beräkning.">
           <span>＋</span> Lägg till
         </button>
-        <button id="newPatientBtn" class="btn btn-ghost">Ny patient</button>
+        <button id="newPatientBtn" class="btn btn-ghost" data-tooltip="Rensa all data och börja om med en ny patient.">Ny patient</button>
       </aside>
 
       <!-- MITTEN: FORMULÄR -->
@@ -119,14 +119,14 @@
               <div class="form-med-name" id="formMedName">—</div>
             </div>
             <div class="form-panel-actions">
-              <button class="btn btn-ghost" id="clearCardBtn">Rensa</button>
+              <button class="btn btn-ghost" id="clearCardBtn" data-tooltip="Rensa formuläret för detta läkemedel.">Rensa</button>
               <a class="btn btn-ghost fass-link is-hidden" id="fassBtnForm" href="#" target="_blank" rel="noopener noreferrer" data-tooltip="Öppnar FASS produktresumé för detta läkemedel i ny flik."><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="5" y="0" width="4" height="14" rx="1" fill="#025954"/><rect x="0" y="5" width="14" height="4" rx="1" fill="#025954"/></svg>FASS</a>
-              <button type="button" class="btn btn-ghost narc-btn is-hidden" id="narcBtnForm" disabled>Narkotika klass —</button>
+              <button type="button" class="btn btn-ghost narc-btn is-hidden" id="narcBtnForm" disabled data-tooltip="Narkotikaklassificering enligt Läkemedelsverket. Gråmarkerad när information saknas.">Narkotika klass —</button>
             </div>
           </div>
 
           <div class="field">
-            <label for="medInput" data-tooltip="Ange läkemedelsnamn och styrka exakt som på receptet, t.ex. 'Elvanse 50 mg'. Styr FASS-sökning.">Läkemedel och styrka</label>
+            <label for="medInput" data-tooltip="Ange läkemedelsnamn och styrka exakt som på receptet, t.ex. 'Sertralin 50 mg'. Styr FASS-sökning.">Läkemedel och styrka</label>
             <input id="medInput" type="text" placeholder="T.ex. Sertralin 50 mg" maxlength="100" lang="zxx" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-describedby="medInput-err">
             <span class="field-error-msg" id="medInput-err" aria-live="polite"></span>
           </div>
@@ -233,22 +233,22 @@
             <div class="early-decision-label">⚑ Åtgärd krävs</div>
             <div class="early-decision-q">Mot bakgrund av ovanstående och patientens unika fall — bedömer du att receptet ska förnyas?</div>
             <div class="early-decision-actions">
-              <button id="earlyDecisionYes" type="button" class="btn early-btn early-btn-yes">✓ Ja, förnya</button>
-              <button id="earlyDecisionNo"  type="button" class="btn early-btn early-btn-no">✕ Nej, avslå</button>
+              <button id="earlyDecisionYes" type="button" class="btn early-btn early-btn-yes" data-tooltip="Godkänn förnyelse trots avvikelse — motivering läggs i journaltexten.">✓ Ja, förnya</button>
+              <button id="earlyDecisionNo"  type="button" class="btn early-btn early-btn-no" data-tooltip="Avslå förnyelse — patienten meddelas via 1177.">✕ Nej, avslå</button>
             </div>
           </div>
 
           <!-- Copy-sektion -->
           <div class="copy-section" id="copySection">
             <div class="copy-tabs-row" role="tablist" aria-label="Texttyp att kopiera">
-              <button class="copy-tab active" role="tab" aria-selected="true"  data-tab="patient">Svar till patient (förslag)</button>
-              <button class="copy-tab"        role="tab" aria-selected="false" data-tab="journal">Journalanteckning (förslag)</button>
+              <button class="copy-tab active" role="tab" aria-selected="true"  data-tab="patient" data-tooltip="Förslag på formulering att skicka till patienten via 1177.">Svar till patient (förslag)</button>
+              <button class="copy-tab"        role="tab" aria-selected="false" data-tab="journal" data-tooltip="Förslag på formulering för dokumentation i journalen.">Journalanteckning (förslag)</button>
             </div>
             <div class="copy-body" id="copyBodyResult"></div>
             <div class="copy-all-meds-label is-hidden" id="nurseAllMedsLabel">Täcker alla läkemedel</div>
             <div class="copy-footer">
-              <button class="btn btn-ghost is-hidden" id="langBtnResult">🌐 English</button>
-              <button class="btn btn-ghost" id="copyBtnResult">📋 Kopiera text</button>
+              <button class="btn btn-ghost is-hidden" id="langBtnResult" data-tooltip="Växla patientbrevet till engelska.">🌐 English</button>
+              <button class="btn btn-ghost" id="copyBtnResult" data-tooltip="Kopiera texten till urklipp.">📋 Kopiera text</button>
             </div>
           </div>
         </div>
@@ -288,8 +288,8 @@
 
             <div class="form-row-2">
               <div class="field">
-                <label for="lt-med" data-tooltip="Ange läkemedelsnamn och styrka exakt som på receptet, t.ex. 'Elvanse 50 mg'. Möjliggör FASS-sökning.">Läkemedel och styrka</label>
-                <input id="lt-med" type="text" placeholder="T.ex. Elvanse 50 mg" maxlength="100" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                <label for="lt-med" data-tooltip="Ange läkemedelsnamn och styrka exakt som på receptet, t.ex. 'Tramadol 100 mg'. Möjliggör FASS-sökning.">Läkemedel och styrka</label>
+                <input id="lt-med" type="text" placeholder="T.ex. Tramadol 100 mg" maxlength="100" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
               </div>
               <div class="field">
                 <label for="lt-dose" data-tooltip="Patientens ordinerade dygnsdos i enheter per dag. Används som referensvärde för att beräkna avvikelse i faktisk förbrukning per period.">Ordinerad dos (enheter/dag)</label>
@@ -299,11 +299,11 @@
 
             <div class="section-label">Receptperioder</div>
             <div id="lt-periods-container"></div>
-            <button id="addPeriodBtn" class="btn btn-ghost btn-add-period">＋ Lägg till period</button>
+            <button id="addPeriodBtn" class="btn btn-ghost btn-add-period" data-tooltip="Lägg till ytterligare en receptperiod för analys.">＋ Lägg till period</button>
 
             <div class="lt-form-actions">
-              <a class="btn fass-link btn-ghost is-hidden" id="lt-fassBtn" href="#" target="_blank" rel="noopener noreferrer"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="5" y="0" width="4" height="14" rx="1" fill="#025954"/><rect x="0" y="5" width="14" height="4" rx="1" fill="#025954"/></svg>FASS</a>
-              <button id="clearLongtermBtn" class="btn btn-ghost ml-auto">Rensa</button>
+              <a class="btn fass-link btn-ghost is-hidden" id="lt-fassBtn" href="#" target="_blank" rel="noopener noreferrer" data-tooltip="Öppnar FASS produktresumé för detta läkemedel i ny flik."><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="5" y="0" width="4" height="14" rx="1" fill="#025954"/><rect x="0" y="5" width="14" height="4" rx="1" fill="#025954"/></svg>FASS</a>
+              <button id="clearLongtermBtn" class="btn btn-ghost ml-auto" data-tooltip="Rensa alla fält och perioder.">Rensa</button>
             </div>
           </div>
 
@@ -328,10 +328,10 @@
               <table class="period-table" id="lt-period-table">
                 <thead>
                   <tr>
-                    <th scope="col">Period</th>
-                    <th scope="col" class="ph-avg">Snitt/dag</th>
-                    <th scope="col">Avvikelse</th>
-                    <th scope="col">Status</th>
+                    <th scope="col" data-tooltip="Datumintervall för receptperioden.">Period</th>
+                    <th scope="col" class="ph-avg" data-tooltip="Genomsnittlig förbrukning per dag under perioden.">Snitt/dag</th>
+                    <th scope="col" data-tooltip="Avvikelse från ordinerad dos i procent.">Avvikelse</th>
+                    <th scope="col" data-tooltip="Bedömning: OK, Över eller Under förbrukning.">Status</th>
                   </tr>
                 </thead>
                 <tbody id="lt-period-rows"></tbody>
