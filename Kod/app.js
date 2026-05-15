@@ -33,9 +33,9 @@ function shouldClearDrugMatch(inputVal, acDrugName) {
 
 // === TEMA ===
 function getActiveSeason() {
-  const now = new Date();
-  const m = now.getMonth() + 1;
-  const d = now.getDate();
+  var d = new Date();
+  var m = d.getUTCMonth() + 1;
+  d = d.getUTCDate();
   for (const s of SEASONAL_THEME_SCHEDULE) {
     const st = s.start, en = s.end;
     if (st.m > en.m || (st.m === en.m && st.d > en.d)) {
@@ -59,14 +59,13 @@ function updateSeasonalBadge(season) {
   else { badge.textContent = ''; badge.classList.remove('visible'); }
 }
 function applyTheme(t, isUserAction) {
+  const season = getActiveSeason();
   if (isUserAction) {
     try { localStorage.setItem('baseTheme', t); } catch(e) {}
-    const s = getActiveSeason();
-    if (s) { try { localStorage.setItem('_seasonOverride', s.theme); } catch(e) {} }
+    if (season) { try { localStorage.setItem('_seasonOverride', season.theme); } catch(e) {} }
     else { try { localStorage.removeItem('_seasonOverride'); } catch(e) {} }
   }
   const baseTheme = getBaseTheme();
-  const season = getActiveSeason();
   let seasonOverride;
   try { seasonOverride = localStorage.getItem('_seasonOverride'); } catch(e) {}
   let effectiveTheme;
