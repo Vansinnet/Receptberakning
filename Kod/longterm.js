@@ -108,12 +108,12 @@ function calcLongtermCore(medRaw, ordDose, rawPeriods, nplId) {
     periodErrors.push({
       idx:        i,
       startError: !!(p.start !== '' && (!startDate || startDate > today)),
-      endError:   !!(p.end   !== '' && (!endDate   || !startDate || endDate <= startDate)),
+      endError:   !!(p.end   !== '' && (!endDate   || endDate > today || !startDate || endDate <= startDate)),
       totalError: !!(p.total !== '' && (isNaN(totalVal) || totalVal <= 0 || !Number.isInteger(totalVal))),
       spanError:  false,
     });
 
-    if (startDate && endDate && !isNaN(totalVal) && totalVal > 0 && Number.isInteger(totalVal) && startDate < endDate) {
+    if (startDate && endDate && endDate <= today && !isNaN(totalVal) && totalVal > 0 && Number.isInteger(totalVal) && startDate < endDate) {
       const days = getDaysDiff(endDate, startDate);
       if (days === 0 || days > MAX_PERIOD_SPAN_DAYS) {
         // Perioden är felfri i sig men orimligt lång — markera start+slutdatum

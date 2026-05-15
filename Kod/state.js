@@ -55,7 +55,7 @@ function getState(i) {
 // Nollställer all klinisk data utan att ändra arrayens längd — används vid pagehide
 // för att undvika att data finns kvar i bfcache.
 function clearAllMedStateData() {
-  states        = states.map(() => ({}));
+  states        = states.map(s => ({ _cardId: s._cardId }));
   prescribeState = {};
   activeMedIdx  = 0;
   ltPeriods     = [{ start: '', total: '', end: '' }];
@@ -78,9 +78,11 @@ function applyPrescribeStatePatch(i, patch) {
 
 // === LÄKEMEDELSKORT: LÄGG TILL / TA BORT ===
 
-// Lägger till ett tomt läkemedelskort och returnerar det nya indexet.
+// Lägger till ett tomt läkemedelskort och returnerar det nya kortets cardId.
 function pushMedCard() {
-  states.push({ _cardId: _nextCardId++ });
+  const cardId = _nextCardId++;
+  states.push({ _cardId: cardId });
+  return cardId;
 }
 
 // Tar bort kort vid index i och kompakterar prescribeState.

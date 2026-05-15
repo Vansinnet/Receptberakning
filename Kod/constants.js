@@ -148,6 +148,13 @@ const FLAG_HEIGHT = 13;
 // ============================================================================
 
 const VALID_THEMES = new Set(['dark', 'klinisk', 'sakura']);
+const VALID_SEASONAL_THEMES = new Set(['jul', 'pask', 'midsommar', 'halloween']);
+const SEASONAL_THEME_SCHEDULE = [
+  { start: {m:12,d:1}, end: {m:1,d:6},  theme: 'jul',        label: '🎄 Jul' },
+  { start: {m:3,d:20},  end: {m:4,d:15}, theme: 'pask',       label: '🐣 Påsk' },
+  { start: {m:6,d:20},  end: {m:6,d:26}, theme: 'midsommar',  label: '🌸 Midsommar' },
+  { start: {m:10,d:24}, end: {m:10,d:31}, theme: 'halloween', label: '🎃 Halloween' },
+];
 const SAFE_ALERT_TYPES = new Set(['danger', 'warn', 'info', 'ok']);
 
 const UNIT_DISPLAY = {

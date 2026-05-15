@@ -32,13 +32,69 @@ function shouldClearDrugMatch(inputVal, acDrugName) {
 }
 
 // === TEMA ===
-function applyTheme(t) {
-  const safeTheme = VALID_THEMES.has(t) ? t : 'klinisk';
+function getActiveSeason() {
+  const now = new Date();
+  const m = now.getMonth() + 1;
+  const d = now.getDate();
+  for (const s of SEASONAL_THEME_SCHEDULE) {
+    const st = s.start, en = s.end;
+    if (st.m > en.m || (st.m === en.m && st.d > en.d)) {
+      // Årsskifte (t.ex. 1 dec → 6 jan)
+      if (m > st.m || (m === st.m && d >= st.d) || m < en.m || (m === en.m && d <= en.d)) return s;
+    } else {
+      if ((m > st.m || (m === st.m && d >= st.d)) && (m < en.m || (m === en.m && d <= en.d))) return s;
+    }
+  }
+  return null;
+}
+function getBaseTheme() {
+  let t;
+  try { t = localStorage.getItem('baseTheme'); } catch(e) {}
+  return VALID_THEMES.has(t) ? t : 'klinisk';
+}
+function updateSeasonalBadge(season) {
+  const badge = getEl('seasonBadge');
+  if (!badge) return;
+  if (season) { badge.textContent = season.label; badge.classList.add('visible'); }
+  else { badge.textContent = ''; badge.classList.remove('visible'); }
+}
+function applyTheme(t, isUserAction) {
+  if (isUserAction) {
+    try { localStorage.setItem('baseTheme', t); } catch(e) {}
+    const s = getActiveSeason();
+    if (s) { try { localStorage.setItem('_seasonOverride', s.theme); } catch(e) {} }
+    else { try { localStorage.removeItem('_seasonOverride'); } catch(e) {} }
+  }
+  const baseTheme = getBaseTheme();
+  const season = getActiveSeason();
+  let seasonOverride;
+  try { seasonOverride = localStorage.getItem('_seasonOverride'); } catch(e) {}
+  let effectiveTheme;
+  if (isUserAction) {
+    effectiveTheme = t;
+  } else if (season && seasonOverride !== season.theme) {
+    effectiveTheme = season.theme;
+  } else {
+    effectiveTheme = baseTheme;
+  }
+  const safeTheme = (VALID_THEMES.has(effectiveTheme) || VALID_SEASONAL_THEMES.has(effectiveTheme)) ? effectiveTheme : 'klinisk';
   document.documentElement.setAttribute('data-theme', safeTheme);
-  const sel = getEl('themeSelect'); if (sel) sel.value = safeTheme;
+  const sel = getEl('themeSelect');
+  if (sel) sel.value = VALID_THEMES.has(baseTheme) ? baseTheme : 'klinisk';
   try { localStorage.setItem('theme', safeTheme); } catch(e) {}
+  if (!season && !isUserAction) {
+    try { localStorage.removeItem('_seasonOverride'); } catch(e) {}
+  }
+  const showBadge = !isUserAction && season && seasonOverride !== season.theme;
+  updateSeasonalBadge(showBadge ? season : null);
   const ann = getEl('a11y-announce');
-  if (ann) ann.textContent = safeTheme === 'dark' ? 'Mörkt tema valt' : safeTheme === 'sakura' ? 'Körsbärstema valt' : 'Kliniskt tema valt';
+  if (ann) {
+    if (showBadge) {
+      ann.textContent = season.label + '-tema aktivt (ändra i tema-väljaren för att återgå)';
+    } else {
+      ann.textContent = safeTheme === 'dark' ? 'Mörkt tema valt' : safeTheme === 'sakura' ? 'Körsbärstema valt' : 'Kliniskt tema valt';
+    }
+  }
 }
 
 // === FLIK-HANTERING (huvud) ===
@@ -90,9 +146,9 @@ function addMedCard() {
   _addMedLocked = true;
   setTimeout(() => { _addMedLocked = false; }, ADD_MED_LOCK_MS);
 
-  pushMedCard();
+  const cardId = pushMedCard();
   const newIdx = states.length - 1;
-  ensureDebounce(states[newIdx]._cardId);
+  ensureDebounce(cardId);
   setActiveMed(newIdx);
   buildMedList();
   renderFormForMed(activeMedIdx);
@@ -124,7 +180,9 @@ function clearCurrentCard() {
   }
 
   // Enda kvarvarande läkemedel — nollställ formuläret
-  calcDebounced.get(states[i]._cardId)?.cancel();
+  var cardId = states[i]._cardId;
+  calcDebounced.get(cardId)?.cancel();
+  calcDebounced.delete(cardId);
   setMedState(i, { activeTab:'patient', patientLang:'sv' });
   initPrescribeState(i, null);
   resetPrescribePanel();
@@ -215,8 +273,8 @@ function copyResultText() {
 }
 
 // === INITIERING ===
-try { applyTheme(localStorage.getItem('theme')||'klinisk'); }
-catch(e) { applyTheme('klinisk'); }
+try { applyTheme(null, false); }
+catch(e) { applyTheme('klinisk', false); }
 
 buildMedList();
 renderFormForMed(0);
@@ -305,7 +363,7 @@ const clearCardBtn = getEl('clearCardBtn'); if (clearCardBtn) clearCardBtn.addEv
 const addMedBtn = getEl('addMedBtn'); if (addMedBtn) addMedBtn.addEventListener('click', addMedCard);
 
 // Topbar
-const themeSelect = getEl('themeSelect'); if (themeSelect) themeSelect.addEventListener('change', e => applyTheme(e.target.value));
+const themeSelect = getEl('themeSelect'); if (themeSelect) themeSelect.addEventListener('change', e => applyTheme(e.target.value, true));
 const newPatientBtn = getEl('newPatientBtn'); if (newPatientBtn) newPatientBtn.addEventListener('click', () => confirmClearAll());
 document.querySelectorAll('.main-tab').forEach(btn => btn.addEventListener('click', () => switchMainTab(btn.dataset.tab)));
 
@@ -445,7 +503,7 @@ function recalcOnDateChange() {
   if (doseEl && doseEl.value) calcLongterm();
 }
 const _recalcOnDate = debounce(recalcOnDateChange, RECALC_ON_DATE_DEBOUNCE_MS);
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden) _recalcOnDate(); });
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) { _recalcOnDate(); applyTheme(null, false); } });
 window.addEventListener('focus',_recalcOnDate);
 
 // Rensa vid pagehide (bfcache-säkerhet)
@@ -480,6 +538,7 @@ window.addEventListener('pagehide',()=>{
 });
 window.addEventListener('pageshow',e=>{
   if(!e.persisted)return;
+  applyTheme(null, false);
   _recalcOnDate.cancel();
   calcDebounced.clear();
   _todayCache=null;

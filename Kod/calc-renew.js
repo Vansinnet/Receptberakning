@@ -44,6 +44,7 @@ function validateValues(medRaw, dateVal, doseRaw, amtRaw, refRaw, leftRaw, doseI
   const remaining = leftRaw !== '' ? parseFloat(leftRaw.replace(',', '.')) : null;
   const leftIsInvalid = leftRaw !== '' && (
     isNaN(remaining) || remaining < 0 ||
+    remaining > MAX_AMT_VALUE ||
     (isDiscreteUnit && !Number.isInteger(remaining))
   );
   if (leftIsInvalid) {
@@ -260,7 +261,7 @@ function calcCore(inputData, prev) {
     : isOveruse    ? 'För tidig förnyelse'
     : isTooEarly   && earlyRenewalDecision === 'yes' ? 'OK – förnyas tidigt'
     : isTooEarly   ? `För tidigt — ${daysToPrescribedEnd}d kvar`
-    : `OK – t.o.m ${prescribedEndDateStr}`;
+    : `OK – t.o.m. ${prescribedEndDateStr}`;
 
   const metrics = _buildMetrics(total, doseUnit, prescribedEndDateStr, daysToPrescribedEnd, endCls, displayAvg, isOveruse, intervalLabel);
 
