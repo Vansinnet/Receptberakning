@@ -5,9 +5,22 @@ const calcDebounced = [];
 function ensureDebounce(i) {
   if (calcDebounced[i]) return;
   while (calcDebounced.length < i) calcDebounced.push(null);
-  calcDebounced[i] = debounce(() => calc(i), 120);
+  calcDebounced[i] = debounce(() => calc(i), CALC_DEBOUNCE_MS);
 }
-const calcLongtermDebounced = debounce(() => calcLongterm(), 150);
+const calcLongtermDebounced = debounce(() => calcLongterm(), LONGTERM_DEBOUNCE_MS);
+
+// AKTIVT VAL: ATC-kodsrensning vid manuell inmatning — prefix-matchning mot
+// det senast valda autocomplete-läkemedlet. Om användaren redigerar namnet så
+// att det inte längre är ett prefix av autocomplete-valet, nollställs alla
+// läkemedelsspecifika fält (atcCode, doseUnit, notCalculable, nplId).
+// Detta förhindrar att interaktionskontrollen körs mot fel ATC-kod.
+function shouldClearDrugMatch(inputVal, acDrugName) {
+  if (!inputVal) return true;
+  if (!acDrugName) return false;
+  var lowerVal = inputVal.toLowerCase();
+  var acPrefix = acDrugName.toLowerCase().substring(0, lowerVal.length);
+  return lowerVal !== acPrefix;
+}
 
 // === TEMA ===
 function applyTheme(t) {
@@ -36,14 +49,14 @@ function switchMainTab(tab) {
 let lastActivityReset = 0;
 function resetTimer(isUserEvent=false) {
   const now = Date.now();
-  if (isUserEvent && now-lastActivityReset < 2000) return;
+  if (isUserEvent && now-lastActivityReset < ACTIVITY_RESET_DEBOUNCE_MS) return;
   lastActivityReset = now;
   clearTimeout(warnTimer); clearTimeout(clearTimer); clearInterval(countdownInt);
   const toast = getEl('toast'), toastCount = getEl('toastCount');
   if (toast) toast.classList.remove('visible');
-  const WARN_MS = 22 * 60 * 1000;
-  const CLEAR_MS = 23 * 60 * 1000;
-  const COUNTDOWN_SEC = 60;
+  const WARN_MS = INACTIVITY_WARN_MS;
+  const CLEAR_MS = INACTIVITY_CLEAR_MS;
+  const COUNTDOWN_SEC = INACTIVITY_COUNTDOWN_SEC;
   warnTimer = setTimeout(() => {
     let s = COUNTDOWN_SEC;
     if (!toast||!toastCount) return;
@@ -51,7 +64,7 @@ function resetTimer(isUserEvent=false) {
     countdownInt = setInterval(() => {
       s--; if (toastCount) toastCount.textContent = String(s);
       if (s<=0) clearInterval(countdownInt);
-    }, 1000);
+    }, COUNTDOWN_TICK_MS);
   }, WARN_MS);
   clearTimer = setTimeout(() => {
     clearInterval(countdownInt); if (toast) toast.classList.remove('visible');
@@ -64,9 +77,9 @@ let _addMedLocked = false;
 let _clearCardLocked = false;
 function addMedCard() {
   if (_addMedLocked) return;
-  if (states.length >= 8) { showToast('Max 8 läkemedel kan hanteras samtidigt.'); return; }
+  if (states.length >= MAX_MED_CARDS) { showToast('Max 8 läkemedel kan hanteras samtidigt.'); return; }
   _addMedLocked = true;
-  setTimeout(() => { _addMedLocked = false; }, 300);
+  setTimeout(() => { _addMedLocked = false; }, ADD_MED_LOCK_MS);
 
   const newIdx = pushMedCard();
   ensureDebounce(newIdx);
@@ -79,7 +92,7 @@ function addMedCard() {
 function clearCurrentCard() {
   if (_clearCardLocked) return;
   _clearCardLocked = true;
-  setTimeout(() => { _clearCardLocked = false; }, 300);
+  setTimeout(() => { _clearCardLocked = false; }, CLEAR_CARD_LOCK_MS);
 
   const i = activeMedIdx;
 
@@ -207,32 +220,30 @@ renderFormForMed(0);
 renderResultForMed(0);
 buildPeriodContainer();
 
+// Förladda läkemedelsdata vid första fokus på medInput — datan är stor (~800 KB)
+// och laddas asynkront från IndexedDB eller nätverk för att inte blockera sidan.
+var medInputEl = getEl('medInput');
+if (medInputEl) {
+  medInputEl.addEventListener('focus', function() { loadDrugs(); }, { once: true });
+}
+
 // Event delegation: formulärinput
 const formPanel = getEl('formPanel');
 if (formPanel) {
-  formPanel.addEventListener('input', e => {
+  formPanel.addEventListener('input', async function(e) {
     if (e.target.id === 'medInput') {
-      const v = e.target.value;
+      var v = e.target.value;
       if (v && v[0] !== v[0].toUpperCase()) {
-        const pos = e.target.selectionStart;
+        var pos = e.target.selectionStart;
         e.target.value = v[0].toUpperCase() + v.slice(1);
         e.target.setSelectionRange(pos, pos);
       }
-      handleAcInput();
+      await handleAcInput();
       var inputVal = e.target.value.trim();
-      if (!inputVal) {
+      var s = getState(activeMedIdx);
+      if (shouldClearDrugMatch(inputVal, s._acDrugName)) {
         applyMedStatePatch(activeMedIdx, { atcCode: null, _acDrugName: null, doseUnit: null, notCalculable: null, nplId: null });
         checkAllInteractions();
-      } else {
-        var s = states[activeMedIdx];
-        if (s && s._acDrugName) {
-          var lowerVal = inputVal.toLowerCase();
-          var acPrefix = s._acDrugName.toLowerCase().substring(0, lowerVal.length);
-          if (lowerVal !== acPrefix) {
-            applyMedStatePatch(activeMedIdx, { atcCode: null, _acDrugName: null, doseUnit: null, notCalculable: null, nplId: null });
-            checkAllInteractions();
-          }
-        }
       }
     }
     if (e.target.id === 'dateInput') {
@@ -429,7 +440,7 @@ function recalcOnDateChange() {
   const doseEl = getEl('lt-dose');
   if (doseEl && doseEl.value) calcLongterm();
 }
-const _recalcOnDate = debounce(recalcOnDateChange, 50);
+const _recalcOnDate = debounce(recalcOnDateChange, RECALC_ON_DATE_DEBOUNCE_MS);
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden) _recalcOnDate(); });
 window.addEventListener('focus',_recalcOnDate);
 
@@ -484,8 +495,8 @@ resetTimer();
   const bubble = document.getElementById('tooltipBubble');
   if (!bubble) return;
   const position = e => {
-    bubble.style.left = (e.clientX + 12) + 'px';
-    bubble.style.top  = (e.clientY - 36) + 'px';
+    bubble.style.left = (e.clientX + TOOLTIP_OFFSET_X) + 'px';
+    bubble.style.top  = (e.clientY - TOOLTIP_OFFSET_Y) + 'px';
   };
   document.addEventListener('mouseover', e => {
     const tooltipTarget = e.target.closest('[data-tooltip]');

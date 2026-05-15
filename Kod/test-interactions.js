@@ -14,6 +14,7 @@ var domStub = {
 var ctx = vm.createContext({ console: console, document: domStub });
 
 // Ladda beroenden (samma ordning som index.html)
+vm.runInContext(fs.readFileSync(path.join(__dirname, 'constants.js'), 'utf8'), ctx);
 vm.runInContext(fs.readFileSync(path.join(__dirname, 'utils.js'), 'utf8'), ctx);
 vm.runInContext(fs.readFileSync(path.join(__dirname, 'state.js'), 'utf8'), ctx);
 vm.runInContext(fs.readFileSync(path.join(__dirname, 'interactions.js'), 'utf8'), ctx);

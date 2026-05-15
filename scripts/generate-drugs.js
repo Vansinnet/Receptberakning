@@ -3,8 +3,9 @@ const path = require("path");
 
 const DATA_DIR = path.join(__dirname, "..", "data");
 const DB_FILE = path.join(DATA_DIR, "product-db.json");
-const OUT_FILE = path.join(__dirname, "..", "Kod", "drugs.js");
-const INDEX_FILE = path.join(__dirname, "..", "Kod", "index.html");
+const OUT_FILE = path.join(__dirname, "..", "Kod", "drugs.json");
+const DATA_FILE = path.join(__dirname, "..", "Kod", "drug-data.js");
+const VERSION_FILE = path.join(__dirname, "..", "Kod", "drugs-version.json");
 
 const ATC_GROUP_LABELS = {
   "N05A": "Antipsykotika",
@@ -207,7 +208,7 @@ function cleanForm(doseForm) {
   return doseForm;
 }
 
-function generateDrugsJs(candidates) {
+function generateDrugsJson(candidates) {
   const groups = {};
 
   for (const [atcCode, products] of Object.entries(candidates)) {
@@ -220,50 +221,40 @@ function generateDrugsJs(candidates) {
   }
 
   const sections = Object.entries(groups).sort((a, b) => a[0].localeCompare(b[0], "sv"));
+  const allEntries = [];
 
-  let output = "const DRUG_LIST = [\n";
-
-  for (const [label, entries] of sections) {
-    output += `  // === ${label} ===\n`;
-
+  for (const [, entries] of sections) {
     const sorted = entries.sort((a, b) => a.name.localeCompare(b.name, "sv"));
-
     for (const entry of sorted) {
-      const fields = [
-        `n: ${JSON.stringify(entry.name)}`,
-        `p: ${entry.pkg}`,
-        `f: ${JSON.stringify(entry.form)}`,
-        `i: ${JSON.stringify(entry.nplId)}`,
-        `a: ${JSON.stringify(entry.atc)}`,
-      ];
-      if (entry.unit && entry.unit !== "st") fields.push(`u: ${JSON.stringify(entry.unit)}`);
-      if (entry.notCalculable) fields.push(`c: true`);
-      if (entry.narc) fields.push(`r: ${JSON.stringify(entry.narc)}`);
-      output += `  { ${fields.join(", ")} },\n`;
+      const obj = {
+        n: entry.name,
+        p: entry.pkg,
+        f: entry.form,
+        i: entry.nplId,
+        a: entry.atc
+      };
+      if (entry.unit && entry.unit !== "st") obj.u = entry.unit;
+      if (entry.notCalculable) obj.c = true;
+      if (entry.narc) obj.r = entry.narc;
+      allEntries.push(obj);
     }
-
-    output += "\n";
   }
 
-  output += "];\n\n";
-  output += "function searchDrugs(query) {\n";
-  output += "  if (!query || query.length < 2) return [];\n";
-  output += "  var q = query.toLowerCase().trim();\n";
-  output += "  var results = [];\n";
-  output += "  for (var i = 0; i < DRUG_LIST.length; i++) {\n";
-  output += "    if (DRUG_LIST[i].n.toLowerCase().indexOf(q) === 0) {\n";
-  output += "      results.push(DRUG_LIST[i]);\n";
-  output += "      if (results.length >= 10) break;\n";
-  output += "    }\n";
-  output += "  }\n";
-  output += "  return results;\n";
-  output += "}\n";
-
-  return output;
+  return JSON.stringify(allEntries);  // kompakt format, ingen indentering
 }
 
-function updateIndexDate() {
-  console.log(`  Versionsnummer hanteras separat vid commit.`);
+function writeVersionFile() {
+  const version = { version: 1, timestamp: new Date().toISOString() };
+  fs.writeFileSync(VERSION_FILE, JSON.stringify(version, null, 2), "utf8");
+  console.log(`  Versionsfil: ${VERSION_FILE}`);
+}
+
+function writeDrugDataJs(jsonContent) {
+  // file://-protokoll kan inte fetch(). Wrappa JSON-datan i en var-deklaration
+  // så att den kan laddas via en dynamisk <script>-tagg (script-src 'self').
+  const js = 'var __DRUG_DATA__ = ' + jsonContent + ';\nconsole.log("[drug-data] laddad, " + __DRUG_DATA__.length + " poster");';
+  fs.writeFileSync(DATA_FILE, js, "utf8");
+  console.log(`  drug-data.js: ${DATA_FILE}`);
 }
 
 function main() {
@@ -273,16 +264,19 @@ function main() {
   const productDb = loadProductDb();
   console.log(`  ${Object.keys(productDb).length} ATC-grupper i databasen\n`);
 
-  console.log("Steg 2: Generera drugs.js (alla produkter)...");
-  const content = generateDrugsJs(productDb);
+  console.log("Steg 2: Generera drugs.json (alla produkter)...");
+  const content = generateDrugsJson(productDb);
   fs.writeFileSync(OUT_FILE, content, "utf8");
 
-  const entryCount = content.split("\n").filter(l => l.includes("n:")).length;
+  const entryCount = (content.match(/"n":/g) || []).length;
   console.log(`  ${entryCount} läkemedelsentries genererade`);
   console.log(`  Skrivet till ${OUT_FILE}\n`);
 
-  console.log("Steg 3: Uppdatera datum i index.html...");
-  updateIndexDate();
+  console.log("Steg 3: Skriv versionsfil...");
+  writeVersionFile();
+
+  console.log("\nSteg 4: Generera drug-data.js (file://-fallback)...");
+  writeDrugDataJs(content);
 
   console.log("\n=== generate-drugs.js slutförd ===");
 }

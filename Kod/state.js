@@ -1,7 +1,8 @@
 // === CENTRALISERAD TILLSTÅNDSHANTERING ===
 // All klinisk state deklareras här. Alla mutationer ska gå via nedanstående
 // funktioner — direktskrivning till state-variablerna är inte tillåten utanför
-// denna fil. Direktläsning är tillåten var som helst.
+// denna fil. För läsning: använd getState(i). Direktläsning (states[i]) är
+// tillåten men getState(i) rekommenderas.
 //
 // Beroende: utils.js måste vara laddat före denna fil (oneYearAgoStr, todayStr).
 
@@ -39,6 +40,12 @@ function setMedState(i, value) {
 function setMedUIPreference(i, key, value) {
   if (!states[i]) states[i] = {};
   states[i][key] = value;
+}
+
+// Rekommenderad läs-accessor för states[i]. Returnerar alltid ett objekt
+// (aldrig undefined/null) för att skydda mot krasch vid obefintligt index.
+function getState(i) {
+  return states[i] || {};
 }
 
 // Nollställer all klinisk data utan att ändra arrayens längd — används vid pagehide
@@ -122,14 +129,14 @@ function setLtPeriodField(i, field, value) {
 
 // Lägger till en tom period. Returnerar true om det lyckades, false om taket (10) nåtts.
 function pushLtPeriod() {
-  if (ltPeriods.length >= 10) return false;
+  if (ltPeriods.length >= MAX_LT_PERIODS) return false;
   ltPeriods.push({ start: '', total: '', end: '' });
   return true;
 }
 
 // Tar bort period vid index i. Returnerar false om det bara finns en period kvar.
 function spliceLtPeriod(i) {
-  if (ltPeriods.length <= 1) return false;
+  if (ltPeriods.length <= MIN_LT_PERIODS) return false;
   ltPeriods.splice(i, 1);
   return true;
 }

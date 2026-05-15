@@ -1,9 +1,5 @@
-const VALID_THEMES     = new Set(['dark','klinisk','sakura']);
-const SAFE_ALERT_TYPES = new Set(['danger','warn','info','ok']);
-const VALID_INTERVALS  = [1, 7, 30];
 
-
-function debounce(fn, wait = 120) {
+function debounce(fn, wait = DEFAULT_DEBOUNCE_MS) {
   let t;
   const d = (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
   d.cancel = () => clearTimeout(t);
@@ -90,7 +86,7 @@ function showEl(id, show, displayValue = 'block') {
   const e = getEl(id); if (e) e.style.display = show ? displayValue : 'none';
 }
 
-function showToast(msg, durationMs = 3000) {
+function showToast(msg, durationMs = TOAST_DURATION_MS) {
   // Ta bort eventuellt tidigare toast så att de inte staplas vid snabba anrop.
   const prev = document.querySelector('.toast-flash');
   if (prev) prev.remove();
@@ -100,7 +96,7 @@ function showToast(msg, durationMs = 3000) {
   requestAnimationFrame(() => div.classList.add('visible'));
   setTimeout(() => {
     div.classList.remove('visible');
-    setTimeout(() => div.remove(), 200); // vänta ut fade-out-transition
+    setTimeout(() => div.remove(), TOAST_FADE_OUT_MS); // vänta ut fade-out-transition
   }, durationMs);
 }
 
@@ -129,7 +125,7 @@ function getToday() {
   return _todayCache;
 }
 
-function getDaysDiff(d1,d2) { return Math.round((d1-d2)/86400000); }
+function getDaysDiff(d1,d2) { return Math.round((d1-d2)/MS_PER_DAY); }
 
 function extractDoseUnit(medRaw) {
   // Längre former (mikrogram, microgram, gram) måste stå före kortare (µg, mcg, g)
@@ -138,7 +134,7 @@ function extractDoseUnit(medRaw) {
   if (!m) return null;
   const amount  = parseFloat(m[1].replace(',', '.'));
   const rawUnit = m[2].toLowerCase();
-  const NORMALIZE = { mikrogram: 'µg', microgram: 'µg', mcg: 'µg', nanogram: 'ng', gram: 'g', ie: 'IE', iu: 'IE' };
+  const NORMALIZE = DOSE_UNIT_NORMALIZE;
   const unit = NORMALIZE[rawUnit] ?? rawUnit;
   return { amount, unit };
 }
@@ -152,20 +148,8 @@ function getFassUrl(medRaw, nplId) {
 let _mfrRe;
 function buildMfrRe() {
   if (_mfrRe) return _mfrRe;
-  let compounds = [
-    "Medical Valley", "Abacus Medicine", "EQL Pharma",
-    "G\\.L\\.\\s*Pharma", "1A Farma", "Omet Pharma", "Nordic Drugs"
-  ];
-  let singles = [
-    "STADA", "Sandoz", "Accord(?:pharma)?", "Teva", "Krka", "Ebb",
-    "Viatris", "Orion", "Actavis", "Zentiva", "Orifarm", "Bluefish",
-    "Glenmark", "Evolan", "APL", "ABECE", "Avansor", "Apofri",
-    "SUN", "Amarox", "Aurobindo", "Hexal", "HEXAL", "Alternova",
-    "Mylan", "Bijon", "Grindeks", "Newbury", "Jubilant", "Strides",
-    "Holsten", "Vitabalans", "Medartuum", "Abcur", "2care4",
-    "Amdipharm", "Brown", "Pfizer", "Xiromed", "Accordpharma", "Pilum",
-    "Rivopharm", "Novum", "Aristo", "Tillomed", "Waymade", "Baxter"
-  ];
+  let compounds = COMPOUND_MFR_NAMES;
+  let singles = SINGLE_MFR_NAMES;
   const all = compounds.concat(singles);
   _mfrRe = new RegExp("\\b(?:" + all.join("|") + ")\\b", "gi");
   return _mfrRe;
@@ -182,7 +166,7 @@ function parseDateUTC(str) {
   if (parts.length !== 3) return null;
   const y = parseInt(parts[0],10), m = parseInt(parts[1],10), day = parseInt(parts[2],10);
   if (isNaN(y)||isNaN(m)||isNaN(day)||m<1||m>12||day<1||day>31) return null;
-  if (y<1950||y>2100) return null;
+  if (y<MIN_VALID_YEAR||y>MAX_VALID_YEAR) return null;
   const d = new Date(Date.UTC(y,m-1,day));
   if (isNaN(d.getTime())) return null;
   if (d.getUTCFullYear()!==y||d.getUTCMonth()!==m-1||d.getUTCDate()!==day) return null;
@@ -217,6 +201,6 @@ function copyTextToClipboard(bodyId, btnId, timerKey) {
       btn.textContent = orig;
       delete btn.dataset.origLabel;
       delete _copyTimers[timerKey];
-    }, 1800);
+    }, COPY_CONFIRMATION_MS);
   }).catch(() => { if (btn) btn.textContent = '⚠️ Kopiera manuellt'; });
 }

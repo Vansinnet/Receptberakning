@@ -3,15 +3,6 @@ function _el(id) { return _dom[id] || (_dom[id] = document.getElementById(id)); 
 
 let _lastMetricsKey = '';
 
-const _drugByName = (() => {
-  const m = new Map();
-  for (let i = 0; i < DRUG_LIST.length; i++) {
-    const key = DRUG_LIST[i].n.toLowerCase().trim();
-    if (!m.has(key)) m.set(key, DRUG_LIST[i]);
-  }
-  return m;
-})();
-
 function resetMetricsCache() {
   _lastMetricsKey = '';
 }
@@ -58,7 +49,7 @@ function buildMedList() {
   list.textContent = '';
   // Inaktivera knappen när taket nås så att läkaren ser gränsen direkt
   const addBtn = _el('addMedBtn');
-  if (addBtn) addBtn.disabled = states.length >= 8;
+  if (addBtn) addBtn.disabled = states.length >= MAX_MED_CARDS;
   for (let i = 0; i < states.length; i++) {
     const s = states[i] || {};
     const isWarnDot = (s.isOveruse || s.isTooEarly) && s.earlyRenewalDecision !== 'yes';
@@ -103,7 +94,7 @@ function updateFormHeader(i) {
   const narcBtn = _el('narcBtnForm');
   let narcClass = '', nplId = s.nplId;
   if (s.medRaw) {
-    const drugEntry = _drugByName.get(s.medRaw.toLowerCase());
+    const drugEntry = getDrugByName(s.medRaw);
     if (drugEntry) {
       narcClass = drugEntry.r;
       // Bevara autocomplete NPL-ID om det finns — Map:et är bara fallback för manuell inmatning.
@@ -407,9 +398,9 @@ function _ensureFlags() {
   };
   const mkSvg = (...children) => {
     const svg = document.createElementNS(NS, 'svg');
-    svg.setAttribute('viewBox', '0 0 22 14');
-    svg.setAttribute('width', '20');
-    svg.setAttribute('height', '13');
+    svg.setAttribute('viewBox', FLAG_VIEWBOX);
+    svg.setAttribute('width', FLAG_WIDTH);
+    svg.setAttribute('height', FLAG_HEIGHT);
     svg.setAttribute('aria-hidden', 'true');
     svg.style.cssText = 'vertical-align:middle;margin-right:5px;border-radius:2px;display:inline-block';
     children.forEach(c => svg.appendChild(c));
@@ -543,17 +534,5 @@ function navigateAutocomplete(dir) {
   const items = container.querySelectorAll('.autocomplete-item');
   for (let i = 0; i < items.length; i++) {
     items[i].classList.toggle('active', i === _acState.selectedIdx);
-  }
-}
-
-function handleAcInput() {
-  const medInput = _el('medInput');
-  if (!medInput) return;
-  const q = medInput.value.trim();
-  const results = searchDrugs(q);
-  if (results.length > 0) {
-    renderAutocomplete(results);
-  } else {
-    hideAutocomplete();
   }
 }

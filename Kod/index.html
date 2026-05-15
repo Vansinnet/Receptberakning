@@ -2,7 +2,7 @@
 <html lang="sv" data-theme="klinisk">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; require-trusted-types-for 'script'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; require-trusted-types-for 'script'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Receptberäkning – Verktyg för läkare | Receptförnyelse &amp; läkemedelsdosering</title>
 <meta name="description" content="Digitalt hjälpmedel för läkare vid receptförnyelse och läkemedelsberäkning. Beräkna dosering, förpackningsstorlek och antal uttag snabbt och korrekt.">
@@ -66,7 +66,7 @@
         </svg>
       </span>
       <span class="app-brand-name">Receptberäkning</span>
-      <span class="app-brand-date">v1.17</span>
+      <span class="app-brand-date">v1.18</span>
     </div>
     <div class="topbar-nav-row">
       <nav class="main-tabs" role="tablist">
@@ -394,9 +394,12 @@
 </div>
 
 <div class="tooltip-bubble" id="tooltipBubble"></div>
+<script src="constants.js" defer></script>
 <script src="utils.js" defer></script>
 <script src="state.js" defer></script>
-<script src="drugs.js" defer></script>
+<script src="text-gen.js" defer></script>
+<script src="drug-loader.js" defer></script>
+<script src="drug-data.js" defer></script>
 <script src="interactions.js" defer></script>
 <script src="ui-renew.js" defer></script>
 <script src="calc-renew.js" defer></script>

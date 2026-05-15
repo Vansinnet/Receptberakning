@@ -38,6 +38,7 @@ const domStub = {
 
 const ctx = vm.createContext({ console, document: domStub, _mockToday: null });
 
+vm.runInContext(fs.readFileSync(path.join(__dirname, 'constants.js'), 'utf8'), ctx);
 vm.runInContext(fs.readFileSync(path.join(__dirname, 'utils.js'), 'utf8'), ctx);
 
 // Patcha getToday för deterministisk testning: sätt ctx._mockToday (ms sedan epoch)
@@ -52,6 +53,7 @@ vm.runInContext(`
 
 // state.js måste laddas före prescribe.js eftersom prescribe.js läser states[] och prescribeState[]
 vm.runInContext(fs.readFileSync(path.join(__dirname, 'state.js'),      'utf8'), ctx);
+vm.runInContext(fs.readFileSync(path.join(__dirname, 'text-gen.js'),   'utf8'), ctx);
 vm.runInContext(fs.readFileSync(path.join(__dirname, 'calc-renew.js'), 'utf8'), ctx);
 vm.runInContext(fs.readFileSync(path.join(__dirname, 'longterm.js'),   'utf8'), ctx);
 vm.runInContext(fs.readFileSync(path.join(__dirname, 'prescribe.js'),  'utf8'), ctx);

@@ -31,8 +31,8 @@ const ctx = vm.createContext({
 });
 
 // Ladda källfiler i rätt beroenderordning
-['utils.js', 'state.js', 'calc-renew.js', 'longterm.js',
- 'prescribe.js', 'drugs.js', 'ui-renew.js', 'app.js'].forEach(file => {
+['constants.js', 'utils.js', 'state.js', 'text-gen.js', 'drug-loader.js', 'calc-renew.js', 'longterm.js',
+ 'prescribe.js', 'ui-renew.js', 'app.js'].forEach(file => {
   vm.runInContext(
     fs.readFileSync(path.join(__dirname, file), 'utf8'),
     ctx
@@ -45,6 +45,22 @@ vm.runInContext(`
   getToday = function() {
     if (_mockToday !== null) return new Date(_mockToday);
     return _realGetToday();
+  };
+
+  // Mockad läkemedelsdata — drug-loader.js laddar normalt via IndexedDB/fetch,
+  // men i testmiljön ersätter vi loadDrugs() med en synkron variant.
+  loadDrugs = async function() {
+    if (_drugList) return;
+    _drugList = [
+      { n: "Elvanse 50 mg", p: 30, f: "Kapsel", i: "20040607001067", a: "N06BA12" },
+      { n: "Sertralin 50 mg", p: 100, f: "Tablett", i: "19951006000014", a: "N06AB06" },
+      { n: "Alvedon 500 mg", p: 20, f: "Tablett", i: "19951006000013", a: "N02BE01" },
+      { n: "Metformin 500 mg", p: 100, f: "Tablett", i: "19951006000015", a: "A10BA02", c: true },
+    ];
+    _drugMap = new Map();
+    for (var d = 0; d < _drugList.length; d++) {
+      _drugMap.set(_drugList[d].n.toLowerCase().trim(), _drugList[d]);
+    }
   };
 `, ctx);
 
@@ -59,11 +75,11 @@ vm.runInContext(`
   function __setPrescribeGlobals(mode, months, endDate) {
     _prescribeMode = mode;
     _prescribeMonths = months;
-    _prescribeEndDate = endDate || '';
+    _prescribeEndDate = endDate;
   }
   function __resetState() {
-    states         = [{}];
-    activeMedIdx   = 0;
+    states = [{}];
+    activeMedIdx = 0;
     prescribeState = {};
   }
 `, ctx);

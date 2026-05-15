@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "test": "node test-calc.js && node test-interactions.js && node test-ui.js",
+    "test": "node test-calc.js && node test-interactions.js && node test-ui.js && node test-app.js",
     "test:calc": "node test-calc.js",
     "test:interactions": "node test-interactions.js",
     "test:ui": "node test-ui.js",
+    "test:app": "node test-app.js",
     "build:css": "node build-css.js",
     "build:db": "node ../scripts/build-product-db.js",
     "generate:drugs": "node ../scripts/generate-drugs.js"

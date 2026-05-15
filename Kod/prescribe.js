@@ -182,7 +182,7 @@ function _buildDurationInner() {
   if (_prescribeMode === 'months') {
     durDiv.appendChild(el('label', { text: 'Förskriva i antal månader', attrs: { for: 'ps-global-months', 'data-tooltip': 'Antal månader som den nya förskrivningen ska täcka — gäller alla läkemedel. Tid som nuvarande recept täcker räknas av automatiskt.' } }));
     const durSel = el('select', { cls: 'prescribe-select', attrs: { id: 'ps-global-months' } });
-    for (let m = 1; m <= 12; m++) {
+    for (let m = 1; m <= MAX_PRESCRIBE_MONTHS; m++) {
       const opt = el('option', { text: m === 1 ? '1 månad' : `${m} månader`, value: String(m) });
       if (m === _prescribeMonths) opt.selected = true;
       durSel.appendChild(opt);
@@ -346,22 +346,20 @@ function renderPrescribeSummary() {
   }
 }
 
-const UNIT_DISPLAY = { st: { short: 'st', long: 'tabletter' }, ml: { short: 'ml', long: 'ml' }, dos: { short: 'dos', long: 'doser' } };
-
 // Håller koll på vilket index panelen senast byggdes för, så att vi
 // slipper riva och återbygga DOM:en (och tappa fokus) vid varje debounce-cykel.
 let _prescribePanelBuiltFor = null;
 let _lastSummaryKey = '';
-let _prescribeMode = 'months';
-let _prescribeMonths = 7;
-let _prescribeEndDate = '';
+let _prescribeMode = DEFAULT_PRESCRIBE_MODE;
+let _prescribeMonths = DEFAULT_PRESCRIBE_MONTHS;
+let _prescribeEndDate = DEFAULT_PRESCRIBE_END_DATE;
 
 function resetPrescribePanel() {
   _prescribePanelBuiltFor = null;
   _lastSummaryKey = '';
-  _prescribeMode = 'months';
-  _prescribeMonths = 7;
-  _prescribeEndDate = '';
+  _prescribeMode = DEFAULT_PRESCRIBE_MODE;
+  _prescribeMonths = DEFAULT_PRESCRIBE_MONTHS;
+  _prescribeEndDate = DEFAULT_PRESCRIBE_END_DATE;
   const pd = getEl('prescribeDuration');
   if (pd) pd.textContent = '';
 }

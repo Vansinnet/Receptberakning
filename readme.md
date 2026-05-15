@@ -116,14 +116,18 @@ Tre inbyggda teman som växlas direkt:
   - `index.html` – applikationsskal
   - `app.css` – all stilmall (tre teman, responsiv design)
   - `app.js` – orkestrering (eventlyssnare, temahantering, inaktivitetstimer)
+  - `constants.js` – kliniska trösklar och konfiguration (AKTIVT VAL-markerade)
   - `utils.js` – DOM-hjälpare, datumverktyg, toast, kopiering
   - `state.js` – centraliserad tillståndshantering
-  - `calc-renew.js` – beräkningskärna och textgenerering för receptförnyelse
-  - `drugs.js` – läkemedelsdatabas (~6 000 preparat)
+  - `text-gen.js` – patientbrev, journalanteckning, sjukskötersketext (DOM-fria)
+  - `calc-renew.js` – beräkningskärna för receptförnyelse
+  - `drug-loader.js` – lazy-loadar läkemedelsdata (IndexedDB-cache + fetch)
+  - `drugs.json` + `drug-data.js` – läkemedelsdatabas (~8 300 poster, genereras via generate:drugs)
   - `interactions.js` – 77 interaktionsregler (handskrivna, ATC-baserade)
-  - `ui-renew.js` – UI-rendering för receptförnyelse (sidebar, formulär, resultatpanel, autocomplete, interaktionsvarningar)
+  - `ui-renew.js` – UI-rendering för receptförnyelse (sidebar, formulär, resultatpanel, interaktionsvarningar)
   - `prescribe.js` – beräkningskärna och UI för nyförskrivning
   - `longterm.js` – långvarig förbrukning (beräkning + UI)
+  - `test-app.js` – integrationstester för app.js (event-logik, state-hantering)
 - Fungerar **helt offline** – öppna bara `index.html` i en webbläsare.
 - **Standardiserad datumhantering** – alla datum hanteras som UTC för att undvika tidszonsproblem.
 - **Rena beräkningsfunktioner** (`calcCore`, `calcLongtermCore`, `calcPrescribeResult`) saknar DOM-beroenden. DOM-skal läser fält, anropar kärnan, renderar resultat.
@@ -137,13 +141,14 @@ Tre inbyggda teman som växlas direkt:
 
 **Utveckling:**
 ```bash
-npm test                  # Kör alla tester (calc + interactions + UI)
+npm test                  # Kör alla tester (calc + interactions + UI + app)
 npm run test:calc         # Endast beräkningslogik
 npm run test:interactions # Endast interaktionsmatchningsmotor
 npm run test:ui           # Endast UI-rendering
+npm run test:app          # Endast app.js-integrationstester
 npm run build:css          # Minifiera app.css → app.min.css
 npm run build:db           # Crawla FASS och bygg product-db.json (~45 min)
-npm run generate:drugs     # Generera drugs.js från product-db.json (~1 min)
+npm run generate:drugs     # Generera drugs.json + drug-data.js (~1 min)
 ```
 
 **Driftsätt online:**
@@ -154,12 +159,12 @@ För **Cloudflare Pages**: ställ in publish directory till **`Kod/`**. `_header
 
 ## Datapipeline
 
-Läkemedelsdatabasen (`drugs.js`) byggs i två steg:
+Läkemedelsdatabasen (`drugs.json` + `drug-data.js`) byggs i två steg:
 
 ```
 FASS.se (~14 000 NPL-ID:n)
   └─ build:db → data/product-db.json
-       └─ generate:drugs → Kod/drugs.js (samtliga beredningsformer)
+       └─ generate:drugs → Kod/drugs.json + Kod/drug-data.js (samtliga beredningsformer)
 ```
 
 `build:db` använder `classifyDoseForm()` för att kategorisera varje produkt: kvantifierbara med enhetsnyckel (`st`, `ml`, `dos`) eller markerade som ej kvantifierbara (`notCalculable`). `generate:drugs` läser klassificeringen och genererar drug‑entrierna med rätt enhet och flagga.

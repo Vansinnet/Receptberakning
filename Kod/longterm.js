@@ -94,10 +94,6 @@ function clearLongterm() {
   const periodTab = getEl('lt-period-table-section'); if (periodTab) periodTab.classList.add('is-hidden');
 }
 
-// Gränsvärden för förbrukningsbedömning — används av både kärna och UI
-const LT_OVER  = 1.10;
-const LT_UNDER = 0.80;
-
 function calcLongtermCore(medRaw, ordDose, rawPeriods, nplId) {
   const today = getToday();
   const periodErrors = [];
@@ -119,7 +115,7 @@ function calcLongtermCore(medRaw, ordDose, rawPeriods, nplId) {
 
     if (startDate && endDate && !isNaN(totalVal) && totalVal > 0 && Number.isInteger(totalVal) && startDate < endDate) {
       const days = getDaysDiff(endDate, startDate);
-      if (days === 0 || days > 365 * 50) {
+      if (days === 0 || days > MAX_PERIOD_SPAN_DAYS) {
         // Perioden är felfri i sig men orimligt lång — markera start+slutdatum
         // så att läkaren ser vilket par som exkluderades, utan tyst felkalkyl.
         periodErrors[periodErrors.length - 1].spanError = true;
@@ -210,7 +206,7 @@ function calcLongtermCore(medRaw, ordDose, rawPeriods, nplId) {
     alertTitle,
     alertMsg,
     hasOverlap,
-    barPct:      Math.min(150, Math.max(0, consumptionPct)),
+    barPct:      Math.min(LT_BAR_MAX_PCT, Math.max(0, consumptionPct)),
     fassUrl:     getFassUrl(medRaw, nplId),
     journalText: `Aktuellt: Förbrukningsanalys av ${stripManufacturer(medRaw)}.\n\nOrdinerad dos: ${ordDose} enheter/dag.\nAnalysperiod: ${periods.length} period(er), totalt ${totalDays} dagar.\n\nPerioder:\n${periodSummary}\n\nSammanlagd snittförbrukning: ${avgStr} (${consumptionPct.toFixed(1)}% av ordinerad dos).\n\nBedömning: [fyll i här]`,
   };
@@ -225,7 +221,7 @@ function calcLongterm() {
   const medRaw  = medEl.value.trim();
   const doseRaw = doseEl.value;
   const ordDose = parseFloat(doseRaw.replace(',', '.'));
-  const doseIsInvalid = doseRaw !== '' && (isNaN(ordDose) || ordDose < 0.1 || ordDose > 50);
+  const doseIsInvalid = doseRaw !== '' && (isNaN(ordDose) || ordDose < MIN_DOSE_VALUE || ordDose > MAX_DOSE_VALUE);
   toggleError(doseEl, doseIsInvalid);
 
   let result;
@@ -235,7 +231,7 @@ function calcLongterm() {
     // kan FASS-länken peka på fel produkt. Påverkar endast länken, inte beräkningen.
     let nplId = null;
     if (medRaw) {
-      const drugEntry = _drugByName.get(medRaw.toLowerCase());
+      const drugEntry = getDrugByName(medRaw);
       if (drugEntry) nplId = drugEntry.i;
     }
     result = calcLongtermCore(medRaw, ordDose, ltPeriods, nplId);
@@ -283,9 +279,9 @@ function calcLongterm() {
 
   const barEl = getEl('lt-bar');
   if (barEl) {
-    barEl.style.width = `${(result.barPct / 150) * 100}%`;
+    barEl.style.width = `${(result.barPct / LT_BAR_MAX_PCT) * 100}%`;
     barEl.className   = `consumption-bar ${result.overallStatus}`;
-    barEl.textContent = result.barPct > 20 ? `${result.consumptionPct.toFixed(0)}%` : '';
+    barEl.textContent = result.barPct > LT_BAR_TEXT_THRESHOLD_PCT ? `${result.consumptionPct.toFixed(0)}%` : '';
     barEl.setAttribute('data-tooltip', `Förbrukning relativt ordination — ${result.consumptionPct.toFixed(0)}% av ordinerad dos.`);
     barEl.setAttribute('aria-valuenow', String(Math.round(result.barPct)));
   }
