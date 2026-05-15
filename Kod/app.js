@@ -1,11 +1,20 @@
 
 let warnTimer, clearTimer, countdownInt;
 
-const calcDebounced = [];
-function ensureDebounce(i) {
-  if (calcDebounced[i]) return;
-  while (calcDebounced.length < i) calcDebounced.push(null);
-  calcDebounced[i] = debounce(() => calc(i), CALC_DEBOUNCE_MS);
+const calcDebounced = new Map();
+function ensureDebounce(cardId) {
+  if (calcDebounced.has(cardId)) return;
+  calcDebounced.set(cardId, debounce(function() {
+    const idx = _findCardIdx(cardId);
+    if (idx === -1 || idx !== activeMedIdx) return;
+    calc(idx);
+  }, CALC_DEBOUNCE_MS));
+}
+function _findCardIdx(cardId) {
+  for (let i = 0; i < states.length; i++) {
+    if (states[i]._cardId === cardId) return i;
+  }
+  return -1;
 }
 const calcLongtermDebounced = debounce(() => calcLongterm(), LONGTERM_DEBOUNCE_MS);
 
@@ -81,8 +90,9 @@ function addMedCard() {
   _addMedLocked = true;
   setTimeout(() => { _addMedLocked = false; }, ADD_MED_LOCK_MS);
 
-  const newIdx = pushMedCard();
-  ensureDebounce(newIdx);
+  pushMedCard();
+  const newIdx = states.length - 1;
+  ensureDebounce(states[newIdx]._cardId);
   setActiveMed(newIdx);
   buildMedList();
   renderFormForMed(activeMedIdx);
@@ -97,17 +107,10 @@ function clearCurrentCard() {
   const i = activeMedIdx;
 
   if (states.length > 1) {
-    // Ta bort kortet helt — kompaktera states och prescribeState
+    const cardId = states[i]._cardId;
+    calcDebounced.get(cardId)?.cancel();
+    calcDebounced.delete(cardId);
     spliceMedCard(i);
-
-    // calcDebounced-closures innehåller fasta idx-värden. Avbryt endast föråldrade
-    // timers vid index >= i (prefix 0..i-1 har fortfarande korrekta stängningar).
-    for (let j = i; j < calcDebounced.length; j++) {
-      calcDebounced[j]?.cancel();
-      calcDebounced[j] = null;
-    }
-    calcDebounced.splice(i, 1);
-    for (let j = i; j < states.length; j++) ensureDebounce(j);
 
     setActiveMed(Math.min(i, states.length - 1));
     resetPrescribePanel();
@@ -121,7 +124,7 @@ function clearCurrentCard() {
   }
 
   // Enda kvarvarande läkemedel — nollställ formuläret
-  calcDebounced[i]?.cancel();
+  calcDebounced.get(states[i]._cardId)?.cancel();
   setMedState(i, { activeTab:'patient', patientLang:'sv' });
   initPrescribeState(i, null);
   resetPrescribePanel();
@@ -183,8 +186,8 @@ function closeNewPatientModal() {
   }
 }
 function executeClearAll() {
-  for (let j = 0; j < calcDebounced.length; j++) calcDebounced[j]?.cancel();
-  calcDebounced.length = 0;
+  for (const fn of calcDebounced.values()) fn?.cancel();
+  calcDebounced.clear();
   calcLongtermDebounced.cancel();
   resetAllMedState();
   resetPrescribePanel();
@@ -257,7 +260,8 @@ if (formPanel) {
       }
     }
     saveFormValues(activeMedIdx);
-    ensureDebounce(activeMedIdx); calcDebounced[activeMedIdx]();
+    const cardId = states[activeMedIdx]._cardId;
+    ensureDebounce(cardId); calcDebounced.get(cardId)();
   });
   formPanel.addEventListener('blur', e => {
     // Sanera dygnsdos vid fältutträde: byt komma mot punkt så att värdet
@@ -446,7 +450,7 @@ window.addEventListener('focus',_recalcOnDate);
 
 // Rensa vid pagehide (bfcache-säkerhet)
 window.addEventListener('pagehide',()=>{
-  for (let j = 0; j < calcDebounced.length; j++) calcDebounced[j]?.cancel();
+  for (const fn of calcDebounced.values()) fn?.cancel();
   _recalcOnDate.cancel();
   calcLongtermDebounced.cancel();
   const ltPeriodCount = ltPeriods.length;
@@ -477,7 +481,7 @@ window.addEventListener('pagehide',()=>{
 window.addEventListener('pageshow',e=>{
   if(!e.persisted)return;
   _recalcOnDate.cancel();
-  calcDebounced.length = 0;
+  calcDebounced.clear();
   _todayCache=null;
   _addMedLocked=false;
   _clearCardLocked=false;

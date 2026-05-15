@@ -68,8 +68,8 @@ vm.runInContext(`
 // exponera hjälpfunktioner inifrån VM-kontexten (samma lösning som test-calc.js).
 vm.runInContext(`
   function __setState(i, data) {
-    while (states.length <= i) states.push({});
-    states[i] = data || {};
+    while (states.length <= i) states.push({ _cardId: _nextCardId++ });
+    states[i] = Object.assign({ _cardId: states[i]._cardId }, data || {});
   }
   function __setActive(i) { activeMedIdx = i; }
   function __setPrescribeGlobals(mode, months, endDate) {
@@ -78,7 +78,8 @@ vm.runInContext(`
     _prescribeEndDate = endDate;
   }
   function __resetState() {
-    states = [{}];
+    _nextCardId = 2;
+    states = [{ _cardId: 1 }];
     activeMedIdx = 0;
     prescribeState = {};
   }

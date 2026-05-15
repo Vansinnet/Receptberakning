@@ -60,8 +60,8 @@ vm.runInContext(`
 // Hjälpfunktioner för state-hantering i test
 vm.runInContext(`
   function __setState(i, data) {
-    while (states.length <= i) states.push({});
-    states[i] = data || {};
+    while (states.length <= i) states.push({ _cardId: _nextCardId++ });
+    states[i] = Object.assign({ _cardId: states[i]._cardId }, data || {});
   }
   function __setActive(i) { activeMedIdx = i; }
   function __setPrescribeGlobals(mode, months, endDate) {
@@ -70,7 +70,8 @@ vm.runInContext(`
     _prescribeEndDate = endDate;
   }
   function __resetState() {
-    states = [{}];
+    _nextCardId = 2;
+    states = [{ _cardId: 1 }];
     activeMedIdx = 0;
     prescribeState = {};
     _addMedLocked = false;
@@ -83,8 +84,8 @@ vm.runInContext(`
   function __getNurseVitalNormal() { return nurseVitalNormal; }
   function __getNurseFollowUpAdequate() { return nurseFollowUpAdequate; }
   function __getPrescribeStateKeys() { return Object.keys(prescribeState); }
-  function __getCalcDebLen() { return calcDebounced.length; }
-  function __setCalcDeb(mockArr) { calcDebounced.length = 0; if (mockArr) mockArr.forEach(function(x) { calcDebounced.push(x); }); }
+  function __getCalcDebLen() { return calcDebounced.size; }
+  function __setCalcDeb(mockEntries) { calcDebounced.clear(); if (mockEntries) mockEntries.forEach(function(e) { calcDebounced.set(e[0], e[1]); }); }
 `, ctx);
 
 const MOCK_TODAY = new Date('2025-06-15T00:00:00.000Z').getTime();
@@ -275,7 +276,7 @@ test('states sätts till [{}]', () => {
 test('calcDebounced töms', () => {
   setState(0, { medRaw: 'A', valid: true });
   setState(1, { medRaw: 'B', valid: true });
-  ctx.__setCalcDeb([{ cancel: function() {} }, { cancel: function() {} }]);
+  ctx.__setCalcDeb([[1, { cancel: function() {} }], [2, { cancel: function() {} }]]);
   ctx.executeClearAll();
   assertEqual(ctx.__getCalcDebLen(), 0, 'calcDebounced är tom');
 });
@@ -358,7 +359,7 @@ test('≥2 kort: kort tas bort och calcDebounced omindexeras', () => {
   setState(1, { medRaw: 'B', valid: true });
   setState(2, { medRaw: 'C', valid: true });
   setActive(1);
-  ctx.__setCalcDeb([{ cancel: function() {} }, { cancel: function() {} }, { cancel: function() {} }]);
+  ctx.__setCalcDeb([[1, { cancel: function() {} }], [2, { cancel: function() {} }], [3, { cancel: function() {} }]]);
   ctx.clearCurrentCard();
   assertEqual(ctx.__getStatesLen(), 2, 'states minskade');
   assertEqual(ctx.__getCalcDebLen(), 2, 'calcDebounced kompakterad');
@@ -368,7 +369,7 @@ test('≥2 kort: kort tas bort och calcDebounced omindexeras', () => {
 test('1 kort kvar: nollställs, inte borttaget', () => {
   setState(0, { medRaw: 'A', valid: true, isOveruse: true, earlyRenewalDecision: 'yes' });
   setActive(0);
-  ctx.__setCalcDeb([{ cancel: function() {} }]);
+  ctx.__setCalcDeb([[1, { cancel: function() {} }]]);
   ctx.clearCurrentCard();
   assertEqual(ctx.__getStatesLen(), 1, 'states.length oförändrat');
   var s = vm.runInContext('states[0]', ctx);

@@ -523,7 +523,8 @@ function selectAutocompleteItem(idx) {
     _acDrugName:   drug.n || null,
   });
   checkAllInteractions();
-  ensureDebounce(activeMedIdx); calcDebounced[activeMedIdx]();
+  const cardId = states[activeMedIdx]._cardId;
+  ensureDebounce(cardId); calcDebounced.get(cardId)();
 }
 
 function navigateAutocomplete(dir) {

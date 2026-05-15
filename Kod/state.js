@@ -7,7 +7,8 @@
 // Beroende: utils.js måste vara laddat före denna fil (oneYearAgoStr, todayStr).
 
 /* Klinisk state */
-let states         = [{}];
+let _nextCardId   = 2;
+let states         = [{ _cardId: 1 }];
 let activeMedIdx   = 0;
 let prescribeState = {};
 let ltPeriods      = [{ start: oneYearAgoStr(), total: '', end: todayStr() }];
@@ -32,8 +33,11 @@ function applyMedStatePatch(i, patch) {
 }
 
 // Ersätter states[i] med ett nytt objekt (t.ex. vid hård nollställning av ett kort).
+// Bevarar _cardId så att calcDebounced-Map:en inte tappar sin nyckel.
 function setMedState(i, value) {
+  const cardId = states[i] && states[i]._cardId;
   states[i] = value;
+  if (cardId) states[i]._cardId = cardId;
 }
 
 // Sätter en enskild UI-preferens (activeTab, patientLang) utan att röra klinisk data.
@@ -76,12 +80,11 @@ function applyPrescribeStatePatch(i, patch) {
 
 // Lägger till ett tomt läkemedelskort och returnerar det nya indexet.
 function pushMedCard() {
-  states.push({});
-  return states.length - 1;
+  states.push({ _cardId: _nextCardId++ });
 }
 
 // Tar bort kort vid index i och kompakterar prescribeState.
-// calcDebounced hanteras separat i app.js (closures innehåller fasta index).
+// calcDebounced hanteras separat i app.js (Map<cardId, fn>, inga index).
 function spliceMedCard(i) {
   states.splice(i, 1);
   const newPS = {};
@@ -93,7 +96,8 @@ function spliceMedCard(i) {
 
 // Återställer all klinisk state till grundläget (ett tomt läkemedelskort).
 function resetAllMedState() {
-  states         = [{}];
+  _nextCardId   = 2;
+  states         = [{ _cardId: 1 }];
   activeMedIdx   = 0;
   prescribeState = {};
   resetLtPeriods();

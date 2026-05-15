@@ -30,6 +30,7 @@
   --clear-btn: #f1f5f9; --clear-btn-hover: #e2e8f0; --clear-btn-text: #334155;
   --code-bg: #f8fafc;
   --danger-bg: var(--red-bg); --danger-color: var(--red); --danger-border: var(--red-border); --danger-hover: var(--red-border);
+  --btn-selected-text: #fff;
   --sidebar-w: 178px;
   --form-w: 360px;
 }
@@ -48,6 +49,7 @@
   --input-bg: #0d1117; --code-bg: #0d1117;
   --clear-btn: #21262d; --clear-btn-hover: #30363d; --clear-btn-text: #c9d1d9;
   --danger-bg: var(--red-bg); --danger-color: var(--red); --danger-border: var(--red-border); --danger-hover: var(--red-border);
+  --btn-selected-text: var(--bg);
 }
 
 [data-theme="klinisk"] {
@@ -500,15 +502,10 @@ html, body {
 .early-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .early-btn-yes { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
 .early-btn-yes:hover  { background: var(--green-border); }
-.early-btn-yes.selected { background: var(--green); color: #fff; border-color: var(--green); }
+.early-btn-yes.selected { background: var(--green); color: var(--btn-selected-text); border-color: var(--green); }
 .early-btn-no  { background: var(--red-bg);   color: var(--red);   border-color: var(--red-border); }
 .early-btn-no:hover   { background: var(--red-border); }
-.early-btn-no.selected  { background: var(--red);   color: #fff; border-color: var(--red); }
-/* Dark mode: vit text på #3fb950/f85149 ger ~2.5:1/3.4:1 — under WCAG AA 4.5:1.
-   --bg (#0d1117) ger 7.5:1 resp. 5.7:1 utan att ändra --green/--red som används
-   som textfärg på mörk bakgrund på andra ställen. */
-[data-theme="dark"] .early-btn-yes.selected,
-[data-theme="dark"] .early-btn-no.selected  { color: var(--bg); }
+.early-btn-no.selected  { background: var(--red);   color: var(--btn-selected-text); border-color: var(--red); }
 
 /* Knapp för vy-växling läkare/sjuksköterska */
 .btn-nurse-toggle {

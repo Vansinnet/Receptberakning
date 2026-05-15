@@ -62,8 +62,8 @@ vm.runInContext(fs.readFileSync(path.join(__dirname, 'prescribe.js'),  'utf8'), 
 // Exponera hjälpfunktioner inifrån VM-kontexten för att sätta state per test.
 vm.runInContext(`
   function __setTestState(i, data) {
-    while (states.length <= i) states.push({});
-    states[i] = data || {};
+    while (states.length <= i) states.push({ _cardId: _nextCardId++ });
+    states[i] = Object.assign({ _cardId: states[i]._cardId }, data || {});
   }
   function __setTestPS(i, data) {
     prescribeState[i] = (data !== null && data !== undefined) ? data : null;
