@@ -77,50 +77,6 @@
   --clear-btn: #fce7f3; --clear-btn-hover: #fbcfe8; --clear-btn-text: #831843;
 }
 
-[data-theme="jul"] {
-  --primary: #b91c1c; --primary-light: #fee2e2; --primary-hover: #991b1b;
-  --bg: #fef9ef; --surface2: #fef3c7;
-  --text: #14532d; --text-muted: #5c4033;
-  --border: #fde68a; --border-strong: #d4a74a;
-  --shadow-sm: 0 1px 3px rgba(185,28,28,0.08), 0 1px 2px rgba(185,28,28,0.05);
-  --shadow-md: 0 4px 16px rgba(185,28,28,0.10), 0 2px 6px rgba(185,28,28,0.06);
-  --code-bg: #fef9ef;
-  --clear-btn: #fef3c7; --clear-btn-hover: #fde68a; --clear-btn-text: #14532d;
-}
-
-[data-theme="pask"] {
-  --primary: #a3860a; --primary-light: #fef9c3; --primary-hover: #856f08;
-  --bg: #feffde; --surface2: #f9e79f;
-  --text: #3d5300; --text-muted: #6b6e3d;
-  --border: #f7dc6f; --border-strong: #e8c84a;
-  --shadow-sm: 0 1px 3px rgba(163,134,10,0.08), 0 1px 2px rgba(163,134,10,0.05);
-  --shadow-md: 0 4px 16px rgba(163,134,10,0.10), 0 2px 6px rgba(163,134,10,0.06);
-  --code-bg: #feffde;
-  --clear-btn: #f9e79f; --clear-btn-hover: #f7dc6f; --clear-btn-text: #3d5300;
-}
-
-[data-theme="midsommar"] {
-  --primary: #0ea5e9; --primary-light: #f0f9ff; --primary-hover: #0284c7;
-  --bg: #f0f9ff; --surface2: #e0f2fe;
-  --text: #164e63; --text-muted: #3d706b;
-  --border: #bae6fd; --border-strong: #7dd3fc;
-  --shadow-sm: 0 1px 3px rgba(14,165,233,0.08), 0 1px 2px rgba(14,165,233,0.05);
-  --shadow-md: 0 4px 16px rgba(14,165,233,0.10), 0 2px 6px rgba(14,165,233,0.06);
-  --code-bg: #f0f9ff;
-  --clear-btn: #e0f2fe; --clear-btn-hover: #bae6fd; --clear-btn-text: #164e63;
-}
-
-[data-theme="halloween"] {
-  --primary: #c2410c; --primary-light: #fff7ed; --primary-hover: #9a3412;
-  --bg: #fff7ed; --surface2: #ffedd5;
-  --text: #3a1a1a; --text-muted: #6b3a2e;
-  --border: #fed7aa; --border-strong: #fdba74;
-  --shadow-sm: 0 1px 3px rgba(194,65,12,0.08), 0 1px 2px rgba(194,65,12,0.05);
-  --shadow-md: 0 4px 16px rgba(194,65,12,0.10), 0 2px 6px rgba(194,65,12,0.06);
-  --code-bg: #fff7ed;
-  --clear-btn: #ffedd5; --clear-btn-hover: #fed7aa; --clear-btn-text: #3a1a1a;
-}
-
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -746,19 +702,6 @@ select.theme-select {
 }
 select.theme-select option { background: var(--surface); color: var(--text); }
 .theme-select:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
-
-.season-badge {
-  font-size: 10px; padding: 1px 6px;
-  border-radius: 4px;
-  background: var(--surface2);
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-  white-space: nowrap;
-  display: none;
-  line-height: 1.4;
-  vertical-align: middle;
-}
-.season-badge.visible { display: inline-block; }
 
 .fass-link {
   text-decoration: none;

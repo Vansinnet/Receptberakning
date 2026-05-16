@@ -32,67 +32,25 @@ function shouldClearDrugMatch(inputVal, acDrugName) {
 }
 
 // === TEMA ===
-function getActiveSeason() {
-  var d = new Date();
-  var m = d.getUTCMonth() + 1;
-  d = d.getUTCDate();
-  for (const s of SEASONAL_THEME_SCHEDULE) {
-    const st = s.start, en = s.end;
-    if (st.m > en.m || (st.m === en.m && st.d > en.d)) {
-      // Årsskifte (t.ex. 1 dec → 6 jan)
-      if (m > st.m || (m === st.m && d >= st.d) || m < en.m || (m === en.m && d <= en.d)) return s;
-    } else {
-      if ((m > st.m || (m === st.m && d >= st.d)) && (m < en.m || (m === en.m && d <= en.d))) return s;
-    }
-  }
-  return null;
-}
 function getBaseTheme() {
   let t;
   try { t = localStorage.getItem('baseTheme'); } catch(e) {}
   return VALID_THEMES.has(t) ? t : 'klinisk';
 }
-function updateSeasonalBadge(season) {
-  const badge = getEl('seasonBadge');
-  if (!badge) return;
-  if (season) { badge.textContent = season.label; badge.classList.add('visible'); }
-  else { badge.textContent = ''; badge.classList.remove('visible'); }
-}
 function applyTheme(t, isUserAction) {
-  const season = getActiveSeason();
   if (isUserAction) {
     try { localStorage.setItem('baseTheme', t); } catch(e) {}
-    if (season) { try { localStorage.setItem('_seasonOverride', season.theme); } catch(e) {} }
-    else { try { localStorage.removeItem('_seasonOverride'); } catch(e) {} }
   }
   const baseTheme = getBaseTheme();
-  let seasonOverride;
-  try { seasonOverride = localStorage.getItem('_seasonOverride'); } catch(e) {}
-  let effectiveTheme;
-  if (isUserAction) {
-    effectiveTheme = t;
-  } else if (season && seasonOverride !== season.theme) {
-    effectiveTheme = season.theme;
-  } else {
-    effectiveTheme = baseTheme;
-  }
-  const safeTheme = (VALID_THEMES.has(effectiveTheme) || VALID_SEASONAL_THEMES.has(effectiveTheme)) ? effectiveTheme : 'klinisk';
+  const effectiveTheme = isUserAction ? t : baseTheme;
+  const safeTheme = VALID_THEMES.has(effectiveTheme) ? effectiveTheme : 'klinisk';
   document.documentElement.setAttribute('data-theme', safeTheme);
   const sel = getEl('themeSelect');
   if (sel) sel.value = VALID_THEMES.has(baseTheme) ? baseTheme : 'klinisk';
   try { localStorage.setItem('theme', safeTheme); } catch(e) {}
-  if (!season && !isUserAction) {
-    try { localStorage.removeItem('_seasonOverride'); } catch(e) {}
-  }
-  const showBadge = !isUserAction && season && seasonOverride !== season.theme;
-  updateSeasonalBadge(showBadge ? season : null);
   const ann = getEl('a11y-announce');
   if (ann) {
-    if (showBadge) {
-      ann.textContent = season.label + '-tema aktivt (ändra i tema-väljaren för att återgå)';
-    } else {
-      ann.textContent = safeTheme === 'dark' ? 'Mörkt tema valt' : safeTheme === 'sakura' ? 'Körsbärstema valt' : 'Kliniskt tema valt';
-    }
+    ann.textContent = safeTheme === 'dark' ? 'Mörkt tema valt' : safeTheme === 'sakura' ? 'Körsbärstema valt' : 'Kliniskt tema valt';
   }
 }
 
