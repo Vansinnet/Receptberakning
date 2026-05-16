@@ -991,7 +991,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 
 .footer-disclaimer {
   display: flex; align-items: flex-start; gap: 7px;
-  max-width: 520px; text-align: center;
+  text-align: center;
   font-size: 11px; color: var(--text-muted); line-height: 1.6;
 }
 .footer-disclaimer-icon { flex-shrink: 0; font-size: 13px; color: var(--amber); margin-top: 1px; }
@@ -1000,6 +1000,12 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   text-underline-offset: 2px;
 }
 .footer-disclaimer a:hover { opacity: 0.8; }
+
+.footer-prod-counter {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 10px; color: var(--text-muted);
+  white-space: nowrap;
+}
 
 .footer-links {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;

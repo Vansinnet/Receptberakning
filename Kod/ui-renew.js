@@ -274,6 +274,9 @@ function renderResultForMed(i) {
     renderPrescribePanel(i);
     return;
   }
+  if (s._cardId != null && s.metrics && s.metrics.length > 0 && typeof incrementProdCounter === 'function') {
+    incrementProdCounter(s._cardId);
+  }
 
   if (emptyState)    emptyState.classList.add('is-hidden');
   if (resultContent) resultContent.classList.remove('is-hidden');

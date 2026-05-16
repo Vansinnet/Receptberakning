@@ -259,6 +259,7 @@ function executeClearAll() {
   renderFormForMed(0);
   renderResultForMed(0);
   clearLongterm();
+  resetProdCounter();
   closeNewPatientModal();
   const medInput = getEl('medInput');
   if (medInput) medInput.focus();
@@ -271,9 +272,51 @@ function copyResultText() {
   copyTextToClipboard('copyBodyResult', 'copyBtnResult', 'result');
 }
 
+// === PRODUKTIONSRÄKNARE ===
+var _prodCounted = new Set();
+var _prodToday = 0;
+var _prodTotal = 0;
+
+function initProdCounter() {
+  try {
+    var today = getToday();
+    var savedDate = localStorage.getItem('prodDate');
+    var savedTotal = localStorage.getItem('prodTotal');
+    var savedToday = localStorage.getItem('prodToday');
+    _prodTotal = savedTotal ? Math.max(0, parseInt(savedTotal, 10) || 0) : 0;
+    _prodToday = (savedDate === today && savedToday) ? Math.max(0, parseInt(savedToday, 10) || 0) : 0;
+  } catch(e) { _prodTotal = 0; _prodToday = 0; }
+  updateProdDisplay();
+}
+
+function incrementProdCounter(cardId) {
+  if (cardId == null || _prodCounted.has(cardId)) return;
+  _prodCounted.add(cardId);
+  _prodToday++;
+  _prodTotal++;
+  updateProdDisplay();
+  try {
+    localStorage.setItem('prodToday', String(_prodToday));
+    localStorage.setItem('prodTotal', String(_prodTotal));
+    localStorage.setItem('prodDate', getToday());
+  } catch(e) {}
+}
+
+function updateProdDisplay() {
+  var todayEl = getEl('prodToday');
+  var totalEl = getEl('prodTotal');
+  if (todayEl) todayEl.textContent = String(_prodToday);
+  if (totalEl) totalEl.textContent = String(_prodTotal);
+}
+
+function resetProdCounter() {
+  _prodCounted = new Set();
+}
+
 // === INITIERING ===
 try { applyTheme(null, false); }
 catch(e) { applyTheme('klinisk', false); }
+initProdCounter();
 
 buildMedList();
 renderFormForMed(0);
