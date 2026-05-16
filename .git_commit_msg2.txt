@@ -1,1 +1,0 @@
-uppdatera readme med test-integration.js info
