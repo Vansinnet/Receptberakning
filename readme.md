@@ -127,7 +127,8 @@ Tre inbyggda teman som växlas direkt:
   - `ui-renew.js` – UI-rendering för receptförnyelse (sidebar, formulär, resultatpanel, interaktionsvarningar)
   - `prescribe.js` – beräkningskärna och UI för nyförskrivning
   - `longterm.js` – långvarig förbrukning (beräkning + UI)
-  - `test-app.js` – integrationstester för app.js (event-logik, state-hantering)
+   - `test-app.js` – integrationstester för app.js (event-logik, state-hantering)
+   - `test-integration.js` – 32 integrationstester (E2E-flöde, multikort, interaktioner via DOM, calcDebounced, earlyRenewalDecision)
 - Fungerar **helt offline** – öppna bara `index.html` i en webbläsare.
 - **Standardiserad datumhantering** – alla datum hanteras som UTC för att undvika tidszonsproblem.
 - **Rena beräkningsfunktioner** (`calcCore`, `calcLongtermCore`, `calcPrescribeResult`) saknar DOM-beroenden. DOM-skal läser fält, anropar kärnan, renderar resultat.
@@ -141,11 +142,12 @@ Tre inbyggda teman som växlas direkt:
 
 **Utveckling:**
 ```bash
-npm test                  # Kör alla tester (calc + interactions + UI + app)
+npm test                  # Kör alla tester (calc + interactions + UI + app + integration)
 npm run test:calc         # Endast beräkningslogik
 npm run test:interactions # Endast interaktionsmatchningsmotor
 npm run test:ui           # Endast UI-rendering
 npm run test:app          # Endast app.js-integrationstester
+npm run test:integration  # Endast E2E-integrationstester
 npm run build:css          # Minifiera app.css → app.min.css
 npm run build:db           # Crawla FASS och bygg product-db.json (~45 min)
 npm run generate:drugs     # Generera drugs.json + drug-data.js (~1 min)
