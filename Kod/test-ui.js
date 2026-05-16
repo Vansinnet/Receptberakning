@@ -1072,6 +1072,52 @@ test('giltig indata → copySection visas med journalText', () => {
 
 
 // ═══════════════════════════════════════════════════════════
+// navigateAutocomplete — piltangentsnavigering
+// ═══════════════════════════════════════════════════════════
+
+group('navigateAutocomplete — piltangentsnavigering');
+
+test('ArrowDown ökar selectedIdx', () => {
+  var items = [{ n: 'Elvanse 50 mg', p: 30, i: '20040607001067', a: 'N06BA12' }, { n: 'Sertralin 50 mg', p: 100, i: '19951006000014', a: 'N06AB06' }];
+  vm.runInContext('_acState.items = []; _acState.selectedIdx = -1; _acState.visible = false;', ctx);
+  ctx.renderAutocomplete(items);
+  assertEqual(vm.runInContext('_acState.selectedIdx', ctx), -1, 'selectedIdx init = -1');
+
+  ctx.navigateAutocomplete(1); // ArrowDown
+  assertEqual(vm.runInContext('_acState.selectedIdx', ctx), 0, 'selectedIdx = 0 efter nedtryck');
+
+  ctx.navigateAutocomplete(1);
+  assertEqual(vm.runInContext('_acState.selectedIdx', ctx), 1, 'selectedIdx = 1 efter andra nedtryck');
+});
+
+test('ArrowDown wrappar inte förbi slutet', () => {
+  var items = [{ n: 'A', p: 10 }, { n: 'B', p: 20 }];
+  ctx.renderAutocomplete(items);
+  ctx.navigateAutocomplete(1); ctx.navigateAutocomplete(1); // selectedIdx = 1
+  ctx.navigateAutocomplete(1); // ska stanna på 1
+  assertEqual(vm.runInContext('_acState.selectedIdx', ctx), 1, 'stannar på sista elementet');
+});
+
+test('ArrowUp minskar selectedIdx och wrappar till -1', () => {
+  var items = [{ n: 'A', p: 10 }, { n: 'B', p: 20 }];
+  ctx.renderAutocomplete(items);
+  ctx.navigateAutocomplete(1); // selectedIdx = 0
+
+  ctx.navigateAutocomplete(-1); // ArrowUp tillbaka till -1
+  assertEqual(vm.runInContext('_acState.selectedIdx', ctx), -1, 'ArrowUp till -1');
+
+  ctx.navigateAutocomplete(-1); // ska stanna på -1
+  assertEqual(vm.runInContext('_acState.selectedIdx', ctx), -1, 'stannar på -1');
+});
+
+test('navigateAutocomplete no-op när dropdown ej synlig', () => {
+  vm.runInContext('_acState.visible = false; _acState.items = []; _acState.selectedIdx = 5;', ctx);
+  ctx.navigateAutocomplete(1);
+  assertEqual(vm.runInContext('_acState.selectedIdx', ctx), 5, 'oförändrat när ej synlig');
+});
+
+
+// ═══════════════════════════════════════════════════════════
 // SAMMANFATTNING
 // ═══════════════════════════════════════════════════════════
 

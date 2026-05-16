@@ -126,9 +126,12 @@ Tre inbyggda teman som växlas direkt:
   - `interactions.js` – 77 interaktionsregler (handskrivna, ATC-baserade)
   - `ui-renew.js` – UI-rendering för receptförnyelse (sidebar, formulär, resultatpanel, interaktionsvarningar)
   - `prescribe.js` – beräkningskärna och UI för nyförskrivning
-  - `longterm.js` – långvarig förbrukning (beräkning + UI)
-   - `test-app.js` – integrationstester för app.js (event-logik, state-hantering)
-   - `test-integration.js` – 32 integrationstester (E2E-flöde, multikort, interaktioner via DOM, calcDebounced, earlyRenewalDecision)
+   - `longterm.js` – långvarig förbrukning (beräkning + UI)
+   - `test-calc.js` – 158 enhetstester (calcCore, calcLongtermCore, calcPrescribeResult, validateValues, textgenerering)
+   - `test-interactions.js` – 42 enhetstester (atcMatches, CHECK_INTERACTIONS)
+   - `test-ui.js` – 96 UI-tester (renderResultForMed, buildMedList, autocomplete, navigateAutocomplete, prescribePanel)
+   - `test-app.js` – 26 integrationstester (clearCurrentCard, addMedCard, executeClearAll, recalcOnDateChange, spliceMedCard, nurse-flaggor)
+   - `test-integration.js` – 32 E2E-tester (formulär→calc→DOM, multikort, calcDebounced, interaktionsdetektion, earlyRenewalDecision)
 - Fungerar **helt offline** – öppna bara `index.html` i en webbläsare.
 - **Standardiserad datumhantering** – alla datum hanteras som UTC för att undvika tidszonsproblem.
 - **Rena beräkningsfunktioner** (`calcCore`, `calcLongtermCore`, `calcPrescribeResult`) saknar DOM-beroenden. DOM-skal läser fält, anropar kärnan, renderar resultat.
@@ -142,7 +145,7 @@ Tre inbyggda teman som växlas direkt:
 
 **Utveckling:**
 ```bash
-npm test                  # Kör alla tester (calc + interactions + UI + app + integration)
+npm test                  # Kör 354 tester (calc + interactions + UI + app + integration)
 npm run test:calc         # Endast beräkningslogik
 npm run test:interactions # Endast interaktionsmatchningsmotor
 npm run test:ui           # Endast UI-rendering

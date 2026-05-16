@@ -379,6 +379,53 @@ test('1 kort kvar: nollställs, inte borttaget', () => {
 });
 
 // ═══════════════════════════════════════════════════════════
+// NIVÅ 5: spliceMedCard — kantfall
+// ═══════════════════════════════════════════════════════════
+
+group('spliceMedCard — kantfall');
+
+test('spliceMedCard med 1 kort → states töms, prescribeState tom', () => {
+  setState(0, { medRaw: 'A' });
+  vm.runInContext('prescribeState = { 0: { packageSize: "30" } }', ctx);
+  assertEqual(ctx.__getStatesLen(), 1, 'states har 1 kort före');
+
+  // Direktanrop — clearCurrentCard skulle normalt blocka detta
+  ctx.spliceMedCard(0);
+
+  assertEqual(ctx.__getStatesLen(), 0, 'states tom efter splice');
+  var psKeys = ctx.__getPrescribeStateKeys();
+  assertEqual(psKeys.length, 0, 'prescribeState tom');
+});
+
+// ═══════════════════════════════════════════════════════════
+// NIVÅ 6: nurse-flaggor — mutation och reset
+// ═══════════════════════════════════════════════════════════
+
+group('nurse-flaggor — mutation och reset');
+
+test('setNurseView sätter nurseViewActive', () => {
+  ctx.setNurseView(true);
+  assertEqual(ctx.__getNurseViewActive(), true, 'nurseViewActive = true');
+  ctx.setNurseView(false);
+  assertEqual(ctx.__getNurseViewActive(), false, 'nurseViewActive = false');
+});
+
+test('setNurseVitalNormal och setNurseFollowUpAdequate', () => {
+  ctx.setNurseVitalNormal(true);
+  assertEqual(ctx.__getNurseVitalNormal(), true, 'nurseVitalNormal = true');
+  ctx.setNurseFollowUpAdequate(true);
+  assertEqual(ctx.__getNurseFollowUpAdequate(), true, 'nurseFollowUpAdequate = true');
+});
+
+test('resetNurseState nollställer alla tre', () => {
+  vm.runInContext('nurseViewActive = true; nurseVitalNormal = true; nurseFollowUpAdequate = true;', ctx);
+  ctx.resetNurseState();
+  assertEqual(ctx.__getNurseViewActive(), false, 'nurseViewActive nollställd');
+  assertEqual(ctx.__getNurseVitalNormal(), false, 'nurseVitalNormal nollställd');
+  assertEqual(ctx.__getNurseFollowUpAdequate(), false, 'nurseFollowUpAdequate nollställd');
+});
+
+// ═══════════════════════════════════════════════════════════
 // RAPPORTERING
 // ═══════════════════════════════════════════════════════════
 

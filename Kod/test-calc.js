@@ -1110,6 +1110,7 @@ test('calcLongtermCore: exakt 1 period → hasOverlap=false, valid=true', () => 
 
 const buildPatientText = ctx.buildPatientText;
 const buildJournalText = ctx.buildJournalText;
+const buildNurseJournalText = ctx.buildNurseJournalText;
 
 // Minimal state för ett läkemedel i normalfall (OK att förnya).
 // MOCK_TODAY = 2025-06-15; prescribedEnd 2025-06-25 = 10 dagar kvar.
@@ -1784,6 +1785,86 @@ test('journal single toRenew (overuse) med prescribeEnds → slutdatum i åtgär
   );
   assertContains(text, 'Åtgärd: Nytt recept utfärdat (räcker t.o.m. 2026-12-10)', 'overuse-åtgärdsraden ska innehålla slutdatum');
 });
+
+
+// ═══════════════════════════════════════════════════════════
+// buildNurseJournalText — TESTER
+// ═══════════════════════════════════════════════════════════
+
+group('buildNurseJournalText — sjuksköterskejournal');
+
+test('inget giltigt state → tom sträng', () => {
+  vm.runInContext('states.length = 0;', ctx);
+  const states = vm.runInContext('states', ctx);
+  const text = buildNurseJournalText(states);
+  assertEqual(text, '', 'tom states ger tom text');
+});
+
+test('1 kort, alla adekvat → adekvat-bedömning', () => {
+  vm.runInContext('states.length = 0; nurseVitalNormal = true; nurseFollowUpAdequate = true;', ctx);
+  setTestState(0, makeRenewState({ valid: true, calculable: true, medNameStripped: 'Elvanse 50 mg' }));
+  const states = vm.runInContext('states', ctx);
+
+  const text = buildNurseJournalText(states);
+
+  assertContains(text, 'Elvanse 50 mg', 'text innehåller läkemedelsnamn');
+  assertContains(text, 'adekvat', 'text innehåller adekvat-bedömning');
+  assertContains(text, 'Lägger receptärendet till läkare', 'text avslutas korrekt');
+});
+
+test('1 kort, båda avvikande → avvikande plural', () => {
+  vm.runInContext('states.length = 0; nurseVitalNormal = false; nurseFollowUpAdequate = false;', ctx);
+  setTestState(0, makeRenewState({ valid: true, calculable: true, medNameStripped: 'Elvanse 50 mg' }));
+  const states = vm.runInContext('states', ctx);
+
+  const text = buildNurseJournalText(states);
+
+  assertContains(text, 'avvikande', 'text innehåller avvikande');
+  assert(!text.includes('adekvat'), 'text ska inte innehålla adekvat');
+});
+
+test('1 kort, endast vitalparametrar avvikande → singular', () => {
+  vm.runInContext('states.length = 0; nurseVitalNormal = false; nurseFollowUpAdequate = true;', ctx);
+  setTestState(0, makeRenewState({ valid: true, calculable: true, medNameStripped: 'Elvanse 50 mg' }));
+  const states = vm.runInContext('states', ctx);
+
+  const text = buildNurseJournalText(states);
+
+  assertContains(text, 'avvikande', 'text innehåller avvikande');
+  assertContains(text, 'vitalparametrar', 'text nämner vitalparametrar');
+  assert(!text.includes('och medicinska uppföljning bedöms vara avvikande'), 'singular, inte plural');
+});
+
+test('2 kort → båda namnen i texten', () => {
+  vm.runInContext('states.length = 0; nurseVitalNormal = true; nurseFollowUpAdequate = true;', ctx);
+  setTestState(0, makeRenewState({ valid: true, calculable: true, medNameStripped: 'Elvanse 50 mg' }));
+  setTestState(1, makeRenewState({ valid: true, calculable: true, medRaw: 'Sertralin 50 mg', medNameStripped: 'Sertralin 50 mg', pDateStr: '2024-09-28', total: 300, prescribedEndDateStr: '2025-06-25' }));
+  const states = vm.runInContext('states', ctx);
+
+  const text = buildNurseJournalText(states);
+
+  assertContains(text, 'Elvanse 50 mg', 'card 0 nämns');
+  assertContains(text, 'Sertralin 50 mg', 'card 1 nämns');
+  assertContains(text, ' och ', 'båda namnen sammanfogade med och');
+});
+
+test('overuse-kort flaggar hasOutsideLimits', () => {
+  vm.runInContext('states.length = 0; nurseVitalNormal = true; nurseFollowUpAdequate = true;', ctx);
+  setTestState(0, makeRenewState({
+    valid: true, calculable: true,
+    medNameStripped: 'Elvanse 50 mg',
+    isOveruse: true,
+    earlyRenewalDecision: null,
+  }));
+  const states = vm.runInContext('states', ctx);
+
+  const text = buildNurseJournalText(states);
+
+  assertContains(text, 'utifrån tidigare förskrivning', 'hasOutsideLimits nämns');
+});
+
+// Nollställ nurse-flaggor efter nurse-testerna
+vm.runInContext('nurseVitalNormal = false; nurseFollowUpAdequate = false;', ctx);
 
 
 // ═══════════════════════════════════════════════════════════
