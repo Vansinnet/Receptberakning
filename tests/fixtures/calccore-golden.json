@@ -1,0 +1,2757 @@
+[
+  {
+    "name": "incomplete",
+    "input": {
+      "valid": false,
+      "reason": "incomplete"
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": false,
+      "statusText": "Ej ifyllt"
+    }
+  },
+  {
+    "name": "invalid_date",
+    "input": {
+      "valid": false,
+      "reason": "invalid_date"
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": false,
+      "statusText": "Ogiltigt datum"
+    }
+  },
+  {
+    "name": "too_many_refs",
+    "input": {
+      "valid": false,
+      "reason": "too_many_refs"
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": false,
+      "isOveruse": false,
+      "isTooEarly": false,
+      "verdictTitle": "Ogiltigt antal uttag",
+      "verdictSub": "Max 12 uttag stöds.",
+      "metrics": [],
+      "alerts": [
+        {
+          "type": "danger",
+          "title": "Ogiltigt antal uttag",
+          "message": "Max 12 uttag stöds."
+        }
+      ],
+      "patientText": "",
+      "patientTextEn": "",
+      "journalText": "",
+      "statusText": "Ogiltigt antal"
+    }
+  },
+  {
+    "name": "daysSince_0",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-06-15T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": false,
+      "isOveruse": false,
+      "isTooEarly": false,
+      "verdictTitle": "Kan ej beräknas idag",
+      "verdictSub": "Receptet måste vara utfärdat minst en dag tillbaka.",
+      "metrics": [],
+      "alerts": [],
+      "patientText": "",
+      "patientTextEn": "",
+      "journalText": "",
+      "statusText": "Kan ej beräknas"
+    }
+  },
+  {
+    "name": "totalDays_over_3650",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-04-26T00:00:00.000Z",
+      "amt": 10000,
+      "dose": 1,
+      "ref": 3,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "10000",
+      "refRaw": "3",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": false,
+      "isOveruse": false,
+      "isTooEarly": false,
+      "verdictTitle": "Orimliga värden",
+      "verdictSub": "Beräknad tid överstiger 10 år.",
+      "metrics": [],
+      "alerts": [
+        {
+          "type": "danger",
+          "title": "Orimlig tid",
+          "message": "Kontrollera inmatade värden."
+        }
+      ],
+      "patientText": "",
+      "patientTextEn": "",
+      "journalText": "",
+      "statusText": "Orimliga värden"
+    }
+  },
+  {
+    "name": "remaining_over_total",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-04-26T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 1,
+      "remaining": 200,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": "200",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": false,
+      "isOveruse": false,
+      "isTooEarly": false,
+      "verdictTitle": "Orimligt värde",
+      "verdictSub": "Kvarvarande (200) kan inte överstiga totalt förskrivet (100).",
+      "metrics": [],
+      "alerts": [],
+      "patientText": "",
+      "patientTextEn": "",
+      "journalText": "",
+      "statusText": "Orimliga värden"
+    }
+  },
+  {
+    "name": "ok_normal",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2024-09-08T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "OK – t.o.m. 2025-07-05",
+      "verdictTitle": "OK – Förnya recept",
+      "verdictSub": "Snittförbrukning 1.07 st/dag (107.1% av ordinerad dos, inom ±10%-gränsen). 20 dagar kvar av receptperioden (<20%-gränsen, 6.7% återstår).",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "300 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-07-05 (20 dagar kvar)",
+          "cls": "warn",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "1.07 st/dag (10.7 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 93.33333333333333,
+      "tlStart": "2024-09-08",
+      "tlEnd": "2025-07-05",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2024-09-08",
+      "total": 300,
+      "remainingDoses": null,
+      "endDateStr": "2025-07-05",
+      "prescribedEndDateStr": "2025-07-05",
+      "daysRemaining": 20,
+      "daysToPrescribedEnd": 20,
+      "displayAvgStr": "1.07 st/dag (10.7 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+    }
+  },
+  {
+    "name": "ok_exakt_110pct",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2024-09-08T00:00:00.000Z",
+      "amt": 308,
+      "dose": 1,
+      "ref": 1,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "308",
+      "refRaw": "1",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "OK – t.o.m. 2025-07-13",
+      "verdictTitle": "OK – Förnya recept",
+      "verdictSub": "Snittförbrukning 1.10 st/dag (110.0% av ordinerad dos, inom ±10%-gränsen). 28 dagar kvar av receptperioden (<20%-gränsen, 9.1% återstår).",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "308 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-07-13 (28 dagar kvar)",
+          "cls": "warn",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "1.10 st/dag (11.0 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 90.9090909090909,
+      "tlStart": "2024-09-08",
+      "tlEnd": "2025-07-13",
+      "earlyThreshold": 62,
+      "medRaw": "Testabol 10 mg",
+      "amt": 308,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2024-09-08",
+      "total": 308,
+      "remainingDoses": null,
+      "endDateStr": "2025-07-13",
+      "prescribedEndDateStr": "2025-07-13",
+      "daysRemaining": 28,
+      "daysToPrescribedEnd": 28,
+      "displayAvgStr": "1.10 st/dag (11.0 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+    }
+  },
+  {
+    "name": "ok_low_consumption",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-05-06T00:00:00.000Z",
+      "amt": 50,
+      "dose": 1,
+      "ref": 1,
+      "remaining": 30,
+      "doseRaw": "1",
+      "amtRaw": "50",
+      "refRaw": "1",
+      "leftRaw": "30",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "OK – t.o.m. 2025-06-25",
+      "verdictTitle": "OK – Förnya recept",
+      "verdictSub": "Snittförbrukning 0.50 st/dag (50.0% av ordinerad dos, inom ±10%-gränsen). 10 dagar kvar av receptperioden (<20%-gränsen, 20.0% återstår).",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "50 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-06-25 (10 dagar kvar)",
+          "cls": "warn",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "0.50 st/dag (5.0 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "warn",
+          "title": "Låg förbrukning",
+          "message": "0.50 st/dag är 50.0% under ordinerad dos. Överväg uppföljning."
+        }
+      ],
+      "tlPct": 80,
+      "tlStart": "2025-05-06",
+      "tlEnd": "2025-06-25",
+      "earlyThreshold": 10,
+      "medRaw": "Testabol 10 mg",
+      "amt": 50,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-05-06",
+      "total": 50,
+      "remainingDoses": 30,
+      "endDateStr": "2025-07-15",
+      "prescribedEndDateStr": "2025-06-25",
+      "daysRemaining": 30,
+      "daysToPrescribedEnd": 10,
+      "displayAvgStr": "0.50 st/dag (5.0 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 20 av 50 tillgängliga st)"
+    }
+  },
+  {
+    "name": "tooEarly_normal",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-05-16T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": 80,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "80",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": true,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidigt — 270d kvar",
+      "verdictTitle": "För tidigt – 270 dagar kvar",
+      "verdictSub": "Förbrukning OK. Kontakta vården närmre slutdatumet.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "300 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2026-03-12 (270 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "0.67 st/dag (6.7 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "warn",
+          "title": "Låg förbrukning",
+          "message": "0.67 st/dag är 33.3% under ordinerad dos. Överväg uppföljning."
+        },
+        {
+          "type": "info",
+          "title": "För tidigt att förnya",
+          "message": "Receptperioden löper ut om 270 dagar (t.o.m. 2026-03-12). Förnyelse rekommenderas närmre slutdatumet."
+        }
+      ],
+      "tlPct": 10,
+      "tlStart": "2025-05-16",
+      "tlEnd": "2026-03-12",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-05-16",
+      "total": 300,
+      "remainingDoses": 80,
+      "endDateStr": "2025-09-03",
+      "prescribedEndDateStr": "2026-03-12",
+      "daysRemaining": 80,
+      "daysToPrescribedEnd": 270,
+      "displayAvgStr": "0.67 st/dag (6.7 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 20 av 100 tillgängliga st)",
+      "renewDateStr": "2026-01-11"
+    }
+  },
+  {
+    "name": "tooEarly_receptperiod",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-06-05T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": 290,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "290",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": true,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidigt — 290d kvar",
+      "verdictTitle": "För tidigt – 290 dagar kvar",
+      "verdictSub": "Förbrukning OK. Kontakta vården närmre slutdatumet.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "300 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2026-04-01 (290 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "1.00 st/dag (10.0 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "info",
+          "title": "För tidigt att förnya",
+          "message": "Receptperioden löper ut om 290 dagar (t.o.m. 2026-04-01). Förnyelse rekommenderas närmre slutdatumet."
+        },
+        {
+          "type": "info",
+          "title": "Tidig uthämtning",
+          "message": "Kvarvarande doser överstiger modellens förväntade tillgängliga mängd. Beräknas från minsta möjliga antal uttag."
+        }
+      ],
+      "tlPct": 3.3333333333333335,
+      "tlStart": "2025-06-05",
+      "tlEnd": "2026-04-01",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-06-05",
+      "total": 300,
+      "remainingDoses": 290,
+      "endDateStr": "2026-04-01",
+      "prescribedEndDateStr": "2026-04-01",
+      "daysRemaining": 290,
+      "daysToPrescribedEnd": 290,
+      "displayAvgStr": "1.00 st/dag (10.0 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 10 av 300 tillgängliga st – patienten kan ha hämtat ut uttag i förväg)",
+      "renewDateStr": "2026-01-31"
+    }
+  },
+  {
+    "name": "overuse_basic",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-04-26T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 1,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 2.00 st/dag överstiger ordination med >10%.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "100 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-08-04 (50 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "2.00 st/dag (20.0 mg/dag)",
+          "cls": "danger",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 50,
+      "tlStart": "2025-04-26",
+      "tlEnd": "2025-08-04",
+      "earlyThreshold": 20,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-04-26",
+      "total": 100,
+      "remainingDoses": null,
+      "endDateStr": "2025-08-04",
+      "prescribedEndDateStr": "2025-08-04",
+      "daysRemaining": 50,
+      "daysToPrescribedEnd": 50,
+      "displayAvgStr": "2.00 st/dag (20.0 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "prescribedContactDateStr": "2025-07-28",
+      "prescribedContactIsPast": false
+    }
+  },
+  {
+    "name": "overuse_remaining_0",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-04-26T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 1,
+      "remaining": 0,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": "0",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 2.00 st/dag överstiger ordination med >10%.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "100 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-08-04 (50 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "2.00 st/dag (20.0 mg/dag)",
+          "cls": "danger",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 50,
+      "tlStart": "2025-04-26",
+      "tlEnd": "2025-08-04",
+      "earlyThreshold": 20,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-04-26",
+      "total": 100,
+      "remainingDoses": 0,
+      "endDateStr": "2025-06-15",
+      "prescribedEndDateStr": "2025-08-04",
+      "daysRemaining": 0,
+      "daysToPrescribedEnd": 50,
+      "displayAvgStr": "2.00 st/dag (20.0 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 100 av 100 tillgängliga st)",
+      "prescribedContactDateStr": "2025-07-28",
+      "prescribedContactIsPast": false
+    }
+  },
+  {
+    "name": "overuse_suppressed_7d",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-05-01T00:00:00.000Z",
+      "amt": 50,
+      "dose": 1,
+      "ref": 1,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "50",
+      "refRaw": "1",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "OK – t.o.m. 2025-06-20",
+      "verdictTitle": "OK – Förnya recept",
+      "verdictSub": "Snittförbrukning 1.11 st/dag (111.1% av ordinerad dos, inom ±10%-gränsen). 5 dagar kvar av receptperioden (<20%-gränsen, 10.0% återstår).",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "50 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-06-20 (5 dagar kvar)",
+          "cls": "warn",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "1.11 st/dag (11.1 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "warn",
+          "title": "Förhöjd förbrukning noterad",
+          "message": "Snitt 1.11 st/dag (11.1 mg/dag) överstiger ordination med >10%, men medicinen beräknas ta slut inom 7 dagar. Förnyelse godkänd — notera förbrukningstakten."
+        }
+      ],
+      "tlPct": 90,
+      "tlStart": "2025-05-01",
+      "tlEnd": "2025-06-20",
+      "earlyThreshold": 10,
+      "medRaw": "Testabol 10 mg",
+      "amt": 50,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-05-01",
+      "total": 50,
+      "remainingDoses": null,
+      "endDateStr": "2025-06-20",
+      "prescribedEndDateStr": "2025-06-20",
+      "daysRemaining": 5,
+      "daysToPrescribedEnd": 5,
+      "displayAvgStr": "1.11 st/dag (11.1 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+    }
+  },
+  {
+    "name": "overuse_low_doses_high_recept",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-03-27T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 1,
+      "remaining": 5,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": "5",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 1.19 st/dag överstiger ordination med >10%.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "100 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-07-05 (20 dagar kvar)",
+          "cls": "warn",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "1.19 st/dag (11.9 mg/dag)",
+          "cls": "danger",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 80,
+      "tlStart": "2025-03-27",
+      "tlEnd": "2025-07-05",
+      "earlyThreshold": 20,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-03-27",
+      "total": 100,
+      "remainingDoses": 5,
+      "endDateStr": "2025-06-20",
+      "prescribedEndDateStr": "2025-07-05",
+      "daysRemaining": 5,
+      "daysToPrescribedEnd": 20,
+      "displayAvgStr": "1.19 st/dag (11.9 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 95 av 100 tillgängliga st)",
+      "prescribedContactDateStr": "2025-06-28",
+      "prescribedContactIsPast": false
+    }
+  },
+  {
+    "name": "overuse_daysSince_1",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-06-14T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 300.00 st/dag överstiger ordination med >10%.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "300 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2026-04-10 (299 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "300.00 st/dag (3000.0 mg/dag)",
+          "cls": "danger",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "warn",
+          "title": "Datakontroll",
+          "message": "Snitt 300.00 st/dag är mycket högt. Kontrollera kvarvarande mängd."
+        }
+      ],
+      "tlPct": 0.33333333333333337,
+      "tlStart": "2025-06-14",
+      "tlEnd": "2026-04-10",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-06-14",
+      "total": 300,
+      "remainingDoses": null,
+      "endDateStr": "2026-04-10",
+      "prescribedEndDateStr": "2026-04-10",
+      "daysRemaining": 299,
+      "daysToPrescribedEnd": 299,
+      "displayAvgStr": "300.00 st/dag (3000.0 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "prescribedContactDateStr": "2026-04-03",
+      "prescribedContactIsPast": false
+    }
+  },
+  {
+    "name": "ref12_normal",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2022-06-11T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 12,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "12",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "OK – t.o.m. 2025-09-23",
+      "verdictTitle": "OK – Förnya recept",
+      "verdictSub": "Snittförbrukning 1.09 st/dag (109.1% av ordinerad dos, inom ±10%-gränsen). 100 dagar kvar av receptperioden (<20%-gränsen, 8.3% återstår).",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "1200 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-09-23 (100 dagar kvar)",
+          "cls": "warn",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "1.09 st/dag (10.9 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 91.66666666666666,
+      "tlStart": "2022-06-11",
+      "tlEnd": "2025-09-23",
+      "earlyThreshold": 240,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2022-06-11",
+      "total": 1200,
+      "remainingDoses": null,
+      "endDateStr": "2025-09-23",
+      "prescribedEndDateStr": "2025-09-23",
+      "daysRemaining": 100,
+      "daysToPrescribedEnd": 100,
+      "displayAvgStr": "1.09 st/dag (10.9 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+    }
+  },
+  {
+    "name": "ref12_tooEarly",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-05-16T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 12,
+      "remaining": 1170,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "12",
+      "leftRaw": "1170",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": true,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidigt — 1170d kvar",
+      "verdictTitle": "För tidigt – 1170 dagar kvar",
+      "verdictSub": "Förbrukning OK. Kontakta vården närmre slutdatumet.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "1200 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2028-08-28 (1170 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "1.00 st/dag (10.0 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "info",
+          "title": "För tidigt att förnya",
+          "message": "Receptperioden löper ut om 1170 dagar (t.o.m. 2028-08-28). Förnyelse rekommenderas närmre slutdatumet."
+        },
+        {
+          "type": "info",
+          "title": "Tidig uthämtning",
+          "message": "Kvarvarande doser överstiger modellens förväntade tillgängliga mängd. Beräknas från minsta möjliga antal uttag."
+        }
+      ],
+      "tlPct": 2.5,
+      "tlStart": "2025-05-16",
+      "tlEnd": "2028-08-28",
+      "earlyThreshold": 240,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-05-16",
+      "total": 1200,
+      "remainingDoses": 1170,
+      "endDateStr": "2028-08-28",
+      "prescribedEndDateStr": "2028-08-28",
+      "daysRemaining": 1170,
+      "daysToPrescribedEnd": 1170,
+      "displayAvgStr": "1.00 st/dag (10.0 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 30 av 1200 tillgängliga st – patienten kan ha hämtat ut uttag i förväg)",
+      "renewDateStr": "2028-01-01"
+    }
+  },
+  {
+    "name": "doseInterval_7_ok",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2024-12-17T00:00:00.000Z",
+      "amt": 30,
+      "dose": 1,
+      "ref": 1,
+      "remaining": 5,
+      "doseRaw": "1",
+      "amtRaw": "30",
+      "refRaw": "1",
+      "leftRaw": "5",
+      "doseInterval": 7,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "OK – t.o.m. 2025-07-15",
+      "verdictTitle": "OK – Förnya recept",
+      "verdictSub": "Snittförbrukning 0.97 st/vecka (97.2% av ordinerad dos, inom ±10%-gränsen). 30 dagar kvar av receptperioden (<20%-gränsen, 14.3% återstår).",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "30 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-07-15 (30 dagar kvar)",
+          "cls": "warn",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "0.97 st/vecka (9.7 mg/vecka)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per vecka sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 85.71428571428571,
+      "tlStart": "2024-12-17",
+      "tlEnd": "2025-07-15",
+      "earlyThreshold": 42,
+      "medRaw": "Testabol 10 mg",
+      "amt": 30,
+      "dose": 1,
+      "doseInterval": 7,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/vecka",
+      "pDateStr": "2024-12-17",
+      "total": 30,
+      "remainingDoses": 5,
+      "endDateStr": "2025-07-20",
+      "prescribedEndDateStr": "2025-07-15",
+      "daysRemaining": 35,
+      "daysToPrescribedEnd": 30,
+      "displayAvgStr": "0.97 st/vecka (9.7 mg/vecka)",
+      "avgNote": "(beräknat på faktisk förbrukning: 25 av 30 tillgängliga st)"
+    }
+  },
+  {
+    "name": "doseInterval_30_ok",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-04-16T00:00:00.000Z",
+      "amt": 30,
+      "dose": 1,
+      "ref": 1,
+      "remaining": 28,
+      "doseRaw": "1",
+      "amtRaw": "30",
+      "refRaw": "1",
+      "leftRaw": "28",
+      "doseInterval": 30,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": true,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidigt — 840d kvar",
+      "verdictTitle": "För tidigt – 840 dagar kvar",
+      "verdictSub": "Förbrukning OK. Kontakta vården närmre slutdatumet.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "30 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2027-10-03 (840 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "1.00 st/månad (10.0 mg/månad)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per månad sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "info",
+          "title": "För tidigt att förnya",
+          "message": "Receptperioden löper ut om 840 dagar (t.o.m. 2027-10-03). Förnyelse rekommenderas närmre slutdatumet."
+        }
+      ],
+      "tlPct": 6.666666666666667,
+      "tlStart": "2025-04-16",
+      "tlEnd": "2027-10-03",
+      "earlyThreshold": 180,
+      "medRaw": "Testabol 10 mg",
+      "amt": 30,
+      "dose": 1,
+      "doseInterval": 30,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/månad",
+      "pDateStr": "2025-04-16",
+      "total": 30,
+      "remainingDoses": 28,
+      "endDateStr": "2027-10-03",
+      "prescribedEndDateStr": "2027-10-03",
+      "daysRemaining": 840,
+      "daysToPrescribedEnd": 840,
+      "displayAvgStr": "1.00 st/månad (10.0 mg/månad)",
+      "avgNote": "(beräknat på faktisk förbrukning: 2 av 30 tillgängliga st)",
+      "renewDateStr": "2027-04-06"
+    }
+  },
+  {
+    "name": "fractional_05",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2024-12-07T00:00:00.000Z",
+      "amt": 100,
+      "dose": 0.5,
+      "ref": 1,
+      "remaining": null,
+      "doseRaw": "0.5",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "OK – t.o.m. 2025-06-25",
+      "verdictTitle": "OK – Förnya recept",
+      "verdictSub": "Snittförbrukning 0.53 st/dag (105.3% av ordinerad dos, inom ±10%-gränsen). 10 dagar kvar av receptperioden (<20%-gränsen, 5.0% återstår).",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "100 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-06-25 (10 dagar kvar)",
+          "cls": "warn",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "0.53 st/dag (5.3 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 95,
+      "tlStart": "2024-12-07",
+      "tlEnd": "2025-06-25",
+      "earlyThreshold": 40,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 0.5,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2024-12-07",
+      "total": 100,
+      "remainingDoses": null,
+      "endDateStr": "2025-06-25",
+      "prescribedEndDateStr": "2025-06-25",
+      "daysRemaining": 10,
+      "daysToPrescribedEnd": 10,
+      "displayAvgStr": "0.53 st/dag (5.3 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+    }
+  },
+  {
+    "name": "fractional_with_mg",
+    "input": {
+      "valid": true,
+      "medRaw": "Depåtablett 5 mg",
+      "pDate": "2024-12-07T00:00:00.000Z",
+      "amt": 100,
+      "dose": 0.5,
+      "ref": 1,
+      "remaining": null,
+      "doseRaw": "0.5",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "OK – t.o.m. 2025-06-25",
+      "verdictTitle": "OK – Förnya recept",
+      "verdictSub": "Snittförbrukning 0.53 st/dag (105.3% av ordinerad dos, inom ±10%-gränsen). 10 dagar kvar av receptperioden (<20%-gränsen, 5.0% återstår).",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "100 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-06-25 (10 dagar kvar)",
+          "cls": "warn",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "0.53 st/dag (2.6 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 95,
+      "tlStart": "2024-12-07",
+      "tlEnd": "2025-06-25",
+      "earlyThreshold": 40,
+      "medRaw": "Depåtablett 5 mg",
+      "amt": 100,
+      "dose": 0.5,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2024-12-07",
+      "total": 100,
+      "remainingDoses": null,
+      "endDateStr": "2025-06-25",
+      "prescribedEndDateStr": "2025-06-25",
+      "daysRemaining": 10,
+      "daysToPrescribedEnd": 10,
+      "displayAvgStr": "0.53 st/dag (2.6 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+    }
+  },
+  {
+    "name": "remaining_lowers_avg",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-04-26T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 1,
+      "remaining": 70,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": "70",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": true,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidigt — 50d kvar",
+      "verdictTitle": "För tidigt – 50 dagar kvar",
+      "verdictSub": "Förbrukning OK. Kontakta vården närmre slutdatumet.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "100 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-08-04 (50 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "0.60 st/dag (6.0 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "warn",
+          "title": "Låg förbrukning",
+          "message": "0.60 st/dag är 40.0% under ordinerad dos. Överväg uppföljning."
+        },
+        {
+          "type": "info",
+          "title": "För tidigt att förnya",
+          "message": "Receptperioden löper ut om 50 dagar (t.o.m. 2025-08-04). Förnyelse rekommenderas närmre slutdatumet."
+        }
+      ],
+      "tlPct": 50,
+      "tlStart": "2025-04-26",
+      "tlEnd": "2025-08-04",
+      "earlyThreshold": 20,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-04-26",
+      "total": 100,
+      "remainingDoses": 70,
+      "endDateStr": "2025-08-24",
+      "prescribedEndDateStr": "2025-08-04",
+      "daysRemaining": 70,
+      "daysToPrescribedEnd": 50,
+      "displayAvgStr": "0.60 st/dag (6.0 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 30 av 100 tillgängliga st)",
+      "renewDateStr": "2025-07-15"
+    }
+  },
+  {
+    "name": "remaining_early_pickup",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-05-16T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": 150,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "150",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 1.67 st/dag överstiger ordination med >10%.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "300 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2026-03-12 (270 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "1.67 st/dag (16.7 mg/dag)",
+          "cls": "danger",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "info",
+          "title": "Tidig uthämtning",
+          "message": "Kvarvarande doser överstiger modellens förväntade tillgängliga mängd. Beräknas från minsta möjliga antal uttag."
+        }
+      ],
+      "tlPct": 10,
+      "tlStart": "2025-05-16",
+      "tlEnd": "2026-03-12",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-05-16",
+      "total": 300,
+      "remainingDoses": 150,
+      "endDateStr": "2025-11-12",
+      "prescribedEndDateStr": "2026-03-12",
+      "daysRemaining": 150,
+      "daysToPrescribedEnd": 270,
+      "displayAvgStr": "1.67 st/dag (16.7 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 50 av 200 tillgängliga st – patienten kan ha hämtat ut uttag i förväg)",
+      "prescribedContactDateStr": "2026-03-05",
+      "prescribedContactIsPast": false
+    }
+  },
+  {
+    "name": "remaining_accessible_plus_1",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-05-16T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": 101,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "101",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 3.30 st/dag överstiger ordination med >10%.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "300 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2026-03-12 (270 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "3.30 st/dag (33.0 mg/dag)",
+          "cls": "danger",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "warn",
+          "title": "Datakontroll",
+          "message": "Snitt 3.30 st/dag är mycket högt. Kontrollera kvarvarande mängd."
+        },
+        {
+          "type": "info",
+          "title": "Tidig uthämtning",
+          "message": "Kvarvarande doser överstiger modellens förväntade tillgängliga mängd. Beräknas från minsta möjliga antal uttag."
+        }
+      ],
+      "tlPct": 10,
+      "tlStart": "2025-05-16",
+      "tlEnd": "2026-03-12",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-05-16",
+      "total": 300,
+      "remainingDoses": 101,
+      "endDateStr": "2025-09-24",
+      "prescribedEndDateStr": "2026-03-12",
+      "daysRemaining": 101,
+      "daysToPrescribedEnd": 270,
+      "displayAvgStr": "3.30 st/dag (33.0 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 99 av 200 tillgängliga st – patienten kan ha hämtat ut uttag i förväg)",
+      "prescribedContactDateStr": "2026-03-05",
+      "prescribedContactIsPast": false
+    }
+  },
+  {
+    "name": "remaining_equal_accessible",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-04-26T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 1,
+      "remaining": 100,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": "100",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": true,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidigt — 50d kvar",
+      "verdictTitle": "För tidigt – 50 dagar kvar",
+      "verdictSub": "Förbrukning OK. Kontakta vården närmre slutdatumet.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "100 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-08-04 (50 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "0.00 st/dag (0.0 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "danger",
+          "title": "Ingen förbrukning registrerad",
+          "message": "Snitt 0 st/dag – patienten verkar inte ha tagit medicinen. Klinisk bedömning krävs."
+        }
+      ],
+      "tlPct": 50,
+      "tlStart": "2025-04-26",
+      "tlEnd": "2025-08-04",
+      "earlyThreshold": 20,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-04-26",
+      "total": 100,
+      "remainingDoses": 100,
+      "endDateStr": "2025-09-23",
+      "prescribedEndDateStr": "2025-08-04",
+      "daysRemaining": 100,
+      "daysToPrescribedEnd": 50,
+      "displayAvgStr": "0.00 st/dag (0.0 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 0 av 100 tillgängliga st)",
+      "renewDateStr": "2025-07-15"
+    }
+  },
+  {
+    "name": "override_tooEarly_yes",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-05-16T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": 80,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "80",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": true,
+      "earlyRenewalDecision": "yes"
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": true,
+      "earlyRenewalDecision": "yes",
+      "statusText": "OK – förnyas tidigt",
+      "verdictTitle": "OK – Förnya recept",
+      "verdictSub": "Klinisk bedömning: förnyelse trots 270 dagar kvar av receptperioden.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "300 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2026-03-12 (270 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "0.67 st/dag (6.7 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "warn",
+          "title": "Låg förbrukning",
+          "message": "0.67 st/dag är 33.3% under ordinerad dos. Överväg uppföljning."
+        },
+        {
+          "type": "info",
+          "title": "För tidigt att förnya",
+          "message": "Receptperioden löper ut om 270 dagar (t.o.m. 2026-03-12). Förnyelse rekommenderas närmre slutdatumet."
+        }
+      ],
+      "tlPct": 10,
+      "tlStart": "2025-05-16",
+      "tlEnd": "2026-03-12",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-05-16",
+      "total": 300,
+      "remainingDoses": 80,
+      "endDateStr": "2025-09-03",
+      "prescribedEndDateStr": "2026-03-12",
+      "daysRemaining": 80,
+      "daysToPrescribedEnd": 270,
+      "displayAvgStr": "0.67 st/dag (6.7 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 20 av 100 tillgängliga st)",
+      "renewDateStr": "2026-01-11"
+    }
+  },
+  {
+    "name": "override_overuse_yes",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-04-26T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 1,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": "yes"
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": "yes",
+      "statusText": "OK – förnyas (klinisk bed.)",
+      "verdictTitle": "OK – Förnya recept",
+      "verdictSub": "Klinisk bedömning: förnyelse trots förhöjd förbrukning.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "100 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-08-04 (50 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "2.00 st/dag (20.0 mg/dag)",
+          "cls": "danger",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 50,
+      "tlStart": "2025-04-26",
+      "tlEnd": "2025-08-04",
+      "earlyThreshold": 20,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-04-26",
+      "total": 100,
+      "remainingDoses": null,
+      "endDateStr": "2025-08-04",
+      "prescribedEndDateStr": "2025-08-04",
+      "daysRemaining": 50,
+      "daysToPrescribedEnd": 50,
+      "displayAvgStr": "2.00 st/dag (20.0 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "prescribedContactDateStr": "2025-07-28",
+      "prescribedContactIsPast": false
+    }
+  },
+  {
+    "name": "override_flags_changed",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2024-09-08T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": true,
+      "earlyRenewalDecision": "yes"
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "OK – t.o.m. 2025-07-05",
+      "verdictTitle": "OK – Förnya recept",
+      "verdictSub": "Snittförbrukning 1.07 st/dag (107.1% av ordinerad dos, inom ±10%-gränsen). 20 dagar kvar av receptperioden (<20%-gränsen, 6.7% återstår).",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "300 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-07-05 (20 dagar kvar)",
+          "cls": "warn",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "1.07 st/dag (10.7 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 93.33333333333333,
+      "tlStart": "2024-09-08",
+      "tlEnd": "2025-07-05",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2024-09-08",
+      "total": 300,
+      "remainingDoses": null,
+      "endDateStr": "2025-07-05",
+      "prescribedEndDateStr": "2025-07-05",
+      "daysRemaining": 20,
+      "daysToPrescribedEnd": 20,
+      "displayAvgStr": "1.07 st/dag (10.7 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+    }
+  },
+  {
+    "name": "output_default_daysSince",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2024-09-08T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "OK – t.o.m. 2025-07-05",
+      "verdictTitle": "OK – Förnya recept",
+      "verdictSub": "Snittförbrukning 1.07 st/dag (107.1% av ordinerad dos, inom ±10%-gränsen). 20 dagar kvar av receptperioden (<20%-gränsen, 6.7% återstår).",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "300 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-07-05 (20 dagar kvar)",
+          "cls": "warn",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "1.07 st/dag (10.7 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 93.33333333333333,
+      "tlStart": "2024-09-08",
+      "tlEnd": "2025-07-05",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2024-09-08",
+      "total": 300,
+      "remainingDoses": null,
+      "endDateStr": "2025-07-05",
+      "prescribedEndDateStr": "2025-07-05",
+      "daysRemaining": 20,
+      "daysToPrescribedEnd": 20,
+      "displayAvgStr": "1.07 st/dag (10.7 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+    }
+  },
+  {
+    "name": "output_150_daysSince",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-01-16T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 2.00 st/dag överstiger ordination med >10%.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "300 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-11-12 (150 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "2.00 st/dag (20.0 mg/dag)",
+          "cls": "danger",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 50,
+      "tlStart": "2025-01-16",
+      "tlEnd": "2025-11-12",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-01-16",
+      "total": 300,
+      "remainingDoses": null,
+      "endDateStr": "2025-11-12",
+      "prescribedEndDateStr": "2025-11-12",
+      "daysRemaining": 150,
+      "daysToPrescribedEnd": 150,
+      "displayAvgStr": "2.00 st/dag (20.0 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "prescribedContactDateStr": "2025-11-05",
+      "prescribedContactIsPast": false
+    }
+  },
+  {
+    "name": "output_100_daysSince",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-03-07T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 3.00 st/dag överstiger ordination med >10%.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "300 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2026-01-01 (200 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "3.00 st/dag (30.0 mg/dag)",
+          "cls": "danger",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "warn",
+          "title": "Datakontroll",
+          "message": "Snitt 3.00 st/dag är mycket högt. Kontrollera kvarvarande mängd."
+        }
+      ],
+      "tlPct": 33.33333333333333,
+      "tlStart": "2025-03-07",
+      "tlEnd": "2026-01-01",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-03-07",
+      "total": 300,
+      "remainingDoses": null,
+      "endDateStr": "2026-01-01",
+      "prescribedEndDateStr": "2026-01-01",
+      "daysRemaining": 200,
+      "daysToPrescribedEnd": 200,
+      "displayAvgStr": "3.00 st/dag (30.0 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "prescribedContactDateStr": "2025-12-25",
+      "prescribedContactIsPast": false
+    }
+  },
+  {
+    "name": "output_amt150_ref4",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2024-09-08T00:00:00.000Z",
+      "amt": 150,
+      "dose": 2,
+      "ref": 4,
+      "remaining": null,
+      "doseRaw": "2",
+      "amtRaw": "150",
+      "refRaw": "4",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "OK – t.o.m. 2025-07-05",
+      "verdictTitle": "OK – Förnya recept",
+      "verdictSub": "Snittförbrukning 2.14 st/dag (107.1% av ordinerad dos, inom ±10%-gränsen). 20 dagar kvar av receptperioden (<20%-gränsen, 6.7% återstår).",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "600 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-07-05 (20 dagar kvar)",
+          "cls": "warn",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "2.14 st/dag (21.4 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 93.33333333333333,
+      "tlStart": "2024-09-08",
+      "tlEnd": "2025-07-05",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 150,
+      "dose": 2,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2024-09-08",
+      "total": 600,
+      "remainingDoses": null,
+      "endDateStr": "2025-07-05",
+      "prescribedEndDateStr": "2025-07-05",
+      "daysRemaining": 20,
+      "daysToPrescribedEnd": 20,
+      "displayAvgStr": "2.14 st/dag (21.4 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+    }
+  },
+  {
+    "name": "output_remaining_40",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-04-26T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 1,
+      "remaining": 40,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": "40",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 1.20 st/dag överstiger ordination med >10%.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "100 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-08-04 (50 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "1.20 st/dag (12.0 mg/dag)",
+          "cls": "danger",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 50,
+      "tlStart": "2025-04-26",
+      "tlEnd": "2025-08-04",
+      "earlyThreshold": 20,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-04-26",
+      "total": 100,
+      "remainingDoses": 40,
+      "endDateStr": "2025-07-25",
+      "prescribedEndDateStr": "2025-08-04",
+      "daysRemaining": 40,
+      "daysToPrescribedEnd": 50,
+      "displayAvgStr": "1.20 st/dag (12.0 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 60 av 100 tillgängliga st)",
+      "prescribedContactDateStr": "2025-07-28",
+      "prescribedContactIsPast": false
+    }
+  },
+  {
+    "name": "avgNum_2_5x",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-06-05T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 1,
+      "remaining": 0,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": "0",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 10.00 st/dag överstiger ordination med >10%.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "100 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-09-13 (90 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "10.00 st/dag (100.0 mg/dag)",
+          "cls": "danger",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "warn",
+          "title": "Datakontroll",
+          "message": "Snitt 10.00 st/dag är mycket högt. Kontrollera kvarvarande mängd."
+        }
+      ],
+      "tlPct": 10,
+      "tlStart": "2025-06-05",
+      "tlEnd": "2025-09-13",
+      "earlyThreshold": 20,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-06-05",
+      "total": 100,
+      "remainingDoses": 0,
+      "endDateStr": "2025-06-15",
+      "prescribedEndDateStr": "2025-09-13",
+      "daysRemaining": 0,
+      "daysToPrescribedEnd": 90,
+      "displayAvgStr": "10.00 st/dag (100.0 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 100 av 100 tillgängliga st)",
+      "prescribedContactDateStr": "2025-09-06",
+      "prescribedContactIsPast": false
+    }
+  },
+  {
+    "name": "endDate_passed",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2024-05-11T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "OK – t.o.m. 2025-03-07",
+      "verdictTitle": "OK – Förnya recept",
+      "verdictSub": "Snittförbrukning 0.75 st/dag (75.0% av ordinerad dos, inom ±10%-gränsen). Receptperioden är slut.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "300 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-03-07 (slut sedan 100 dagar)",
+          "cls": "danger",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "0.75 st/dag (7.5 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "warn",
+          "title": "Låg förbrukning",
+          "message": "0.75 st/dag är 25.0% under ordinerad dos. Överväg uppföljning."
+        }
+      ],
+      "tlPct": 100,
+      "tlStart": "2024-05-11",
+      "tlEnd": "2025-03-07",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2024-05-11",
+      "total": 300,
+      "remainingDoses": null,
+      "endDateStr": "2025-03-07",
+      "prescribedEndDateStr": "2025-03-07",
+      "daysRemaining": -100,
+      "daysToPrescribedEnd": -100,
+      "displayAvgStr": "0.75 st/dag (7.5 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+    }
+  },
+  {
+    "name": "endDate_warn",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2024-10-03T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 1.18 st/dag överstiger ordination med >10%.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "300 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-07-30 (45 dagar kvar)",
+          "cls": "warn",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "1.18 st/dag (11.8 mg/dag)",
+          "cls": "danger",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 85,
+      "tlStart": "2024-10-03",
+      "tlEnd": "2025-07-30",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2024-10-03",
+      "total": 300,
+      "remainingDoses": null,
+      "endDateStr": "2025-07-30",
+      "prescribedEndDateStr": "2025-07-30",
+      "daysRemaining": 45,
+      "daysToPrescribedEnd": 45,
+      "displayAvgStr": "1.18 st/dag (11.8 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "prescribedContactDateStr": "2025-07-23",
+      "prescribedContactIsPast": false
+    }
+  },
+  {
+    "name": "remaining_diff_endDate",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-06-14T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 1,
+      "remaining": 50,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": "50",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 50.00 st/dag överstiger ordination med >10%.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "100 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-09-22 (99 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "50.00 st/dag (500.0 mg/dag)",
+          "cls": "danger",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "warn",
+          "title": "Datakontroll",
+          "message": "Snitt 50.00 st/dag är mycket högt. Kontrollera kvarvarande mängd."
+        }
+      ],
+      "tlPct": 1,
+      "tlStart": "2025-06-14",
+      "tlEnd": "2025-09-22",
+      "earlyThreshold": 20,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-06-14",
+      "total": 100,
+      "remainingDoses": 50,
+      "endDateStr": "2025-08-04",
+      "prescribedEndDateStr": "2025-09-22",
+      "daysRemaining": 50,
+      "daysToPrescribedEnd": 99,
+      "displayAvgStr": "50.00 st/dag (500.0 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 50 av 100 tillgängliga st)",
+      "prescribedContactDateStr": "2025-09-15",
+      "prescribedContactIsPast": false
+    }
+  },
+  {
+    "name": "not_calculable",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-03-07T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": true
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": false,
+      "isOveruse": false,
+      "isTooEarly": false,
+      "verdictTitle": "Beräkning ej tillämplig",
+      "verdictSub": "Denna beredningsform kan inte kvantifieras automatiskt. Klinisk bedömning krävs.",
+      "metrics": [],
+      "alerts": [
+        {
+          "type": "info",
+          "title": "Manuell bedömning",
+          "message": "Beredningsformen (t.ex. kräm, lösning för dialys) lämpar sig inte för automatisk förbrukningsberäkning."
+        }
+      ],
+      "patientText": "",
+      "patientTextEn": "",
+      "journalText": "",
+      "statusText": "Ej tillämplig"
+    }
+  }
+]
