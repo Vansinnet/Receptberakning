@@ -1,14 +1,12 @@
-# Byggartefakter
 node_modules/
-
-# Rådata från FASS-crawl
-data/
-
-# OS-filer
+dist/
+.vite/
+test-results/
+*.tsbuildinfo
+data/product-db.json
+data/_crawl-progress.json
 .DS_Store
 Thumbs.db
-
-# Lokala utvecklingsfiler (ska aldrig checkas in)
 AGENTS.md
-build-css.js
-.git_commit_msg*
+MIGRATION_4.0.md
+.env*

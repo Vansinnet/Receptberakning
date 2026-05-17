@@ -3,9 +3,10 @@ const path = require("path");
 
 const DATA_DIR = path.join(__dirname, "..", "data");
 const DB_FILE = path.join(DATA_DIR, "product-db.json");
-const OUT_FILE = path.join(__dirname, "..", "Kod", "drugs.json");
-const DATA_FILE = path.join(__dirname, "..", "Kod", "drug-data.js");
-const VERSION_FILE = path.join(__dirname, "..", "Kod", "drugs-version.json");
+const OUT_FILE = path.join(__dirname, "..", "public", "data", "drugs.json");
+// drug-data.js genereras inte i 4.0 — ersatt av fetch/lazy-import enligt B3-beslut
+// const DATA_FILE = path.join(__dirname, "..", "Kod", "drug-data.js");
+const VERSION_FILE = path.join(__dirname, "..", "public", "data", "drugs-version.json");
 
 const ATC_GROUP_LABELS = {
   "N05A": "Antipsykotika",
@@ -250,11 +251,10 @@ function writeVersionFile() {
 }
 
 function writeDrugDataJs(jsonContent) {
-  // file://-protokoll kan inte fetch(). Wrappa JSON-datan i en var-deklaration
-  // så att den kan laddas via en dynamisk <script>-tagg (script-src 'self').
-  const js = 'var __DRUG_DATA__ = ' + jsonContent + ';\nconsole.log("[drug-data] laddad, " + __DRUG_DATA__.length + " poster");';
-  fs.writeFileSync(DATA_FILE, js, "utf8");
-  console.log(`  drug-data.js: ${DATA_FILE}`);
+  // drug-data.js genereras inte i 4.0 — ersatt av fetch/lazy-import enligt B3-beslut
+  // const js = 'var __DRUG_DATA__ = ' + jsonContent + ';\nconsole.log("[drug-data] laddad, " + __DRUG_DATA__.length + " poster");';
+  // fs.writeFileSync(DATA_FILE, js, "utf8");
+  // console.log(`  drug-data.js: ${DATA_FILE}`);
 }
 
 function main() {
@@ -275,8 +275,8 @@ function main() {
   console.log("Steg 3: Skriv versionsfil...");
   writeVersionFile();
 
-  console.log("\nSteg 4: Generera drug-data.js (file://-fallback)...");
-  writeDrugDataJs(content);
+  console.log("\nSteg 4: Generera drug-data.js (file://-fallback) — INAKTIVT i 4.0");
+  // writeDrugDataJs(content); — genereras inte i 4.0 enligt B3-beslut
 
   console.log("\n=== generate-drugs.js slutförd ===");
 }

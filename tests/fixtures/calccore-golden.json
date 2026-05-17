@@ -1,6 +1,7 @@
 [
   {
-    "name": "incomplete",
+    "name": "calcCore_1",
+    "fn": "calcCore",
     "input": {
       "valid": false,
       "reason": "incomplete"
@@ -16,7 +17,8 @@
     }
   },
   {
-    "name": "invalid_date",
+    "name": "calcCore_2",
+    "fn": "calcCore",
     "input": {
       "valid": false,
       "reason": "invalid_date"
@@ -32,7 +34,8 @@
     }
   },
   {
-    "name": "too_many_refs",
+    "name": "calcCore_3",
+    "fn": "calcCore",
     "input": {
       "valid": false,
       "reason": "too_many_refs"
@@ -64,7 +67,8 @@
     }
   },
   {
-    "name": "daysSince_0",
+    "name": "calcCore_4",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -102,7 +106,8 @@
     }
   },
   {
-    "name": "totalDays_over_3650",
+    "name": "calcCore_5",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -146,7 +151,8 @@
     }
   },
   {
-    "name": "remaining_over_total",
+    "name": "calcCore_6",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -184,7 +190,8 @@
     }
   },
   {
-    "name": "ok_normal",
+    "name": "calcCore_7",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -258,7 +265,8 @@
     }
   },
   {
-    "name": "ok_exakt_110pct",
+    "name": "calcCore_8",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -332,7 +340,8 @@
     }
   },
   {
-    "name": "ok_low_consumption",
+    "name": "calcCore_9",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -412,7 +421,8 @@
     }
   },
   {
-    "name": "tooEarly_normal",
+    "name": "calcCore_10",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -498,7 +508,8 @@
     }
   },
   {
-    "name": "tooEarly_receptperiod",
+    "name": "calcCore_11",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -584,7 +595,8 @@
     }
   },
   {
-    "name": "overuse_basic",
+    "name": "calcCore_12",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -660,7 +672,8 @@
     }
   },
   {
-    "name": "overuse_remaining_0",
+    "name": "calcCore_13",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -736,7 +749,8 @@
     }
   },
   {
-    "name": "overuse_suppressed_7d",
+    "name": "calcCore_14",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -816,7 +830,8 @@
     }
   },
   {
-    "name": "overuse_low_doses_high_recept",
+    "name": "calcCore_15",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -892,7 +907,8 @@
     }
   },
   {
-    "name": "overuse_daysSince_1",
+    "name": "calcCore_16",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -974,7 +990,8 @@
     }
   },
   {
-    "name": "ref12_normal",
+    "name": "calcCore_17",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -1048,7 +1065,8 @@
     }
   },
   {
-    "name": "ref12_tooEarly",
+    "name": "calcCore_18",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -1134,7 +1152,8 @@
     }
   },
   {
-    "name": "doseInterval_7_ok",
+    "name": "calcCore_19",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -1208,7 +1227,83 @@
     }
   },
   {
-    "name": "doseInterval_30_ok",
+    "name": "calcCore_20",
+    "fn": "calcCore",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2024-12-17T00:00:00.000Z",
+      "amt": 30,
+      "dose": 1,
+      "ref": 1,
+      "remaining": 5,
+      "doseRaw": "1",
+      "amtRaw": "30",
+      "refRaw": "1",
+      "leftRaw": "5",
+      "doseInterval": 7,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "OK – t.o.m. 2025-07-15",
+      "verdictTitle": "OK – Förnya recept",
+      "verdictSub": "Snittförbrukning 0.97 st/vecka (97.2% av ordinerad dos, inom ±10%-gränsen). 30 dagar kvar av receptperioden (<20%-gränsen, 14.3% återstår).",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "30 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-07-15 (30 dagar kvar)",
+          "cls": "warn",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "0.97 st/vecka (9.7 mg/vecka)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per vecka sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 85.71428571428571,
+      "tlStart": "2024-12-17",
+      "tlEnd": "2025-07-15",
+      "earlyThreshold": 42,
+      "medRaw": "Testabol 10 mg",
+      "amt": 30,
+      "dose": 1,
+      "doseInterval": 7,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/vecka",
+      "pDateStr": "2024-12-17",
+      "total": 30,
+      "remainingDoses": 5,
+      "endDateStr": "2025-07-20",
+      "prescribedEndDateStr": "2025-07-15",
+      "daysRemaining": 35,
+      "daysToPrescribedEnd": 30,
+      "displayAvgStr": "0.97 st/vecka (9.7 mg/vecka)",
+      "avgNote": "(beräknat på faktisk förbrukning: 25 av 30 tillgängliga st)"
+    }
+  },
+  {
+    "name": "calcCore_21",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -1289,7 +1384,90 @@
     }
   },
   {
-    "name": "fractional_05",
+    "name": "calcCore_22",
+    "fn": "calcCore",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-04-16T00:00:00.000Z",
+      "amt": 30,
+      "dose": 1,
+      "ref": 1,
+      "remaining": 28,
+      "doseRaw": "1",
+      "amtRaw": "30",
+      "refRaw": "1",
+      "leftRaw": "28",
+      "doseInterval": 30,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": true,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidigt — 840d kvar",
+      "verdictTitle": "För tidigt – 840 dagar kvar",
+      "verdictSub": "Förbrukning OK. Kontakta vården närmre slutdatumet.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "30 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2027-10-03 (840 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "1.00 st/månad (10.0 mg/månad)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per månad sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "info",
+          "title": "För tidigt att förnya",
+          "message": "Receptperioden löper ut om 840 dagar (t.o.m. 2027-10-03). Förnyelse rekommenderas närmre slutdatumet."
+        }
+      ],
+      "tlPct": 6.666666666666667,
+      "tlStart": "2025-04-16",
+      "tlEnd": "2027-10-03",
+      "earlyThreshold": 180,
+      "medRaw": "Testabol 10 mg",
+      "amt": 30,
+      "dose": 1,
+      "doseInterval": 30,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/månad",
+      "pDateStr": "2025-04-16",
+      "total": 30,
+      "remainingDoses": 28,
+      "endDateStr": "2027-10-03",
+      "prescribedEndDateStr": "2027-10-03",
+      "daysRemaining": 840,
+      "daysToPrescribedEnd": 840,
+      "displayAvgStr": "1.00 st/månad (10.0 mg/månad)",
+      "avgNote": "(beräknat på faktisk förbrukning: 2 av 30 tillgängliga st)",
+      "renewDateStr": "2027-04-06"
+    }
+  },
+  {
+    "name": "calcCore_23",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -1363,7 +1541,8 @@
     }
   },
   {
-    "name": "fractional_with_mg",
+    "name": "calcCore_24",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Depåtablett 5 mg",
@@ -1437,7 +1616,8 @@
     }
   },
   {
-    "name": "remaining_lowers_avg",
+    "name": "calcCore_25",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -1523,7 +1703,85 @@
     }
   },
   {
-    "name": "remaining_early_pickup",
+    "name": "calcCore_26",
+    "fn": "calcCore",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-04-26T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 1,
+      "remaining": 0,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": "0",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 2.00 st/dag överstiger ordination med >10%.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "100 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-08-04 (50 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "2.00 st/dag (20.0 mg/dag)",
+          "cls": "danger",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 50,
+      "tlStart": "2025-04-26",
+      "tlEnd": "2025-08-04",
+      "earlyThreshold": 20,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-04-26",
+      "total": 100,
+      "remainingDoses": 0,
+      "endDateStr": "2025-06-15",
+      "prescribedEndDateStr": "2025-08-04",
+      "daysRemaining": 0,
+      "daysToPrescribedEnd": 50,
+      "displayAvgStr": "2.00 st/dag (20.0 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 100 av 100 tillgängliga st)",
+      "prescribedContactDateStr": "2025-07-28",
+      "prescribedContactIsPast": false
+    }
+  },
+  {
+    "name": "calcCore_27",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -1605,7 +1863,8 @@
     }
   },
   {
-    "name": "remaining_accessible_plus_1",
+    "name": "calcCore_28",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -1692,7 +1951,8 @@
     }
   },
   {
-    "name": "remaining_equal_accessible",
+    "name": "calcCore_29",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -1773,7 +2033,8 @@
     }
   },
   {
-    "name": "override_tooEarly_yes",
+    "name": "calcCore_30",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -1859,7 +2120,8 @@
     }
   },
   {
-    "name": "override_overuse_yes",
+    "name": "calcCore_31",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -1935,7 +2197,8 @@
     }
   },
   {
-    "name": "override_flags_changed",
+    "name": "calcCore_32",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -2009,7 +2272,8 @@
     }
   },
   {
-    "name": "output_default_daysSince",
+    "name": "calcCore_33",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -2083,7 +2347,8 @@
     }
   },
   {
-    "name": "output_150_daysSince",
+    "name": "calcCore_34",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -2159,7 +2424,8 @@
     }
   },
   {
-    "name": "output_100_daysSince",
+    "name": "calcCore_35",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -2241,7 +2507,8 @@
     }
   },
   {
-    "name": "output_amt150_ref4",
+    "name": "calcCore_36",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -2315,7 +2582,8 @@
     }
   },
   {
-    "name": "output_remaining_40",
+    "name": "calcCore_37",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -2391,7 +2659,2620 @@
     }
   },
   {
-    "name": "avgNum_2_5x",
+    "name": "calcCore_38",
+    "fn": "calcCore",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-04-26T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 1,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 2.00 st/dag överstiger ordination med >10%.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "100 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-08-04 (50 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "2.00 st/dag (20.0 mg/dag)",
+          "cls": "danger",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 50,
+      "tlStart": "2025-04-26",
+      "tlEnd": "2025-08-04",
+      "earlyThreshold": 20,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-04-26",
+      "total": 100,
+      "remainingDoses": null,
+      "endDateStr": "2025-08-04",
+      "prescribedEndDateStr": "2025-08-04",
+      "daysRemaining": 50,
+      "daysToPrescribedEnd": 50,
+      "displayAvgStr": "2.00 st/dag (20.0 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "prescribedContactDateStr": "2025-07-28",
+      "prescribedContactIsPast": false
+    }
+  },
+  {
+    "name": "calcLongtermCore_39",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": null,
+      "rawPeriods": [
+        {
+          "start": "2025-03-17",
+          "end": "2025-06-15",
+          "total": "90"
+        }
+      ]
+    },
+    "expected": {
+      "valid": false,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        }
+      ]
+    }
+  },
+  {
+    "name": "calcLongtermCore_40",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "",
+          "end": "",
+          "total": ""
+        }
+      ]
+    },
+    "expected": {
+      "valid": false,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        }
+      ]
+    }
+  },
+  {
+    "name": "calcLongtermCore_41",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "2025-06-16",
+          "end": "2025-06-15",
+          "total": "30"
+        }
+      ]
+    },
+    "expected": {
+      "valid": false,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": true,
+          "endError": true,
+          "totalError": false,
+          "spanError": false
+        }
+      ]
+    }
+  },
+  {
+    "name": "calcLongtermCore_42",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "2025-06-05",
+          "end": "2025-05-16",
+          "total": "20"
+        }
+      ]
+    },
+    "expected": {
+      "valid": false,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": true,
+          "totalError": false,
+          "spanError": false
+        }
+      ]
+    }
+  },
+  {
+    "name": "calcLongtermCore_43",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "2025-03-17",
+          "end": "2025-06-15",
+          "total": "-5"
+        }
+      ]
+    },
+    "expected": {
+      "valid": false,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": true,
+          "spanError": false
+        }
+      ]
+    }
+  },
+  {
+    "name": "calcLongtermCore_44",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "2024-12-17",
+          "end": "2025-03-17",
+          "total": "90"
+        },
+        {
+          "start": "2025-03-17",
+          "end": "2025-06-15",
+          "total": "90"
+        }
+      ]
+    },
+    "expected": {
+      "valid": true,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        },
+        {
+          "idx": 1,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        }
+      ],
+      "periods": [
+        {
+          "startDate": "2024-12-17T00:00:00.000Z",
+          "endDate": "2025-03-17T00:00:00.000Z",
+          "total": 90,
+          "days": 90,
+          "avgPerDay": 1,
+          "classification": "ok"
+        },
+        {
+          "startDate": "2025-03-17T00:00:00.000Z",
+          "endDate": "2025-06-15T00:00:00.000Z",
+          "total": 90,
+          "days": 90,
+          "avgPerDay": 1,
+          "classification": "ok"
+        }
+      ],
+      "totalTablets": 180,
+      "totalDays": 180,
+      "overallAvg": 1,
+      "consumptionPct": 100,
+      "avgStr": "1.00 enheter/dag (10.0 mg/dag)",
+      "ordDose": 1,
+      "overallStatus": "ok",
+      "alertType": "ok",
+      "alertTitle": "Förbrukning enligt ordination",
+      "alertMsg": "Snitt 1.00 enheter/dag (10.0 mg/dag) är i linje med ordinerad dos (1 enheter/dag), avvikelse 0.0%.",
+      "hasOverlap": false,
+      "barPct": 100,
+      "fassUrl": "https://www.fass.se/LIF/result?query=Test%2010%20mg&userType=0",
+      "journalText": "Aktuellt: Förbrukningsanalys av Test 10 mg.\n\nOrdinerad dos: 1 enheter/dag.\nAnalysperiod: 2 period(er), totalt 180 dagar.\n\nPerioder:\n  2024-12-17–2025-03-17 (90 dagar, 90 enheter, snitt 1.00 enheter/dag)\n  2025-03-17–2025-06-15 (90 dagar, 90 enheter, snitt 1.00 enheter/dag)\n\nSammanlagd snittförbrukning: 1.00 enheter/dag (10.0 mg/dag) (100.0% av ordinerad dos).\n\nBedömning: [fyll i här]"
+    }
+  },
+  {
+    "name": "calcLongtermCore_45",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "2025-03-17",
+          "end": "2025-06-15",
+          "total": "90"
+        }
+      ]
+    },
+    "expected": {
+      "valid": true,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        }
+      ],
+      "periods": [
+        {
+          "startDate": "2025-03-17T00:00:00.000Z",
+          "endDate": "2025-06-15T00:00:00.000Z",
+          "total": 90,
+          "days": 90,
+          "avgPerDay": 1,
+          "classification": "ok"
+        }
+      ],
+      "totalTablets": 90,
+      "totalDays": 90,
+      "overallAvg": 1,
+      "consumptionPct": 100,
+      "avgStr": "1.00 enheter/dag (10.0 mg/dag)",
+      "ordDose": 1,
+      "overallStatus": "ok",
+      "alertType": "ok",
+      "alertTitle": "Förbrukning enligt ordination",
+      "alertMsg": "Snitt 1.00 enheter/dag (10.0 mg/dag) är i linje med ordinerad dos (1 enheter/dag), avvikelse 0.0%.",
+      "hasOverlap": false,
+      "barPct": 100,
+      "fassUrl": "https://www.fass.se/LIF/result?query=Test%2010%20mg&userType=0",
+      "journalText": "Aktuellt: Förbrukningsanalys av Test 10 mg.\n\nOrdinerad dos: 1 enheter/dag.\nAnalysperiod: 1 period(er), totalt 90 dagar.\n\nPerioder:\n  2025-03-17–2025-06-15 (90 dagar, 90 enheter, snitt 1.00 enheter/dag)\n\nSammanlagd snittförbrukning: 1.00 enheter/dag (10.0 mg/dag) (100.0% av ordinerad dos).\n\nBedömning: [fyll i här]"
+    }
+  },
+  {
+    "name": "calcLongtermCore_46",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "2025-04-16",
+          "end": "2025-06-15",
+          "total": "90"
+        }
+      ]
+    },
+    "expected": {
+      "valid": true,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        }
+      ],
+      "periods": [
+        {
+          "startDate": "2025-04-16T00:00:00.000Z",
+          "endDate": "2025-06-15T00:00:00.000Z",
+          "total": 90,
+          "days": 60,
+          "avgPerDay": 1.5,
+          "classification": "over"
+        }
+      ],
+      "totalTablets": 90,
+      "totalDays": 60,
+      "overallAvg": 1.5,
+      "consumptionPct": 150,
+      "avgStr": "1.50 enheter/dag (15.0 mg/dag)",
+      "ordDose": 1,
+      "overallStatus": "over",
+      "alertType": "danger",
+      "alertTitle": "Förbrukning överstiger ordination",
+      "alertMsg": "Snitt 1.50 enheter/dag (15.0 mg/dag) är 50.0% över ordinerad dos (1 enheter/dag). Gör en individuell klinisk bedömning.",
+      "hasOverlap": false,
+      "barPct": 150,
+      "fassUrl": "https://www.fass.se/LIF/result?query=Test%2010%20mg&userType=0",
+      "journalText": "Aktuellt: Förbrukningsanalys av Test 10 mg.\n\nOrdinerad dos: 1 enheter/dag.\nAnalysperiod: 1 period(er), totalt 60 dagar.\n\nPerioder:\n  2025-04-16–2025-06-15 (60 dagar, 90 enheter, snitt 1.50 enheter/dag)\n\nSammanlagd snittförbrukning: 1.50 enheter/dag (15.0 mg/dag) (150.0% av ordinerad dos).\n\nBedömning: [fyll i här]"
+    }
+  },
+  {
+    "name": "calcLongtermCore_47",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "2025-03-17",
+          "end": "2025-06-15",
+          "total": "45"
+        }
+      ]
+    },
+    "expected": {
+      "valid": true,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        }
+      ],
+      "periods": [
+        {
+          "startDate": "2025-03-17T00:00:00.000Z",
+          "endDate": "2025-06-15T00:00:00.000Z",
+          "total": 45,
+          "days": 90,
+          "avgPerDay": 0.5,
+          "classification": "under"
+        }
+      ],
+      "totalTablets": 45,
+      "totalDays": 90,
+      "overallAvg": 0.5,
+      "consumptionPct": 50,
+      "avgStr": "0.50 enheter/dag (5.0 mg/dag)",
+      "ordDose": 1,
+      "overallStatus": "under",
+      "alertType": "warn",
+      "alertTitle": "Låg förbrukning",
+      "alertMsg": "Snitt 0.50 enheter/dag (5.0 mg/dag) är 50.0% under ordinerad dos (1 enheter/dag). Överväg om patienten tar medicinen som ordinerat.",
+      "hasOverlap": false,
+      "barPct": 50,
+      "fassUrl": "https://www.fass.se/LIF/result?query=Test%2010%20mg&userType=0",
+      "journalText": "Aktuellt: Förbrukningsanalys av Test 10 mg.\n\nOrdinerad dos: 1 enheter/dag.\nAnalysperiod: 1 period(er), totalt 90 dagar.\n\nPerioder:\n  2025-03-17–2025-06-15 (90 dagar, 45 enheter, snitt 0.50 enheter/dag)\n\nSammanlagd snittförbrukning: 0.50 enheter/dag (5.0 mg/dag) (50.0% av ordinerad dos).\n\nBedömning: [fyll i här]"
+    }
+  },
+  {
+    "name": "calcLongtermCore_48",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "2025-03-07",
+          "end": "2025-06-15",
+          "total": "110"
+        }
+      ]
+    },
+    "expected": {
+      "valid": true,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        }
+      ],
+      "periods": [
+        {
+          "startDate": "2025-03-07T00:00:00.000Z",
+          "endDate": "2025-06-15T00:00:00.000Z",
+          "total": 110,
+          "days": 100,
+          "avgPerDay": 1.1,
+          "classification": "ok"
+        }
+      ],
+      "totalTablets": 110,
+      "totalDays": 100,
+      "overallAvg": 1.1,
+      "consumptionPct": 110.00000000000001,
+      "avgStr": "1.10 enheter/dag (11.0 mg/dag)",
+      "ordDose": 1,
+      "overallStatus": "ok",
+      "alertType": "ok",
+      "alertTitle": "Förbrukning enligt ordination",
+      "alertMsg": "Snitt 1.10 enheter/dag (11.0 mg/dag) är i linje med ordinerad dos (1 enheter/dag), avvikelse 10.0%.",
+      "hasOverlap": false,
+      "barPct": 110.00000000000001,
+      "fassUrl": "https://www.fass.se/LIF/result?query=Test%2010%20mg&userType=0",
+      "journalText": "Aktuellt: Förbrukningsanalys av Test 10 mg.\n\nOrdinerad dos: 1 enheter/dag.\nAnalysperiod: 1 period(er), totalt 100 dagar.\n\nPerioder:\n  2025-03-07–2025-06-15 (100 dagar, 110 enheter, snitt 1.10 enheter/dag)\n\nSammanlagd snittförbrukning: 1.10 enheter/dag (11.0 mg/dag) (110.0% av ordinerad dos).\n\nBedömning: [fyll i här]"
+    }
+  },
+  {
+    "name": "calcLongtermCore_49",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "2024-12-17",
+          "end": "2025-03-17",
+          "total": "90"
+        },
+        {
+          "start": "2025-03-17",
+          "end": "2025-06-15",
+          "total": "90"
+        }
+      ]
+    },
+    "expected": {
+      "valid": true,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        },
+        {
+          "idx": 1,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        }
+      ],
+      "periods": [
+        {
+          "startDate": "2024-12-17T00:00:00.000Z",
+          "endDate": "2025-03-17T00:00:00.000Z",
+          "total": 90,
+          "days": 90,
+          "avgPerDay": 1,
+          "classification": "ok"
+        },
+        {
+          "startDate": "2025-03-17T00:00:00.000Z",
+          "endDate": "2025-06-15T00:00:00.000Z",
+          "total": 90,
+          "days": 90,
+          "avgPerDay": 1,
+          "classification": "ok"
+        }
+      ],
+      "totalTablets": 180,
+      "totalDays": 180,
+      "overallAvg": 1,
+      "consumptionPct": 100,
+      "avgStr": "1.00 enheter/dag (10.0 mg/dag)",
+      "ordDose": 1,
+      "overallStatus": "ok",
+      "alertType": "ok",
+      "alertTitle": "Förbrukning enligt ordination",
+      "alertMsg": "Snitt 1.00 enheter/dag (10.0 mg/dag) är i linje med ordinerad dos (1 enheter/dag), avvikelse 0.0%.",
+      "hasOverlap": false,
+      "barPct": 100,
+      "fassUrl": "https://www.fass.se/LIF/result?query=Test%2010%20mg&userType=0",
+      "journalText": "Aktuellt: Förbrukningsanalys av Test 10 mg.\n\nOrdinerad dos: 1 enheter/dag.\nAnalysperiod: 2 period(er), totalt 180 dagar.\n\nPerioder:\n  2024-12-17–2025-03-17 (90 dagar, 90 enheter, snitt 1.00 enheter/dag)\n  2025-03-17–2025-06-15 (90 dagar, 90 enheter, snitt 1.00 enheter/dag)\n\nSammanlagd snittförbrukning: 1.00 enheter/dag (10.0 mg/dag) (100.0% av ordinerad dos).\n\nBedömning: [fyll i här]"
+    }
+  },
+  {
+    "name": "calcLongtermCore_50",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "2025-02-15",
+          "end": "2025-05-16",
+          "total": "90"
+        },
+        {
+          "start": "2025-05-06",
+          "end": "2025-06-10",
+          "total": "35"
+        }
+      ]
+    },
+    "expected": {
+      "valid": true,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        },
+        {
+          "idx": 1,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        }
+      ],
+      "periods": [
+        {
+          "startDate": "2025-02-15T00:00:00.000Z",
+          "endDate": "2025-05-16T00:00:00.000Z",
+          "total": 90,
+          "days": 90,
+          "avgPerDay": 1,
+          "classification": "ok"
+        },
+        {
+          "startDate": "2025-05-06T00:00:00.000Z",
+          "endDate": "2025-06-10T00:00:00.000Z",
+          "total": 35,
+          "days": 35,
+          "avgPerDay": 1,
+          "classification": "ok"
+        }
+      ],
+      "totalTablets": 125,
+      "totalDays": 115,
+      "overallAvg": 1.0869565217391304,
+      "consumptionPct": 108.69565217391303,
+      "avgStr": "1.09 enheter/dag (10.9 mg/dag)",
+      "ordDose": 1,
+      "overallStatus": "ok",
+      "alertType": "ok",
+      "alertTitle": "Förbrukning enligt ordination",
+      "alertMsg": "Snitt 1.09 enheter/dag (10.9 mg/dag) är i linje med ordinerad dos (1 enheter/dag), avvikelse 8.7%.",
+      "hasOverlap": true,
+      "barPct": 108.69565217391303,
+      "fassUrl": "https://www.fass.se/LIF/result?query=Test%2010%20mg&userType=0",
+      "journalText": "Aktuellt: Förbrukningsanalys av Test 10 mg.\n\nOrdinerad dos: 1 enheter/dag.\nAnalysperiod: 2 period(er), totalt 115 dagar.\n\nPerioder:\n  2025-02-15–2025-05-16 (90 dagar, 90 enheter, snitt 1.00 enheter/dag)\n  2025-05-06–2025-06-10 (35 dagar, 35 enheter, snitt 1.00 enheter/dag)\n\nSammanlagd snittförbrukning: 1.09 enheter/dag (10.9 mg/dag) (108.7% av ordinerad dos).\n\nBedömning: [fyll i här]"
+    }
+  },
+  {
+    "name": "calcLongtermCore_51",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "2024-12-17",
+          "end": "2025-03-17",
+          "total": "90"
+        },
+        {
+          "start": "2025-03-17",
+          "end": "2025-06-15",
+          "total": "90"
+        }
+      ]
+    },
+    "expected": {
+      "valid": true,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        },
+        {
+          "idx": 1,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        }
+      ],
+      "periods": [
+        {
+          "startDate": "2024-12-17T00:00:00.000Z",
+          "endDate": "2025-03-17T00:00:00.000Z",
+          "total": 90,
+          "days": 90,
+          "avgPerDay": 1,
+          "classification": "ok"
+        },
+        {
+          "startDate": "2025-03-17T00:00:00.000Z",
+          "endDate": "2025-06-15T00:00:00.000Z",
+          "total": 90,
+          "days": 90,
+          "avgPerDay": 1,
+          "classification": "ok"
+        }
+      ],
+      "totalTablets": 180,
+      "totalDays": 180,
+      "overallAvg": 1,
+      "consumptionPct": 100,
+      "avgStr": "1.00 enheter/dag (10.0 mg/dag)",
+      "ordDose": 1,
+      "overallStatus": "ok",
+      "alertType": "ok",
+      "alertTitle": "Förbrukning enligt ordination",
+      "alertMsg": "Snitt 1.00 enheter/dag (10.0 mg/dag) är i linje med ordinerad dos (1 enheter/dag), avvikelse 0.0%.",
+      "hasOverlap": false,
+      "barPct": 100,
+      "fassUrl": "https://www.fass.se/LIF/result?query=Test%2010%20mg&userType=0",
+      "journalText": "Aktuellt: Förbrukningsanalys av Test 10 mg.\n\nOrdinerad dos: 1 enheter/dag.\nAnalysperiod: 2 period(er), totalt 180 dagar.\n\nPerioder:\n  2024-12-17–2025-03-17 (90 dagar, 90 enheter, snitt 1.00 enheter/dag)\n  2025-03-17–2025-06-15 (90 dagar, 90 enheter, snitt 1.00 enheter/dag)\n\nSammanlagd snittförbrukning: 1.00 enheter/dag (10.0 mg/dag) (100.0% av ordinerad dos).\n\nBedömning: [fyll i här]"
+    }
+  },
+  {
+    "name": "calcLongtermCore_52",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "2024-12-17",
+          "end": "2025-02-15",
+          "total": "90"
+        },
+        {
+          "start": "2025-03-17",
+          "end": "2025-06-15",
+          "total": "45"
+        }
+      ]
+    },
+    "expected": {
+      "valid": true,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        },
+        {
+          "idx": 1,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        }
+      ],
+      "periods": [
+        {
+          "startDate": "2024-12-17T00:00:00.000Z",
+          "endDate": "2025-02-15T00:00:00.000Z",
+          "total": 90,
+          "days": 60,
+          "avgPerDay": 1.5,
+          "classification": "over"
+        },
+        {
+          "startDate": "2025-03-17T00:00:00.000Z",
+          "endDate": "2025-06-15T00:00:00.000Z",
+          "total": 45,
+          "days": 90,
+          "avgPerDay": 0.5,
+          "classification": "under"
+        }
+      ],
+      "totalTablets": 135,
+      "totalDays": 150,
+      "overallAvg": 0.9,
+      "consumptionPct": 90,
+      "avgStr": "0.90 enheter/dag (9.0 mg/dag)",
+      "ordDose": 1,
+      "overallStatus": "ok",
+      "alertType": "ok",
+      "alertTitle": "Förbrukning enligt ordination",
+      "alertMsg": "Snitt 0.90 enheter/dag (9.0 mg/dag) är i linje med ordinerad dos (1 enheter/dag), avvikelse 10.0%.",
+      "hasOverlap": false,
+      "barPct": 90,
+      "fassUrl": "https://www.fass.se/LIF/result?query=Test%2010%20mg&userType=0",
+      "journalText": "Aktuellt: Förbrukningsanalys av Test 10 mg.\n\nOrdinerad dos: 1 enheter/dag.\nAnalysperiod: 2 period(er), totalt 150 dagar.\n\nPerioder:\n  2024-12-17–2025-02-15 (60 dagar, 90 enheter, snitt 1.50 enheter/dag)\n  2025-03-17–2025-06-15 (90 dagar, 45 enheter, snitt 0.50 enheter/dag)\n\nSammanlagd snittförbrukning: 0.90 enheter/dag (9.0 mg/dag) (90.0% av ordinerad dos).\n\nBedömning: [fyll i här]"
+    }
+  },
+  {
+    "name": "calcLongtermCore_53",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Elvanse 50 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "2025-03-17",
+          "end": "2025-06-15",
+          "total": "90"
+        }
+      ]
+    },
+    "expected": {
+      "valid": true,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        }
+      ],
+      "periods": [
+        {
+          "startDate": "2025-03-17T00:00:00.000Z",
+          "endDate": "2025-06-15T00:00:00.000Z",
+          "total": 90,
+          "days": 90,
+          "avgPerDay": 1,
+          "classification": "ok"
+        }
+      ],
+      "totalTablets": 90,
+      "totalDays": 90,
+      "overallAvg": 1,
+      "consumptionPct": 100,
+      "avgStr": "1.00 enheter/dag (50.0 mg/dag)",
+      "ordDose": 1,
+      "overallStatus": "ok",
+      "alertType": "ok",
+      "alertTitle": "Förbrukning enligt ordination",
+      "alertMsg": "Snitt 1.00 enheter/dag (50.0 mg/dag) är i linje med ordinerad dos (1 enheter/dag), avvikelse 0.0%.",
+      "hasOverlap": false,
+      "barPct": 100,
+      "fassUrl": "https://www.fass.se/LIF/result?query=Elvanse%2050%20mg&userType=0",
+      "journalText": "Aktuellt: Förbrukningsanalys av Elvanse 50 mg.\n\nOrdinerad dos: 1 enheter/dag.\nAnalysperiod: 1 period(er), totalt 90 dagar.\n\nPerioder:\n  2025-03-17–2025-06-15 (90 dagar, 90 enheter, snitt 1.00 enheter/dag)\n\nSammanlagd snittförbrukning: 1.00 enheter/dag (50.0 mg/dag) (100.0% av ordinerad dos).\n\nBedömning: [fyll i här]"
+    }
+  },
+  {
+    "name": "calcLongtermCore_54",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Ritalin 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "2025-03-17",
+          "end": "2025-06-15",
+          "total": "90"
+        }
+      ]
+    },
+    "expected": {
+      "valid": true,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        }
+      ],
+      "periods": [
+        {
+          "startDate": "2025-03-17T00:00:00.000Z",
+          "endDate": "2025-06-15T00:00:00.000Z",
+          "total": 90,
+          "days": 90,
+          "avgPerDay": 1,
+          "classification": "ok"
+        }
+      ],
+      "totalTablets": 90,
+      "totalDays": 90,
+      "overallAvg": 1,
+      "consumptionPct": 100,
+      "avgStr": "1.00 enheter/dag (10.0 mg/dag)",
+      "ordDose": 1,
+      "overallStatus": "ok",
+      "alertType": "ok",
+      "alertTitle": "Förbrukning enligt ordination",
+      "alertMsg": "Snitt 1.00 enheter/dag (10.0 mg/dag) är i linje med ordinerad dos (1 enheter/dag), avvikelse 0.0%.",
+      "hasOverlap": false,
+      "barPct": 100,
+      "fassUrl": "https://www.fass.se/LIF/result?query=Ritalin%2010%20mg&userType=0",
+      "journalText": "Aktuellt: Förbrukningsanalys av Ritalin 10 mg.\n\nOrdinerad dos: 1 enheter/dag.\nAnalysperiod: 1 period(er), totalt 90 dagar.\n\nPerioder:\n  2025-03-17–2025-06-15 (90 dagar, 90 enheter, snitt 1.00 enheter/dag)\n\nSammanlagd snittförbrukning: 1.00 enheter/dag (10.0 mg/dag) (100.0% av ordinerad dos).\n\nBedömning: [fyll i här]"
+    }
+  },
+  {
+    "name": "calcLongtermCore_55",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "2025-03-17",
+          "end": "2025-06-15",
+          "total": "90"
+        }
+      ]
+    },
+    "expected": {
+      "valid": true,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        }
+      ],
+      "periods": [
+        {
+          "startDate": "2025-03-17T00:00:00.000Z",
+          "endDate": "2025-06-15T00:00:00.000Z",
+          "total": 90,
+          "days": 90,
+          "avgPerDay": 1,
+          "classification": "ok"
+        }
+      ],
+      "totalTablets": 90,
+      "totalDays": 90,
+      "overallAvg": 1,
+      "consumptionPct": 100,
+      "avgStr": "1.00 enheter/dag (10.0 mg/dag)",
+      "ordDose": 1,
+      "overallStatus": "ok",
+      "alertType": "ok",
+      "alertTitle": "Förbrukning enligt ordination",
+      "alertMsg": "Snitt 1.00 enheter/dag (10.0 mg/dag) är i linje med ordinerad dos (1 enheter/dag), avvikelse 0.0%.",
+      "hasOverlap": false,
+      "barPct": 100,
+      "fassUrl": "https://www.fass.se/LIF/result?query=Test%2010%20mg&userType=0",
+      "journalText": "Aktuellt: Förbrukningsanalys av Test 10 mg.\n\nOrdinerad dos: 1 enheter/dag.\nAnalysperiod: 1 period(er), totalt 90 dagar.\n\nPerioder:\n  2025-03-17–2025-06-15 (90 dagar, 90 enheter, snitt 1.00 enheter/dag)\n\nSammanlagd snittförbrukning: 1.00 enheter/dag (10.0 mg/dag) (100.0% av ordinerad dos).\n\nBedömning: [fyll i här]"
+    }
+  },
+  {
+    "name": "calcLongtermCore_56",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "2025-06-05",
+          "end": "2025-06-15",
+          "total": "100"
+        }
+      ]
+    },
+    "expected": {
+      "valid": true,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        }
+      ],
+      "periods": [
+        {
+          "startDate": "2025-06-05T00:00:00.000Z",
+          "endDate": "2025-06-15T00:00:00.000Z",
+          "total": 100,
+          "days": 10,
+          "avgPerDay": 10,
+          "classification": "over"
+        }
+      ],
+      "totalTablets": 100,
+      "totalDays": 10,
+      "overallAvg": 10,
+      "consumptionPct": 1000,
+      "avgStr": "10.00 enheter/dag (100.0 mg/dag)",
+      "ordDose": 1,
+      "overallStatus": "over",
+      "alertType": "danger",
+      "alertTitle": "Förbrukning överstiger ordination",
+      "alertMsg": "Snitt 10.00 enheter/dag (100.0 mg/dag) är 900.0% över ordinerad dos (1 enheter/dag). Gör en individuell klinisk bedömning.",
+      "hasOverlap": false,
+      "barPct": 150,
+      "fassUrl": "https://www.fass.se/LIF/result?query=Test%2010%20mg&userType=0",
+      "journalText": "Aktuellt: Förbrukningsanalys av Test 10 mg.\n\nOrdinerad dos: 1 enheter/dag.\nAnalysperiod: 1 period(er), totalt 10 dagar.\n\nPerioder:\n  2025-06-05–2025-06-15 (10 dagar, 100 enheter, snitt 10.00 enheter/dag)\n\nSammanlagd snittförbrukning: 10.00 enheter/dag (100.0 mg/dag) (1000.0% av ordinerad dos).\n\nBedömning: [fyll i här]"
+    }
+  },
+  {
+    "name": "canRenewMed_57",
+    "fn": "canRenewMed",
+    "args": [
+      0
+    ],
+    "expected": false
+  },
+  {
+    "name": "canRenewMed_58",
+    "fn": "canRenewMed",
+    "args": [
+      0
+    ],
+    "expected": false
+  },
+  {
+    "name": "canRenewMed_59",
+    "fn": "canRenewMed",
+    "args": [
+      0
+    ],
+    "expected": true
+  },
+  {
+    "name": "canRenewMed_60",
+    "fn": "canRenewMed",
+    "args": [
+      0
+    ],
+    "expected": false
+  },
+  {
+    "name": "canRenewMed_61",
+    "fn": "canRenewMed",
+    "args": [
+      0
+    ],
+    "expected": false
+  },
+  {
+    "name": "canRenewMed_62",
+    "fn": "canRenewMed",
+    "args": [
+      0
+    ],
+    "expected": true
+  },
+  {
+    "name": "canRenewMed_63",
+    "fn": "canRenewMed",
+    "args": [
+      0
+    ],
+    "expected": true
+  },
+  {
+    "name": "prescribeValidationHint_64",
+    "fn": "prescribeValidationHint",
+    "args": [
+      0,
+      null
+    ],
+    "expected": []
+  },
+  {
+    "name": "prescribeValidationHint_65",
+    "fn": "prescribeValidationHint",
+    "args": [
+      0,
+      {
+        "packageSize": "",
+        "mode": "months",
+        "months": 3
+      }
+    ],
+    "expected": [
+      {
+        "type": "info",
+        "field": "pkg",
+        "msg": "Ange förpackningsstorlek för att beräkna antal förpackningar."
+      }
+    ]
+  },
+  {
+    "name": "prescribeValidationHint_66",
+    "fn": "prescribeValidationHint",
+    "args": [
+      0,
+      {
+        "packageSize": "0",
+        "mode": "months",
+        "months": 3
+      }
+    ],
+    "expected": [
+      {
+        "type": "warn",
+        "field": "pkg",
+        "msg": "Förpackningsstorleken måste vara ett heltal om minst 1."
+      }
+    ]
+  },
+  {
+    "name": "prescribeValidationHint_67",
+    "fn": "prescribeValidationHint",
+    "args": [
+      0,
+      {
+        "packageSize": "30",
+        "mode": "months",
+        "months": 3,
+        "endDate": ""
+      }
+    ],
+    "expected": []
+  },
+  {
+    "name": "prescribeValidationHint_68",
+    "fn": "prescribeValidationHint",
+    "args": [
+      0,
+      {
+        "packageSize": "30"
+      }
+    ],
+    "expected": [
+      {
+        "type": "warn",
+        "field": "date",
+        "msg": "Ange ett giltigt datum (ÅÅÅÅ-MM-DD)."
+      }
+    ]
+  },
+  {
+    "name": "prescribeValidationHint_69",
+    "fn": "prescribeValidationHint",
+    "args": [
+      0,
+      {
+        "packageSize": "30"
+      }
+    ],
+    "expected": [
+      {
+        "type": "warn",
+        "field": "date",
+        "msg": "Slutdatumet måste vara efter 2025-06-15."
+      }
+    ]
+  },
+  {
+    "name": "prescribeValidationHint_70",
+    "fn": "prescribeValidationHint",
+    "args": [
+      0,
+      {
+        "packageSize": "30"
+      }
+    ],
+    "expected": []
+  },
+  {
+    "name": "calcPrescribeResult_71",
+    "fn": "calcPrescribeResult",
+    "args": [
+      0
+    ],
+    "expected": null
+  },
+  {
+    "name": "calcPrescribeResult_72",
+    "fn": "calcPrescribeResult",
+    "args": [
+      0
+    ],
+    "expected": {
+      "startDate": "2025-06-15T00:00:00.000Z",
+      "startDateStr": "2025-06-15",
+      "daysAlreadyCovered": 0,
+      "endDate": "2025-09-15T00:00:00.000Z",
+      "endDateStr": "2025-09-15",
+      "totalDays": 92,
+      "totalTablets": 92,
+      "packages": 1,
+      "packageSize": 100,
+      "dose": 1,
+      "doseUnit": "st",
+      "unitLabelLong": "tabletter",
+      "unitLabelShort": "st"
+    }
+  },
+  {
+    "name": "calcPrescribeResult_73",
+    "fn": "calcPrescribeResult",
+    "args": [
+      0
+    ],
+    "expected": {
+      "startDate": "2025-07-15T00:00:00.000Z",
+      "startDateStr": "2025-07-15",
+      "daysAlreadyCovered": 30,
+      "endDate": "2025-09-15T00:00:00.000Z",
+      "endDateStr": "2025-09-15",
+      "totalDays": 62,
+      "totalTablets": 62,
+      "packages": 1,
+      "packageSize": 100,
+      "dose": 1,
+      "doseUnit": "st",
+      "unitLabelLong": "tabletter",
+      "unitLabelShort": "st"
+    }
+  },
+  {
+    "name": "calcPrescribeResult_74",
+    "fn": "calcPrescribeResult",
+    "args": [
+      0
+    ],
+    "expected": {
+      "startDate": "2025-10-13T00:00:00.000Z",
+      "startDateStr": "2025-10-13",
+      "daysAlreadyCovered": 120,
+      "endDate": null,
+      "totalDays": 0,
+      "totalTablets": 0,
+      "packages": 0
+    }
+  },
+  {
+    "name": "calcPrescribeResult_75",
+    "fn": "calcPrescribeResult",
+    "args": [
+      0
+    ],
+    "expected": {
+      "startDate": "2025-01-31T00:00:00.000Z",
+      "startDateStr": "2025-01-31",
+      "daysAlreadyCovered": 0,
+      "endDate": "2025-02-28T00:00:00.000Z",
+      "endDateStr": "2025-02-28",
+      "totalDays": 28,
+      "totalTablets": 28,
+      "packages": 1,
+      "packageSize": 28,
+      "dose": 1,
+      "doseUnit": "st",
+      "unitLabelLong": "tabletter",
+      "unitLabelShort": "st"
+    }
+  },
+  {
+    "name": "calcPrescribeResult_76",
+    "fn": "calcPrescribeResult",
+    "args": [
+      0
+    ],
+    "expected": {
+      "startDate": "2025-06-15T00:00:00.000Z",
+      "startDateStr": "2025-06-15",
+      "daysAlreadyCovered": 0,
+      "endDate": "2025-09-14T00:00:00.000Z",
+      "endDateStr": "2025-09-14",
+      "totalDays": 91,
+      "totalTablets": 91,
+      "packages": 2,
+      "packageSize": 90,
+      "dose": 1,
+      "doseUnit": "st",
+      "unitLabelLong": "tabletter",
+      "unitLabelShort": "st"
+    }
+  },
+  {
+    "name": "calcPrescribeResult_77",
+    "fn": "calcPrescribeResult",
+    "args": [
+      0
+    ],
+    "expected": {
+      "startDate": "2025-06-15T00:00:00.000Z",
+      "startDateStr": "2025-06-15",
+      "daysAlreadyCovered": 0,
+      "endDate": null,
+      "totalDays": 0,
+      "totalTablets": 0,
+      "packages": 0
+    }
+  },
+  {
+    "name": "calcPrescribeResult_78",
+    "fn": "calcPrescribeResult",
+    "args": [
+      0
+    ],
+    "expected": {
+      "startDate": "2025-06-15T00:00:00.000Z",
+      "startDateStr": "2025-06-15",
+      "daysAlreadyCovered": 0,
+      "endDate": "2025-08-14T00:00:00.000Z",
+      "endDateStr": "2025-08-14",
+      "totalDays": 60,
+      "totalTablets": 30,
+      "packages": 1,
+      "packageSize": 30,
+      "dose": 0.5,
+      "doseUnit": "st",
+      "unitLabelLong": "tabletter",
+      "unitLabelShort": "st"
+    }
+  },
+  {
+    "name": "calcPrescribeResult_79",
+    "fn": "calcPrescribeResult",
+    "args": [
+      0
+    ],
+    "expected": {
+      "startDate": "2025-06-15T00:00:00.000Z",
+      "startDateStr": "2025-06-15",
+      "daysAlreadyCovered": 0,
+      "endDate": "2025-09-15T00:00:00.000Z",
+      "endDateStr": "2025-09-15",
+      "totalDays": 92,
+      "totalTablets": 14,
+      "packages": 2,
+      "packageSize": 10,
+      "dose": 1,
+      "doseUnit": "st",
+      "unitLabelLong": "tabletter",
+      "unitLabelShort": "st"
+    }
+  },
+  {
+    "name": "calcPrescribeResult_80",
+    "fn": "calcPrescribeResult",
+    "args": [
+      0
+    ],
+    "expected": {
+      "startDate": "2025-06-15T00:00:00.000Z",
+      "startDateStr": "2025-06-15",
+      "daysAlreadyCovered": 0,
+      "endDate": "2025-09-15T00:00:00.000Z",
+      "endDateStr": "2025-09-15",
+      "totalDays": 92,
+      "totalTablets": 4,
+      "packages": 1,
+      "packageSize": 10,
+      "dose": 1,
+      "doseUnit": "st",
+      "unitLabelLong": "tabletter",
+      "unitLabelShort": "st"
+    }
+  },
+  {
+    "name": "calcPrescribeResult_81",
+    "fn": "calcPrescribeResult",
+    "args": [
+      0
+    ],
+    "expected": {
+      "startDate": "2025-06-15T00:00:00.000Z",
+      "startDateStr": "2025-06-15",
+      "daysAlreadyCovered": 0,
+      "endDate": null,
+      "totalDays": 0,
+      "totalTablets": 0,
+      "packages": 0
+    }
+  },
+  {
+    "name": "calcPrescribeResult_82",
+    "fn": "calcPrescribeResult",
+    "args": [
+      0
+    ],
+    "expected": {
+      "startDate": "2025-06-15T00:00:00.000Z",
+      "startDateStr": "2025-06-15",
+      "daysAlreadyCovered": 0,
+      "endDate": null,
+      "totalDays": 0,
+      "totalTablets": 0,
+      "packages": 0
+    }
+  },
+  {
+    "name": "validateValues_83",
+    "fn": "validateValues",
+    "args": {
+      "medRaw": "Elvanse 50 mg",
+      "dateVal": "2025-01-01",
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": ""
+    },
+    "expected": {
+      "valid": true,
+      "fieldErrors": {
+        "medInput": "",
+        "dateInput": "",
+        "doseInput": "",
+        "amtInput": "",
+        "refInput": "",
+        "leftInput": ""
+      },
+      "medRaw": "Elvanse 50 mg",
+      "dateVal": "2025-01-01",
+      "pDate": "2025-01-01T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    }
+  },
+  {
+    "name": "validateValues_84",
+    "fn": "validateValues",
+    "args": {
+      "medRaw": "Elvanse 50 mg",
+      "dateVal": "2025-01-01",
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "40"
+    },
+    "expected": {
+      "valid": true,
+      "fieldErrors": {
+        "medInput": "",
+        "dateInput": "",
+        "doseInput": "",
+        "amtInput": "",
+        "refInput": "",
+        "leftInput": ""
+      },
+      "medRaw": "Elvanse 50 mg",
+      "dateVal": "2025-01-01",
+      "pDate": "2025-01-01T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": 40,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "40",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    }
+  },
+  {
+    "name": "validateValues_85",
+    "fn": "validateValues",
+    "args": {
+      "medRaw": "Elvanse 50 mg",
+      "dateVal": "2025-01-01-extra",
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": ""
+    },
+    "expected": {
+      "valid": false,
+      "reason": "invalid_date",
+      "fieldErrors": {
+        "medInput": "",
+        "dateInput": "Ogiltigt datum.",
+        "doseInput": "",
+        "amtInput": "",
+        "refInput": "",
+        "leftInput": ""
+      }
+    }
+  },
+  {
+    "name": "validateValues_86",
+    "fn": "validateValues",
+    "args": {
+      "medRaw": "Elvanse 50 mg",
+      "dateVal": "2030-06-15",
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": ""
+    },
+    "expected": {
+      "valid": false,
+      "reason": "invalid_date",
+      "fieldErrors": {
+        "medInput": "",
+        "dateInput": "Datumet är satt i framtiden.",
+        "doseInput": "",
+        "amtInput": "",
+        "refInput": "",
+        "leftInput": ""
+      }
+    }
+  },
+  {
+    "name": "validateValues_87",
+    "fn": "validateValues",
+    "args": {
+      "medRaw": "Elvanse 50 mg",
+      "dateVal": "2025-01-01",
+      "doseRaw": "99",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": ""
+    },
+    "expected": {
+      "valid": false,
+      "reason": "incomplete",
+      "fieldErrors": {
+        "medInput": "",
+        "dateInput": "",
+        "doseInput": "Ange ett tal mellan 0,1 och 50.",
+        "amtInput": "",
+        "refInput": "",
+        "leftInput": ""
+      }
+    }
+  },
+  {
+    "name": "validateValues_88",
+    "fn": "validateValues",
+    "args": {
+      "medRaw": "Elvanse 50 mg",
+      "dateVal": "2025-01-01",
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "12",
+      "leftRaw": ""
+    },
+    "expected": {
+      "valid": true,
+      "fieldErrors": {
+        "medInput": "",
+        "dateInput": "",
+        "doseInput": "",
+        "amtInput": "",
+        "refInput": "",
+        "leftInput": ""
+      },
+      "medRaw": "Elvanse 50 mg",
+      "dateVal": "2025-01-01",
+      "pDate": "2025-01-01T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 12,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "12",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    }
+  },
+  {
+    "name": "validateValues_89",
+    "fn": "validateValues",
+    "args": {
+      "medRaw": "Elvanse 50 mg",
+      "dateVal": "2025-01-01",
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "13",
+      "leftRaw": ""
+    },
+    "expected": {
+      "valid": false,
+      "reason": "too_many_refs",
+      "fieldErrors": {
+        "medInput": "",
+        "dateInput": "",
+        "doseInput": "",
+        "amtInput": "",
+        "refInput": "Max 12 uttag stöds.",
+        "leftInput": ""
+      }
+    }
+  },
+  {
+    "name": "validateValues_90",
+    "fn": "validateValues",
+    "args": {
+      "medRaw": "Elvanse 50 mg",
+      "dateVal": "2025-01-01",
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "-1"
+    },
+    "expected": {
+      "valid": false,
+      "reason": "incomplete",
+      "fieldErrors": {
+        "medInput": "",
+        "dateInput": "",
+        "doseInput": "",
+        "amtInput": "",
+        "refInput": "",
+        "leftInput": "Ange ett heltal (0 eller fler), eller lämna tomt."
+      }
+    }
+  },
+  {
+    "name": "validateValues_91",
+    "fn": "validateValues",
+    "args": {
+      "medRaw": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "dateVal": "2025-01-01",
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": ""
+    },
+    "expected": {
+      "valid": false,
+      "reason": "incomplete",
+      "fieldErrors": {
+        "medInput": "Läkemedelsnamnet får inte överstiga 100 tecken.",
+        "dateInput": "",
+        "doseInput": "",
+        "amtInput": "",
+        "refInput": "",
+        "leftInput": ""
+      }
+    }
+  },
+  {
+    "name": "validateValues_92",
+    "fn": "validateValues",
+    "args": {
+      "medRaw": "Testabol 10 mg",
+      "dateVal": "2025-02-30",
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": ""
+    },
+    "expected": {
+      "valid": false,
+      "reason": "invalid_date",
+      "fieldErrors": {
+        "medInput": "",
+        "dateInput": "Ogiltigt datum.",
+        "doseInput": "",
+        "amtInput": "",
+        "refInput": "",
+        "leftInput": ""
+      }
+    }
+  },
+  {
+    "name": "calcLongtermCore_93",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "1970-06-15",
+          "end": "2025-06-15",
+          "total": "100"
+        }
+      ]
+    },
+    "expected": {
+      "valid": false,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": true
+        }
+      ]
+    }
+  },
+  {
+    "name": "calcLongtermCore_94",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "2025-03-17",
+          "end": "2025-06-15",
+          "total": "90"
+        }
+      ]
+    },
+    "expected": {
+      "valid": true,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        }
+      ],
+      "periods": [
+        {
+          "startDate": "2025-03-17T00:00:00.000Z",
+          "endDate": "2025-06-15T00:00:00.000Z",
+          "total": 90,
+          "days": 90,
+          "avgPerDay": 1,
+          "classification": "ok"
+        }
+      ],
+      "totalTablets": 90,
+      "totalDays": 90,
+      "overallAvg": 1,
+      "consumptionPct": 100,
+      "avgStr": "1.00 enheter/dag (10.0 mg/dag)",
+      "ordDose": 1,
+      "overallStatus": "ok",
+      "alertType": "ok",
+      "alertTitle": "Förbrukning enligt ordination",
+      "alertMsg": "Snitt 1.00 enheter/dag (10.0 mg/dag) är i linje med ordinerad dos (1 enheter/dag), avvikelse 0.0%.",
+      "hasOverlap": false,
+      "barPct": 100,
+      "fassUrl": "https://www.fass.se/LIF/result?query=Test%2010%20mg&userType=0",
+      "journalText": "Aktuellt: Förbrukningsanalys av Test 10 mg.\n\nOrdinerad dos: 1 enheter/dag.\nAnalysperiod: 1 period(er), totalt 90 dagar.\n\nPerioder:\n  2025-03-17–2025-06-15 (90 dagar, 90 enheter, snitt 1.00 enheter/dag)\n\nSammanlagd snittförbrukning: 1.00 enheter/dag (10.0 mg/dag) (100.0% av ordinerad dos).\n\nBedömning: [fyll i här]"
+    }
+  },
+  {
+    "name": "calcLongtermCore_95",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "1970-06-15",
+          "end": "2025-06-15",
+          "total": "100"
+        },
+        {
+          "start": "2025-03-17",
+          "end": "2025-06-15",
+          "total": "90"
+        }
+      ]
+    },
+    "expected": {
+      "valid": true,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": true
+        },
+        {
+          "idx": 1,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        }
+      ],
+      "periods": [
+        {
+          "startDate": "2025-03-17T00:00:00.000Z",
+          "endDate": "2025-06-15T00:00:00.000Z",
+          "total": 90,
+          "days": 90,
+          "avgPerDay": 1,
+          "classification": "ok"
+        }
+      ],
+      "totalTablets": 90,
+      "totalDays": 90,
+      "overallAvg": 1,
+      "consumptionPct": 100,
+      "avgStr": "1.00 enheter/dag (10.0 mg/dag)",
+      "ordDose": 1,
+      "overallStatus": "ok",
+      "alertType": "ok",
+      "alertTitle": "Förbrukning enligt ordination",
+      "alertMsg": "Snitt 1.00 enheter/dag (10.0 mg/dag) är i linje med ordinerad dos (1 enheter/dag), avvikelse 0.0%.",
+      "hasOverlap": false,
+      "barPct": 100,
+      "fassUrl": "https://www.fass.se/LIF/result?query=Test%2010%20mg&userType=0",
+      "journalText": "Aktuellt: Förbrukningsanalys av Test 10 mg.\n\nOrdinerad dos: 1 enheter/dag.\nAnalysperiod: 1 period(er), totalt 90 dagar.\n\nPerioder:\n  2025-03-17–2025-06-15 (90 dagar, 90 enheter, snitt 1.00 enheter/dag)\n\nSammanlagd snittförbrukning: 1.00 enheter/dag (10.0 mg/dag) (100.0% av ordinerad dos).\n\nBedömning: [fyll i här]"
+    }
+  },
+  {
+    "name": "calcLongtermCore_96",
+    "fn": "calcLongtermCore",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "ordDose": 1,
+      "rawPeriods": [
+        {
+          "start": "2025-03-17",
+          "end": "2025-06-15",
+          "total": "90"
+        }
+      ],
+      "nplId": null
+    },
+    "expected": {
+      "valid": true,
+      "periodErrors": [
+        {
+          "idx": 0,
+          "startError": false,
+          "endError": false,
+          "totalError": false,
+          "spanError": false
+        }
+      ],
+      "periods": [
+        {
+          "startDate": "2025-03-17T00:00:00.000Z",
+          "endDate": "2025-06-15T00:00:00.000Z",
+          "total": 90,
+          "days": 90,
+          "avgPerDay": 1,
+          "classification": "ok"
+        }
+      ],
+      "totalTablets": 90,
+      "totalDays": 90,
+      "overallAvg": 1,
+      "consumptionPct": 100,
+      "avgStr": "1.00 enheter/dag (10.0 mg/dag)",
+      "ordDose": 1,
+      "overallStatus": "ok",
+      "alertType": "ok",
+      "alertTitle": "Förbrukning enligt ordination",
+      "alertMsg": "Snitt 1.00 enheter/dag (10.0 mg/dag) är i linje med ordinerad dos (1 enheter/dag), avvikelse 0.0%.",
+      "hasOverlap": false,
+      "barPct": 100,
+      "fassUrl": "https://www.fass.se/LIF/result?query=Test%2010%20mg&userType=0",
+      "journalText": "Aktuellt: Förbrukningsanalys av Test 10 mg.\n\nOrdinerad dos: 1 enheter/dag.\nAnalysperiod: 1 period(er), totalt 90 dagar.\n\nPerioder:\n  2025-03-17–2025-06-15 (90 dagar, 90 enheter, snitt 1.00 enheter/dag)\n\nSammanlagd snittförbrukning: 1.00 enheter/dag (10.0 mg/dag) (100.0% av ordinerad dos).\n\nBedömning: [fyll i här]"
+    }
+  },
+  {
+    "name": "buildPatientText_97",
+    "fn": "buildPatientText",
+    "args": [
+      "sv",
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      [],
+      [],
+      1
+    ],
+    "expected": "Hej,\n\nVi har tagit emot din förfrågan om receptförnyelse för Elvanse 50 mg och kommer att förnya ditt recept inom 2–3 arbetsdagar. Du kan därefter hämta ut din medicin på valfritt apotek.\n\nVid frågor är du välkommen att kontakta oss via 1177."
+  },
+  {
+    "name": "buildPatientText_98",
+    "fn": "buildPatientText",
+    "args": [
+      "sv",
+      [],
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      [],
+      1
+    ],
+    "expected": "Hej,\n\nVi har tagit emot din förfrågan om receptförnyelse för Elvanse 50 mg. Enligt din ordination (1 st/dag) beräknas medicinen räcka till den 2025-12-31. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. Vänligen hör av dig igen runt den 2025-10-12 så hjälper vi dig då med nytt recept.\n\nVid frågor är du välkommen att kontakta oss via 1177."
+  },
+  {
+    "name": "buildPatientText_99",
+    "fn": "buildPatientText",
+    "args": [
+      "sv",
+      [],
+      [],
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      1
+    ],
+    "expected": "Hej,\n\nVi har tagit emot din förfrågan om receptförnyelse för Elvanse 50 mg. Utifrån föregående recept beräknades medicinen räcka till den 2025-01-01. Receptet kan nu förnyas — vänligen hör av dig igen så hjälper vi dig med nytt recept.\n\nVid frågor är du välkommen att kontakta oss via 1177."
+  },
+  {
+    "name": "buildPatientText_100",
+    "fn": "buildPatientText",
+    "args": [
+      "sv",
+      [],
+      [],
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      1
+    ],
+    "expected": "Hej,\n\nVi har tagit emot din förfrågan om receptförnyelse för Elvanse 50 mg. Utifrån föregående recept beräknades medicinen räcka till den 2025-09-01. Vi har granskat förfrågan och kan tyvärr inte förnya receptet vid detta tillfälle. Vänligen hör av dig igen närmre den 2025-08-25 så hjälper vi dig då.\n\nVid frågor är du välkommen att kontakta oss via 1177."
+  },
+  {
+    "name": "buildPatientText_101",
+    "fn": "buildPatientText",
+    "args": [
+      "sv",
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        },
+        {
+          "name": "Melatonin 3 mg",
+          "i": 1
+        }
+      ],
+      [],
+      [],
+      2
+    ],
+    "expected": "Hej,\n\nVi har tagit emot din förfrågan om receptförnyelse för följande läkemedel:\n\nElvanse 50 mg: Vi förnyar ditt recept inom 2–3 arbetsdagar.\nMelatonin 3 mg: Vi förnyar ditt recept inom 2–3 arbetsdagar.\n\nVid frågor är du välkommen att kontakta oss via 1177."
+  },
+  {
+    "name": "buildPatientText_102",
+    "fn": "buildPatientText",
+    "args": [
+      "sv",
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      [
+        {
+          "name": "Melatonin 3 mg",
+          "i": 1
+        }
+      ],
+      [],
+      2
+    ],
+    "expected": "Hej,\n\nVi har tagit emot din förfrågan om receptförnyelse för följande läkemedel:\n\nElvanse 50 mg: Vi förnyar ditt recept inom 2–3 arbetsdagar.\nMelatonin 3 mg: Enligt din ordination beräknas medicinen räcka till 2025-12-31 — vi kan därför inte förnya receptet ännu. Hör av dig runt 2025-10-12.\n\nVid frågor är du välkommen att kontakta oss via 1177."
+  },
+  {
+    "name": "buildPatientText_103",
+    "fn": "buildPatientText",
+    "args": [
+      "en",
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      [],
+      [],
+      1
+    ],
+    "expected": "Hello,\n\nWe have received your prescription renewal request for Elvanse 50 mg and will renew your prescription within 2–3 working days. You can then collect your medication at any pharmacy.\n\nIf you have questions, please contact us through 1177."
+  },
+  {
+    "name": "buildPatientText_104",
+    "fn": "buildPatientText",
+    "args": [
+      "sv",
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      [],
+      [],
+      1
+    ],
+    "expected": "Hej,\n\nVi har tagit emot din förfrågan om receptförnyelse för Elvanse 50 mg och kommer att förnya ditt recept inom 2–3 arbetsdagar. Du kan därefter hämta ut din medicin på valfritt apotek.\n\nVid frågor är du välkommen att kontakta oss via 1177."
+  },
+  {
+    "name": "buildPatientText_105",
+    "fn": "buildPatientText",
+    "args": [
+      "xx",
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      [],
+      [],
+      1
+    ],
+    "expected": "Hej,\n\nVi har tagit emot din förfrågan om receptförnyelse för Elvanse 50 mg och kommer att förnya ditt recept inom 2–3 arbetsdagar. Du kan därefter hämta ut din medicin på valfritt apotek.\n\nVid frågor är du välkommen att kontakta oss via 1177."
+  },
+  {
+    "name": "buildPatientText_106",
+    "fn": "buildPatientText",
+    "args": [
+      "sv",
+      [],
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      [
+        {
+          "name": "Melatonin 3 mg",
+          "i": 1
+        }
+      ],
+      2
+    ],
+    "expected": "Hej,\n\nVi har tagit emot din förfrågan om receptförnyelse för följande läkemedel:\n\nElvanse 50 mg: Enligt din ordination beräknas medicinen räcka till 2025-12-31 — vi kan därför inte förnya receptet ännu. Hör av dig runt 2025-10-12.\nMelatonin 3 mg: Beräknades räcka till 2025-09-01 — kan tyvärr inte förnyas vid detta tillfälle. Hör av dig närmre 2025-08-25.\n\nVid frågor är du välkommen att kontakta oss via 1177."
+  },
+  {
+    "name": "remainingDosesNote_108",
+    "fn": "remainingDosesNote",
+    "args": [
+      {
+        "_cardId": 1,
+        "medRaw": "Elvanse 50 mg",
+        "pDateStr": "2024-09-28",
+        "total": 300,
+        "dose": 1,
+        "prescribedEndDateStr": "2025-06-25",
+        "displayAvgStr": "1.00 st/dag",
+        "avgNote": "(beräknat under antagandet att alla tillgängliga doser är förbrukade)",
+        "remainingDoses": null,
+        "daysRemaining": 10,
+        "daysToPrescribedEnd": 10,
+        "earlyRenewalDecision": null
+      }
+    ],
+    "expected": ""
+  },
+  {
+    "name": "buildJournalText_108",
+    "fn": "buildJournalText",
+    "args": [
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      [],
+      [],
+      1
+    ],
+    "expected": "Kontaktorsak: Receptförnyelse via 1177.\n\nBedömning: Patienten begär förnyelse av Elvanse 50 mg. Senaste receptet utfärdades 2024-09-28 (totalt 300 st, ordination 1 st/dag) och beräknas räcka till 2025-06-25.\nFörbrukning bedöms vara enligt ordination (snittförbrukning: 1.00 st/dag (beräknat under antagandet att alla tillgängliga doser är förbrukade)).\n\nÅtgärd: Nytt recept utfärdat. Svar skickat till patient via 1177."
+  },
+  {
+    "name": "remainingDosesNote_110",
+    "fn": "remainingDosesNote",
+    "args": [
+      {
+        "_cardId": 1,
+        "medRaw": "Elvanse 50 mg",
+        "pDateStr": "2024-09-28",
+        "total": 300,
+        "dose": 1,
+        "prescribedEndDateStr": "2025-06-25",
+        "displayAvgStr": "1.50 st/dag",
+        "avgNote": "(beräknat under antagandet att alla tillgängliga doser är förbrukade)",
+        "remainingDoses": null,
+        "daysRemaining": 10,
+        "daysToPrescribedEnd": 10,
+        "earlyRenewalDecision": null
+      }
+    ],
+    "expected": ""
+  },
+  {
+    "name": "buildJournalText_110",
+    "fn": "buildJournalText",
+    "args": [
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0,
+          "earlyRenewal": "overuse"
+        }
+      ],
+      [],
+      [],
+      1
+    ],
+    "expected": "Kontaktorsak: Receptförnyelse via 1177.\n\nBedömning: Patienten begär förnyelse av Elvanse 50 mg. Senaste receptet utfärdades 2024-09-28 (totalt 300 st, ordination 1 st/dag) och borde räcka till 2025-06-25.\nBeräknad snittförbrukning: 1.50 st/dag (beräknat under antagandet att alla tillgängliga doser är förbrukade) — överstiger ordination. Receptet förnyas på klinisk indikation efter individuell bedömning.\n\nÅtgärd: Nytt recept utfärdat. Svar skickat till patient via 1177."
+  },
+  {
+    "name": "remainingDosesNote_112",
+    "fn": "remainingDosesNote",
+    "args": [
+      {
+        "_cardId": 1,
+        "medRaw": "Elvanse 50 mg",
+        "pDateStr": "2024-09-28",
+        "total": 300,
+        "dose": 1,
+        "prescribedEndDateStr": "2025-09-01",
+        "displayAvgStr": "1.00 st/dag",
+        "avgNote": "(beräknat under antagandet att alla tillgängliga doser är förbrukade)",
+        "remainingDoses": null,
+        "daysRemaining": 10,
+        "daysToPrescribedEnd": 78,
+        "earlyRenewalDecision": null
+      }
+    ],
+    "expected": ""
+  },
+  {
+    "name": "buildJournalText_112",
+    "fn": "buildJournalText",
+    "args": [
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0,
+          "earlyRenewal": "tooEarly"
+        }
+      ],
+      [],
+      [],
+      1
+    ],
+    "expected": "Kontaktorsak: Receptförnyelse via 1177.\n\nBedömning: Patienten begär förnyelse av Elvanse 50 mg. Senaste receptet utfärdades 2024-09-28 (totalt 300 st, ordination 1 st/dag) och beräknas räcka till 2025-09-01. Receptet förnyas på klinisk indikation efter individuell bedömning trots att receptperioden löper ut 2025-09-01 (78 dagar kvar).\nFörbrukning bedöms vara enligt ordination (snittförbrukning: 1.00 st/dag (beräknat under antagandet att alla tillgängliga doser är förbrukade)).\n\nÅtgärd: Nytt recept utfärdat. Svar skickat till patient via 1177."
+  },
+  {
+    "name": "remainingDosesNote_114",
+    "fn": "remainingDosesNote",
+    "args": [
+      {
+        "_cardId": 1,
+        "medRaw": "Elvanse 50 mg",
+        "pDateStr": "2024-09-28",
+        "total": 300,
+        "dose": 1,
+        "prescribedEndDateStr": "2025-12-31",
+        "displayAvgStr": "1.00 st/dag",
+        "avgNote": "(beräknat under antagandet att alla tillgängliga doser är förbrukade)",
+        "remainingDoses": null,
+        "daysRemaining": 10,
+        "daysToPrescribedEnd": 199,
+        "earlyRenewalDecision": null
+      }
+    ],
+    "expected": ""
+  },
+  {
+    "name": "buildJournalText_114",
+    "fn": "buildJournalText",
+    "args": [
+      [],
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      [],
+      1
+    ],
+    "expected": "Kontaktorsak: Receptförnyelse via 1177.\n\nBedömning: Patienten begär förnyelse av Elvanse 50 mg. Senaste receptet utfärdades 2024-09-28 (totalt 300 st, ordination 1 st/dag) och beräknas räcka till 2025-12-31 (199 dagar kvar).\nFörbrukning bedöms vara enligt ordination (snittförbrukning: 1.00 st/dag (beräknat under antagandet att alla tillgängliga doser är förbrukade)).\n\nÅtgärd: Ej förnyat — för tidigt. Svar skickat till patient via 1177."
+  },
+  {
+    "name": "buildJournalText_115",
+    "fn": "buildJournalText",
+    "args": [
+      [],
+      [],
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      1
+    ],
+    "expected": "Kontaktorsak: Receptförnyelse via 1177.\n\nBedömning: Patienten begär förnyelse av Elvanse 50 mg. Senaste receptet utfärdades 2024-09-28 (totalt 300 st, ordination 1 st/dag) och borde räcka till 2025-09-01. Aktuell förskrivning beräknas räcka ytterligare 78 dagar. Beräknad snittförbrukning: 1.00 st/dag (beräknat under antagandet att alla tillgängliga doser är förbrukade).\n\nÅtgärd: [Nytt recept utfärdat / Ej utfärdat — motivering]"
+  },
+  {
+    "name": "buildJournalText_116",
+    "fn": "buildJournalText",
+    "args": [
+      [],
+      [],
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      1
+    ],
+    "expected": "Kontaktorsak: Receptförnyelse via 1177.\n\nBedömning: Patienten begär förnyelse av Elvanse 50 mg. Senaste receptet utfärdades 2024-09-28 (totalt 300 st, ordination 1 st/dag) och borde räcka till 2025-09-01. Aktuell förskrivning beräknas räcka ytterligare 78 dagar. Beräknad snittförbrukning: 1.00 st/dag (beräknat under antagandet att alla tillgängliga doser är förbrukade).\n\nÅtgärd: Ej förnyat efter klinisk, individuell bedömning."
+  },
+  {
+    "name": "buildJournalText_117",
+    "fn": "buildJournalText",
+    "args": [
+      [],
+      [],
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      1
+    ],
+    "expected": "Kontaktorsak: Receptförnyelse via 1177.\n\nBedömning: Patienten begär förnyelse av Elvanse 50 mg. Senaste receptet utfärdades 2024-09-28 (totalt 300 st, ordination 1 st/dag) och borde räcka till 2025-09-01. Vid förnyelse framkommer att patienten har 30 st (30 dagar) kvar. Beräknad snittförbrukning: 1.00 st/dag (beräknat under antagandet att alla tillgängliga doser är förbrukade).\n\nÅtgärd: [Nytt recept utfärdat / Ej utfärdat — motivering]"
+  },
+  {
+    "name": "remainingDosesNote_119",
+    "fn": "remainingDosesNote",
+    "args": [
+      {
+        "_cardId": 1,
+        "medRaw": "Elvanse 50 mg",
+        "pDateStr": "2024-09-28",
+        "total": 300,
+        "dose": 1,
+        "prescribedEndDateStr": "2025-06-25",
+        "displayAvgStr": "1.00 st/dag",
+        "avgNote": "(beräknat under antagandet att alla tillgängliga doser är förbrukade)",
+        "remainingDoses": null,
+        "daysRemaining": 10,
+        "daysToPrescribedEnd": 10,
+        "earlyRenewalDecision": null
+      }
+    ],
+    "expected": ""
+  },
+  {
+    "name": "buildJournalText_119",
+    "fn": "buildJournalText",
+    "args": [
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      [
+        {
+          "name": "Melatonin 3 mg",
+          "i": 1
+        }
+      ],
+      [],
+      2
+    ],
+    "expected": "Kontaktorsak: Receptförnyelse via 1177 (flera läkemedel).\n\nElvanse 50 mg: Utfärdat 2024-09-28 (300 st, 1 st/dag). Räcker t.o.m. 2025-06-25. Snitt: 1.00 st/dag. Åtgärd: Förnyat.\n\nMelatonin 3 mg: Utfärdat 2024-09-28 (300 st, 1 st/dag). Räcker t.o.m. 2025-12-31 (199 dagar kvar). Snitt: 1.00 st/dag. Åtgärd: Ej förnyat — för tidigt.\n\nRecept utfärdat för: Elvanse 50 mg. Svar skickat via 1177."
+  },
+  {
+    "name": "buildJournalText_120",
+    "fn": "buildJournalText",
+    "args": [
+      [],
+      [],
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        },
+        {
+          "name": "Melatonin 3 mg",
+          "i": 1
+        }
+      ],
+      2
+    ],
+    "expected": "Kontaktorsak: Receptförnyelse via 1177 (flera läkemedel).\n\nElvanse 50 mg: Utfärdat 2024-09-28 (300 st, 1 st/dag). Borde räcka t.o.m. 2025-09-01. Räcker ytterligare 78 dagar. Snitt: 1.00 st/dag. Åtgärd: [Nytt recept utfärdat / Ej utfärdat — motivering]\n\nMelatonin 3 mg: Utfärdat 2024-09-28 (300 st, 1 st/dag). Borde räcka t.o.m. 2025-10-01. Räcker ytterligare 108 dagar. Snitt: 1.00 st/dag. Åtgärd: [Nytt recept utfärdat / Ej utfärdat — motivering]\n\nInga recept utfärdade. Svar skickat via 1177."
+  },
+  {
+    "name": "calcCore_121",
+    "fn": "calcCore",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-04-26T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 1,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": "yes"
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": "yes",
+      "statusText": "OK – förnyas (klinisk bed.)",
+      "verdictTitle": "OK – Förnya recept",
+      "verdictSub": "Klinisk bedömning: förnyelse trots förhöjd förbrukning.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "100 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-08-04 (50 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "2.00 st/dag (20.0 mg/dag)",
+          "cls": "danger",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 50,
+      "tlStart": "2025-04-26",
+      "tlEnd": "2025-08-04",
+      "earlyThreshold": 20,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-04-26",
+      "total": 100,
+      "remainingDoses": null,
+      "endDateStr": "2025-08-04",
+      "prescribedEndDateStr": "2025-08-04",
+      "daysRemaining": 50,
+      "daysToPrescribedEnd": 50,
+      "displayAvgStr": "2.00 st/dag (20.0 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "prescribedContactDateStr": "2025-07-28",
+      "prescribedContactIsPast": false
+    }
+  },
+  {
+    "name": "calcCore_122",
+    "fn": "calcCore",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-05-16T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": 80,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "80",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": true,
+      "earlyRenewalDecision": "yes"
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": true,
+      "earlyRenewalDecision": "yes",
+      "statusText": "OK – förnyas tidigt",
+      "verdictTitle": "OK – Förnya recept",
+      "verdictSub": "Klinisk bedömning: förnyelse trots 270 dagar kvar av receptperioden.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "300 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2026-03-12 (270 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "0.67 st/dag (6.7 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "warn",
+          "title": "Låg förbrukning",
+          "message": "0.67 st/dag är 33.3% under ordinerad dos. Överväg uppföljning."
+        },
+        {
+          "type": "info",
+          "title": "För tidigt att förnya",
+          "message": "Receptperioden löper ut om 270 dagar (t.o.m. 2026-03-12). Förnyelse rekommenderas närmre slutdatumet."
+        }
+      ],
+      "tlPct": 10,
+      "tlStart": "2025-05-16",
+      "tlEnd": "2026-03-12",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-05-16",
+      "total": 300,
+      "remainingDoses": 80,
+      "endDateStr": "2025-09-03",
+      "prescribedEndDateStr": "2026-03-12",
+      "daysRemaining": 80,
+      "daysToPrescribedEnd": 270,
+      "displayAvgStr": "0.67 st/dag (6.7 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 20 av 100 tillgängliga st)",
+      "renewDateStr": "2026-01-11"
+    }
+  },
+  {
+    "name": "calcCore_123",
+    "fn": "calcCore",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-05-16T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": 80,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "80",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": true,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidigt — 270d kvar",
+      "verdictTitle": "För tidigt – 270 dagar kvar",
+      "verdictSub": "Förbrukning OK. Kontakta vården närmre slutdatumet.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "300 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2026-03-12 (270 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "0.67 st/dag (6.7 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "warn",
+          "title": "Låg förbrukning",
+          "message": "0.67 st/dag är 33.3% under ordinerad dos. Överväg uppföljning."
+        },
+        {
+          "type": "info",
+          "title": "För tidigt att förnya",
+          "message": "Receptperioden löper ut om 270 dagar (t.o.m. 2026-03-12). Förnyelse rekommenderas närmre slutdatumet."
+        }
+      ],
+      "tlPct": 10,
+      "tlStart": "2025-05-16",
+      "tlEnd": "2026-03-12",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-05-16",
+      "total": 300,
+      "remainingDoses": 80,
+      "endDateStr": "2025-09-03",
+      "prescribedEndDateStr": "2026-03-12",
+      "daysRemaining": 80,
+      "daysToPrescribedEnd": 270,
+      "displayAvgStr": "0.67 st/dag (6.7 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 20 av 100 tillgängliga st)",
+      "renewDateStr": "2026-01-11"
+    }
+  },
+  {
+    "name": "calcCore_124",
+    "fn": "calcCore",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-04-26T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 1,
+      "remaining": 100,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": "100",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": true,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidigt — 50d kvar",
+      "verdictTitle": "För tidigt – 50 dagar kvar",
+      "verdictSub": "Förbrukning OK. Kontakta vården närmre slutdatumet.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "100 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-08-04 (50 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "0.00 st/dag (0.0 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "danger",
+          "title": "Ingen förbrukning registrerad",
+          "message": "Snitt 0 st/dag – patienten verkar inte ha tagit medicinen. Klinisk bedömning krävs."
+        }
+      ],
+      "tlPct": 50,
+      "tlStart": "2025-04-26",
+      "tlEnd": "2025-08-04",
+      "earlyThreshold": 20,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-04-26",
+      "total": 100,
+      "remainingDoses": 100,
+      "endDateStr": "2025-09-23",
+      "prescribedEndDateStr": "2025-08-04",
+      "daysRemaining": 100,
+      "daysToPrescribedEnd": 50,
+      "displayAvgStr": "0.00 st/dag (0.0 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 0 av 100 tillgängliga st)",
+      "renewDateStr": "2025-07-15"
+    }
+  },
+  {
+    "name": "calcCore_125",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -2473,7 +5354,95 @@
     }
   },
   {
-    "name": "endDate_passed",
+    "name": "calcCore_126",
+    "fn": "calcCore",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-05-16T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": 80,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "80",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": true,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidigt — 270d kvar",
+      "verdictTitle": "För tidigt – 270 dagar kvar",
+      "verdictSub": "Förbrukning OK. Kontakta vården närmre slutdatumet.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "300 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2026-03-12 (270 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "0.67 st/dag (6.7 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "warn",
+          "title": "Låg förbrukning",
+          "message": "0.67 st/dag är 33.3% under ordinerad dos. Överväg uppföljning."
+        },
+        {
+          "type": "info",
+          "title": "För tidigt att förnya",
+          "message": "Receptperioden löper ut om 270 dagar (t.o.m. 2026-03-12). Förnyelse rekommenderas närmre slutdatumet."
+        }
+      ],
+      "tlPct": 10,
+      "tlStart": "2025-05-16",
+      "tlEnd": "2026-03-12",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-05-16",
+      "total": 300,
+      "remainingDoses": 80,
+      "endDateStr": "2025-09-03",
+      "prescribedEndDateStr": "2026-03-12",
+      "daysRemaining": 80,
+      "daysToPrescribedEnd": 270,
+      "displayAvgStr": "0.67 st/dag (6.7 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 20 av 100 tillgängliga st)",
+      "renewDateStr": "2026-01-11"
+    }
+  },
+  {
+    "name": "calcCore_127",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -2553,7 +5522,8 @@
     }
   },
   {
-    "name": "endDate_warn",
+    "name": "calcCore_128",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -2629,7 +5599,259 @@
     }
   },
   {
-    "name": "remaining_diff_endDate",
+    "name": "calcCore_129",
+    "fn": "calcCore",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-05-16T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": 80,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "80",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": true,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidigt — 270d kvar",
+      "verdictTitle": "För tidigt – 270 dagar kvar",
+      "verdictSub": "Förbrukning OK. Kontakta vården närmre slutdatumet.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "300 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2026-03-12 (270 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "0.67 st/dag (6.7 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "warn",
+          "title": "Låg förbrukning",
+          "message": "0.67 st/dag är 33.3% under ordinerad dos. Överväg uppföljning."
+        },
+        {
+          "type": "info",
+          "title": "För tidigt att förnya",
+          "message": "Receptperioden löper ut om 270 dagar (t.o.m. 2026-03-12). Förnyelse rekommenderas närmre slutdatumet."
+        }
+      ],
+      "tlPct": 10,
+      "tlStart": "2025-05-16",
+      "tlEnd": "2026-03-12",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-05-16",
+      "total": 300,
+      "remainingDoses": 80,
+      "endDateStr": "2025-09-03",
+      "prescribedEndDateStr": "2026-03-12",
+      "daysRemaining": 80,
+      "daysToPrescribedEnd": 270,
+      "displayAvgStr": "0.67 st/dag (6.7 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 20 av 100 tillgängliga st)",
+      "renewDateStr": "2026-01-11"
+    }
+  },
+  {
+    "name": "calcCore_130",
+    "fn": "calcCore",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-04-26T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 1,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 2.00 st/dag överstiger ordination med >10%.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "100 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-08-04 (50 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "2.00 st/dag (20.0 mg/dag)",
+          "cls": "danger",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [],
+      "tlPct": 50,
+      "tlStart": "2025-04-26",
+      "tlEnd": "2025-08-04",
+      "earlyThreshold": 20,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-04-26",
+      "total": 100,
+      "remainingDoses": null,
+      "endDateStr": "2025-08-04",
+      "prescribedEndDateStr": "2025-08-04",
+      "daysRemaining": 50,
+      "daysToPrescribedEnd": 50,
+      "displayAvgStr": "2.00 st/dag (20.0 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "prescribedContactDateStr": "2025-07-28",
+      "prescribedContactIsPast": false
+    }
+  },
+  {
+    "name": "calcCore_131",
+    "fn": "calcCore",
+    "input": {
+      "valid": true,
+      "medRaw": "Testabol 10 mg",
+      "pDate": "2025-05-16T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": 80,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "80",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    },
+    "prev": {
+      "isOveruse": false,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null
+    },
+    "expected": {
+      "valid": true,
+      "calculable": true,
+      "isOveruse": false,
+      "isTooEarly": true,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidigt — 270d kvar",
+      "verdictTitle": "För tidigt – 270 dagar kvar",
+      "verdictSub": "Förbrukning OK. Kontakta vården närmre slutdatumet.",
+      "metrics": [
+        {
+          "label": "Totalt förskrivet",
+          "value": "300 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2026-03-12 (270 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "0.67 st/dag (6.7 mg/dag)",
+          "cls": "",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
+        }
+      ],
+      "alerts": [
+        {
+          "type": "warn",
+          "title": "Låg förbrukning",
+          "message": "0.67 st/dag är 33.3% under ordinerad dos. Överväg uppföljning."
+        },
+        {
+          "type": "info",
+          "title": "För tidigt att förnya",
+          "message": "Receptperioden löper ut om 270 dagar (t.o.m. 2026-03-12). Förnyelse rekommenderas närmre slutdatumet."
+        }
+      ],
+      "tlPct": 10,
+      "tlStart": "2025-05-16",
+      "tlEnd": "2026-03-12",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-05-16",
+      "total": 300,
+      "remainingDoses": 80,
+      "endDateStr": "2025-09-03",
+      "prescribedEndDateStr": "2026-03-12",
+      "daysRemaining": 80,
+      "daysToPrescribedEnd": 270,
+      "displayAvgStr": "0.67 st/dag (6.7 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 20 av 100 tillgängliga st)",
+      "renewDateStr": "2026-01-11"
+    }
+  },
+  {
+    "name": "calcCore_132",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
@@ -2711,11 +5933,12 @@
     }
   },
   {
-    "name": "not_calculable",
+    "name": "calcCore_133",
+    "fn": "calcCore",
     "input": {
       "valid": true,
       "medRaw": "Testabol 10 mg",
-      "pDate": "2025-03-07T00:00:00.000Z",
+      "pDate": "2025-01-16T00:00:00.000Z",
       "amt": 100,
       "dose": 1,
       "ref": 3,
@@ -2726,7 +5949,7 @@
       "leftRaw": "",
       "doseInterval": 1,
       "doseUnit": "st",
-      "notCalculable": true
+      "notCalculable": false
     },
     "prev": {
       "isOveruse": false,
@@ -2735,23 +5958,969 @@
     },
     "expected": {
       "valid": true,
-      "calculable": false,
-      "isOveruse": false,
+      "calculable": true,
+      "isOveruse": true,
       "isTooEarly": false,
-      "verdictTitle": "Beräkning ej tillämplig",
-      "verdictSub": "Denna beredningsform kan inte kvantifieras automatiskt. Klinisk bedömning krävs.",
-      "metrics": [],
-      "alerts": [
+      "earlyRenewalDecision": null,
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 2.00 st/dag överstiger ordination med >10%.",
+      "metrics": [
         {
-          "type": "info",
-          "title": "Manuell bedömning",
-          "message": "Beredningsformen (t.ex. kräm, lösning för dialys) lämpar sig inte för automatisk förbrukningsberäkning."
+          "label": "Totalt förskrivet",
+          "value": "300 st",
+          "cls": "",
+          "tooltip": "Mängd per uttag × antal uttag. Den totala förskrivna mängden på receptet."
+        },
+        {
+          "label": "Räcker t.o.m.",
+          "value": "2025-11-12 (150 dagar kvar)",
+          "cls": "ok",
+          "tooltip": "Beräknat datum då receptet tar slut vid ordinerad dos. Kvarvarande mängd används enbart för att beräkna snittförbrukning."
+        },
+        {
+          "label": "Snittförbrukning",
+          "value": "2.00 st/dag (20.0 mg/dag)",
+          "cls": "danger",
+          "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
         }
       ],
-      "patientText": "",
-      "patientTextEn": "",
-      "journalText": "",
-      "statusText": "Ej tillämplig"
+      "alerts": [],
+      "tlPct": 50,
+      "tlStart": "2025-01-16",
+      "tlEnd": "2025-11-12",
+      "earlyThreshold": 60,
+      "medRaw": "Testabol 10 mg",
+      "amt": 100,
+      "dose": 1,
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "doseUnitLabel": "st/dag",
+      "pDateStr": "2025-01-16",
+      "total": 300,
+      "remainingDoses": null,
+      "endDateStr": "2025-11-12",
+      "prescribedEndDateStr": "2025-11-12",
+      "daysRemaining": 150,
+      "daysToPrescribedEnd": 150,
+      "displayAvgStr": "2.00 st/dag (20.0 mg/dag)",
+      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "prescribedContactDateStr": "2025-11-05",
+      "prescribedContactIsPast": false
     }
+  },
+  {
+    "name": "validateValues_134",
+    "fn": "validateValues",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "dateVal": "2025-01-01",
+      "doseRaw": "1,5",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": ""
+    },
+    "expected": {
+      "valid": true,
+      "fieldErrors": {
+        "medInput": "",
+        "dateInput": "",
+        "doseInput": "",
+        "amtInput": "",
+        "refInput": "",
+        "leftInput": ""
+      },
+      "medRaw": "Test 10 mg",
+      "dateVal": "2025-01-01",
+      "pDate": "2025-01-01T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1.5,
+      "ref": 3,
+      "remaining": null,
+      "doseRaw": "1,5",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    }
+  },
+  {
+    "name": "validateValues_135",
+    "fn": "validateValues",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "dateVal": "2025-01-01",
+      "doseRaw": "1",
+      "amtRaw": "1",
+      "refRaw": "1",
+      "leftRaw": ""
+    },
+    "expected": {
+      "valid": true,
+      "fieldErrors": {
+        "medInput": "",
+        "dateInput": "",
+        "doseInput": "",
+        "amtInput": "",
+        "refInput": "",
+        "leftInput": ""
+      },
+      "medRaw": "Test 10 mg",
+      "dateVal": "2025-01-01",
+      "pDate": "2025-01-01T00:00:00.000Z",
+      "amt": 1,
+      "dose": 1,
+      "ref": 1,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "1",
+      "refRaw": "1",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    }
+  },
+  {
+    "name": "validateValues_136",
+    "fn": "validateValues",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "dateVal": "2025-01-01",
+      "doseRaw": "1",
+      "amtRaw": "10000",
+      "refRaw": "1",
+      "leftRaw": ""
+    },
+    "expected": {
+      "valid": true,
+      "fieldErrors": {
+        "medInput": "",
+        "dateInput": "",
+        "doseInput": "",
+        "amtInput": "",
+        "refInput": "",
+        "leftInput": ""
+      },
+      "medRaw": "Test 10 mg",
+      "dateVal": "2025-01-01",
+      "pDate": "2025-01-01T00:00:00.000Z",
+      "amt": 10000,
+      "dose": 1,
+      "ref": 1,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "10000",
+      "refRaw": "1",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    }
+  },
+  {
+    "name": "validateValues_137",
+    "fn": "validateValues",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "dateVal": "2025-01-01",
+      "doseRaw": "1",
+      "amtRaw": "10001",
+      "refRaw": "1",
+      "leftRaw": ""
+    },
+    "expected": {
+      "valid": false,
+      "reason": "incomplete",
+      "fieldErrors": {
+        "medInput": "",
+        "dateInput": "",
+        "doseInput": "",
+        "amtInput": "Ange ett heltal mellan 1 och 10 000.",
+        "refInput": "",
+        "leftInput": ""
+      }
+    }
+  },
+  {
+    "name": "validateValues_138",
+    "fn": "validateValues",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "dateVal": "2025-01-01",
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "0"
+    },
+    "expected": {
+      "valid": true,
+      "fieldErrors": {
+        "medInput": "",
+        "dateInput": "",
+        "doseInput": "",
+        "amtInput": "",
+        "refInput": "",
+        "leftInput": ""
+      },
+      "medRaw": "Test 10 mg",
+      "dateVal": "2025-01-01",
+      "pDate": "2025-01-01T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 3,
+      "remaining": 0,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": "0",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    }
+  },
+  {
+    "name": "validateValues_139",
+    "fn": "validateValues",
+    "args": {
+      "medRaw": "",
+      "dateVal": "2025-01-01",
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "3",
+      "leftRaw": ""
+    },
+    "expected": {
+      "valid": false,
+      "reason": "incomplete",
+      "fieldErrors": {
+        "medInput": "",
+        "dateInput": "",
+        "doseInput": "",
+        "amtInput": "",
+        "refInput": "",
+        "leftInput": ""
+      }
+    }
+  },
+  {
+    "name": "validateValues_140",
+    "fn": "validateValues",
+    "args": {
+      "medRaw": "Test 10 mg",
+      "dateVal": "2025-01-01",
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": ""
+    },
+    "expected": {
+      "valid": true,
+      "fieldErrors": {
+        "medInput": "",
+        "dateInput": "",
+        "doseInput": "",
+        "amtInput": "",
+        "refInput": "",
+        "leftInput": ""
+      },
+      "medRaw": "Test 10 mg",
+      "dateVal": "2025-01-01",
+      "pDate": "2025-01-01T00:00:00.000Z",
+      "amt": 100,
+      "dose": 1,
+      "ref": 1,
+      "remaining": null,
+      "doseRaw": "1",
+      "amtRaw": "100",
+      "refRaw": "1",
+      "leftRaw": "",
+      "doseInterval": 1,
+      "doseUnit": "st",
+      "notCalculable": false
+    }
+  },
+  {
+    "name": "remainingDosesNote_141",
+    "fn": "remainingDosesNote",
+    "args": [
+      {
+        "remainingDoses": null
+      }
+    ],
+    "expected": ""
+  },
+  {
+    "name": "remainingDosesNote_142",
+    "fn": "remainingDosesNote",
+    "args": [
+      {
+        "remainingDoses": 30,
+        "daysRemaining": 30
+      }
+    ],
+    "expected": " Vid förnyelse framkommer att patienten har 30 st (30 dagar) kvar."
+  },
+  {
+    "name": "remainingDosesNote_143",
+    "fn": "remainingDosesNote",
+    "args": [
+      {
+        "remainingDoses": 0,
+        "daysRemaining": 0
+      }
+    ],
+    "expected": " Vid förnyelse framkommer att patienten uppger att medicinen är slut."
+  },
+  {
+    "name": "buildPatientText_144",
+    "fn": "buildPatientText",
+    "args": [
+      "sv",
+      [],
+      [],
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      1
+    ],
+    "expected": "Hej,\n\nVi har tagit emot din förfrågan om receptförnyelse för Elvanse 50 mg. Utifrån föregående recept beräknades medicinen räcka till den 2025-09-01. Vi har granskat förfrågan och kan tyvärr inte förnya receptet vid detta tillfälle. Medicinen beräknas ta slut inom kort — vänligen hör av dig igen så hjälper vi dig.\n\nVid frågor är du välkommen att kontakta oss via 1177."
+  },
+  {
+    "name": "buildPatientText_145",
+    "fn": "buildPatientText",
+    "args": [
+      "sv",
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      [],
+      [
+        {
+          "name": "Melatonin 3 mg",
+          "i": 1
+        }
+      ],
+      2
+    ],
+    "expected": "Hej,\n\nVi har tagit emot din förfrågan om receptförnyelse för följande läkemedel:\n\nElvanse 50 mg: Vi förnyar ditt recept inom 2–3 arbetsdagar.\nMelatonin 3 mg: Beräknades räcka till 2025-01-01. Receptet kan nu förnyas — kontakta oss igen.\n\nVid frågor är du välkommen att kontakta oss via 1177."
+  },
+  {
+    "name": "buildPatientText_146",
+    "fn": "buildPatientText",
+    "args": [
+      "sv",
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      [],
+      [
+        {
+          "name": "Melatonin 3 mg",
+          "i": 1
+        }
+      ],
+      2
+    ],
+    "expected": "Hej,\n\nVi har tagit emot din förfrågan om receptförnyelse för följande läkemedel:\n\nElvanse 50 mg: Vi förnyar ditt recept inom 2–3 arbetsdagar.\nMelatonin 3 mg: Beräknades räcka till 2025-09-01 — kan tyvärr inte förnyas vid detta tillfälle. Medicinen beräknas ta slut inom kort — hör av dig igen.\n\nVid frågor är du välkommen att kontakta oss via 1177."
+  },
+  {
+    "name": "buildPatientText_147",
+    "fn": "buildPatientText",
+    "args": [
+      "sv",
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      [],
+      [
+        {
+          "name": "Melatonin 3 mg",
+          "i": 1
+        }
+      ],
+      2
+    ],
+    "expected": "Hej,\n\nVi har tagit emot din förfrågan om receptförnyelse för följande läkemedel:\n\nElvanse 50 mg: Vi förnyar ditt recept inom 2–3 arbetsdagar.\nMelatonin 3 mg: Beräknades räcka till 2025-10-01 — kan tyvärr inte förnyas vid detta tillfälle. Hör av dig närmre 2025-09-24.\n\nVid frågor är du välkommen att kontakta oss via 1177."
+  },
+  {
+    "name": "remainingDosesNote_149",
+    "fn": "remainingDosesNote",
+    "args": [
+      {
+        "_cardId": 1,
+        "medRaw": "Elvanse 50 mg",
+        "pDateStr": "2024-09-28",
+        "total": 300,
+        "dose": 1,
+        "prescribedEndDateStr": "2025-06-25",
+        "displayAvgStr": "1.00 st/dag",
+        "avgNote": "(beräknat under antagandet att alla tillgängliga doser är förbrukade)",
+        "remainingDoses": null,
+        "daysRemaining": 10,
+        "daysToPrescribedEnd": 10,
+        "earlyRenewalDecision": null
+      }
+    ],
+    "expected": ""
+  },
+  {
+    "name": "buildJournalText_149",
+    "fn": "buildJournalText",
+    "args": [
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      [],
+      [
+        {
+          "name": "Melatonin 3 mg",
+          "i": 1
+        }
+      ],
+      2
+    ],
+    "expected": "Kontaktorsak: Receptförnyelse via 1177 (flera läkemedel).\n\nElvanse 50 mg: Utfärdat 2024-09-28 (300 st, 1 st/dag). Räcker t.o.m. 2025-06-25. Snitt: 1.00 st/dag. Åtgärd: Förnyat.\n\nMelatonin 3 mg: Utfärdat 2024-09-28 (300 st, 1 st/dag). Borde räcka t.o.m. 2025-09-01. Räcker ytterligare 78 dagar. Snitt: 1.00 st/dag. Åtgärd: Ej förnyat efter klinisk, individuell bedömning.\n\nRecept utfärdat för: Elvanse 50 mg. Svar skickat via 1177."
+  },
+  {
+    "name": "buildJournalText_150",
+    "fn": "buildJournalText",
+    "args": [
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0,
+          "earlyRenewal": "overuse"
+        }
+      ],
+      [],
+      [],
+      2
+    ],
+    "expected": "Kontaktorsak: Receptförnyelse via 1177 (flera läkemedel).\n\nElvanse 50 mg: Utfärdat 2024-09-28 (300 st, 1 st/dag). Borde räcka t.o.m. 2025-06-25. Snitt: 1.80 st/dag — överstiger ordination. Åtgärd: Förnyat efter klinisk, individuell bedömning.\n\nRecept utfärdat för: Elvanse 50 mg. Svar skickat via 1177."
+  },
+  {
+    "name": "remainingDosesNote_152",
+    "fn": "remainingDosesNote",
+    "args": [
+      {
+        "_cardId": 1,
+        "medRaw": "Elvanse 50 mg",
+        "pDateStr": "2024-09-28",
+        "total": 300,
+        "dose": 1,
+        "prescribedEndDateStr": "2025-09-01",
+        "displayAvgStr": "1.00 st/dag",
+        "avgNote": "(beräknat under antagandet att alla tillgängliga doser är förbrukade)",
+        "remainingDoses": null,
+        "daysRemaining": 10,
+        "daysToPrescribedEnd": 78,
+        "earlyRenewalDecision": null
+      }
+    ],
+    "expected": ""
+  },
+  {
+    "name": "buildJournalText_152",
+    "fn": "buildJournalText",
+    "args": [
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0,
+          "earlyRenewal": "tooEarly"
+        }
+      ],
+      [],
+      [],
+      2
+    ],
+    "expected": "Kontaktorsak: Receptförnyelse via 1177 (flera läkemedel).\n\nElvanse 50 mg: Utfärdat 2024-09-28 (300 st, 1 st/dag). Räcker t.o.m. 2025-09-01. Snitt: 1.00 st/dag. Åtgärd: Förnyat efter klinisk, individuell bedömning (78d kvar av receptperiod).\n\nRecept utfärdat för: Elvanse 50 mg. Svar skickat via 1177."
+  },
+  {
+    "name": "buildJournalText_153",
+    "fn": "buildJournalText",
+    "args": [
+      [],
+      [],
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      2
+    ],
+    "expected": "Kontaktorsak: Receptförnyelse via 1177 (flera läkemedel).\n\nElvanse 50 mg: Utfärdat 2024-09-28 (300 st, 1 st/dag). Borde räcka t.o.m. 2025-09-01. Vid förnyelse framkommer att patienten har 30 st (30 dagar) kvar. Snitt: 1.00 st/dag. Åtgärd: [Nytt recept utfärdat / Ej utfärdat — motivering]\n\nInga recept utfärdade. Svar skickat via 1177."
+  },
+  {
+    "name": "buildPatientText_154",
+    "fn": "buildPatientText",
+    "args": [
+      "sv",
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      [],
+      [],
+      1,
+      {
+        "0": "2026-12-10"
+      }
+    ],
+    "expected": "Hej,\n\nVi har tagit emot din förfrågan om receptförnyelse för Elvanse 50 mg och kommer att förnya ditt recept inom 2–3 arbetsdagar så att läkemedlet räcker till och med 2026-12-10. Du kan därefter hämta ut din medicin på valfritt apotek.\n\nVid frågor är du välkommen att kontakta oss via 1177."
+  },
+  {
+    "name": "buildPatientText_155",
+    "fn": "buildPatientText",
+    "args": [
+      "sv",
+      [
+        {
+          "name": "Sertralin 50 mg",
+          "i": 0
+        },
+        {
+          "name": "Voxra 300 mg",
+          "i": 1
+        }
+      ],
+      [],
+      [],
+      2,
+      {
+        "0": "2026-12-10",
+        "1": "2026-12-10"
+      }
+    ],
+    "expected": "Hej,\n\nVi har tagit emot din förfrågan om receptförnyelse för följande läkemedel:\n\nSertralin 50 mg: Vi förnyar ditt recept inom 2–3 arbetsdagar så att läkemedlet räcker till och med 2026-12-10.\nVoxra 300 mg: Vi förnyar ditt recept inom 2–3 arbetsdagar så att läkemedlet räcker till och med 2026-12-10.\n\nVid frågor är du välkommen att kontakta oss via 1177."
+  },
+  {
+    "name": "buildPatientText_156",
+    "fn": "buildPatientText",
+    "args": [
+      "en",
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      [],
+      [],
+      1,
+      {
+        "0": "2026-12-10"
+      }
+    ],
+    "expected": "Hello,\n\nWe have received your prescription renewal request for Elvanse 50 mg and will renew your prescription within 2–3 working days so that the medication lasts until 2026-12-10. You can then collect your medication at any pharmacy.\n\nIf you have questions, please contact us through 1177."
+  },
+  {
+    "name": "buildPatientText_157",
+    "fn": "buildPatientText",
+    "args": [
+      "en",
+      [
+        {
+          "name": "Sertralin 50 mg",
+          "i": 0
+        },
+        {
+          "name": "Voxra 300 mg",
+          "i": 1
+        }
+      ],
+      [],
+      [],
+      2,
+      {
+        "0": "2026-12-10",
+        "1": "2026-12-10"
+      }
+    ],
+    "expected": "Hello,\n\nWe have received your prescription renewal request for the following medications:\n\nSertralin 50 mg: We will renew your prescription within 2–3 working days so that the medication lasts until 2026-12-10.\nVoxra 300 mg: We will renew your prescription within 2–3 working days so that the medication lasts until 2026-12-10.\n\nIf you have questions, please contact us through 1177."
+  },
+  {
+    "name": "buildPatientText_158",
+    "fn": "buildPatientText",
+    "args": [
+      "sv",
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      [],
+      [],
+      1
+    ],
+    "expected": "Hej,\n\nVi har tagit emot din förfrågan om receptförnyelse för Elvanse 50 mg och kommer att förnya ditt recept inom 2–3 arbetsdagar. Du kan därefter hämta ut din medicin på valfritt apotek.\n\nVid frågor är du välkommen att kontakta oss via 1177."
+  },
+  {
+    "name": "remainingDosesNote_160",
+    "fn": "remainingDosesNote",
+    "args": [
+      {
+        "_cardId": 1,
+        "medRaw": "Sertralin 50 mg",
+        "pDateStr": "2024-09-28",
+        "total": 300,
+        "dose": 1,
+        "prescribedEndDateStr": "2025-06-25",
+        "displayAvgStr": "1.00 st/dag",
+        "avgNote": "(beräknat under antagandet att alla tillgängliga doser är förbrukade)",
+        "remainingDoses": null,
+        "daysRemaining": 10,
+        "daysToPrescribedEnd": 10,
+        "earlyRenewalDecision": null
+      }
+    ],
+    "expected": ""
+  },
+  {
+    "name": "remainingDosesNote_161",
+    "fn": "remainingDosesNote",
+    "args": [
+      {
+        "_cardId": 2,
+        "medRaw": "Voxra 300 mg",
+        "pDateStr": "2024-09-28",
+        "total": 300,
+        "dose": 1,
+        "prescribedEndDateStr": "2025-06-25",
+        "displayAvgStr": "1.00 st/dag",
+        "avgNote": "(beräknat under antagandet att alla tillgängliga doser är förbrukade)",
+        "remainingDoses": null,
+        "daysRemaining": 10,
+        "daysToPrescribedEnd": 10,
+        "earlyRenewalDecision": null
+      }
+    ],
+    "expected": ""
+  },
+  {
+    "name": "buildJournalText_161",
+    "fn": "buildJournalText",
+    "args": [
+      [
+        {
+          "name": "Sertralin 50 mg",
+          "i": 0
+        },
+        {
+          "name": "Voxra 300 mg",
+          "i": 1
+        }
+      ],
+      [],
+      [],
+      2,
+      {
+        "0": "2026-12-10",
+        "1": "2026-12-10"
+      }
+    ],
+    "expected": "Kontaktorsak: Receptförnyelse via 1177 (flera läkemedel).\n\nSertralin 50 mg: Utfärdat 2024-09-28 (300 st, 1 st/dag). Räcker t.o.m. 2025-06-25. Snitt: 1.00 st/dag. Åtgärd: Förnyat.\n\nVoxra 300 mg: Utfärdat 2024-09-28 (300 st, 1 st/dag). Räcker t.o.m. 2025-06-25. Snitt: 1.00 st/dag. Åtgärd: Förnyat.\n\nRecept utfärdat för: Sertralin 50 mg fram till och med 2026-12-10, Voxra 300 mg fram till och med 2026-12-10. Svar skickat via 1177."
+  },
+  {
+    "name": "remainingDosesNote_163",
+    "fn": "remainingDosesNote",
+    "args": [
+      {
+        "_cardId": 1,
+        "medRaw": "Elvanse 50 mg",
+        "pDateStr": "2024-09-28",
+        "total": 300,
+        "dose": 1,
+        "prescribedEndDateStr": "2025-06-25",
+        "displayAvgStr": "1.00 st/dag",
+        "avgNote": "(beräknat under antagandet att alla tillgängliga doser är förbrukade)",
+        "remainingDoses": null,
+        "daysRemaining": 10,
+        "daysToPrescribedEnd": 10,
+        "earlyRenewalDecision": null
+      }
+    ],
+    "expected": ""
+  },
+  {
+    "name": "buildJournalText_163",
+    "fn": "buildJournalText",
+    "args": [
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      [],
+      [],
+      1
+    ],
+    "expected": "Kontaktorsak: Receptförnyelse via 1177.\n\nBedömning: Patienten begär förnyelse av Elvanse 50 mg. Senaste receptet utfärdades 2024-09-28 (totalt 300 st, ordination 1 st/dag) och beräknas räcka till 2025-06-25.\nFörbrukning bedöms vara enligt ordination (snittförbrukning: 1.00 st/dag (beräknat under antagandet att alla tillgängliga doser är förbrukade)).\n\nÅtgärd: Nytt recept utfärdat. Svar skickat till patient via 1177."
+  },
+  {
+    "name": "remainingDosesNote_165",
+    "fn": "remainingDosesNote",
+    "args": [
+      {
+        "_cardId": 1,
+        "medRaw": "Elvanse 50 mg",
+        "pDateStr": "2024-09-28",
+        "total": 300,
+        "dose": 1,
+        "prescribedEndDateStr": "2025-06-25",
+        "displayAvgStr": "1.00 st/dag",
+        "avgNote": "(beräknat under antagandet att alla tillgängliga doser är förbrukade)",
+        "remainingDoses": null,
+        "daysRemaining": 10,
+        "daysToPrescribedEnd": 10,
+        "earlyRenewalDecision": null
+      }
+    ],
+    "expected": ""
+  },
+  {
+    "name": "buildJournalText_165",
+    "fn": "buildJournalText",
+    "args": [
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0
+        }
+      ],
+      [],
+      [],
+      1,
+      {
+        "0": "2026-12-10"
+      }
+    ],
+    "expected": "Kontaktorsak: Receptförnyelse via 1177.\n\nBedömning: Patienten begär förnyelse av Elvanse 50 mg. Senaste receptet utfärdades 2024-09-28 (totalt 300 st, ordination 1 st/dag) och beräknas räcka till 2025-06-25.\nFörbrukning bedöms vara enligt ordination (snittförbrukning: 1.00 st/dag (beräknat under antagandet att alla tillgängliga doser är förbrukade)).\n\nÅtgärd: Nytt recept utfärdat (räcker t.o.m. 2026-12-10). Svar skickat till patient via 1177."
+  },
+  {
+    "name": "remainingDosesNote_167",
+    "fn": "remainingDosesNote",
+    "args": [
+      {
+        "_cardId": 1,
+        "medRaw": "Elvanse 50 mg",
+        "pDateStr": "2024-09-28",
+        "total": 300,
+        "dose": 1,
+        "prescribedEndDateStr": "2025-01-01",
+        "displayAvgStr": "1.50 st/dag",
+        "avgNote": "(beräknat under antagandet att alla tillgängliga doser är förbrukade)",
+        "remainingDoses": null,
+        "daysRemaining": 10,
+        "daysToPrescribedEnd": 10,
+        "earlyRenewalDecision": null
+      }
+    ],
+    "expected": ""
+  },
+  {
+    "name": "buildJournalText_167",
+    "fn": "buildJournalText",
+    "args": [
+      [
+        {
+          "name": "Elvanse 50 mg",
+          "i": 0,
+          "earlyRenewal": "overuse"
+        }
+      ],
+      [],
+      [],
+      1,
+      {
+        "0": "2026-12-10"
+      }
+    ],
+    "expected": "Kontaktorsak: Receptförnyelse via 1177.\n\nBedömning: Patienten begär förnyelse av Elvanse 50 mg. Senaste receptet utfärdades 2024-09-28 (totalt 300 st, ordination 1 st/dag) och borde räcka till 2025-01-01.\nBeräknad snittförbrukning: 1.50 st/dag (beräknat under antagandet att alla tillgängliga doser är förbrukade) — överstiger ordination. Receptet förnyas på klinisk indikation efter individuell bedömning.\n\nÅtgärd: Nytt recept utfärdat (räcker t.o.m. 2026-12-10). Svar skickat till patient via 1177."
+  },
+  {
+    "name": "buildNurseJournalText_168",
+    "fn": "buildNurseJournalText",
+    "args": [
+      [
+        {
+          "_cardId": 8,
+          "medRaw": "Elvanse 50 mg",
+          "pDateStr": "2024-09-28",
+          "total": 300,
+          "dose": 1,
+          "prescribedEndDateStr": "2025-06-25",
+          "displayAvgStr": "1.00 st/dag",
+          "avgNote": "(beräknat under antagandet att alla tillgängliga doser är förbrukade)",
+          "remainingDoses": null,
+          "daysRemaining": 10,
+          "daysToPrescribedEnd": 10,
+          "earlyRenewalDecision": null,
+          "valid": true,
+          "calculable": true,
+          "medNameStripped": "Elvanse 50 mg",
+          "isOveruse": true
+        }
+      ]
+    ],
+    "expected": ""
+  },
+  {
+    "name": "buildNurseJournalText_169",
+    "fn": "buildNurseJournalText",
+    "args": [
+      [
+        {
+          "_cardId": 8,
+          "medRaw": "Elvanse 50 mg",
+          "pDateStr": "2024-09-28",
+          "total": 300,
+          "dose": 1,
+          "prescribedEndDateStr": "2025-06-25",
+          "displayAvgStr": "1.00 st/dag",
+          "avgNote": "(beräknat under antagandet att alla tillgängliga doser är förbrukade)",
+          "remainingDoses": null,
+          "daysRemaining": 10,
+          "daysToPrescribedEnd": 10,
+          "earlyRenewalDecision": null,
+          "valid": true,
+          "calculable": true,
+          "medNameStripped": "Elvanse 50 mg",
+          "isOveruse": true
+        }
+      ]
+    ],
+    "expected": "Patient önskar förnyelse av Elvanse 50 mg.\nVid bedömningen bedöms patientens nuvarande Elvanse 50 mg räcka till och med 2025-06-25.\nPatientens vitalparametrar och medicinska uppföljning bedöms adekvata.\nLägger receptärendet till läkare för slutlig bedömning."
+  },
+  {
+    "name": "buildNurseJournalText_170",
+    "fn": "buildNurseJournalText",
+    "args": [
+      [
+        {
+          "_cardId": 8,
+          "medRaw": "Elvanse 50 mg",
+          "pDateStr": "2024-09-28",
+          "total": 300,
+          "dose": 1,
+          "prescribedEndDateStr": "2025-06-25",
+          "displayAvgStr": "1.00 st/dag",
+          "avgNote": "(beräknat under antagandet att alla tillgängliga doser är förbrukade)",
+          "remainingDoses": null,
+          "daysRemaining": 10,
+          "daysToPrescribedEnd": 10,
+          "earlyRenewalDecision": null,
+          "valid": true,
+          "calculable": true,
+          "medNameStripped": "Elvanse 50 mg",
+          "isOveruse": true
+        }
+      ]
+    ],
+    "expected": "Patient önskar förnyelse av Elvanse 50 mg.\nVid bedömningen bedöms patientens nuvarande Elvanse 50 mg räcka till och med 2025-06-25.\nPatientens vitalparametrar och medicinska uppföljning bedöms vara avvikande.\nLägger receptärendet till läkare för slutlig bedömning."
+  },
+  {
+    "name": "buildNurseJournalText_171",
+    "fn": "buildNurseJournalText",
+    "args": [
+      [
+        {
+          "_cardId": 8,
+          "medRaw": "Elvanse 50 mg",
+          "pDateStr": "2024-09-28",
+          "total": 300,
+          "dose": 1,
+          "prescribedEndDateStr": "2025-06-25",
+          "displayAvgStr": "1.00 st/dag",
+          "avgNote": "(beräknat under antagandet att alla tillgängliga doser är förbrukade)",
+          "remainingDoses": null,
+          "daysRemaining": 10,
+          "daysToPrescribedEnd": 10,
+          "earlyRenewalDecision": null,
+          "valid": true,
+          "calculable": true,
+          "medNameStripped": "Elvanse 50 mg",
+          "isOveruse": true
+        }
+      ]
+    ],
+    "expected": "Patient önskar förnyelse av Elvanse 50 mg.\nVid bedömningen bedöms patientens nuvarande Elvanse 50 mg räcka till och med 2025-06-25.\nPatientens vitalparametrar bedöms vara avvikande.\nLägger receptärendet till läkare för slutlig bedömning."
+  },
+  {
+    "name": "buildNurseJournalText_172",
+    "fn": "buildNurseJournalText",
+    "args": [
+      [
+        {
+          "_cardId": 8,
+          "medRaw": "Elvanse 50 mg",
+          "pDateStr": "2024-09-28",
+          "total": 300,
+          "dose": 1,
+          "prescribedEndDateStr": "2025-06-25",
+          "displayAvgStr": "1.00 st/dag",
+          "avgNote": "(beräknat under antagandet att alla tillgängliga doser är förbrukade)",
+          "remainingDoses": null,
+          "daysRemaining": 10,
+          "daysToPrescribedEnd": 10,
+          "earlyRenewalDecision": null,
+          "valid": true,
+          "calculable": true,
+          "medNameStripped": "Elvanse 50 mg",
+          "isOveruse": true
+        }
+      ]
+    ],
+    "expected": "Patient önskar förnyelse av Elvanse 50 mg, Sertralin 50 mg.\nVid bedömningen bedöms patientens nuvarande Elvanse 50 mg räcka till och med 2025-06-25 och Sertralin 50 mg räcka till och med 2025-06-25.\nPatientens vitalparametrar och medicinska uppföljning bedöms adekvata.\nLägger receptärendet till läkare för slutlig bedömning."
+  },
+  {
+    "name": "buildNurseJournalText_173",
+    "fn": "buildNurseJournalText",
+    "args": [
+      [
+        {
+          "_cardId": 8,
+          "medRaw": "Elvanse 50 mg",
+          "pDateStr": "2024-09-28",
+          "total": 300,
+          "dose": 1,
+          "prescribedEndDateStr": "2025-06-25",
+          "displayAvgStr": "1.00 st/dag",
+          "avgNote": "(beräknat under antagandet att alla tillgängliga doser är förbrukade)",
+          "remainingDoses": null,
+          "daysRemaining": 10,
+          "daysToPrescribedEnd": 10,
+          "earlyRenewalDecision": null,
+          "valid": true,
+          "calculable": true,
+          "medNameStripped": "Elvanse 50 mg",
+          "isOveruse": true
+        }
+      ]
+    ],
+    "expected": "Patient önskar förnyelse av Elvanse 50 mg.\nVid bedömningen bedöms patientens nuvarande Elvanse 50 mg räcka till och med 2025-06-25 utifrån tidigare förskrivning.\nPatientens vitalparametrar och medicinska uppföljning bedöms adekvata.\nLägger receptärendet till läkare för slutlig bedömning."
   }
 ]

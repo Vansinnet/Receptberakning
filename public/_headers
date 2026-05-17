@@ -1,0 +1,43 @@
+# ⚠ /* på nästa rad är en Cloudflare URL-glob (matchar alla rotnivåfiler) — radera den ej
+/*
+  # Förhindrar MIME-sniffing (browser tolkar aldrig CSS/JS som HTML)
+  X-Content-Type-Options: nosniff
+
+  # Tvingar HTTPS och instruerar webbläsaren att minnas det i 2 år
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+
+  # Skickar ingen Referer-header till externa sidor (t.ex. FASS-länkar)
+  Referrer-Policy: no-referrer
+
+  # Stänger av webbläsarfunktioner som verktyget inte behöver
+  # Inkluderar moderna fingerprinting- och spårnings-APIs
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=(), accelerometer=(), autoplay=(), display-capture=(), fullscreen=(), gyroscope=(), magnetometer=(), midi=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), xr-spatial-tracking=(), identity-credentials-get=()
+
+  # Förhindrar att sidan bäddas in i en iframe (clickjacking-skydd)
+  X-Frame-Options: DENY
+
+  # Content Security Policy som HTTP-header (starkare än <meta>-taggen i HTML)
+  # require-trusted-types-for blockerar DOM-baserad XSS på webbläsarnivå
+  # B1: connect-src 'self' ersätter 'none' för att tillåta fetch('drugs.json')
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+
+  # Isolerar fönstret från cross-origin-kontexter — skyddar mot Spectre-liknande sidokanalsattacker
+  Cross-Origin-Opener-Policy: same-origin
+
+  # Förhindrar att resurser på sidan laddas in av externa ursprung utan explicit tillstånd
+  Cross-Origin-Resource-Policy: same-origin
+
+  # Kräver att alla inladdade resurser explicit tillåter cross-origin-delning (CORP-header)
+  Cross-Origin-Embedder-Policy: require-corp
+
+  # Förhindrar DNS-prefetch på utgående länkar (FASS) — undviker DNS-läckage
+  X-DNS-Prefetch-Control: off
+
+  # Blockar cross-domain-förfrågningar från Adobe Flash/PDF (defense-in-depth)
+  X-Permitted-Cross-Domain-Policies: none
+
+# Strikt cache-policy för HTML-dokumentet
+/
+  Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0
+  Pragma: no-cache
+  Expires: 0
