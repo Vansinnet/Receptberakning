@@ -1,4 +1,4 @@
-﻿# Receptberäkning
+﻿# Receptberäkning 4.0
 
 > Beräkningshjälpmedel för läkare vid handläggning av receptförnyelser via 1177, nyförskrivning samt analys av långvarig förbrukning.
 
@@ -26,12 +26,12 @@ För överförbrukning eller för tidig förnyelse kan läkaren **aktivt överst
 
 För varje läkemedel genereras direkt:
 - **Svar till patient (svenska)** – redo att skickas via 1177.
-- **Svar till patient (engelska)** – växla med en knapp.
+- **Svar till patient (engelska)** – växla med en knapp (inklusiva SVG-flaggor).
 - **Journalanteckning (förslag)** – anpassad efter bedömningen.
 
-Stöd för upp till **8 läkemedel** i samma session – en sammanhållen patienttext och journalanteckning skapas för alla.
+Stöd för upp till **8 läkemedel** i samma session — en sammanhållen patienttext och journalanteckning skapas för alla.
 
-Vid flera läkemedel analyseras automatiskt **läkemedelsinteraktioner** — 77 regler baserade på ATC-koder som varnar för bland annat serotonergt syndrom, blödningsrisk, QT-förlängning och dubbelbehandling. Varningarna graderas som danger (röd) eller warn (gul) och visas ovanför beräkningsresultatet.
+Vid flera läkemedel analyseras automatiskt **läkemedelsinteraktioner** — 89 regler baserade på ATC-koder som varnar för bland annat serotonergt syndrom, blödningsrisk, QT-förlängning och dubbelbehandling. Varningarna graderas som danger (röd) eller warn (gul) och visas ovanför beräkningsresultatet.
 
 När förnyelse beviljas visas en **nyförskrivningspanel** — läkaren anger förskrivningsperiod (1–12 månader eller slutdatum) och verktyget beräknar exakt antal förpackningar med hänsyn till kvarvarande dagar på befintligt recept.
 
@@ -49,7 +49,7 @@ Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder
 
 ### ✅ Receptförnyelse
 - Stöd för upp till **8 läkemedel**.
-- **Autocomplete** för läkemedelsnamn – sök bland ~6 000 preparat ur FASS.
+- **Autocomplete** för läkemedelsnamn – sök bland ~8 300 preparat ur FASS.
 - **Automatisk datumformatering** (ÅÅÅÅ-MM-DD).
 - **Dosintervall** – per dag, per vecka (t.ex. plåster, veckodepåer) eller per månad (t.ex. månadsdepåer, implantat).
 - **Dosenheter** – st (tabletter, kapslar, plåster), ml (orala lösningar, injektioner), doser (inhalatorer, nässprayer, ögondroppar, injektionspennor).
@@ -60,11 +60,11 @@ Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder
 - **Tidslinje** – visar hur stor del av receptperioden som förflutit.
 - **Mätvärden** med verktygstips (totalt förskrivet, slutdatum, snittförbrukning i aktuell enhet).
 - **Alerter** – varning vid låg förbrukning, förhöjd förbrukning inom 7 dagar, tidig uthämtning, avvikande data.
-- **Kliniskt överstyrande** – vid överförbrukning eller för tidig begäran kan läkaren manuellt godkänna förnyelse (Ja/Nej).
-- **Svar till patient på svenska och engelska** – växla med en knapp, ingen översättningstjänst krävs.
+- **Kliniskt överstyrande** – vid överförbrukning eller för tidig begäran kan läkaren manuellt godkänna förnyelse (Ja/Nej). Beslutet bevaras vid kortväxling.
+- **Svar till patient på svenska och engelska** – växla med SVG-flaggor, ingen översättningstjänst krävs.
 - **Journalanteckning** – anpassas efter förnyelsebeslut och klinisk bedömning.
-- **Interaktionsvarningar** – 77 regler fördelade på 10 kategorier: serotonergt syndrom, blödningsrisk, hyperkalemi, bradykardi/AV-block, smal terapeutisk bredd, CYP-interaktioner, QT-förlängning, triple whammy, psykofarmaka och övriga. Varningarna graderas danger/warn med beskrivning och åtgärdsrekommendation.
-- **Kopieringsknappar** – för snabb inklistring i journalsystem/1177.
+- **Interaktionsvarningar** – 89 regler fördelade på kategorier: serotonergt syndrom, blödningsrisk, hyperkalemi, bradykardi/AV-block, smal terapeutisk bredd, CYP-interaktioner, QT-förlängning, triple whammy, psykofarmaka och övriga. Varningarna graderas danger/warn med beskrivning och åtgärdsrekommendation.
+- **Kopieringsknappar** – för snabb inklistring i journalsystem/1177. Tillfällig bekräftelsetext ("✅ Text kopierad till urklipp.") visas i 2 sekunder.
 
 ### 📦 Nyförskrivning
 - Välj periodlängd via **månadsväljare** (1–12 månader) eller **angivet slutdatum**.
@@ -78,7 +78,6 @@ Valfri kolumn som möjliggör dokumentation av sjuksköterskans kliniska bedömn
 
 ### 📊 Långvarig förbrukning
 - **Upp till 10 perioder** – lägg till/ta bort efter behov.
-- Förvalda datum: start = ett år tillbaka, slut = idag.
 - Validering av datum (start < slut, inga framtida datum).
 - Hanterar **överlappande perioder** via datumunion för korrekt totaldygnsberäkning.
 - **Stapeldiagram** – relativ förbrukning (0–150 % av ordination).
@@ -89,9 +88,8 @@ Valfri kolumn som möjliggör dokumentation av sjuksköterskans kliniska bedömn
 - All patientdata stannar **enbart i webbläsarens minne** – skickas aldrig till någon server.
 - **Automatisk rensning** efter 23 minuters inaktivitet (varning efter 22 min) – anpassat för delade kliniska datorer.
 - Endast temainställningen sparas i `localStorage`.
-- **Content Security Policy** blockerar alla externa nätverksanrop.
-- **Inga externa bibliotek** – ren HTML/CSS/JavaScript.
-- **Trusted Types** enforced för skydd mot DOM-baserade XSS-attacker.
+- **Content Security Policy** blockerar alla externa nätverksanrop. `connect-src 'self'` tillåter fetch av `drugs.json` från samma origin.
+- **Inga externa bibliotek i runtime** – Svelte 5 kompileras bort vid build.
 - Data rensas vid `pagehide` (bfcache-säkerhet).
 
 ### 🎨 Utseende
@@ -111,68 +109,73 @@ Tre inbyggda teman som växlas direkt:
 
 ## Teknisk information
 
-- **Ren HTML/CSS/JavaScript** – inga ramverk, inga externa beroenden i produktion.
-- **Modulär arkitektur** (alla filer i `Kod/`):
-  - `index.html` – applikationsskal
-  - `app.css` – all stilmall (tre teman, responsiv design)
-  - `app.js` – orkestrering (eventlyssnare, temahantering, inaktivitetstimer)
-  - `constants.js` – kliniska trösklar och konfiguration (AKTIVT VAL-markerade)
-  - `utils.js` – DOM-hjälpare, datumverktyg, toast, kopiering
-  - `state.js` – centraliserad tillståndshantering
-  - `text-gen.js` – patientbrev, journalanteckning, sjukskötersketext (DOM-fria)
-  - `calc-renew.js` – beräkningskärna för receptförnyelse
-  - `drug-loader.js` – lazy-loadar läkemedelsdata (IndexedDB-cache + fetch)
-  - `drugs.json` + `drug-data.js` – läkemedelsdatabas (~8 300 poster, genereras via generate:drugs)
-  - `interactions.js` – 77 interaktionsregler (handskrivna, ATC-baserade)
-  - `ui-renew.js` – UI-rendering för receptförnyelse (sidebar, formulär, resultatpanel, interaktionsvarningar)
-  - `prescribe.js` – beräkningskärna och UI för nyförskrivning
-   - `longterm.js` – långvarig förbrukning (beräkning + UI)
-   - `test-calc.js` – 158 enhetstester (calcCore, calcLongtermCore, calcPrescribeResult, validateValues, textgenerering)
-   - `test-interactions.js` – 42 enhetstester (atcMatches, CHECK_INTERACTIONS)
-   - `test-ui.js` – 96 UI-tester (renderResultForMed, buildMedList, autocomplete, navigateAutocomplete, prescribePanel)
-   - `test-app.js` – 26 integrationstester (clearCurrentCard, addMedCard, executeClearAll, recalcOnDateChange, spliceMedCard, nurse-flaggor)
-   - `test-integration.js` – 32 E2E-tester (formulär→calc→DOM, multikort, calcDebounced, interaktionsdetektion, earlyRenewalDecision)
-- Fungerar **helt offline** – öppna bara `index.html` i en webbläsare.
-- **Standardiserad datumhantering** – alla datum hanteras som UTC för att undvika tidszonsproblem.
-- **Rena beräkningsfunktioner** (`calcCore`, `calcLongtermCore`, `calcPrescribeResult`) saknar DOM-beroenden. DOM-skal läser fält, anropar kärnan, renderar resultat.
+- **Svelte 5 + TypeScript** — reaktiva komponenter med `$state`/`$derived`, strict type-checking
+- **Vite** — byggsystem med HMR i dev, tree-shaking och code-splitting i production
+- **Vitest** — 258 enhetstester (208 calc + 42 interactions + 8 property-based)
+- **Playwright** — 32 E2E-tester + 200 fuzz-simuleringar
+- **PWA** — offline-first via `vite-plugin-pwa` + Workbox, precache av alla assets
+
+### Projektstruktur
+```
+src/
+  lib/           — 10 pure-function filer (TypeScript)
+    constants.ts, types.ts, clock.ts, utils.ts,
+    calc.ts, calc-longterm.ts, text-gen.ts,
+    prescribe-calc.ts, interactions.ts, drug-search.ts,
+    state.svelte.ts  — Svelte 5 reaktivt tillståndslager
+  components/    — 9 Svelte-komponenter
+    App.svelte, TopBar.svelte, MedList.svelte,
+    MedCard.svelte, CalcResult.svelte, NurseView.svelte,
+    PrescribePanel.svelte, LongtermPanel.svelte, Alert.svelte
+  app.css        — CSS (global, inga scoped styles)
+  main.ts        — Entrypoint
+public/
+  _headers       — CSP för Cloudflare Pages
+  robots.txt
+  data/          — drugs.json + drugs-version.json
+```
+
+- **Standardiserad datumhantering** — alla datum hanteras som UTC för att undvika tidszonsproblem. `clock.ts` möjliggör mockning i tester.
+- **Rena beräkningsfunktioner** (`calcCore`, `calcLongtermCore`, `calcPrescribeResult`) saknar DOM-beroenden. Verifierade mot 3.0 med 51 golden fixtures (`deep.equal`).
+- **WCAG 2.1 AA** — 0 axe-core violations, 27 passes.
+- **CSP** — strikt Content Security Policy (`style-src 'self'`, `script-src 'self'`, `connect-src 'self'`).
 
 ---
 
 ## Kom igång
 
-**Lokalt:**
-Öppna `Kod/index.html` i valfri webbläsare – ingen installation behövs.
-
 **Utveckling:**
 ```bash
-npm test                  # Kör 354 tester (calc + interactions + UI + app + integration)
-npm run test:calc         # Endast beräkningslogik
-npm run test:interactions # Endast interaktionsmatchningsmotor
-npm run test:ui           # Endast UI-rendering
-npm run test:app          # Endast app.js-integrationstester
-npm run test:integration  # Endast E2E-integrationstester
-npm run build:css          # Minifiera app.css → app.min.css
-npm run build:db           # Crawla FASS och bygg product-db.json (~45 min)
-npm run generate:drugs     # Generera drugs.json + drug-data.js (~1 min)
+npm install               # Installera beroenden
+npm run dev               # Starta Vite dev-server (HMR)
+npm run build             # Production build → dist/
+npm test                  # Kör 258 vitest-tester
+npm run test:e2e          # Kör 32 Playwright E2E-tester
+npm run check             # TypeScript-kontroll (svelte-check)
+npm run build:db          # Crawla FASS och bygg product-db.json (~45 min)
+npm run generate:drugs    # Generera drugs.json → public/data/drugs.json (~1 min)
 ```
 
 **Driftsätt online:**
-Ladda upp samtliga filer i `Kod/` till valfri statisk webbserver.
-För **Cloudflare Pages**: ställ in publish directory till **`Kod/`**. `_headers`-filen konfigurerar säkerhetsheaders (CSP, HSTS, COOP/COEP/CORP).
+```bash
+npm run build             # Bygg → dist/
+```
+
+För **Cloudflare Pages**: build command `npm run build`, output directory `dist`. `_headers`-filen konfigurerar säkerhetsheaders (CSP, HSTS, COOP/COEP/CORP) automatiskt.
 
 ---
 
 ## Datapipeline
 
-Läkemedelsdatabasen (`drugs.json` + `drug-data.js`) byggs i två steg:
+Läkemedelsdatabasen (`drugs.json`) byggs i två steg:
 
 ```
 FASS.se (~14 000 NPL-ID:n)
   └─ build:db → data/product-db.json
-       └─ generate:drugs → Kod/drugs.json + Kod/drug-data.js (samtliga beredningsformer)
+       └─ generate:drugs → public/data/drugs.json (samtliga beredningsformer)
 ```
 
-`build:db` använder `classifyDoseForm()` för att kategorisera varje produkt: kvantifierbara med enhetsnyckel (`st`, `ml`, `dos`) eller markerade som ej kvantifierbara (`notCalculable`). `generate:drugs` läser klassificeringen och genererar drug‑entrierna med rätt enhet och flagga.
+`build:db` använder `classifyDoseForm()` för att kategorisera varje produkt: kvantifierbara med enhetsnyckel (`st`, `ml`, `dos`) eller markerade som ej kvantifierbara (`notCalculable`). `generate:drugs` läser klassificeringen och genererar drug‑entrierna med rätt enhet och flagga. `drug-data.js` genereras inte i 4.0 — ersatt av `fetch('/data/drugs.json')` via `drug-search.ts` med IndexedDB-cache.
 
 Bör köras kvartalsvis eller vid större förändringar i FASS sortiment.
 
