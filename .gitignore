@@ -10,5 +10,6 @@ Thumbs.db
 
 # Lokala utvecklingsfiler (ska aldrig checkas in)
 AGENTS.md
+MIGRATION_4.0.md
 build-css.js
 .git_commit_msg*
