@@ -337,5 +337,14 @@ Några observationer om varför testsviten inte fångar upp de kända buggarna:
 Fuzz-testet fyller formuläret via direktmutation av form.leftRaw = left || '' (alltid en sträng), vilket kringgår Svelte 5:s bind:value-konvertering från type="number" som orsakar Buggar #1, #15. Det fångar inte heller Bug #16 (calculable=false renderas inte) eftersom konsistenskontrollen saknar ett specifikt utfall för notCalc-fallet.
 app-state.spec.ts har ett test som heter "Max 8 kort — efter 7 tillägg finns 8 kort" som klickar exakt 7 gånger och räknar till 8 — det verifierar inte att ett nionde klick avvisas. Bug #13 (ingen gränskontroll i pushMedCard) är alltså faktiskt otestad.
 Unit-testerna testar buildPatientText och buildJournalText med i: 0, i: 1 direkt, vilket kringgår _prescribeState-indexmismatch i Bug #7 — testen passerar, men integrationen via _texts är fortfarande bruten.
+
+
     : 'Aktuell receptperiod är avslutad.');
 
+För #7 (indexmismatch): Ge Deepseek hela state.svelte.ts + PrescribePanel.svelte och ange explicit: "Välj ett konsekvent nyckelschema — antingen cardId genomgående eller arrayindex genomgående — och ändra alla anrop till getPrescribeState, initPrescribeState, applyPrescribeStatePatch för att matcha." Annars riskerar Deepseek att bara fixa ena sidan.
+**För #12 (`state‘i‘state` i `
+state‘i‘derived`):** Förklara Svelte 5-regeln explicit i prompten: *"I Svelte 5 är det förbjudet att mutera `state‘inuti‘state` inuti `
+state‘inuti‘derived.by()`. Lösningen är att flytta mutationen av `_cardStatus` till ett `$effect` som körs efter att `_texts` beräknats, eller att göra `_cardStatus` till ett vanligt icke-reaktivt objekt som uppdateras utan att trigga reaktivitetscykeln."* Annars hittar Deepseek inte lösningen utan ledning.
+För #8 (earlyRenewalDecision nollställs inte): Ange tydligt var i kedjan nollställningen ska ske: "Lägg till ett $effect i App.svelte som reagerar på result.earlyRenewalDecision och nollställer medCards[activeIdx].earlyRenewalDecision om result.earlyRenewalDecision är null och medCards[activeIdx].earlyRenewalDecision inte är null."
+För #9 (inaktivitetstimer): Ge Deepseek constants.ts och App.svelte och säg: "Implementera inaktivitetstimern som konstanterna INACTIVITY_WARN_MS, INACTIVITY_CLEAR_MS, INACTIVITY_COUNTDOWN_SEC beskriver. Använd mousemove, keydown och pointerdown som aktivitetshändelser. Visa en toast-notis vid 22 minuter med en nedräkning, och anropa clearAllMedState() vid 23 minuter."
+För #11 (drug cache): Ge Deepseek drug-search.ts + drugs-version.json och ange: "Hämta /data/drugs-version.json vid start och jämför version-fältet mot vad som lagrats i IndexedDB. Om de skiljer sig, eller om cachen saknas, hämta ny drugs.json och lagra den nya versionen."
