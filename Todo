@@ -332,5 +332,10 @@ Det stämmer inte: receptperioden (daysToPrescribedEnd) kan fortfarande ha dagar
 Åtgärd: Ersätt kontrollen med s.daysToPrescribedEnd (receptperioden) i stället för s.daysRemaining (förbrukningshorisonten) för sn-variabelns else-gren:
 ts: (s.daysToPrescribedEnd != null && s.daysToPrescribedEnd > 0
     ? `Aktuell receptperiod löper ut om ${s.daysToPrescribedEnd} dagar (t.o.m. ${s.prescribedEndDateStr}).`
+
+Några observationer om varför testsviten inte fångar upp de kända buggarna:
+Fuzz-testet fyller formuläret via direktmutation av form.leftRaw = left || '' (alltid en sträng), vilket kringgår Svelte 5:s bind:value-konvertering från type="number" som orsakar Buggar #1, #15. Det fångar inte heller Bug #16 (calculable=false renderas inte) eftersom konsistenskontrollen saknar ett specifikt utfall för notCalc-fallet.
+app-state.spec.ts har ett test som heter "Max 8 kort — efter 7 tillägg finns 8 kort" som klickar exakt 7 gånger och räknar till 8 — det verifierar inte att ett nionde klick avvisas. Bug #13 (ingen gränskontroll i pushMedCard) är alltså faktiskt otestad.
+Unit-testerna testar buildPatientText och buildJournalText med i: 0, i: 1 direkt, vilket kringgår _prescribeState-indexmismatch i Bug #7 — testen passerar, men integrationen via _texts är fortfarande bruten.
     : 'Aktuell receptperiod är avslutad.');
 
