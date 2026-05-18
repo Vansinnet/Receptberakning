@@ -1,5 +1,5 @@
 Buggar:
-#1 Jag fyller i läkemedel. Diazepam Accord 5 mg, senaste recept 2025-10-31, dos 1, förpackningsstorlek 100, antal uttag 3. Om jag sedan fyller i kvarvarande dos 1 st, sjunker genomsnittlig dos på ett konstigt sätt i resultatpanelen. Från:
+#1 Jag fyller i läkemedel. Diazepam Accord 5 mg, senaste recept 2025-10-31, dos 1, förpackningsstorlek 100, antal uttag 3. Om jag sedan fyller i kvarvarande dos 1 st, sjunker genomsnittlig dos på ett konstigt sätt i resultatpanelen. Det verkar dessutom bara hända när jag aktivt tryckt "Förnya". Från:
 
 [med fältet tomt]
 Snittförbrukning
