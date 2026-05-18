@@ -12,6 +12,7 @@ import { validateValues, calcCore } from './calc';
 import { getToday, stripManufacturer } from './utils';
 import { calcPrescribeResult } from './prescribe-calc';
 import { buildPatientText, buildJournalText, buildNurseJournalText } from './text-gen';
+import { MAX_MED_CARDS } from './constants';
 
 // =====================================================
 // TYPER
@@ -74,7 +75,8 @@ const _app = $state({
 
 export const medCards = $state<MedCard[]>([createEmptyCard(1)]);
 
-export function pushMedCard(): number {
+export function pushMedCard(): number | null {
+  if (medCards.length >= MAX_MED_CARDS) return null;
   const cardId = _app.nextCardId++;
   medCards.push(createEmptyCard(cardId));
   return cardId;

@@ -34,6 +34,13 @@
     const q = (e.target as HTMLInputElement).value.trim();
     acSearchSeq++;
     const seq = acSearchSeq;
+
+    if (card) {
+      card.form.atcCode = null;
+      card.form.nplId = null;
+      card.form.notCalculable = false;
+    }
+
     if (q.length < 2) {
       acResults = [];
       acVisible = false;
@@ -56,7 +63,7 @@
     card.form.nplId = d.i || null;
     card.form.notCalculable = !!(d as any).c || false;
     if (d.p && d.p > 0) card.form.amtRaw = String(d.p);
-    if (d.u === 'ml') card.form.doseUnit = 'ml';
+    card.form.doseUnit = d.u === 'ml' ? 'ml' : 'st';
     acVisible = false;
     acResults = [];
   }
@@ -78,6 +85,13 @@
       acVisible = false;
       acResults = [];
     }
+  }
+
+  function handleBlur() {
+    setTimeout(() => {
+      acVisible = false;
+      acResults = [];
+    }, 150);
   }
 
   function handleDateInput(e: Event) {
@@ -123,7 +137,7 @@
       <input
         id="medInput" type="text" placeholder="T.ex. Sertralin 50 mg" maxlength="100"
         autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-        bind:value={card.form.medRaw} oninput={handleMedInput} onkeydown={handleAcKeydown}
+        bind:value={card.form.medRaw} oninput={handleMedInput} onkeydown={handleAcKeydown} onblur={handleBlur}
         class:input-error={!!(fieldErrors?.medInput)}
         aria-invalid={!!(fieldErrors?.medInput)}
         aria-autocomplete="list"

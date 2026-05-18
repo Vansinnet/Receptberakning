@@ -165,9 +165,9 @@ export function buildJournalText(
         ? (s.daysRemaining != null && s.daysRemaining > 0
             ? `Vid förnyelse framkommer att patienten har ${s.remainingDoses} ${u1} (${s.daysRemaining} dagar) kvar.`
             : 'Vid förnyelse framkommer att patienten uppger att medicinen är slut.')
-        : (s.daysRemaining != null && s.daysRemaining > 0
-            ? `Aktuell förskrivning beräknas räcka ytterligare ${s.daysRemaining} dagar.`
-            : 'Aktuell förskrivning är slut.');
+        : (s.daysToPrescribedEnd != null && s.daysToPrescribedEnd > 0
+            ? `Aktuell receptperiod löper ut om ${s.daysToPrescribedEnd} dagar (t.o.m. ${s.prescribedEndDateStr}).`
+            : 'Aktuell receptperiod är avslutad.');
       const atgard = s.earlyRenewalDecision === 'no'
         ? 'Åtgärd: Ej förnyat efter klinisk, individuell bedömning.'
         : 'Åtgärd: [Nytt recept utfärdat / Ej utfärdat — motivering]';
@@ -203,9 +203,9 @@ export function buildJournalText(
         ? (s.daysRemaining != null && s.daysRemaining > 0
             ? `Vid förnyelse framkommer att patienten har ${s.remainingDoses} ${u2} (${s.daysRemaining} dagar) kvar.`
             : 'Vid förnyelse framkommer att patienten uppger att medicinen är slut.')
-        : (s.daysRemaining != null && s.daysRemaining > 0
-            ? `Räcker ytterligare ${s.daysRemaining} dagar.`
-            : 'Förskrivningen är slut.');
+        : (s.daysToPrescribedEnd != null && s.daysToPrescribedEnd > 0
+            ? `Receptperiod löper ut om ${s.daysToPrescribedEnd} dagar.`
+            : 'Receptperioden är avslutad.');
       const atgard = s.earlyRenewalDecision === 'no'
         ? 'Åtgärd: Ej förnyat efter klinisk, individuell bedömning.'
         : 'Åtgärd: [Nytt recept utfärdat / Ej utfärdat — motivering]';

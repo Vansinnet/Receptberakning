@@ -1,11 +1,13 @@
 <script lang="ts">
   import { medCards, getActiveMedIdx, setActiveMedIdx, pushMedCard, getActiveResult, clearAllMedState, getCardStatus } from '$lib/state.svelte';
+  import { MAX_MED_CARDS } from '$lib/constants';
 
   function handleSelectMed(idx: number) {
     setActiveMedIdx(idx);
   }
 
   function handleAddMed() {
+    if (medCards.length >= MAX_MED_CARDS) return;
     pushMedCard();
     setActiveMedIdx(medCards.length - 1);
   }
@@ -63,7 +65,7 @@
       </button>
     {/each}
   </div>
-  <button class="btn-add-med" aria-label="Lägg till läkemedel" data-tooltip="Lägg till ett nytt läkemedel." onclick={handleAddMed}>
+  <button class="btn-add-med" class:is-hidden={medCards.length >= MAX_MED_CARDS} aria-label="Lägg till läkemedel" data-tooltip="Lägg till ett nytt läkemedel." onclick={handleAddMed}>
     <span>＋</span> Lägg till
   </button>
   <button class="btn btn-ghost" data-tooltip="Rensa all data och börja om med en ny patient." onclick={handleNewPatient}>Ny patient</button>

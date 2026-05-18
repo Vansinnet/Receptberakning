@@ -23,7 +23,7 @@
     for (let i = 0; i < medCards.length; i++) {
       const c = medCards[i];
       if (c?.form?.atcCode && c.form.medRaw) {
-        entries.push({ a: c.form.atcCode, i: String(c._cardId) });
+        entries.push({ a: c.form.atcCode, i: c.form.medRaw });
       }
     }
     if (entries.length < 2) return [];
@@ -204,6 +204,14 @@
                 <div class="result-empty-state">
                   <div class="empty-icon">📋</div>
                   <div>{result.statusText || 'Fyll i formuläret för att se resultatet'}</div>
+                </div>
+              {:else if result?.valid && result?.calculable === false}
+                <div class="result-empty-state">
+                  <div class="empty-icon">📋</div>
+                  <div>{result.verdictTitle || result.statusText || 'Kan ej beräknas'}</div>
+                  {#if result.verdictSub}
+                    <div class="result-verdict-sub">{result.verdictSub}</div>
+                  {/if}
                 </div>
               {:else}
                 <div class="result-empty-state">

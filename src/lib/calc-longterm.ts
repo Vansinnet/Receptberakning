@@ -132,6 +132,8 @@ export function calcLongtermCore(
     consumptionPct,
     overallStatus,
     alertType,
+    alertTitle,
+    alertMsg,
     hasOverlap,
     barPct:      Math.min(LT_BAR_MAX_PCT, Math.max(0, consumptionPct)),
     fassUrl:     getFassUrl(medRaw, nplId),
