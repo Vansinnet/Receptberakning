@@ -112,7 +112,7 @@ export const INTERACTIONS: InteractionRule[] = [
   // ===== CARDIOVASKULÄRT / NEFROLOGI =====
   { a: ["H02AB"], b: ["M01A"], s: "warn", t: "Ökad risk för GI-blödning och ulcus", d: "Systemiska kortikosteroider + NSAID ökar risken additivt för övre gastrointestinal blödning och ulcus, särskilt hos äldre.", r: "Överväg paracetamol som smärtlindring. Vid nödvändig NSAID-behandling: kortast möjliga tid, lägsta dos, överväg gastroskydd (PPI)." },
   { a: ["B01AA03"], b: ["C01BD01"], s: "danger", t: "Ökad blödningsrisk — INR-stegring", d: "Amiodaron hämmar CYP2C9 och ökar warfarineffekten kraftigt med risk för allvarlig blödning.", r: "Minska warfarindosen med 30–50 % vid insättning av amiodaron. Monitorera PK/INR inom 3–5 dagar och justera därefter." },
-  { a: ["B01AC04"], b: ["A02BC03"], s: "warn", t: "Minskad klopidogreleffekt", d: "Esomeprazol hämmar CYP2C19 och minskar aktiveringen av klopidogrel, samma mekanism som omeprazol.", r: "Överväg pantoprazol som alternativ PPI (svagare CYP2C19-hämning)." },
+  { a: ["B01AC04"], b: ["A02BC05"], s: "warn", t: "Minskad klopidogreleffekt", d: "Esomeprazol hämmar CYP2C19 och minskar aktiveringen av klopidogrel, samma mekanism som omeprazol.", r: "Överväg pantoprazol som alternativ PPI (svagare CYP2C19-hämning)." },
   { a: ["L04AD01"], b: ["M01A"], s: "danger", t: "Ökad risk för njurtoxicitet", d: "Ciklosporin och NSAID har additiv nefrotoxisk effekt som kan leda till akut njursvikt.", r: "Undvik kombinationen. Överväg paracetamol som smärtlindring. Vid nödvändig NSAID-behandling: monitorera njurfunktion och ciklosporinnivåer noggrant." },
 
   // ===== FAS 1: TCA-INTERAKTIONER =====
@@ -193,6 +193,11 @@ export function atcMatches(atcCode: string | null | undefined, pattern: string):
 
 export function CHECK_INTERACTIONS(atcEntries: Array<{ a: string; i: string }>): InteractionWarning[] {
   const warnings: InteractionWarning[] = [];
+  // Deduplicering baseras på (titel, läkemedel1, läkemedel2).
+  // Designmässigt medvetet val: vid redundanta regelpar (specifik + generisk regel
+  // med samma titel) behålls den FÖRSTA regeln som matchar — dess beskrivning och
+  // rekommendation vinner. Detta är säkert så länge specifika regler ligger före
+  // generiska i INTERACTIONS-arrayen, vilket de gör idag (se t.ex. rad 68 före 139).
   for (let i = 0; i < INTERACTIONS.length; i++) {
     const ix = INTERACTIONS[i];
     for (let x = 0; x < atcEntries.length; x++) {

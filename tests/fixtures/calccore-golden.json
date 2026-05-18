@@ -221,7 +221,7 @@
       "earlyRenewalDecision": null,
       "statusText": "OK – t.o.m. 2025-07-05",
       "verdictTitle": "OK – Förnya recept",
-      "verdictSub": "Snittförbrukning 1.07 st/dag (107.1% av ordinerad dos, inom ±10%-gränsen). 20 dagar kvar av receptperioden (<20%-gränsen, 6.7% återstår).",
+      "verdictSub": "Snittförbrukning 1.07 st/dag (107.1% av ordinerad dos, inom ±10%-gränsen). 20 dagar kvar av receptperioden (≤20%-gränsen, 6.7% återstår).",
       "metrics": [
         {
           "label": "Totalt förskrivet",
@@ -261,7 +261,7 @@
       "daysRemaining": 20,
       "daysToPrescribedEnd": 20,
       "displayAvgStr": "1.07 st/dag (10.7 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)"
     }
   },
   {
@@ -296,7 +296,7 @@
       "earlyRenewalDecision": null,
       "statusText": "OK – t.o.m. 2025-07-13",
       "verdictTitle": "OK – Förnya recept",
-      "verdictSub": "Snittförbrukning 1.10 st/dag (110.0% av ordinerad dos, inom ±10%-gränsen). 28 dagar kvar av receptperioden (<20%-gränsen, 9.1% återstår).",
+      "verdictSub": "Snittförbrukning 1.10 st/dag (110.0% av ordinerad dos, inom ±10%-gränsen). 28 dagar kvar av receptperioden (≤20%-gränsen, 9.1% återstår).",
       "metrics": [
         {
           "label": "Totalt förskrivet",
@@ -336,7 +336,7 @@
       "daysRemaining": 28,
       "daysToPrescribedEnd": 28,
       "displayAvgStr": "1.10 st/dag (11.0 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)"
     }
   },
   {
@@ -371,7 +371,7 @@
       "earlyRenewalDecision": null,
       "statusText": "OK – t.o.m. 2025-06-25",
       "verdictTitle": "OK – Förnya recept",
-      "verdictSub": "Snittförbrukning 0.50 st/dag (50.0% av ordinerad dos, inom ±10%-gränsen). 10 dagar kvar av receptperioden (<20%-gränsen, 20.0% återstår).",
+      "verdictSub": "Snittförbrukning 0.50 st/dag (50.0% av ordinerad dos, inom ±10%-gränsen). 10 dagar kvar av receptperioden (≤20%-gränsen, 20.0% återstår).",
       "metrics": [
         {
           "label": "Totalt förskrivet",
@@ -666,7 +666,7 @@
       "daysRemaining": 50,
       "daysToPrescribedEnd": 50,
       "displayAvgStr": "2.00 st/dag (20.0 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)",
       "prescribedContactDateStr": "2025-07-28",
       "prescribedContactIsPast": false
     }
@@ -780,7 +780,7 @@
       "earlyRenewalDecision": null,
       "statusText": "OK – t.o.m. 2025-06-20",
       "verdictTitle": "OK – Förnya recept",
-      "verdictSub": "Snittförbrukning 1.11 st/dag (111.1% av ordinerad dos, inom ±10%-gränsen). 5 dagar kvar av receptperioden (<20%-gränsen, 10.0% återstår).",
+      "verdictSub": "Snittförbrukning 1.11 st/dag (111.1% av ordinerad dos, inom ±10%-gränsen). 5 dagar kvar av receptperioden (≤20%-gränsen, 10.0% återstår).",
       "metrics": [
         {
           "label": "Totalt förskrivet",
@@ -826,7 +826,7 @@
       "daysRemaining": 5,
       "daysToPrescribedEnd": 5,
       "displayAvgStr": "1.11 st/dag (11.1 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)"
     }
   },
   {
@@ -984,7 +984,7 @@
       "daysRemaining": 299,
       "daysToPrescribedEnd": 299,
       "displayAvgStr": "300.00 st/dag (3000.0 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)",
       "prescribedContactDateStr": "2026-04-03",
       "prescribedContactIsPast": false
     }
@@ -1021,7 +1021,7 @@
       "earlyRenewalDecision": null,
       "statusText": "OK – t.o.m. 2025-09-23",
       "verdictTitle": "OK – Förnya recept",
-      "verdictSub": "Snittförbrukning 1.09 st/dag (109.1% av ordinerad dos, inom ±10%-gränsen). 100 dagar kvar av receptperioden (<20%-gränsen, 8.3% återstår).",
+      "verdictSub": "Snittförbrukning 1.09 st/dag (109.1% av ordinerad dos, inom ±10%-gränsen). 100 dagar kvar av receptperioden (≤20%-gränsen, 8.3% återstår).",
       "metrics": [
         {
           "label": "Totalt förskrivet",
@@ -1061,7 +1061,7 @@
       "daysRemaining": 100,
       "daysToPrescribedEnd": 100,
       "displayAvgStr": "1.09 st/dag (10.9 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)"
     }
   },
   {
@@ -1183,7 +1183,7 @@
       "earlyRenewalDecision": null,
       "statusText": "OK – t.o.m. 2025-07-15",
       "verdictTitle": "OK – Förnya recept",
-      "verdictSub": "Snittförbrukning 0.97 st/vecka (97.2% av ordinerad dos, inom ±10%-gränsen). 30 dagar kvar av receptperioden (<20%-gränsen, 14.3% återstår).",
+      "verdictSub": "Snittförbrukning 0.97 st/vecka (97.2% av ordinerad dos, inom ±10%-gränsen). 30 dagar kvar av receptperioden (≤20%-gränsen, 14.3% återstår).",
       "metrics": [
         {
           "label": "Totalt förskrivet",
@@ -1258,7 +1258,7 @@
       "earlyRenewalDecision": null,
       "statusText": "OK – t.o.m. 2025-07-15",
       "verdictTitle": "OK – Förnya recept",
-      "verdictSub": "Snittförbrukning 0.97 st/vecka (97.2% av ordinerad dos, inom ±10%-gränsen). 30 dagar kvar av receptperioden (<20%-gränsen, 14.3% återstår).",
+      "verdictSub": "Snittförbrukning 0.97 st/vecka (97.2% av ordinerad dos, inom ±10%-gränsen). 30 dagar kvar av receptperioden (≤20%-gränsen, 14.3% återstår).",
       "metrics": [
         {
           "label": "Totalt förskrivet",
@@ -1497,7 +1497,7 @@
       "earlyRenewalDecision": null,
       "statusText": "OK – t.o.m. 2025-06-25",
       "verdictTitle": "OK – Förnya recept",
-      "verdictSub": "Snittförbrukning 0.53 st/dag (105.3% av ordinerad dos, inom ±10%-gränsen). 10 dagar kvar av receptperioden (<20%-gränsen, 5.0% återstår).",
+      "verdictSub": "Snittförbrukning 0.53 st/dag (105.3% av ordinerad dos, inom ±10%-gränsen). 10 dagar kvar av receptperioden (≤20%-gränsen, 5.0% återstår).",
       "metrics": [
         {
           "label": "Totalt förskrivet",
@@ -1537,7 +1537,7 @@
       "daysRemaining": 10,
       "daysToPrescribedEnd": 10,
       "displayAvgStr": "0.53 st/dag (5.3 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)"
     }
   },
   {
@@ -1572,7 +1572,7 @@
       "earlyRenewalDecision": null,
       "statusText": "OK – t.o.m. 2025-06-25",
       "verdictTitle": "OK – Förnya recept",
-      "verdictSub": "Snittförbrukning 0.53 st/dag (105.3% av ordinerad dos, inom ±10%-gränsen). 10 dagar kvar av receptperioden (<20%-gränsen, 5.0% återstår).",
+      "verdictSub": "Snittförbrukning 0.53 st/dag (105.3% av ordinerad dos, inom ±10%-gränsen). 10 dagar kvar av receptperioden (≤20%-gränsen, 5.0% återstår).",
       "metrics": [
         {
           "label": "Totalt förskrivet",
@@ -1612,7 +1612,7 @@
       "daysRemaining": 10,
       "daysToPrescribedEnd": 10,
       "displayAvgStr": "0.53 st/dag (2.6 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)"
     }
   },
   {
@@ -2191,7 +2191,7 @@
       "daysRemaining": 50,
       "daysToPrescribedEnd": 50,
       "displayAvgStr": "2.00 st/dag (20.0 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)",
       "prescribedContactDateStr": "2025-07-28",
       "prescribedContactIsPast": false
     }
@@ -2228,7 +2228,7 @@
       "earlyRenewalDecision": null,
       "statusText": "OK – t.o.m. 2025-07-05",
       "verdictTitle": "OK – Förnya recept",
-      "verdictSub": "Snittförbrukning 1.07 st/dag (107.1% av ordinerad dos, inom ±10%-gränsen). 20 dagar kvar av receptperioden (<20%-gränsen, 6.7% återstår).",
+      "verdictSub": "Snittförbrukning 1.07 st/dag (107.1% av ordinerad dos, inom ±10%-gränsen). 20 dagar kvar av receptperioden (≤20%-gränsen, 6.7% återstår).",
       "metrics": [
         {
           "label": "Totalt förskrivet",
@@ -2268,7 +2268,7 @@
       "daysRemaining": 20,
       "daysToPrescribedEnd": 20,
       "displayAvgStr": "1.07 st/dag (10.7 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)"
     }
   },
   {
@@ -2303,7 +2303,7 @@
       "earlyRenewalDecision": null,
       "statusText": "OK – t.o.m. 2025-07-05",
       "verdictTitle": "OK – Förnya recept",
-      "verdictSub": "Snittförbrukning 1.07 st/dag (107.1% av ordinerad dos, inom ±10%-gränsen). 20 dagar kvar av receptperioden (<20%-gränsen, 6.7% återstår).",
+      "verdictSub": "Snittförbrukning 1.07 st/dag (107.1% av ordinerad dos, inom ±10%-gränsen). 20 dagar kvar av receptperioden (≤20%-gränsen, 6.7% återstår).",
       "metrics": [
         {
           "label": "Totalt förskrivet",
@@ -2343,7 +2343,7 @@
       "daysRemaining": 20,
       "daysToPrescribedEnd": 20,
       "displayAvgStr": "1.07 st/dag (10.7 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)"
     }
   },
   {
@@ -2418,7 +2418,7 @@
       "daysRemaining": 150,
       "daysToPrescribedEnd": 150,
       "displayAvgStr": "2.00 st/dag (20.0 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)",
       "prescribedContactDateStr": "2025-11-05",
       "prescribedContactIsPast": false
     }
@@ -2501,7 +2501,7 @@
       "daysRemaining": 200,
       "daysToPrescribedEnd": 200,
       "displayAvgStr": "3.00 st/dag (30.0 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)",
       "prescribedContactDateStr": "2025-12-25",
       "prescribedContactIsPast": false
     }
@@ -2538,7 +2538,7 @@
       "earlyRenewalDecision": null,
       "statusText": "OK – t.o.m. 2025-07-05",
       "verdictTitle": "OK – Förnya recept",
-      "verdictSub": "Snittförbrukning 2.14 st/dag (107.1% av ordinerad dos, inom ±10%-gränsen). 20 dagar kvar av receptperioden (<20%-gränsen, 6.7% återstår).",
+      "verdictSub": "Snittförbrukning 2.14 st/dag (107.1% av ordinerad dos, inom ±10%-gränsen). 20 dagar kvar av receptperioden (≤20%-gränsen, 6.7% återstår).",
       "metrics": [
         {
           "label": "Totalt förskrivet",
@@ -2578,7 +2578,7 @@
       "daysRemaining": 20,
       "daysToPrescribedEnd": 20,
       "displayAvgStr": "2.14 st/dag (21.4 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)"
     }
   },
   {
@@ -2730,7 +2730,7 @@
       "daysRemaining": 50,
       "daysToPrescribedEnd": 50,
       "displayAvgStr": "2.00 st/dag (20.0 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)",
       "prescribedContactDateStr": "2025-07-28",
       "prescribedContactIsPast": false
     }
@@ -5009,7 +5009,7 @@
       "daysRemaining": 50,
       "daysToPrescribedEnd": 50,
       "displayAvgStr": "2.00 st/dag (20.0 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)",
       "prescribedContactDateStr": "2025-07-28",
       "prescribedContactIsPast": false
     }
@@ -5518,7 +5518,7 @@
       "daysRemaining": -100,
       "daysToPrescribedEnd": -100,
       "displayAvgStr": "0.75 st/dag (7.5 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)"
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)"
     }
   },
   {
@@ -5593,7 +5593,7 @@
       "daysRemaining": 45,
       "daysToPrescribedEnd": 45,
       "displayAvgStr": "1.18 st/dag (11.8 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)",
       "prescribedContactDateStr": "2025-07-23",
       "prescribedContactIsPast": false
     }
@@ -5757,7 +5757,7 @@
       "daysRemaining": 50,
       "daysToPrescribedEnd": 50,
       "displayAvgStr": "2.00 st/dag (20.0 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)",
       "prescribedContactDateStr": "2025-07-28",
       "prescribedContactIsPast": false
     }
@@ -6004,7 +6004,7 @@
       "daysRemaining": 150,
       "daysToPrescribedEnd": 150,
       "displayAvgStr": "2.00 st/dag (20.0 mg/dag)",
-      "avgNote": "(beräknat under antagandet att alla hittills tillgängliga st är förbrukade)",
+      "avgNote": "(beräknat under antagandet att alla förskrivna st är förbrukade)",
       "prescribedContactDateStr": "2025-11-05",
       "prescribedContactIsPast": false
     }

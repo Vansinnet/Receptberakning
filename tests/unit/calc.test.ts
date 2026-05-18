@@ -346,7 +346,7 @@ describe('calcCore — Output-struktur', () => {
     const withRem = calcCore(makeInput({ amt: 100, dose: 1, ref: 1, daysSince: 50, remaining: 40 }), NO_PREV);
     const withoutRem = calcCore(makeInput({ amt: 100, dose: 1, ref: 1, daysSince: 50 }), NO_PREV);
     expect(withRem.avgNote).toContain('faktisk förbrukning');
-    expect(withoutRem.avgNote).toContain('tillgängliga');
+    expect(withoutRem.avgNote).toContain('förskrivna');
     expect(withRem.avgNote).not.toBe(withoutRem.avgNote);
   });
 });
@@ -1040,11 +1040,11 @@ describe('buildJournalText', () => {
     expect(text).toContain('2025-12-31');
   });
 
-  it('single overuse utan beslut → platshållare', () => {
+  it('single overuse utan beslut → klinisk bedömning krävs', () => {
     const s = makeRenewState({ prescribedEndDateStr: '2025-09-01', daysRemaining: 78, earlyRenewalDecision: null });
     const items = [{ name: 'Elvanse 50 mg', i: 0, state: s }];
     const text = buildJournalText([], [], items, 1, {}, [s]);
-    expect(text).toContain('[Nytt recept utfärdat');
+    expect(text).toContain('Klinisk bedömning krävs');
   });
 });
 

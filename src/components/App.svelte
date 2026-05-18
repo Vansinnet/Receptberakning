@@ -9,13 +9,12 @@
   import { medCards, getNurseViewActive, setNurseViewActive, tickCurrentDate, clearAllMedState, getActiveMedIdx, getActiveResult, getPrescribeState } from '$lib/state.svelte';
   import { CHECK_INTERACTIONS } from '$lib/interactions';
   import { canRenewMed } from '$lib/prescribe-calc';
-  import { INACTIVITY_WARN_MS, INACTIVITY_CLEAR_MS, INACTIVITY_COUNTDOWN_SEC, COUNTDOWN_TICK_MS, ACTIVITY_RESET_DEBOUNCE_MS } from '$lib/constants';
+  import { INACTIVITY_WARN_MS, INACTIVITY_COUNTDOWN_SEC, COUNTDOWN_TICK_MS, ACTIVITY_RESET_DEBOUNCE_MS } from '$lib/constants';
 
   let activeTab = $state<'renew' | 'longterm'>('renew');
   let theme = $state('klinisk');
 
   let inactivityWarnTimer: ReturnType<typeof setTimeout> | null = null;
-  let inactivityClearTimer: ReturnType<typeof setTimeout> | null = null;
   let inactivityCountdownTimer: ReturnType<typeof setInterval> | null = null;
   let lastActivityTs = 0;
   let inactivityCountdown = $state(INACTIVITY_COUNTDOWN_SEC);
@@ -93,7 +92,6 @@
 
   function resetInactivityTimer() {
     if (inactivityWarnTimer) clearTimeout(inactivityWarnTimer);
-    if (inactivityClearTimer) clearTimeout(inactivityClearTimer);
     if (inactivityCountdownTimer) clearInterval(inactivityCountdownTimer);
     showInactivityToast = false;
 
@@ -111,9 +109,6 @@
         }
       }, COUNTDOWN_TICK_MS);
     }, INACTIVITY_WARN_MS);
-    inactivityClearTimer = setTimeout(() => {
-      clearAllMedState();
-    }, INACTIVITY_CLEAR_MS);
   }
 
   function handleActivity() {
@@ -143,7 +138,6 @@
         document.removeEventListener('keydown', handleActivity);
         document.removeEventListener('pointerdown', handleActivity);
         if (inactivityWarnTimer) clearTimeout(inactivityWarnTimer);
-        if (inactivityClearTimer) clearTimeout(inactivityClearTimer);
         if (inactivityCountdownTimer) clearInterval(inactivityCountdownTimer);
       };
     }
@@ -164,7 +158,6 @@
     const hasData = medCards.some(c => c.form.medRaw !== '');
     if (!hasData) {
       if (inactivityWarnTimer) clearTimeout(inactivityWarnTimer);
-      if (inactivityClearTimer) clearTimeout(inactivityClearTimer);
       if (inactivityCountdownTimer) clearInterval(inactivityCountdownTimer);
       showInactivityToast = false;
     }

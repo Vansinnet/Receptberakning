@@ -84,7 +84,10 @@ export function pushMedCard(): number | null {
 
 export function spliceMedCard(i: number): void {
   if (medCards.length <= 1) return;
+  const removedCardId = medCards[i]._cardId;
   medCards.splice(i, 1);
+  _cardStatus.delete(removedCardId);
+  delete _prescribeState[removedCardId];
   if (_app.activeMedIdx >= medCards.length) {
     _app.activeMedIdx = medCards.length - 1;
   }
@@ -163,6 +166,15 @@ type CardStatusCache = {
   statusText: string;
 };
 
+// _cardStatus är en icke-reaktiv cache som skrivs i _texts-derivaten och läses
+// i _activeResult-derivaten. Mutation i $derived.by är ett Svelte 5-antimönster,
+// men cachen är ofarlig här eftersom:
+//   - _activeResult läser prev för flagsChanged-detektering — prev ska vara
+//     resultatet från FÖREGÅENDE omvärdering, vilket cachen innehåller
+//   - _texts körs efter _activeResult i renderingsordningen, så cachen
+//     uppdateras först nästa cykel
+// Framtida refaktor: flytta per-kort calcCore-resultat till en $state-struktur
+// och låt _texts vara en ren $derived.by utan sidoeffekter.
 const _cardStatus = new Map<number, CardStatusCache>();
 
 export function getCardStatus(cardId: number): CardStatusCache | undefined {
@@ -198,6 +210,9 @@ interface CardResult {
 }
 
 const _texts = $derived.by((): TextResult => {
+  // Tvinga omvärdering vid midnattsbyte — texterna ska alltid spegla dagens datum.
+  void _app.currentDate;
+
   // 1. Beräkna calcCore för alla giltiga kort och gruppera
   const cardResults: CardResult[] = [];
   for (let i = 0; i < medCards.length; i++) {
@@ -260,6 +275,7 @@ const _texts = $derived.by((): TextResult => {
       pDateStr: cr.calc.pDateStr,
       total: cr.calc.total,
       dose: cr.calc.dose,
+      doseInterval: cr.calc.doseInterval,
       doseUnit: cr.calc.doseUnit,
       doseUnitLabel: cr.calc.doseUnitLabel,
       prescribedEndDateStr: cr.calc.prescribedEndDateStr,

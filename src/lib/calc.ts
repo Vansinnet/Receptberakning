@@ -13,6 +13,7 @@ import {
   OVERUSE_THRESHOLD,
   OVERUSE_SUPPRESSION_DAYS,
   OVERUSE_MIN_RECEPT_DAYS,
+  OVERUSE_ZERO_STOCK_MULTIPLIER,
   EARLY_RENEWAL_THRESHOLD,
   LOW_CONSUMPTION_PCT,
   VERY_HIGH_CONSUMPTION_MULTIPLIER,
@@ -104,6 +105,11 @@ export function validateValues(
 
 export function calcCore(inputData: CalcInput, prev: PrevCalcResult): CalcResult {
   if (!inputData.valid) {
+    // too_many_refs returnerar valid:true, calculable:false istället för valid:false.
+    // Detta är avsiktligt: valideringen säger "ogiltig input", men vi vill visa ett
+    // UI-meddelande (danger-alert) snarare än en tom "ej ifyllt"-ruta. Annan kod som
+    // konsumerar CalcResult ska kontrollera calculable, inte valid, för att avgöra
+    // om ett resultat kan visas.
     if (inputData.reason === 'too_many_refs') {
       return {
         valid: true, calculable: false, isOveruse: false, isTooEarly: false,
@@ -230,7 +236,7 @@ export function calcCore(inputData: CalcInput, prev: PrevCalcResult): CalcResult
   if (mgUnit) displayAvg += ` (${(avgPerInterval * mgUnit.amount).toFixed(1)} ${mgUnit.unit}/${intervalLabel})`;
   const avgNote = hasRemaining
     ? `(beräknat på faktisk förbrukning: ${calcBase - remaining!} av ${calcBase} tillgängliga ${doseUnit}${earlyPickup ? ' – patienten kan ha hämtat ut uttag i förväg' : ''})`
-    : `(beräknat under antagandet att alla hittills tillgängliga ${doseUnit} är förbrukade)`;
+    : `(beräknat under antagandet att alla förskrivna ${doseUnit} är förbrukade)`;
 
   const flagsChanged         = prev.isOveruse !== isOveruse || prev.isTooEarly !== isTooEarly;
   const earlyRenewalDecision = flagsChanged ? null : (prev.earlyRenewalDecision || null);
@@ -289,6 +295,11 @@ export function calcCore(inputData: CalcInput, prev: PrevCalcResult): CalcResult
 // === INTERNA HJÄLPFUNKTIONER ===
 
 function _detectOveruse(avgNum: number, effectiveDailyDose: number, daysRemaining: number, daysToPrescribedEnd: number): boolean {
+  // Skydda mot falskt OK vid korta recept med 0 kvarvarande doser.
+  // Om medicinen är helt slut (daysRemaining = 0) och snittförbrukningen är
+  // kraftigt förhöjd (>1.5× ordinerad dos), flagga som överanvändning oavsett
+  // suppression-reglerna — patienten har överkonsumerat och medicinen är slut.
+  if (daysRemaining <= 0 && avgNum > effectiveDailyDose * OVERUSE_ZERO_STOCK_MULTIPLIER) return true;
   return avgNum > effectiveDailyDose * OVERUSE_THRESHOLD && (daysRemaining > OVERUSE_SUPPRESSION_DAYS || daysToPrescribedEnd > OVERUSE_MIN_RECEPT_DAYS);
 }
 
@@ -344,7 +355,7 @@ function _buildVerdict(
   const remainingPct     = (daysToPrescribedEnd / (totalDays || 1) * 100).toFixed(1);
   const daysNote = daysToPrescribedEnd <= 0
     ? 'Receptperioden är slut.'
-    : `${daysToPrescribedEnd} dagar kvar av receptperioden (<20%-gränsen, ${remainingPct}% återstår).`;
+    : `${daysToPrescribedEnd} dagar kvar av receptperioden (≤20%-gränsen, ${remainingPct}% återstår).`;
   return { verdictTitle: 'OK – Förnya recept', verdictSub: `${consumptionNote} ${daysNote}` };
 }
 
@@ -364,7 +375,10 @@ function _buildAlerts(
 ): CalcAlert[] {
   let alerts: CalcAlert[] = [];
   const overuseSuppressedBy7day = !isOveruse && daysRemaining >= 0 && daysRemaining <= OVERUSE_SUPPRESSION_DAYS && avgNum > effectiveDailyDose * OVERUSE_THRESHOLD;
-  if (overuseSuppressedBy7day) {
+  const expiredWithElevatedUse = !isOveruse && daysRemaining < 0 && avgNum > effectiveDailyDose * OVERUSE_THRESHOLD;
+  if (expiredWithElevatedUse) {
+    alerts.push({ type: 'warn', title: 'Förhöjd förbrukning — receptperioden har löpt ut', message: `Snitt ${displayAvg} överstiger ordination med >10% och receptperioden har passerat. Kontrollera förbrukningsmönster och gör klinisk bedömning.` });
+  } else if (overuseSuppressedBy7day) {
     alerts.push({ type: 'warn', title: 'Förhöjd förbrukning noterad', message: `Snitt ${displayAvg} överstiger ordination med >10%, men medicinen beräknas ta slut inom 7 dagar. Förnyelse godkänd — notera förbrukningstakten.` });
   } else if (avgNum === 0) {
     alerts.push({ type: 'danger', title: 'Ingen förbrukning registrerad', message: `Snitt 0 ${doseUnitLabel} – patienten verkar inte ha tagit medicinen. Klinisk bedömning krävs.` });

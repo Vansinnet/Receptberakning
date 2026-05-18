@@ -3,8 +3,20 @@ import { getToday, parseDateUTC } from './utils';
 
 // === STATE RESOLVER ===
 
+// Sentry-MedState med tomma strängar för alla datumfält — används som fallback
+// för att undvika att "undefined" renderas i patient/journal-texter.
+const EMPTY_STATE: MedState = {
+  _cardId: 0,
+  medRaw: '', medNameStripped: '', pDateStr: '', total: 0, dose: 0,
+  doseUnit: 'st', doseUnitLabel: '', prescribedEndDateStr: '',
+  displayAvgStr: '', avgNote: '', remainingDoses: null, daysRemaining: 0,
+  daysToPrescribedEnd: 0, renewDateStr: '', prescribedContactDateStr: '',
+  prescribedContactIsPast: false, valid: false, calculable: false,
+  earlyRenewalDecision: null,
+};
+
 export function resolveState(item: { state?: MedState | null; i: number }, states?: MedState[]): MedState {
-  return (item.state || (states ? states[item.i] : null) || {}) as MedState;
+  return (item.state || (states ? states[item.i] : null) || EMPTY_STATE) as MedState;
 }
 
 // === REMAINING DOSES NOTE ===
@@ -170,7 +182,9 @@ export function buildJournalText(
             : 'Aktuell receptperiod är avslutad.');
       const atgard = s.earlyRenewalDecision === 'no'
         ? 'Åtgärd: Ej förnyat efter klinisk, individuell bedömning.'
-        : 'Åtgärd: [Nytt recept utfärdat / Ej utfärdat — motivering]';
+        : s.earlyRenewalDecision === 'yes'
+          ? 'Åtgärd: Nytt recept utfärdat efter klinisk, individuell bedömning.'
+          : 'Åtgärd: Klinisk bedömning krävs.';
       lines.push(
         'Kontaktorsak: Receptförnyelse via 1177.', '',
         `Bedömning: Patienten begär förnyelse av ${overuse[0].name}. Senaste receptet utfärdades ${s.pDateStr} (totalt ${s.total} ${s.doseUnit || 'st'}, ordination ${s.dose} ${s.doseUnitLabel || 'st/dag'}) och borde räcka till ${s.prescribedEndDateStr}. ${sn} Beräknad snittförbrukning: ${s.displayAvgStr} ${s.avgNote}.`,
@@ -208,7 +222,9 @@ export function buildJournalText(
             : 'Receptperioden är avslutad.');
       const atgard = s.earlyRenewalDecision === 'no'
         ? 'Åtgärd: Ej förnyat efter klinisk, individuell bedömning.'
-        : 'Åtgärd: [Nytt recept utfärdat / Ej utfärdat — motivering]';
+        : s.earlyRenewalDecision === 'yes'
+          ? 'Åtgärd: Förnyat efter klinisk, individuell bedömning.'
+          : 'Åtgärd: Klinisk bedömning krävs.';
       lines.push(`${item.name}: Utfärdat ${s.pDateStr} (${s.total} ${s.doseUnit || 'st'}, ${s.dose} ${s.doseUnitLabel || 'st/dag'}). Borde räcka t.o.m. ${s.prescribedEndDateStr}. ${sn2} Snitt: ${s.displayAvgStr}. ${atgard}`, '');
     }
     lines.push(

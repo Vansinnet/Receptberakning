@@ -2,11 +2,11 @@
 // Portad från Kod/drug-loader.js. Enligt B3-beslutet: IndexedDB → fetch('drugs.json').
 // __DRUG_DATA__-globalen existerar inte i 4.0.
 
+import { MIN_SEARCH_QUERY_LENGTH, MAX_AUTOCOMPLETE_RESULTS } from './constants';
+
 const CACHE_NAME = 'drug-data';
 const DB_NAME = 'ReceptCache';
 const STORE_NAME = 'drugs';
-const MIN_SEARCH_QUERY_LENGTH = 2;
-const MAX_AUTOCOMPLETE_RESULTS = 10;
 
 interface CacheData {
   version: number;
@@ -62,12 +62,15 @@ async function fetchAndCache(serverVersion: number): Promise<DrugEntry[]> {
   const resp = await fetch('/data/drugs.json');
   if (!resp.ok) throw new Error(`drugs.json: ${resp.status}`);
   const entries = await resp.json();
+  // Cache-skrivning är best-effort — data finns redan i minnet.
   openDB().then(db => {
     try {
       const tx = db.transaction(STORE_NAME, 'readwrite');
-      tx.objectStore(STORE_NAME).put({ id: CACHE_NAME, version: serverVersion, entries, ts: Date.now() }, CACHE_NAME);
-    } catch { /* cache failure is non-critical */ }
-  }).catch(() => {});
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.put({ id: CACHE_NAME, version: serverVersion, entries, ts: Date.now() }, CACHE_NAME);
+      req.onerror = () => console.warn('[drug-search] IndexedDB cache write failed:', req.error);
+    } catch (e) { console.warn('[drug-search] IndexedDB transaction failed:', e); }
+  }).catch(e => { console.warn('[drug-search] IndexedDB open failed:', e); });
   return entries;
 }
 
@@ -94,7 +97,9 @@ export async function loadDrugs(): Promise<void> {
       }
     } catch (err) {
       console.error('[drug-search] kunde inte ladda läkemedelsdata:', err);
-      _drugList = [];
+      _drugList = null;
+      _loadPromise = null;
+      return;
     }
     _drugMap = new Map();
     for (let i = 0; i < _drugList.length; i++) {
@@ -111,7 +116,7 @@ export function searchDrugs(query: string): DrugEntry[] {
   const q = query.toLowerCase().trim();
   const results: DrugEntry[] = [];
   for (let i = 0; i < _drugList.length; i++) {
-    if (_drugList[i].n.toLowerCase().indexOf(q) === 0) {
+    if (_drugList[i].n.toLowerCase().includes(q)) {
       results.push(_drugList[i]);
       if (results.length >= MAX_AUTOCOMPLETE_RESULTS) break;
     }

@@ -27,6 +27,12 @@ export const OVERUSE_SUPPRESSION_DAYS = 7;
 // Se calcCore() för fullständig motivering (hasRemaining-fallet).
 export const OVERUSE_MIN_RECEPT_DAYS = 14;
 
+// AKTIVT VAL: 1.5x — tröskel för att flagga överanvändning när medicinen är helt
+// slut (daysRemaining = 0) och snittförbrukningen överstiger ordination med minst 50%.
+// Lägre än VERY_HIGH_CONSUMPTION_MULTIPLIER (2.5x) eftersom slut på medicin + förhöjd
+// förbrukning alltid kräver klinisk uppmärksamhet, även vid måttlig överskridning.
+export const OVERUSE_ZERO_STOCK_MULTIPLIER = 1.5;
+
 // AKTIVT VAL: 2.5x — vid denna multiplikator av ordinerad dos triggas en
 // datakontrollsvarning. Fångar orimlig inmatning (t.ex. fel enhet) utan att
 // blockera legitima fall (t.ex. titrering).
