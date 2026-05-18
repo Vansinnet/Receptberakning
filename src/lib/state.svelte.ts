@@ -10,8 +10,7 @@
 import type { DoseUnit, DoseInterval, CalcResult, PrevCalcResult, MedState } from './types';
 import { validateValues, calcCore } from './calc';
 import { getToday, stripManufacturer } from './utils';
-import { DEFAULT_PRESCRIBE_MODE, DEFAULT_PRESCRIBE_MONTHS } from './constants';
-import { setPrescribeMode, setPrescribeMonths, setPrescribeEndDate, calcPrescribeResult } from './prescribe-calc';
+import { calcPrescribeResult } from './prescribe-calc';
 import { buildPatientText, buildJournalText, buildNurseJournalText } from './text-gen';
 
 // =====================================================
@@ -380,6 +379,9 @@ export function resetLtPeriods(): void {
 export interface PrescribeEntry {
   packageSize: string;
   _lastAmt?: string;
+  mode?: string;
+  months?: number;
+  endDate?: string;
 }
 
 const _prescribeState = $state<Record<number, PrescribeEntry>>({});
@@ -415,7 +417,4 @@ export function clearAllMedState(): void {
   clearPrescribeState();
   resetLtPeriods();
   resetNurseState();
-  setPrescribeMode(DEFAULT_PRESCRIBE_MODE);
-  setPrescribeMonths(DEFAULT_PRESCRIBE_MONTHS);
-  setPrescribeEndDate('');
 }

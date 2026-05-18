@@ -1,20 +1,20 @@
 <script lang="ts">
-  import { getActiveMedIdx, medCards, getPrescribeState, initPrescribeState, applyPrescribeStatePatch } from '$lib/state.svelte';
-  import { calcPrescribeResult, canRenewMed, prescribeValidationHint, setPrescribeMode, setPrescribeMonths, setPrescribeEndDate } from '$lib/prescribe-calc';
+  import { medCards, getPrescribeState, initPrescribeState, applyPrescribeStatePatch, getActiveMedIdx } from '$lib/state.svelte';
+  import { calcPrescribeResult, canRenewMed, prescribeValidationHint } from '$lib/prescribe-calc';
   import { getActiveResult } from '$lib/state.svelte';
-  import { UNIT_DISPLAY, DEFAULT_PRESCRIBE_MODE, DEFAULT_PRESCRIBE_MONTHS, DEFAULT_PRESCRIBE_END_DATE } from '$lib/constants';
+  import { UNIT_DISPLAY, DEFAULT_PRESCRIBE_MODE, DEFAULT_PRESCRIBE_MONTHS } from '$lib/constants';
   import type { MedState } from '$lib/types';
 
   let { visible = false } = $props();
 
-  // Lokal $state speglar globalerna — Svelte-spårbar reaktivitet
-  let mode = $state(DEFAULT_PRESCRIBE_MODE);
-  let months = $state(DEFAULT_PRESCRIBE_MONTHS);
-  let endDate = $state(DEFAULT_PRESCRIBE_END_DATE);
-
-  let activeIdx = $derived(getActiveMedIdx());
+  let activeIdx = $derived(getActiveMedIdx()); // keep for template display
   let card = $derived(medCards[activeIdx] ?? null);
   let result = $derived(getActiveResult());
+
+  let psEntry = $derived(card ? getPrescribeState(card._cardId) : null);
+  let entryMode = $derived(psEntry?.mode ?? DEFAULT_PRESCRIBE_MODE);
+  let entryMonths = $derived(psEntry?.months ?? DEFAULT_PRESCRIBE_MONTHS);
+  let entryEndDate = $derived(psEntry?.endDate ?? '');
 
   let eligible = $derived(card && result ? canRenewMed({
     _cardId: card._cardId,
@@ -31,47 +31,48 @@
     const s = result;
     if (!s?.valid || !s?.calculable) return;
     const currentAmt = String(s.amt ?? '');
-    const ps = getPrescribeState(activeIdx);
+    const ps = getPrescribeState(card._cardId);
     if (!ps) {
-      initPrescribeState(activeIdx, { packageSize: currentAmt, _lastAmt: currentAmt });
+      initPrescribeState(card._cardId, { packageSize: currentAmt, _lastAmt: currentAmt });
     } else {
       if (ps._lastAmt !== currentAmt && currentAmt !== '') {
-        applyPrescribeStatePatch(activeIdx, { _lastAmt: currentAmt, packageSize: currentAmt });
+        applyPrescribeStatePatch(card._cardId, { _lastAmt: currentAmt, packageSize: currentAmt });
       } else if (ps.packageSize === '') {
-        applyPrescribeStatePatch(activeIdx, { packageSize: currentAmt });
+        applyPrescribeStatePatch(card._cardId, { packageSize: currentAmt });
       }
     }
   });
 
   function handlePkgInput(e: Event) {
+    if (!card) return;
     const val = (e.target as HTMLInputElement).value;
-    applyPrescribeStatePatch(activeIdx, { packageSize: val });
+    applyPrescribeStatePatch(card._cardId, { packageSize: val });
   }
 
   function handleModeChange(m: string) {
-    mode = m;
-    setPrescribeMode(m);
+    if (!card) return;
+    applyPrescribeStatePatch(card._cardId, { mode: m });
   }
 
   function handleMonthsChange(e: Event) {
+    if (!card) return;
     const m = parseInt((e.target as HTMLSelectElement).value, 10);
-    months = m;
-    setPrescribeMonths(m);
+    applyPrescribeStatePatch(card._cardId, { months: m });
   }
 
   function handleEndDateInput(e: Event) {
+    if (!card) return;
     const input = e.target as HTMLInputElement;
     let val = input.value.replace(/\D/g, '').substring(0, 8);
     if (val.length > 4) val = val.substring(0, 4) + '-' + val.substring(4);
     if (val.length > 7) val = val.substring(0, 7) + '-' + val.substring(7);
     input.value = val;
-    endDate = val;
-    setPrescribeEndDate(val);
+    applyPrescribeStatePatch(card._cardId, { endDate: val });
   }
 
   let prescResult = $derived.by(() => {
     if (!card || !result?.valid || !result?.calculable) return null;
-    const ps = getPrescribeState(activeIdx);
+    const ps = getPrescribeState(card._cardId);
     const s: MedState = {
       _cardId: card._cardId,
       dose: result.dose,
@@ -85,20 +86,9 @@
   let hasSummary = $derived.by(() => {
     let count = 0;
     for (let i = 0; i < medCards.length; i++) {
-      const c = medCards[i];
-      const ps = getPrescribeState(i);
-      if (!ps) continue;
-      const r = getActiveResult(); // use active as approximation
-      if (c && r?.valid && r?.calculable && canRenewMed({
-        _cardId: c._cardId,
-        valid: r.valid,
-        calculable: r.calculable,
-        isOveruse: r.isOveruse,
-        isTooEarly: r.isTooEarly,
-        earlyRenewalDecision: c.earlyRenewalDecision,
-      })) {
-        count++;
-      }
+      const ps = getPrescribeState(medCards[i]._cardId);
+      if (!ps || !ps.packageSize) continue;
+      count++;
     }
     return count >= 2;
   });
@@ -108,13 +98,13 @@
   <!-- Duration -->
     <div id="prescribeDuration">
       <div class="prescribe-mode-toggle">
-        <button type="button" class="prescribe-mode-btn {mode === 'months' ? 'active' : ''}" data-tooltip="Välj period i hela månader." onclick={() => handleModeChange('months')}>Månader</button>
-        <button type="button" class="prescribe-mode-btn {mode === 'date' ? 'active' : ''}" data-tooltip="Välj ett specifikt slutdatum för förskrivningen." onclick={() => handleModeChange('date')}>Datum</button>
+        <button type="button" class="prescribe-mode-btn {entryMode === 'months' ? 'active' : ''}" data-tooltip="Välj period i hela månader." onclick={() => handleModeChange('months')}>Månader</button>
+        <button type="button" class="prescribe-mode-btn {entryMode === 'date' ? 'active' : ''}" data-tooltip="Välj ett specifikt slutdatum för förskrivningen." onclick={() => handleModeChange('date')}>Datum</button>
       </div>
-      {#if mode === 'months'}
+      {#if entryMode === 'months'}
         <div class="field">
           <label for="ps-global-months" data-tooltip="Antal månader som den nya förskrivningen ska täcka.">Förskriva i antal månader</label>
-          <select id="ps-global-months" class="prescribe-select" value={months} onchange={handleMonthsChange}>
+          <select id="ps-global-months" class="prescribe-select" value={entryMonths} onchange={handleMonthsChange}>
             {#each Array.from({ length: 12 }, (_, i) => i + 1) as m}
               <option value={m}>{m === 1 ? '1 månad' : `${m} månader`}</option>
             {/each}
@@ -123,7 +113,7 @@
       {:else}
         <div class="field">
           <label for="ps-global-enddate" data-tooltip="Sista datum som den nya förskrivningen ska täcka.">Förskriva t.o.m.</label>
-          <input id="ps-global-enddate" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" maxlength="10" autocomplete="off" value={endDate} oninput={handleEndDateInput} />
+          <input id="ps-global-enddate" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" maxlength="10" autocomplete="off" value={entryEndDate} oninput={handleEndDateInput} />
         </div>
       {/if}
     </div>
@@ -135,7 +125,7 @@
 
         <div class="field" style:margin-top="10px">
           <label for="ps-pkg" data-tooltip="Antal enheter per förpackning.">Förpackningsstorlek ({UNIT_DISPLAY[(result.doseUnit ?? 'st') as keyof typeof UNIT_DISPLAY]?.long ?? 'tabletter'})</label>
-          <input id="ps-pkg" type="number" min="1" step="1" placeholder="T.ex. 30" value={getPrescribeState(activeIdx)?.packageSize ?? ''} oninput={handlePkgInput} />
+          <input id="ps-pkg" type="number" min="1" step="1" placeholder="T.ex. 30" value={psEntry?.packageSize ?? ''} oninput={handlePkgInput} />
         </div>
 
         <div class="prescribe-info-row">
@@ -162,10 +152,10 @@
             </div>
           {:else if prescResult && prescResult.packages === 0 && prescResult.totalDays === 0 && prescResult.daysAlreadyCovered > 0}
             <div class="prescribe-result-covered">Nuvarande recept täcker redan hela perioden.</div>
-          {:else if getPrescribeState(activeIdx)}
+          {:else if psEntry}
             {#each prescribeValidationHint(
               { _cardId: card._cardId, prescribedEndDateStr: result.prescribedEndDateStr },
-              getPrescribeState(activeIdx) ?? null
+              psEntry
             ) as hint}
               <div class="alert alert-{hint.type}" role="alert">{hint.msg}</div>
             {/each}
@@ -181,8 +171,15 @@
           <div class="prescribe-summary-header">Sammanställning av läkemedel att förskriva</div>
           <div class="prescribe-summary-list">
             {#each medCards as c, i}
-              {#if getPrescribeState(i)}
-                {@const pr = calcPrescribeResult({ _cardId: c._cardId, dose: 1, doseInterval: 1, doseUnit: 'st', prescribedEndDateStr: '' }, getPrescribeState(i) ?? null)}
+              {#if getPrescribeState(c._cardId)}
+                {@const d = parseFloat((c.form.doseRaw || '').replace(',', '.')) || 0}
+                {@const pr = calcPrescribeResult({
+                  _cardId: c._cardId,
+                  dose: d,
+                  doseInterval: c.form.doseInterval,
+                  doseUnit: c.form.doseUnit,
+                  prescribedEndDateStr: '',
+                }, getPrescribeState(c._cardId) ?? null)}
                 <button type="button" class="prescribe-summary-row {i === activeIdx ? 'active' : ''}">
                   <span class="prescribe-summary-name">{c.form.medRaw || `Läkemedel ${i + 1}`}</span>
                   <span class="prescribe-summary-right">

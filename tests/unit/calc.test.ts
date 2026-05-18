@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
 import { setMockNow } from '../../src/lib/clock';
 import { calcCore, validateValues } from '../../src/lib/calc';
 import { calcLongtermCore } from '../../src/lib/calc-longterm';
-import { calcPrescribeResult, canRenewMed, prescribeValidationHint, setPrescribeMode, setPrescribeMonths, setPrescribeEndDate, resetPrescribeState } from '../../src/lib/prescribe-calc';
+import { calcPrescribeResult, canRenewMed, prescribeValidationHint } from '../../src/lib/prescribe-calc';
 import { buildPatientText, buildJournalText, buildNurseJournalText, remainingDosesNote, resolveState } from '../../src/lib/text-gen';
 import goldenFixtures from '../fixtures/calccore-golden.json';
 import type { MedState, PrevCalcResult } from '../../src/lib/types';
@@ -759,44 +759,35 @@ describe('canRenewMed', () => {
 });
 
 describe('prescribeValidationHint', () => {
-  beforeEach(() => {
-    resetPrescribeState();
-  });
-
   it('ps=null → tom array', () => {
     const hints = prescribeValidationHint({ _cardId: 1 }, null);
     expect(hints).toEqual([]);
   });
 
   it('packageSize="" → info-hint', () => {
-    setPrescribeMode('months');
-    setPrescribeMonths(3);
-    const hints = prescribeValidationHint({ _cardId: 1 }, { packageSize: '' });
+    const hints = prescribeValidationHint({ _cardId: 1 }, { packageSize: '', mode: 'months', months: 3 });
     expect(hints.length).toBe(1);
     expect(hints[0].type).toBe('info');
     expect(hints[0].field).toBe('pkg');
   });
 
   it('packageSize="0" → warn-hint', () => {
-    setPrescribeMode('months');
-    setPrescribeMonths(3);
-    const hints = prescribeValidationHint({ _cardId: 1 }, { packageSize: '0' });
+    const hints = prescribeValidationHint({ _cardId: 1 }, { packageSize: '0', mode: 'months', months: 3 });
     expect(hints.length).toBe(1);
     expect(hints[0].type).toBe('warn');
     expect(hints[0].field).toBe('pkg');
   });
 
   it('giltig packageSize, månadsläge → tom array', () => {
-    setPrescribeMode('months');
-    setPrescribeMonths(3);
-    const hints = prescribeValidationHint({ _cardId: 1 }, { packageSize: '30' });
+    const hints = prescribeValidationHint({ _cardId: 1 }, { packageSize: '30', mode: 'months', months: 3 });
     expect(hints.length).toBe(0);
   });
 
   it('datumläge, ogiltigt slutdatum → warn', () => {
-    setPrescribeMode('date');
-    setPrescribeEndDate('fel-datum');
-    const hints = prescribeValidationHint({ _cardId: 1, prescribedEndDateStr: '2025-06-01' }, { packageSize: '30' });
+    const hints = prescribeValidationHint(
+      { _cardId: 1, prescribedEndDateStr: '2025-06-01' },
+      { packageSize: '30', mode: 'date', endDate: 'fel-datum' }
+    );
     expect(hints.length).toBe(1);
     expect(hints[0].type).toBe('warn');
     expect(hints[0].field).toBe('date');
@@ -804,9 +795,10 @@ describe('prescribeValidationHint', () => {
   });
 
   it('datumläge, slutdatum före startdatum → warn', () => {
-    setPrescribeMode('date');
-    setPrescribeEndDate(daysAgo(5));
-    const hints = prescribeValidationHint({ _cardId: 1, prescribedEndDateStr: '2025-06-01' }, { packageSize: '30' });
+    const hints = prescribeValidationHint(
+      { _cardId: 1, prescribedEndDateStr: '2025-06-01' },
+      { packageSize: '30', mode: 'date', endDate: daysAgo(5) }
+    );
     expect(hints.length).toBe(1);
     expect(hints[0].type).toBe('warn');
     expect(hints[0].field).toBe('date');
@@ -814,28 +806,23 @@ describe('prescribeValidationHint', () => {
   });
 
   it('datumläge, giltigt framtida slutdatum → tom array', () => {
-    setPrescribeMode('date');
-    setPrescribeEndDate('2025-12-31');
-    const hints = prescribeValidationHint({ _cardId: 1, prescribedEndDateStr: '2025-06-01' }, { packageSize: '30' });
+    const hints = prescribeValidationHint(
+      { _cardId: 1, prescribedEndDateStr: '2025-06-01' },
+      { packageSize: '30', mode: 'date', endDate: '2025-12-31' }
+    );
     expect(hints.length).toBe(0);
   });
 });
 
 describe('calcPrescribeResult', () => {
-  beforeEach(() => {
-    resetPrescribeState();
-  });
-
   it('ps null → null', () => {
     expect(calcPrescribeResult({ _cardId: 1, dose: 1, prescribedEndDateStr: '2025-06-01' }, null)).toBeNull();
   });
 
   it('recept utgånget → startDate=idag, daysAlreadyCovered=0', () => {
-    setPrescribeMode('months');
-    setPrescribeMonths(3);
     const r = calcPrescribeResult(
       { _cardId: 1, dose: 1, doseInterval: 1, doseUnit: 'st', prescribedEndDateStr: '2025-06-01' },
-      { packageSize: '100' }
+      { packageSize: '100', mode: 'months', months: 3 }
     );
     expect(r).not.toBeNull();
     expect(r!.startDateStr).toBe('2025-06-15');
@@ -845,12 +832,10 @@ describe('calcPrescribeResult', () => {
   });
 
   it('recept fortfarande giltigt → startDate=receptslut, daysAlreadyCovered>0', () => {
-    setPrescribeMode('months');
-    setPrescribeMonths(3);
     const end30 = daysFromNow(30);
     const r = calcPrescribeResult(
       { _cardId: 1, dose: 1, doseInterval: 1, doseUnit: 'st', prescribedEndDateStr: end30 },
-      { packageSize: '100' }
+      { packageSize: '100', mode: 'months', months: 3 }
     );
     expect(r).not.toBeNull();
     expect(r!.daysAlreadyCovered).toBe(30);
@@ -860,12 +845,10 @@ describe('calcPrescribeResult', () => {
   });
 
   it('befintligt recept täcker hela perioden → packages=0', () => {
-    setPrescribeMode('months');
-    setPrescribeMonths(3);
     const end120 = daysFromNow(120);
     const r = calcPrescribeResult(
       { _cardId: 1, dose: 1, doseInterval: 1, doseUnit: 'st', prescribedEndDateStr: end120 },
-      { packageSize: '100' }
+      { packageSize: '100', mode: 'months', months: 3 }
     );
     expect(r).not.toBeNull();
     expect(r!.packages).toBe(0);
@@ -876,25 +859,21 @@ describe('calcPrescribeResult', () => {
   it('månadsklämning: 31 jan + 1 månad → 28 feb', () => {
     const JAN31 = new Date('2025-01-31T00:00:00.000Z').getTime();
     setMockNow(JAN31);
-    setPrescribeMode('months');
-    setPrescribeMonths(1);
     const r = calcPrescribeResult(
       { _cardId: 1, dose: 1, doseInterval: 1, doseUnit: 'st', prescribedEndDateStr: '2025-01-30' },
-      { packageSize: '28' }
+      { packageSize: '28', mode: 'months', months: 1 }
     );
     expect(r).not.toBeNull();
     expect(r!.endDateStr).toBe('2025-02-28');
     expect(r!.totalDays).toBe(28);
     expect(r!.packages).toBe(1);
-    setMockNow(MOCK_TODAY_MS); // restore
+    setMockNow(MOCK_TODAY_MS);
   });
 
   it('datumläge: korrekt beräkning med avrundning uppåt', () => {
-    setPrescribeMode('date');
-    setPrescribeEndDate('2025-09-14');
     const r = calcPrescribeResult(
       { _cardId: 1, dose: 1, doseInterval: 1, doseUnit: 'st', prescribedEndDateStr: '2025-06-01' },
-      { packageSize: '90' }
+      { packageSize: '90', mode: 'date', endDate: '2025-09-14' }
     );
     expect(r).not.toBeNull();
     expect(r!.totalDays).toBe(91);
@@ -903,22 +882,18 @@ describe('calcPrescribeResult', () => {
   });
 
   it('datumläge: slutdatum < startdatum → packages=0', () => {
-    setPrescribeMode('date');
-    setPrescribeEndDate(daysAgo(5));
     const r = calcPrescribeResult(
       { _cardId: 1, dose: 1, doseInterval: 1, doseUnit: 'st', prescribedEndDateStr: '2025-06-01' },
-      { packageSize: '30' }
+      { packageSize: '30', mode: 'date', endDate: daysAgo(5) }
     );
     expect(r).not.toBeNull();
     expect(r!.packages).toBe(0);
   });
 
   it('datumläge: fraktionell dos → korrekt tabletträkning', () => {
-    setPrescribeMode('date');
-    setPrescribeEndDate('2025-08-14');
     const r = calcPrescribeResult(
       { _cardId: 1, dose: 0.5, doseInterval: 1, doseUnit: 'st', prescribedEndDateStr: '2025-06-01' },
-      { packageSize: '30' }
+      { packageSize: '30', mode: 'date', endDate: '2025-08-14' }
     );
     expect(r).not.toBeNull();
     expect(r!.totalDays).toBe(60);
@@ -927,11 +902,9 @@ describe('calcPrescribeResult', () => {
   });
 
   it('veckodos (doseInterval=7) → korrekt totalTablets', () => {
-    setPrescribeMode('months');
-    setPrescribeMonths(3);
     const r = calcPrescribeResult(
       { _cardId: 1, dose: 1, doseInterval: 7, doseUnit: 'st', prescribedEndDateStr: '2025-06-01' },
-      { packageSize: '10' }
+      { packageSize: '10', mode: 'months', months: 3 }
     );
     expect(r).not.toBeNull();
     expect(r!.totalTablets).toBe(14);
@@ -939,11 +912,9 @@ describe('calcPrescribeResult', () => {
   });
 
   it('månadsdos (doseInterval=30) → korrekt totalTablets', () => {
-    setPrescribeMode('months');
-    setPrescribeMonths(3);
     const r = calcPrescribeResult(
       { _cardId: 1, dose: 1, doseInterval: 30, doseUnit: 'st', prescribedEndDateStr: '2025-06-01' },
-      { packageSize: '10' }
+      { packageSize: '10', mode: 'months', months: 3 }
     );
     expect(r).not.toBeNull();
     expect(r!.totalTablets).toBe(4);
@@ -951,22 +922,18 @@ describe('calcPrescribeResult', () => {
   });
 
   it('packageSize=0 → packages=0', () => {
-    setPrescribeMode('months');
-    setPrescribeMonths(3);
     const r = calcPrescribeResult(
       { _cardId: 1, dose: 1, doseInterval: 1, doseUnit: 'st', prescribedEndDateStr: '2025-06-01' },
-      { packageSize: '0' }
+      { packageSize: '0', mode: 'months', months: 3 }
     );
     expect(r).not.toBeNull();
     expect(r!.packages).toBe(0);
   });
 
   it('dos=0 → packages=0', () => {
-    setPrescribeMode('months');
-    setPrescribeMonths(3);
     const r = calcPrescribeResult(
       { _cardId: 1, dose: 0, doseInterval: 1, doseUnit: 'st', prescribedEndDateStr: '2025-06-01' },
-      { packageSize: '100' }
+      { packageSize: '100', mode: 'months', months: 3 }
     );
     expect(r).not.toBeNull();
     expect(r!.packages).toBe(0);

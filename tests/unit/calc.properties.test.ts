@@ -2,7 +2,7 @@ import { describe, it, beforeAll } from 'vitest';
 import fc from 'fast-check';
 import { setMockNow } from '../../src/lib/clock';
 import { calcCore } from '../../src/lib/calc';
-import { calcPrescribeResult, setPrescribeMode, setPrescribeMonths, resetPrescribeState } from '../../src/lib/prescribe-calc';
+import { calcPrescribeResult } from '../../src/lib/prescribe-calc';
 import { buildPatientText, buildJournalText } from '../../src/lib/text-gen';
 import type { PrevCalcResult, MedState } from '../../src/lib/types';
 
@@ -294,9 +294,6 @@ describe('Property-based: calcCore invarianter', () => {
 
   // Invariant 8: calcPrescribeResult → packages ≥ 1 när input är giltig
   it('calcPrescribeResult → packages ≥ 1 vid giltig input', () => {
-    resetPrescribeState();
-    setPrescribeMode('months');
-    setPrescribeMonths(3);
     fc.assert(
       fc.property(
         fc.record({
@@ -317,7 +314,7 @@ describe('Property-based: calcCore invarianter', () => {
             prescribedEndDateStr: endStr,
             valid: true, calculable: true,
           };
-          const r = calcPrescribeResult(s, { packageSize: String(pkgSize) });
+          const r = calcPrescribeResult(s, { packageSize: String(pkgSize), mode: 'months', months: 3 });
           if (!r) return;
           if (r.packages < 1 && r.totalDays > 0) {
             throw new Error(

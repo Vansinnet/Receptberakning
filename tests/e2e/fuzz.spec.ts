@@ -307,7 +307,7 @@ async function fillForm(page: Page, seq: number, s: Scenario, errors: LogEntry[]
         form.medRaw = med;
         form.dateVal = date;
         form.doseRaw = dose;
-        if (doseInterval) form.doseInterval = parseInt(doseInterval, 10);
+        if (doseInterval) form.doseInterval = parseInt(doseInterval, 10) as 1 | 7 | 30;
         form.amtRaw = amt;
         form.refRaw = ref;
         form.leftRaw = left || '';

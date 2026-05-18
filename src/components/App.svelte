@@ -8,7 +8,7 @@
   import LongtermPanel from './LongtermPanel.svelte';
   import { medCards, getNurseViewActive, setNurseViewActive, tickCurrentDate, clearAllMedState, getActiveMedIdx, getActiveResult, getPrescribeState } from '$lib/state.svelte';
   import { CHECK_INTERACTIONS } from '$lib/interactions';
-  import { canRenewMed, resetPrescribeState } from '$lib/prescribe-calc';
+  import { canRenewMed } from '$lib/prescribe-calc';
 
   let activeTab = $state<'renew' | 'longterm'>('renew');
   let theme = $state('klinisk');
@@ -42,7 +42,7 @@
   let hasSummary = $derived.by(() => {
     let count = 0;
     for (let i = 0; i < medCards.length; i++) {
-      const ps = getPrescribeState(i);
+      const ps = getPrescribeState(medCards[i]._cardId);
       if (!ps || !ps.packageSize) continue;
       count++;
     }
@@ -81,7 +81,6 @@
 
   function onPageHide() {
     clearAllMedState();
-    resetPrescribeState();
   }
 
   $effect(() => {
@@ -93,6 +92,15 @@
         document.removeEventListener('visibilitychange', onVisibilityChange);
         window.removeEventListener('pagehide', onPageHide);
       };
+    }
+  });
+
+  // Nollställ earlyRenewalDecision i medCards när flagsChanged i calcCore återställer returvärdet
+  $effect(() => {
+    const idx = getActiveMedIdx();
+    if (!result || idx < 0 || idx >= medCards.length) return;
+    if (result.earlyRenewalDecision === null && medCards[idx].earlyRenewalDecision !== null) {
+      medCards[idx].earlyRenewalDecision = null;
     }
   });
 

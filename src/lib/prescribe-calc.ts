@@ -8,21 +8,6 @@ import {
   UNIT_DISPLAY,
 } from './constants';
 
-// === PRESCRIBE STATE (module-level, mirrors 3.0 globaler) ===
-
-export let _prescribeMode: string = DEFAULT_PRESCRIBE_MODE;
-export let _prescribeMonths: number = DEFAULT_PRESCRIBE_MONTHS;
-export let _prescribeEndDate: string = DEFAULT_PRESCRIBE_END_DATE;
-
-export function setPrescribeMode(mode: string): void { _prescribeMode = mode; }
-export function setPrescribeMonths(months: number): void { _prescribeMonths = months; }
-export function setPrescribeEndDate(endDate: string): void { _prescribeEndDate = endDate; }
-export function resetPrescribeState(): void {
-  _prescribeMode = DEFAULT_PRESCRIBE_MODE;
-  _prescribeMonths = DEFAULT_PRESCRIBE_MONTHS;
-  _prescribeEndDate = DEFAULT_PRESCRIBE_END_DATE;
-}
-
 // === CAN RENEW ===
 
 export function canRenewMed(s: MedState): boolean {
@@ -64,9 +49,9 @@ export function calcPrescribeResult(
   let endDate: Date | null = null;
   let totalDays = 0;
 
-  const mode = ps.mode || _prescribeMode;
-  const months = ps.months || _prescribeMonths;
-  const endDateRaw = ps.endDate || _prescribeEndDate;
+  const mode = ps.mode || DEFAULT_PRESCRIBE_MODE;
+  const months = ps.months || DEFAULT_PRESCRIBE_MONTHS;
+  const endDateRaw = ps.endDate || DEFAULT_PRESCRIBE_END_DATE;
 
   if (mode === 'months' && months > 0) {
     const tYear  = today.getUTCFullYear();
@@ -135,8 +120,8 @@ export function prescribeValidationHint(
     pkgHint = { type: 'warn', field: 'pkg', msg: 'Förpackningsstorleken måste vara ett heltal.' };
   }
 
-  const mode = ps.mode || _prescribeMode;
-  const endDateRaw = ps.endDate || _prescribeEndDate;
+  const mode = ps.mode || DEFAULT_PRESCRIBE_MODE;
+  const endDateRaw = ps.endDate || DEFAULT_PRESCRIBE_END_DATE;
 
   if (mode === 'date') {
     if (!endDateRaw) {
