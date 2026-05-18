@@ -419,4 +419,5 @@ export function clearAllMedState(): void {
   clearPrescribeState();
   resetLtPeriods();
   resetNurseState();
+  _cardStatus.clear();
 }

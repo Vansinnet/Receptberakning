@@ -1,3 +1,7 @@
+<script module lang="ts">
+  declare const __APP_VERSION__: string;
+</script>
+
 <script lang="ts">
   let {
     activeTab = 'renew' as 'renew' | 'longterm',
@@ -8,8 +12,7 @@
     onThemeChange = (_theme: string) => {},
   } = $props();
 
-  // __APP_VERSION__ injecteras av vite.config.ts define
-  const version = '2.0.0';
+  const version = __APP_VERSION__;
 </script>
 
 <header class="topbar">

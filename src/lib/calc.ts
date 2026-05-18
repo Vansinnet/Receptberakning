@@ -205,6 +205,7 @@ export function calcCore(inputData: CalcInput, prev: PrevCalcResult): CalcResult
     }
     avgNum        = consumed / daysSince;
     daysRemaining = Math.floor(remaining! / effectiveDailyDose);
+    daysRemaining = Math.min(daysRemaining, MAX_TOTAL_DAYS);
     endDate = new Date(today);
     endDate.setUTCDate(today.getUTCDate() + daysRemaining);
   } else {

@@ -21,6 +21,7 @@ export interface DrugEntry {
   u?: string;
   f?: string;
   r?: string;
+  c?: boolean;
 }
 
 let _drugList: DrugEntry[] | null = null;
