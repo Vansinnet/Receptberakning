@@ -9,9 +9,17 @@
   import { medCards, getNurseViewActive, setNurseViewActive, tickCurrentDate, clearAllMedState, getActiveMedIdx, getActiveResult, getPrescribeState } from '$lib/state.svelte';
   import { CHECK_INTERACTIONS } from '$lib/interactions';
   import { canRenewMed } from '$lib/prescribe-calc';
+  import { INACTIVITY_WARN_MS, INACTIVITY_CLEAR_MS, INACTIVITY_COUNTDOWN_SEC, COUNTDOWN_TICK_MS, ACTIVITY_RESET_DEBOUNCE_MS } from '$lib/constants';
 
   let activeTab = $state<'renew' | 'longterm'>('renew');
   let theme = $state('klinisk');
+
+  let inactivityWarnTimer: ReturnType<typeof setTimeout> | null = null;
+  let inactivityClearTimer: ReturnType<typeof setTimeout> | null = null;
+  let inactivityCountdownTimer: ReturnType<typeof setInterval> | null = null;
+  let lastActivityTs = 0;
+  let inactivityCountdown = $state(INACTIVITY_COUNTDOWN_SEC);
+  let showInactivityToast = $state(false);
 
   let nurseActive = $derived(getNurseViewActive());
   let result = $derived(getActiveResult());
@@ -83,14 +91,60 @@
     clearAllMedState();
   }
 
+  function resetInactivityTimer() {
+    if (inactivityWarnTimer) clearTimeout(inactivityWarnTimer);
+    if (inactivityClearTimer) clearTimeout(inactivityClearTimer);
+    if (inactivityCountdownTimer) clearInterval(inactivityCountdownTimer);
+    showInactivityToast = false;
+
+    const hasData = medCards.some(c => c.form.medRaw !== '');
+    if (!hasData) return;
+
+    inactivityCountdown = INACTIVITY_COUNTDOWN_SEC;
+    inactivityWarnTimer = setTimeout(() => {
+      showInactivityToast = true;
+      inactivityCountdownTimer = setInterval(() => {
+        inactivityCountdown--;
+        if (inactivityCountdown <= 0) {
+          if (inactivityCountdownTimer) clearInterval(inactivityCountdownTimer);
+          clearAllMedState();
+        }
+      }, COUNTDOWN_TICK_MS);
+    }, INACTIVITY_WARN_MS);
+    inactivityClearTimer = setTimeout(() => {
+      clearAllMedState();
+    }, INACTIVITY_CLEAR_MS);
+  }
+
+  function handleActivity() {
+    const now = Date.now();
+    if (now - lastActivityTs < ACTIVITY_RESET_DEBOUNCE_MS) return;
+    lastActivityTs = now;
+    resetInactivityTimer();
+  }
+
+  function dismissInactivityToast() {
+    resetInactivityTimer();
+  }
+
   $effect(() => {
     if (typeof document !== 'undefined') {
       document.documentElement.setAttribute('data-theme', theme);
       document.addEventListener('visibilitychange', onVisibilityChange);
       window.addEventListener('pagehide', onPageHide);
+      document.addEventListener('mousemove', handleActivity);
+      document.addEventListener('keydown', handleActivity);
+      document.addEventListener('pointerdown', handleActivity);
+      resetInactivityTimer();
       return () => {
         document.removeEventListener('visibilitychange', onVisibilityChange);
         window.removeEventListener('pagehide', onPageHide);
+        document.removeEventListener('mousemove', handleActivity);
+        document.removeEventListener('keydown', handleActivity);
+        document.removeEventListener('pointerdown', handleActivity);
+        if (inactivityWarnTimer) clearTimeout(inactivityWarnTimer);
+        if (inactivityClearTimer) clearTimeout(inactivityClearTimer);
+        if (inactivityCountdownTimer) clearInterval(inactivityCountdownTimer);
       };
     }
   });
@@ -101,6 +155,18 @@
     if (!result || idx < 0 || idx >= medCards.length) return;
     if (result.earlyRenewalDecision === null && medCards[idx].earlyRenewalDecision !== null) {
       medCards[idx].earlyRenewalDecision = null;
+    }
+  });
+
+  // Nollställ inaktivitetstimers när alla kort rensats
+  $effect(() => {
+    medCards;
+    const hasData = medCards.some(c => c.form.medRaw !== '');
+    if (!hasData) {
+      if (inactivityWarnTimer) clearTimeout(inactivityWarnTimer);
+      if (inactivityClearTimer) clearTimeout(inactivityClearTimer);
+      if (inactivityCountdownTimer) clearInterval(inactivityCountdownTimer);
+      showInactivityToast = false;
     }
   });
 
@@ -250,4 +316,12 @@
     </footer>
   </div>
   <div class="tooltip-bubble" id="tooltipBubble"></div>
+
+  {#if showInactivityToast}
+    <div class="inactivity-toast" role="alert" aria-live="assertive">
+      <span class="toast-icon">⏰</span>
+      <span>Inaktivitet — sessionen rensas om <strong>{inactivityCountdown}s</strong></span>
+      <button class="btn btn-ghost" onclick={dismissInactivityToast}>Fortsätt</button>
+    </div>
+  {/if}
 </svelte:boundary>

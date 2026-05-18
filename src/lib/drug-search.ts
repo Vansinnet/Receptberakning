@@ -8,6 +8,11 @@ const STORE_NAME = 'drugs';
 const MIN_SEARCH_QUERY_LENGTH = 2;
 const MAX_AUTOCOMPLETE_RESULTS = 10;
 
+interface CacheData {
+  version: number;
+  entries: DrugEntry[];
+}
+
 export interface DrugEntry {
   n: string;
   i: string;
@@ -31,7 +36,7 @@ function openDB(): Promise<IDBDatabase> {
   });
 }
 
-async function loadFromCache(): Promise<DrugEntry[] | null> {
+async function loadFromCache(): Promise<CacheData | null> {
   try {
     const db = await openDB();
     return new Promise((resolve) => {
@@ -40,7 +45,7 @@ async function loadFromCache(): Promise<DrugEntry[] | null> {
       req.onsuccess = () => {
         const data = req.result;
         if (data && data.entries && data.version) {
-          resolve(data.entries);
+          resolve({ version: data.version, entries: data.entries });
         } else {
           resolve(null);
         }
@@ -52,14 +57,14 @@ async function loadFromCache(): Promise<DrugEntry[] | null> {
   }
 }
 
-async function fetchAndCache(): Promise<DrugEntry[]> {
+async function fetchAndCache(serverVersion: number): Promise<DrugEntry[]> {
   const resp = await fetch('/data/drugs.json');
   if (!resp.ok) throw new Error(`drugs.json: ${resp.status}`);
   const entries = await resp.json();
   openDB().then(db => {
     try {
       const tx = db.transaction(STORE_NAME, 'readwrite');
-      tx.objectStore(STORE_NAME).put({ id: CACHE_NAME, version: 1, entries, ts: Date.now() }, CACHE_NAME);
+      tx.objectStore(STORE_NAME).put({ id: CACHE_NAME, version: serverVersion, entries, ts: Date.now() }, CACHE_NAME);
     } catch { /* cache failure is non-critical */ }
   }).catch(() => {});
   return entries;
@@ -70,11 +75,21 @@ export async function loadDrugs(): Promise<void> {
   if (_loadPromise) return _loadPromise;
   _loadPromise = (async () => {
     try {
+      let serverVersion = 0;
+      try {
+        const vResp = await fetch('/data/drugs-version.json');
+        if (vResp.ok) {
+          const vData = await vResp.json();
+          serverVersion = vData.version || 0;
+        }
+      } catch { /* non-critical */ }
+
       const cached = await loadFromCache();
-      if (cached) {
-        _drugList = cached;
+
+      if (cached && cached.version === serverVersion && serverVersion > 0) {
+        _drugList = cached.entries;
       } else {
-        _drugList = await fetchAndCache();
+        _drugList = await fetchAndCache(serverVersion);
       }
     } catch (err) {
       console.error('[drug-search] kunde inte ladda läkemedelsdata:', err);
