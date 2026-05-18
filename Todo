@@ -2,3 +2,94 @@ Buggar:
 #1 Jag fyller i läkemedel. Diazepam Accord 5 mg, senaste recept 2025-10-31, dos 1, förpackningsstorlek 100, antal uttag 3. Svarara "Ja, förnya" Fyller sedan i kvarvarande dos, raderar den sedan. Då räknas inte läkemedlet om utan försvinner i både patienttext och journaltext. Läkemedlet försvinner också i prescribe-panelen.
 #2 Om jag fyller i kvarvarande dos 1 st, sjunker genomsnittlig dos på ett konstigt sätt i resultatpanelen. 
 #3 Ändrar vi tid (både i antal månader och t.o.m. datum) att förskriva uppdateras inte antalet förpackning som ska förskrivas. Det är först när vi ändrar förpackningsstorlek i prescribepanelen som prescribepanelen räknar om antalet förpackningar att förskriva.
+
+
+
+Följande buggar har jag hittat:
+#1 Jag fyller i läkemedel. Diazepam Accord 5 mg, senaste recept 2025-10-31, dos 1, förpackningsstorlek 100, antal uttag 3. Svarara "Ja, förnya" Fyller sedan i kvarvarande dos, raderar den sedan. Då räknas inte läkemedlet om utan försvinner i både patienttext och journaltext. Läkemedlet försvinner också i prescribe-panelen. #2 Om jag fyller i kvarvarande dos 1 st, sjunker genomsnittlig dos på ett konstigt sätt i resultatpanelen.  #3 Ändrar vi tid (både i antal månader och t.o.m. datum) att förskriva uppdateras inte antalet förpackning som ska förskrivas. Det är först när vi ändrar förpackningsstorlek i prescribepanelen som prescribepanelen räknar om antalet förpackningar att förskriva.
+Du får inte fixa buggarna själv utan analysera bakgrunden till dem.12:55Claude responded: Nu har jag läst igenom all relevant kod.Analyserade reaktivitetskedjan i deriverad tillståndshanteringAnalyserade reaktivitetskedjan i deriverad tillståndshanteringNu har jag läst igenom all relevant kod. Här är analysen av samtliga tre buggar:
+
+Bugg #1 — Läkemedlet försvinner när kvarvarande dos raderas
+Rotorsak: leftRaw är bunden med bind:value på ett type="number"-fält. I Svelte 5 returnerar en tömd type="number"-input inte en tom sträng '' — den returnerar null (eller undefined).
+I validateValues (calc.ts rad 68–84) ser logiken ut så här:
+tsconst remaining = leftRaw !== '' ? parseFloat(String(leftRaw).replace(',', '.')) : null;
+const leftIsInvalid = leftRaw !== '' && (isNaN(remaining!) || ...)
+När leftRaw är null (raderat number-fält) utvärderas null !== '' som true, så koden försöker parsa String(null) → "null" → parseFloat("null") → NaN. Det gör att leftIsInvalid = true.
+Längre ner returneras { valid: false, reason: 'incomplete' }, vilket gör att:
+
+_activeResult returnerar { valid: false } → CalcResult-panelen töms
+_texts-kedjan i state.svelte.ts hoppar över kortet (continue) → patient- och journaltext töms
+eligible i PrescribePanel blir false (eftersom result.valid === false) → prescribe-panelen döljs
+
+Problemet är alltså att typen på leftRaw i FormValues är deklarerad som string, men bind:value på ett number-fält ger null vid rensning — en typkonflikt som orsakar ett felaktigt valideringsutfall för hela kortet.
+
+Bugg #2 — Genomsnittlig dos sjunker konstigt vid kvarvarande dos 1 st
+Rotorsak: De två kodvägarna i calcCore (med och utan remaining) använder olika täljare för att beräkna avgNum, vilket skapar en diskontinuitet.
+Med värdena: dos 1/dag, förpackning 100, 3 uttag → total = 300 st. Idag är ~199 dagar sedan receptet (2025-10-31).
+Utan kvarvarande dos (rad 213–215):
+tsavgNum = total / daysSince;   // 300 / 199 ≈ 1.507 st/dag
+Här antas att alla 300 tabletter (3 uttag) har förbrukats.
+Med kvarvarande = 1 st (rad 188–204):
+tsbatchesDispensed = min(3, floor(199/100)+1) = min(3, 2) = 2
+accessibleTotal  = 2 × 100 = 200
+calcBase         = accessibleTotal = 200  // earlyPickup = false
+consumed         = 200 − 1 = 199
+avgNum           = consumed / daysSince = 199 / 199 = 1.0 st/dag
+Nu används bara 200 tabletter (2 uttag) som bas — det tredje uttaget räknas inte in.
+Resultatet: snittförbrukning hoppar från 1.51 → 1.00 (och isOveruse-flaggan försvinner) bara för att man anger att 1 tablett finns kvar. Det är modellens inkonsistens mellan de två beräkningsvägarna — total/daysSince vs (accessibleTotal − remaining)/daysSince — som orsakar det märkliga fallet.
+
+Bugg #3 — Antal förpackningar uppdateras inte när månader/datum ändras
+Rotorsak: _prescribeMode, _prescribeMonths och _prescribeEndDate i prescribe-calc.ts är vanliga let-variabler på modulnivå — inte $state. Svelte 5:s reaktivitetssystem spårar inte förändringar i dem.
+prescResult i PrescribePanel.svelte definieras som:
+tslet prescResult = $derived.by(() => {
+  const ps = getPrescribeState(activeIdx);  // ← $state, reaktiv
+  return calcPrescribeResult(s, ps ?? null);
+});
+Inuti calcPrescribeResult läses:
+tsconst mode   = ps.mode || _prescribeMode;    // ← ej reaktiv
+const months = ps.months || _prescribeMonths; // ← ej reaktiv
+ps (PrescribeEntry) innehåller bara packageSize och _lastAmt — ingen mode, months eller endDate. Fallback till de modul-globala variablerna sker alltså alltid, men de är osynliga för Svelte.
+När användaren ändrar månadsväljaren anropas setPrescribeMonths(m) som uppdaterar _prescribeMonths (icke-reaktiv) + lokal $state months (reaktiv, men används bara i template för att visa korrekt värde i dropdownen — den ingår inte i prescResult-kroppen). Eftersom _prescribeState[activeIdx] inte förändras re-evalueras aldrig prescResult.
+När däremot packageSize ändras anropas applyPrescribeStatePatch(...) som muterar _prescribeState[activeIdx].packageSize — det är $state och spårat. Det triggar re-evaluering av prescResult, och vid det tillfället läses de (redan uppdaterade) icke-reaktiva variablerna, vilket ger rätt svar. Därför fungerar det "som en bieffekt" när förpackningsstorlek ändras.You said: Har du några åtgärdsförslag?Har du några åtgärdsförslag?12:58Claude responded: Ja, här är förslag per bugg:Formulerade lösningsförslag för tre buggarFormulerade lösningsförslag för tre buggarJa, här är förslag per bugg:
+
+Bugg #1 — leftRaw null-problem vid rensning
+Problemet är typkonflikten mellan string (deklarerad typ) och null (vad Svelte 5 faktiskt levererar från ett tomt number-fält). Två möjliga angreppssätt:
+Alt A – Normalisera i validateValues (minst invasivt):
+Lägg till en normalisering allra först i validateValues så att null, undefined och liknande behandlas som '':
+tsconst safeLeft = (leftRaw == null || leftRaw === 'null') ? '' : String(leftRaw);
+Använd sedan safeLeft i stället för leftRaw i hela funktionen.
+Alt B – Normalisera vid bindningen i MedCard.svelte:
+Byt ut bind:value mot en explicit oninput-handler som konverterar null/undefined till '' innan det skrivs till card.form.leftRaw. Då förblir leftRaw alltid en sträng, i linje med FormValues-typen.
+Alt A är snabbast och kräver förändring på ett enda ställe.
+
+Bugg #2 — Inkonsistent avgNum-beräkning
+De två vägarna behöver använda samma logik för vilka tabletter som anses förbrukade. Det finns två filosofiska val:
+Alt A – Använd accessibleTotal även utan remaining (striktare modell):
+I den "utan remaining"-grenen, ersätt:
+tsavgNum = total / daysSince;
+med:
+tsavgNum = accessibleTotal / daysSince;
+Det ger konsistens: båda vägarna baseras enbart på vad modellen bedömer vara tillgängliga tabletter. Nackdel: overuse-detektionen kan bli något mjukare i slutet av receptperioden.
+Alt B – Bevara nuvarande "utan remaining"-beteende, justera "med remaining"-vägen:
+När remaining är angivet och !earlyPickup, använd total (inte accessibleTotal) som bas om remaining < accessibleTotal:
+tscalcBase = total;  // eller: max(accessibleTotal, calcBase från tredje uttaget)
+Det är svårare att motivera matematiskt eftersom tredje uttaget kanske inte hämtats ut.
+Alt A är att föredra — det är mer konsistent och enklare att förklara kliniskt. Beteendet utan remaining är egentligen den som är "fel" i dag, eftersom den antar att alla 3 uttag förbrukats även när bara 2 borde vara tillgängliga.
+
+Bugg #3 — Icke-reaktiva prescribe-variabler
+Kärnan är att _prescribeMode, _prescribeMonths, _prescribeEndDate behöver vara Svelte-reaktiva. Tre alternativ:
+Alt A – Flytta in variablerna i _prescribeState (rekommenderat):
+Utöka PrescribeEntry med mode, months och endDate:
+tsexport interface PrescribeEntry {
+  packageSize: string;
+  _lastAmt?: string;
+  mode?: string;
+  months?: number;
+  endDate?: string;
+}
+Låt handleModeChange, handleMonthsChange och handleEndDateInput i PrescribePanel anropa applyPrescribeStatePatch för dessa fält i stället för (eller utöver) de modul-globala setterarna. Eftersom _prescribeState är $state blir förändringarna automatiskt spårade och prescResult re-evalueras.
+Alt B – Konvertera de modul-globala variablerna till $state i en .svelte.ts-fil:
+Flytta _prescribeMode, _prescribeMonths, _prescribeEndDate till en .svelte.ts-fil och deklarera dem med $state. Det kräver dock att filen importeras korrekt (Svelte 5-kompilatorn hanterar $state i .svelte.ts men inte i vanliga .ts-filer).
+Alt C – Referera de lokala $state-variablerna direkt i prescResult:
+I prescResult-kroppen, läs mode, months och endDate (de lokala $state-variablerna i PrescribePanel) och skicka dem explicit till calcPrescribeResult i stället för att låta funktionen falla tillbaka på modulvariablerna. Det är minst strukturellt invasivt men förutsätter att calcPrescribeResult accepterar dem som argument.
+Alt A är renast eftersom det samlar all prescribe-state på ett ställe (_prescribeState) och eliminerar de modul-globala variablerna helt.
