@@ -162,7 +162,7 @@ type CardStatusCache = {
   statusText: string;
 };
 
-const _cardStatus = $state<Map<number, CardStatusCache>>(new Map());
+const _cardStatus = new Map<number, CardStatusCache>();
 
 export function getCardStatus(cardId: number): CardStatusCache | undefined {
   return _cardStatus.get(cardId);

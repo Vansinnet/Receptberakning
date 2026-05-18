@@ -34,6 +34,10 @@ export function validateValues(
 ): CalcInput {
   const fieldErrors = { medInput: '', dateInput: '', doseInput: '', amtInput: '', refInput: '', leftInput: '' };
 
+  const safeAmtRaw = (amtRaw == null || amtRaw === 'null') ? '' : String(amtRaw);
+  const safeRefRaw = (refRaw == null || refRaw === 'null') ? '' : String(refRaw);
+  const safeLeftRaw = (leftRaw == null || leftRaw === 'null') ? '' : String(leftRaw);
+
   if (medRaw.length > MAX_MED_NAME_LENGTH) {
     fieldErrors.medInput = 'Läkemedelsnamnet får inte överstiga 100 tecken.';
   }
@@ -41,16 +45,16 @@ export function validateValues(
     fieldErrors.dateInput = 'Ogiltigt datum.';
   }
 
-  const amt = parseInt(amtRaw, 10);
-  const amtIsInvalid = amtRaw !== '' && (isNaN(amt) || amt <= 0 || amt > MAX_AMT_VALUE || !Number.isInteger(Number(amtRaw)));
+  const amt = parseInt(safeAmtRaw, 10);
+  const amtIsInvalid = safeAmtRaw !== '' && (isNaN(amt) || amt <= 0 || amt > MAX_AMT_VALUE || !Number.isInteger(Number(safeAmtRaw)));
   if (amtIsInvalid) fieldErrors.amtInput = 'Ange ett heltal mellan 1 och 10 000.';
 
   const dose = parseFloat(doseRaw.replace(',', '.'));
   const doseIsInvalid = doseRaw !== '' && (isNaN(dose) || dose < MIN_DOSE_VALUE || dose > MAX_DOSE_VALUE);
   if (doseIsInvalid) fieldErrors.doseInput = 'Ange ett tal mellan 0,1 och 50.';
 
-  const refNum = Number(refRaw);
-  const refIsInvalid  = refRaw !== '' && (!Number.isFinite(refNum) || !Number.isInteger(refNum) || refNum < MIN_REF_VALUE || refNum > MAX_REF_VALUE);
+  const refNum = Number(safeRefRaw);
+  const refIsInvalid  = safeRefRaw !== '' && (!Number.isFinite(refNum) || !Number.isInteger(refNum) || refNum < MIN_REF_VALUE || refNum > MAX_REF_VALUE);
   const refOutOfRange = Number.isFinite(refNum) && Number.isInteger(refNum) && refNum > MAX_REF_VALUE;
   if (refOutOfRange)    fieldErrors.refInput = 'Max 12 uttag stöds.';
   else if (refIsInvalid) fieldErrors.refInput = 'Ange ett heltal mellan 1 och 12.';
@@ -65,8 +69,8 @@ export function validateValues(
 
   const doseUnit = doseUnitRaw || 'st';
   const isDiscreteUnit = (doseUnit === 'st');
-  const remaining = leftRaw !== '' ? parseFloat(String(leftRaw).replace(',', '.')) : null;
-  const leftIsInvalid = leftRaw !== '' && (
+  const remaining = safeLeftRaw !== '' ? parseFloat(safeLeftRaw.replace(',', '.')) : null;
+  const leftIsInvalid = safeLeftRaw !== '' && (
     isNaN(remaining!) || remaining! < 0 ||
     remaining! > MAX_AMT_VALUE ||
     (isDiscreteUnit && !Number.isInteger(remaining!))
@@ -93,7 +97,7 @@ export function validateValues(
 
   const ref = refNum;
 
-  return { valid: true, medRaw, dateVal, pDate, amt, dose, ref, remaining, doseRaw, amtRaw, refRaw, leftRaw, doseInterval: doseInterval as DoseInterval, doseUnit: doseUnit as DoseUnit, notCalculable: !!notCalculable };
+  return { valid: true, medRaw, dateVal, pDate, amt, dose, ref, remaining, doseRaw, amtRaw: safeAmtRaw, refRaw: safeRefRaw, leftRaw: safeLeftRaw, doseInterval: doseInterval as DoseInterval, doseUnit: doseUnit as DoseUnit, notCalculable: !!notCalculable };
 }
 
 // === CALCCORE ===
