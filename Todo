@@ -1,0 +1,3 @@
+Buggar:
+#1 Jag fyller i läkemedel. Fyller sedan i kvarvarande dos, raderar den sedan. Då räknas inte läkemedlet om utan försvinner i både patienttext och journaltext. Läkemedlet försvinner också i prescribe-panelen.
+#2 Om jag fyller i kvarvarande dos 1 st, sjunker genomsnittlig dos på ett konstigt sätt. 
