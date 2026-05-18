@@ -247,3 +247,14 @@ tsexport function pushMedCard(): number | null {
   return cardId;
 }
 Uppdatera handleAddMed i MedList att hantera null-returen och dölja/inaktivera "Lägg till"-knappen när gränsen nåtts.
+
+Bugg #14 — ALLVARLIG: Långvarig förbrukningsanalys rensas inte vid "Ny patient"
+Fil: src/components/LongtermPanel.svelte + src/lib/state.svelte.ts
+Rotorsak: LongtermPanel har två lokala $state-variabler för läkemedelsnamn och dos:
+tslet medRaw = $state('');
+let doseRaw = $state('');
+Dessa är komponentlokala och lever för hela sidans livstid eftersom LongtermPanel alltid är monterad i DOM:en (den döljs visuellt men förstörs inte vid flikbyte). clearAllMedState() — som anropas från "Ny patient"-knappen — återställer medCards, ltPeriods, och prescribe-state, men känner inte till och kan inte nå komponentens lokala $state.
+Resultatet: en kliniker klickar "Ny patient", fyller i ett nytt läkemedel i receptförnyelse-fliken, byter sedan till Långvarig-fliken — och ser föregående patients läkemedel och dos fortfarande ifyllda. Perioder är rensade (de styrs av ltPeriods i global state), men läkemedelsnamnet och dosen är kvar. result-derivatet beräknas om direkt med det gamla läkemedelsnamnet mot de nya (tomma) perioderna, men ett fältfel visas inte — medRaw räknas som ifyllt.
+En kliniker som inte noterar det kvarliggande namnet riskerar att påbörja en analys med fel läkemedelsbeteckning på en ny patient.
+Notera att PrescribePanel har ett liknande problem med sina lokala mode-, months- och endDate-variabler (en bieffekt av Bugg #3), men det är ett lägre säkerhetsriskvärde eftersom de värdena inte är patientidentifierande utan konfigurationsval.
+Åtgärd: Flytta medRaw och doseRaw till den globala state.svelte.ts (som egna $state-fält, analogt med hur ltPeriods hanteras), och inkludera dem i clearAllMedState. Alternativt: exponera en resetLongtermForm()-funktion från state.svelte.ts och anropa den explicit från clearAllMedState.
