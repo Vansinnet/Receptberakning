@@ -258,3 +258,79 @@ Resultatet: en kliniker klickar "Ny patient", fyller i ett nytt läkemedel i rec
 En kliniker som inte noterar det kvarliggande namnet riskerar att påbörja en analys med fel läkemedelsbeteckning på en ny patient.
 Notera att PrescribePanel har ett liknande problem med sina lokala mode-, months- och endDate-variabler (en bieffekt av Bugg #3), men det är ett lägre säkerhetsriskvärde eftersom de värdena inte är patientidentifierande utan konfigurationsval.
 Åtgärd: Flytta medRaw och doseRaw till den globala state.svelte.ts (som egna $state-fält, analogt med hur ltPeriods hanteras), och inkludera dem i clearAllMedState. Alternativt: exponera en resetLongtermForm()-funktion från state.svelte.ts och anropa den explicit från clearAllMedState.
+
+Bugg #15 — Felmeddelande visas för amtRaw och refRaw när fälten töms
+Fil: src/components/MedCard.svelte + src/lib/calc.ts
+Samma rotorsak som Bugg #1: amtRaw och refRaw är bundna med bind:value på type="number"-inputs och får värdet null (inte '') när användaren raderar innehållet. I validateValues tolkas detta som ett ogiltigt värde: parseInt(null) = NaN → amtIsInvalid = true, och Number(null) = 0 < MIN_REF_VALUE → refIsInvalid = true. Fältfelsmeddelanden visas för fält som är tomma — "Ange ett heltal mellan 1 och 10 000" respektive "Ange ett heltal mellan 1 och 12" — trots att fältet bara är tömt, inte ifyllt fel. Rätt beteende vore inget fältelmeddelande alls på ett tomt obligatoriskt fält.
+
+Bugg #16 — calculable=false-resultat renderas aldrig i resultpanelen
+Fil: src/components/App.svelte
+calcCore returnerar valid: true, calculable: false för flera viktiga tillstånd: icke-kvantifierbara beredningar (kräm, lösning etc.), för många uttag (ref > 12), recept utfärdat idag, och orimliga värden. App.svelte:s render-logik hanterar inte detta fall:
+svelte{#if result?.valid && result?.calculable !== false}  <!-- calculable=false → hoppar förbi -->
+  <CalcResult ... />
+{:else if result && !result.valid}                   <!-- valid=true → hoppar förbi -->
+  ...
+{:else}
+  <div>Fyll i formuläret för att se resultatet</div>  <!-- ← hamnar alltid här -->
+{/if}
+Alla noggrant formulerade felmeddelanden ("Beräkning ej tillämplig", "Ogiltigt antal uttag", "Kan ej beräknas idag", "Orimliga värden") visas aldrig. Användaren ser istället alltid den generiska "Fyll i formuläret"-texten.
+Åtgärd: Lägg till ett mellanliggande {:else if result?.valid && result?.calculable === false} som renderar <CalcResult> även i dessa fall, eller visa result.verdictTitle + result.verdictSub direkt.
+
+Bugg #17 — Stale metadata (atcCode, nplId, notCalculable) efter manuell textredigering av läkemedelsnamn
+Fil: src/components/MedCard.svelte
+handleMedInput — som triggas vid varje tangenttryckning i läkemedelsfältet — återställer aldrig atcCode, nplId eller notCalculable. Om en användare väljer ett läkemedel via autocomplete och sedan manuellt skriver över texten kvarstår den gamla drogans metadata:
+
+atcCode från det gamla läkemedlet → felaktiga interaktionsvarningar (ett annat ATC-kods interaktioner flaggas för det nya läkemedlet)
+nplId från det gamla läkemedlet → FASS-knappen länkar till fel produktsida
+notCalculable: true från ett icke-kalkylerbart läkemedel → nästa inmatade läkemedel behandlas som icke-kalkylerbart och visar "Beräkning ej tillämplig"
+
+Åtgärd: Lägg till återställning av dessa fält i handleMedInput vid varje tangenttryckning, t.ex. card.form.atcCode = null; card.form.nplId = null; card.form.notCalculable = false;.
+
+Bugg #18 — doseUnit återställs inte vid byte till ett nytt läkemedel via autocomplete
+Fil: src/components/MedCard.svelte
+selectDrug sätter doseUnit = 'ml' om det valda läkemedlet har enheten ml, men återställer aldrig doseUnit till 'st' om det nya läkemedlet inte är ett ml-preparat:
+tsfunction selectDrug(d: DrugEntry) {
+  // ...
+  if (d.u === 'ml') card.form.doseUnit = 'ml';  // sätts vid ml
+  // men återställs aldrig till 'st' vid st-preparat
+}
+Om en användare väljer ett ml-preparat (t.ex. Metadon mixtur), sedan byter till ett tablett-preparat (t.ex. Diazepam 5 mg) utan att rensa formuläret, kvarstår doseUnit = 'ml'. Konsekvensen: resultpanelen visar "snittförbrukning X ml/dag" istället för "X st/dag", och heltalsvali­deringen för kvarvarande dos (som endast gäller st) är inaktiverad.
+Åtgärd: Återställ alltid doseUnit till 'st' i selectDrug innan villkorlig tilldelning: card.form.doseUnit = d.u === 'ml' ? 'ml' : 'st';.
+
+Korrigering av Bugg #14
+Bugg #14 håller inte i praktiken. LongtermPanel renderas villkorligt i {:else}-grenen — när användaren är på receptförnyelse-fliken (den enda platsen "Ny patient"-knappen finns) är panelen destruerad. Komponentens lokala medRaw och doseRaw nollställs automatiskt vid nästa montering. Buggen är en falsk positiv och behöver inte åtgärdas.
+
+Bugg #15 (omformulerad) — Felmeddelanden visas för amtRaw och refRaw vid tom inmatning
+Fil: src/components/MedCard.svelte + src/lib/calc.ts
+Samma rotorsak som Bugg #1 men med annorlunda konsekvens. Svelte 5 ger null (inte '') från bind:value på type="number" när fältet töms. I validateValues:
+tsconst amt = parseInt(amtRaw, 10);
+// parseInt(null) → parseInt("null") → NaN
+const amtIsInvalid = amtRaw !== '' && (isNaN(amt) || ...);
+// null !== '' → true → isNaN(NaN) → amtIsInvalid = true → fältfelmeddelande visas
+Detsamma för refRaw: Number(null) = 0 < MIN_REF_VALUE(1) → refIsInvalid = true. Effekten skiljer sig från Bugg #1: kortet försvinner inte, men ett rött fältfelmeddelande ("Ange ett heltal...") visas på ett tomt fält. Rätt beteende vore att ett tomt obligatoriskt fält ger tyst valid: false utan feltext — precis som medRaw och doseRaw (som är type="text") beter sig.
+Åtgärd: Normalisera null-värden till '' på samma sätt som Bugg #1:s åtgärd, antingen i validateValues eller vid bindningen.
+
+Bugg #19 — Autocompletedropdown stängs inte när fokusen lämnar läkemedelsfältet
+Fil: src/components/MedCard.svelte
+Det finns ingen onblur-hanterare på läkemedelsinmatningsfältet. Om användaren öppnar autocompletedropdownen och sedan klickar på ett annat fält (t.ex. datumet) förblir dropdownen synlig tills användaren skriver igen i läkemedelsfältet eller trycker Escape. Dropdownen blockerar visuellt delar av formuläret och skapar förvirring om vad som är aktivt.
+Notera att onmousedown på dropdownobjekten har e.preventDefault() — detta är korrekt för att förhindra att fokusen lämnar inmatningsfältet när användaren väljer ett alternativ. Men det hjälper inte när användaren klickar utanför dropdownen.
+Åtgärd: Lägg till en onblur-hanterare på medInput som stänger dropdownen med en kort fördröjning (så att onmousedown på dropdownobjekten hinner köras först):
+tsfunction handleBlur() {
+  setTimeout(() => { acVisible = false; }, 150);
+}
+
+Bugg #20 — Journaltext visar "förskrivningen är slut" felaktigt vid överförbrukning utan kvarvarande dos
+Fil: src/lib/text-gen.ts
+I journaltexten för ett overuse-kort utan kvarvarande mängd angivet bestäms sn-variabeln av s.daysRemaining:
+tsconst sn = s.remainingDoses != null
+  ? (...)
+  : (s.daysRemaining != null && s.daysRemaining > 0
+      ? `Aktuell förskrivning beräknas räcka ytterligare ${s.daysRemaining} dagar.`
+      : 'Aktuell förskrivning är slut.');
+Vid överförbrukning utan remaining beräknas daysRemaining som getDaysDiff(endDate, today) där endDate = pDate + totalDays / avgRate. Eftersom patienten förbrukat mer än ordinerat är endDate förfluten (medicinen teoretiskt slut) → daysRemaining ≤ 0 → journalen skriver "Aktuell förskrivning är slut."
+Det stämmer inte: receptperioden (daysToPrescribedEnd) kan fortfarande ha dagar kvar. Texten förväxlar "beräknat datum då medicinen tog slut baserat på förbrukningstakt" med "receptperioden har löpt ut." En läkare som läser journaltexten tror att receptet hunnit gå ut, men i verkligheten är det bara förbrukningsberäkningen som pekar bakåt i tiden.
+Åtgärd: Ersätt kontrollen med s.daysToPrescribedEnd (receptperioden) i stället för s.daysRemaining (förbrukningshorisonten) för sn-variabelns else-gren:
+ts: (s.daysToPrescribedEnd != null && s.daysToPrescribedEnd > 0
+    ? `Aktuell receptperiod löper ut om ${s.daysToPrescribedEnd} dagar (t.o.m. ${s.prescribedEndDateStr}).`
+    : 'Aktuell receptperiod är avslutad.');
+
