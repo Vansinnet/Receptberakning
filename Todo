@@ -1,3 +1,4 @@
 Buggar:
-#1 Jag fyller i läkemedel. Fyller sedan i kvarvarande dos, raderar den sedan. Då räknas inte läkemedlet om utan försvinner i både patienttext och journaltext. Läkemedlet försvinner också i prescribe-panelen.
-#2 Om jag fyller i kvarvarande dos 1 st, sjunker genomsnittlig dos på ett konstigt sätt. 
+#1 Jag fyller i läkemedel. Diazepam Accord 5 mg, senaste recept 2025-10-31, dos 1, förpackningsstorlek 100, antal uttag 3. Svarara "Ja, förnya" Fyller sedan i kvarvarande dos, raderar den sedan. Då räknas inte läkemedlet om utan försvinner i både patienttext och journaltext. Läkemedlet försvinner också i prescribe-panelen.
+#2 Om jag fyller i kvarvarande dos 1 st, sjunker genomsnittlig dos på ett konstigt sätt i resultatpanelen. 
+#3 Ändrar vi tid (både i antal månader och t.o.m. datum) att förskriva uppdateras inte antalet förpackning som ska förskrivas. Det är först när vi ändrar förpackningsstorlek i prescribepanelen som prescribepanelen räknar om antalet förpackningar att förskriva.
