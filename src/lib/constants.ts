@@ -119,10 +119,6 @@ export const ACTIVITY_RESET_DEBOUNCE_MS = 2000;
 // för att skydda patientdata vid bortglömd session.
 export const INACTIVITY_WARN_MS = 22 * 60 * 1000;
 
-// AKTIVT VAL: 23 minuter — sidan töms automatiskt efter denna tid.
-// En minut efter varning, tillräckligt för att användaren ska hinna reagera.
-export const INACTIVITY_CLEAR_MS = 23 * 60 * 1000;
-
 // AKTIVT VAL: 60 sekunder — nedräkning som visas i toasten före rensning.
 export const INACTIVITY_COUNTDOWN_SEC = 60;
 
@@ -130,29 +126,10 @@ export const INACTIVITY_COUNTDOWN_SEC = 60;
 export const COUNTDOWN_TICK_MS = 1000;
 
 // ============================================================================
-// 7. UI — TOAST / KOPIERING / TOOLTIP
-// ============================================================================
-
-export const TOAST_DURATION_MS = 3000;
-export const TOAST_FADE_OUT_MS = 200;
-export const COPY_CONFIRMATION_MS = 1800;
-export const TOOLTIP_OFFSET_X = 12;
-export const TOOLTIP_OFFSET_Y = 36;
-
-// ============================================================================
-// 8. UI — FLAGGOR
-// ============================================================================
-
-export const FLAG_VIEWBOX = '0 0 22 14';
-export const FLAG_WIDTH = 20;
-export const FLAG_HEIGHT = 13;
-
-// ============================================================================
-// 9. ENHETER / DISPLAY-MAPPNINGAR
+// 7. ENHETER / DISPLAY-MAPPNINGAR
 // ============================================================================
 
 export const VALID_THEMES = new Set(['dark', 'klinisk', 'sakura']);
-export const SAFE_ALERT_TYPES = new Set(['danger', 'warn', 'info', 'ok']);
 
 export const UNIT_DISPLAY = {
   st:  { short: 'st',  long: 'tabletter' },
@@ -168,14 +145,14 @@ export const DOSE_UNIT_NORMALIZE: Record<string, string> = {
 };
 
 // ============================================================================
-// 10. DEFAULT-VÄRDEN — PANELER / FORMULÄR
+// 8. DEFAULT-VÄRDEN — PANELER / FORMULÄR
 // ============================================================================
 
 export const DEFAULT_PRESCRIBE_MODE = 'months';
 export const DEFAULT_PRESCRIBE_END_DATE = '';
 
 // ============================================================================
-// 11. LÄKEMEDELSTILLVERKARE — används av stripManufacturer() för att
+// 9. LÄKEMEDELSTILLVERKARE — används av stripManufacturer() för att
 //     rensa bort tillverkarnamn ur läkemedelssträngar.
 // ============================================================================
 
@@ -198,7 +175,7 @@ export const SINGLE_MFR_NAMES: string[] = [
 ];
 
 // ============================================================================
-// 12. LÄKEMEDELSSÖKNING / AUTOCOMPLETE
+// 10. LÄKEMEDELSSÖKNING / AUTOCOMPLETE
 // ============================================================================
 
 export const MIN_SEARCH_QUERY_LENGTH = 2;

@@ -479,7 +479,7 @@ export function clearAllMedState(): void {
   _cardStatus = {};
 }
 
-export function getHasSummary(): boolean {
+const _hasSummary = $derived.by(() => {
   let count = 0;
   for (let i = 0; i < medCards.length; i++) {
     const ps = _prescribeState[medCards[i]._cardId];
@@ -496,4 +496,8 @@ export function getHasSummary(): boolean {
     count++;
   }
   return count >= 2;
+});
+
+export function getHasSummary(): boolean {
+  return _hasSummary;
 }

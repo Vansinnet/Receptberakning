@@ -181,25 +181,6 @@
       showInactivityToast = false;
     }
   });
-
-  $effect(() => {
-    if (typeof document === 'undefined') return;
-    document.addEventListener('visibilitychange', onVisibilityChange);
-    window.addEventListener('pagehide', onPageHide);
-    document.addEventListener('mousemove', handleActivity);
-    document.addEventListener('keydown', handleActivity);
-    document.addEventListener('pointerdown', handleActivity);
-    resetInactivityTimer();
-    return () => {
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-      window.removeEventListener('pagehide', onPageHide);
-      document.removeEventListener('mousemove', handleActivity);
-      document.removeEventListener('keydown', handleActivity);
-      document.removeEventListener('pointerdown', handleActivity);
-      if (inactivityWarnTimer) clearTimeout(inactivityWarnTimer);
-      if (inactivityCountdownTimer) clearInterval(inactivityCountdownTimer);
-    };
-  });
 </script>
 
 <svelte:boundary>

@@ -32,14 +32,14 @@
     };
   });
 
-  function getVerdictIcon(): string {
-    if (!result?.valid || !result?.calculable) return '⚠';
-    if (result.isOveruse && result.earlyRenewalDecision === 'yes') return '✓';
-    if (result.isOveruse) return '⚠';
-    if (result.isTooEarly && result.earlyRenewalDecision === 'yes') return '✓';
-    if (result.isTooEarly) return '⏱';
-    return '✓';
-  }
+  let verdict = $derived.by((): { icon: string; cls: string } => {
+    if (!result?.valid || !result?.calculable) return { icon: '⚠', cls: '' };
+    if (result.isOveruse && result.earlyRenewalDecision === 'yes') return { icon: '✓', cls: 'ok' };
+    if (result.isOveruse) return { icon: '⚠', cls: 'danger' };
+    if (result.isTooEarly && result.earlyRenewalDecision === 'yes') return { icon: '✓', cls: 'ok' };
+    if (result.isTooEarly) return { icon: '⏱', cls: 'warn' };
+    return { icon: '✓', cls: 'ok' };
+  });
 
   function copyText() {
     const body = activeTab === 'patient'
@@ -54,17 +54,6 @@
     }
   }
 
-  let verdictIcon = $derived(getVerdictIcon());
-
-  let verdictCls = $derived.by((): string => {
-    if (!result?.valid || !result?.calculable) return '';
-    if (result.isOveruse && result.earlyRenewalDecision === 'yes') return 'ok';
-    if (result.isOveruse) return 'danger';
-    if (result.isTooEarly && result.earlyRenewalDecision === 'yes') return 'ok';
-    if (result.isTooEarly) return 'warn';
-    return 'ok';
-  });
-
   let tlWidthClass = $derived(pctClass(result?.tlPct ?? 0, 'w'));
 
   // Tvinga journal-flik i sjuksköterskeläge
@@ -76,8 +65,8 @@
 {#if result && result.valid && result.calculable !== false}
   <div class="result-content">
     <!-- Verdict -->
-    <div class="verdict verdict-{verdictCls}" aria-live="polite" aria-atomic="true">
-      <div class="verdict-icon" aria-hidden="true">{verdictIcon}</div>
+    <div class="verdict verdict-{verdict.cls}" aria-live="polite" aria-atomic="true">
+      <div class="verdict-icon" aria-hidden="true">{verdict.icon}</div>
       <div>
         <div class="verdict-title">{result.verdictTitle ?? '—'}</div>
         {#if result.verdictSub}
@@ -91,7 +80,7 @@
       <div class="tl-wrap">
         <div class="tl-label" data-tooltip="Visar hur stor andel av receptperioden som förflutit sedan förskrivningsdatumet.">Receptperiod</div>
         <div class="tl-bar-bg">
-          <div class="tl-fill tl-fill-{verdictCls} {tlWidthClass}" role="progressbar" aria-valuenow={Math.round(result.tlPct)} aria-valuemin="0" aria-valuemax="100" aria-label="Förfluten andel av receptperioden">
+          <div class="tl-fill tl-fill-{verdict.cls} {tlWidthClass}" role="progressbar" aria-valuenow={Math.round(result.tlPct)} aria-valuemin="0" aria-valuemax="100" aria-label="Förfluten andel av receptperioden">
             <div class="tl-today-marker"></div>
           </div>
         </div>

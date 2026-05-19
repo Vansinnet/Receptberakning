@@ -31,6 +31,7 @@
     if (!s?.valid || !s?.calculable) return;
     const currentAmt = String(s.amt ?? '');
     const ps = getPrescribeState(card._cardId);
+    if (ps && ps._lastAmt === currentAmt && ps.packageSize !== '') return;
     if (!ps) {
       initPrescribeState(card._cardId, { packageSize: currentAmt, _lastAmt: currentAmt });
     } else {
