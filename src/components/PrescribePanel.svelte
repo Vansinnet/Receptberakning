@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { medCards, getPrescribeState, initPrescribeState, applyPrescribeStatePatch, getActiveMedIdx, getCardStatus, getActiveResult, getHasSummary } from '$lib/state.svelte';
+  import { medCards, getPrescribeState, initPrescribeState, applyPrescribeStatePatch, getActiveMedIdx, setActiveMedIdx, getCardStatus, getActiveResult, getHasSummary } from '$lib/state.svelte';
   import { calcPrescribeResult, canRenewMed, prescribeValidationHint } from '$lib/prescribe-calc';
   import { UNIT_DISPLAY, DEFAULT_PRESCRIBE_MODE, DEFAULT_PRESCRIBE_MONTHS } from '$lib/constants';
   import type { MedState } from '$lib/types';
@@ -63,10 +63,25 @@
   function handleEndDateInput(e: Event) {
     if (!card) return;
     const input = e.target as HTMLInputElement;
-    let val = input.value.replace(/\D/g, '').substring(0, 8);
+    const originalVal = input.value;
+    let val = originalVal.replace(/\D/g, '').substring(0, 8);
     if (val.length > 4) val = val.substring(0, 4) + '-' + val.substring(4);
     if (val.length > 7) val = val.substring(0, 7) + '-' + val.substring(7);
+    const sel = input.selectionStart ?? 0;
+    const digitsBefore = originalVal.substring(0, sel).replace(/\D/g, '').length;
     applyPrescribeStatePatch(card._cardId, { endDate: val });
+    if (val !== originalVal) {
+      let newPos = 0, count = 0;
+      for (let i = 0; i < val.length; i++) {
+        if (/\d/.test(val[i])) count++;
+        if (count === digitsBefore) { newPos = i + 1; break; }
+      }
+      if (count < digitsBefore) newPos = val.length;
+      const target = newPos;
+      requestAnimationFrame(() => {
+        try { input.setSelectionRange(target, target); } catch (_) {}
+      });
+    }
   }
 
   let prescResult = $derived.by(() => {
@@ -179,7 +194,7 @@
                   doseUnit: c.form.doseUnit,
                   prescribedEndDateStr: status?.prescribedEndDateStr ?? '',
                 }, getPrescribeState(c._cardId) ?? null)}
-                <button type="button" class="prescribe-summary-row {i === activeIdx ? 'active' : ''}">
+                <button type="button" class="prescribe-summary-row {i === activeIdx ? 'active' : ''}" onclick={() => setActiveMedIdx(i)}>
                   <span class="prescribe-summary-name">{c.form.medRaw || `Läkemedel ${i + 1}`}</span>
                   <span class="prescribe-summary-right">
                     <span class="prescribe-summary-pkg">{pr?.packages ?? '—'} förp.</span>

@@ -44,6 +44,8 @@
     card.form.notCalculable = false;
     card.form.amtRaw = '';
     card.form.doseUnit = 'st';
+    card.form.doseRaw = '';
+    card.form.doseInterval = 1;
     }
 
     if (q.length < MIN_SEARCH_QUERY_LENGTH) {
@@ -80,7 +82,7 @@
       acHighlight = Math.min(acHighlight + 1, acResults.length - 1);
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      acHighlight = Math.max(acHighlight - 1, 0);
+      acHighlight = acHighlight >= 0 ? Math.max(acHighlight - 1, 0) : -1;
     } else if (e.key === 'Enter') {
       e.preventDefault();
       if (acHighlight >= 0 && acHighlight < acResults.length) {
@@ -142,6 +144,11 @@
 
 {#if card}
   <svelte:boundary>
+    {#snippet failed(error)}
+      <div class="boundary-error" role="alert">
+        <strong>Formuläret kunde inte visas.</strong> Vänligen pröva att ladda om sidan.
+      </div>
+    {/snippet}
     <div class="form-panel-header">
       <div>
         <div class="form-med-name">{card.form.medRaw || '—'}</div>

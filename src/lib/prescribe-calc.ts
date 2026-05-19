@@ -49,9 +49,9 @@ export function calcPrescribeResult(
   let endDate: Date | null = null;
   let totalDays = 0;
 
-  const mode = ps.mode || DEFAULT_PRESCRIBE_MODE;
-  const months = ps.months || DEFAULT_PRESCRIBE_MONTHS;
-  const endDateRaw = ps.endDate || DEFAULT_PRESCRIBE_END_DATE;
+  const mode = ps.mode ?? DEFAULT_PRESCRIBE_MODE;
+  const months = ps.months ?? DEFAULT_PRESCRIBE_MONTHS;
+  const endDateRaw = ps.endDate ?? DEFAULT_PRESCRIBE_END_DATE;
 
   if (mode === 'months' && months > 0) {
     const tYear  = today.getUTCFullYear();

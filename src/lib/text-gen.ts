@@ -26,9 +26,13 @@ export function resolveState(item: { state?: MedState | null; i: number }, state
 export function remainingDosesNote(s: MedState, leading: string = ' '): string {
   if (s.remainingDoses == null) return '';
   const u: string = s.doseUnit || 'st';
-  return s.daysRemaining != null && s.daysRemaining > 0
-    ? `${leading}Vid förnyelse framkommer att patienten har ${s.remainingDoses} ${u} (${s.daysRemaining} dagar) kvar.`
-    : `${leading}Vid förnyelse framkommer att patienten uppger att medicinen är slut.`;
+  if (s.daysRemaining != null && s.daysRemaining > 0) {
+    return `${leading}Vid förnyelse framkommer att patienten har ${s.remainingDoses} ${u} (${s.daysRemaining} dagar) kvar.`;
+  }
+  if (Number(s.remainingDoses) > 0) {
+    return `${leading}Vid förnyelse framkommer att patienten har ${s.remainingDoses} ${u} kvar (under ett dygn).`;
+  }
+  return `${leading}Vid förnyelse framkommer att patienten uppger att medicinen är slut.`;
 }
 
 // === PATIENT TEXT TEMPLATES ===

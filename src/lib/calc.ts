@@ -40,7 +40,7 @@ export function validateValues(
   const safeLeftRaw = (leftRaw == null || leftRaw === 'null') ? '' : String(leftRaw);
 
   if (medRaw.length > MAX_MED_NAME_LENGTH) {
-    fieldErrors.medInput = 'Läkemedelsnamnet får inte överstiga 100 tecken.';
+    fieldErrors.medInput = `Läkemedelsnamnet får inte överstiga ${MAX_MED_NAME_LENGTH} tecken.`;
   }
   if (dateVal.length > MAX_DATE_LENGTH) {
     fieldErrors.dateInput = 'Ogiltigt datum.';
@@ -48,17 +48,17 @@ export function validateValues(
 
   const amt = parseInt(safeAmtRaw, 10);
   const amtIsInvalid = safeAmtRaw !== '' && (isNaN(amt) || amt <= 0 || amt > MAX_AMT_VALUE || !Number.isInteger(Number(safeAmtRaw)));
-  if (amtIsInvalid) fieldErrors.amtInput = 'Ange ett heltal mellan 1 och 10 000.';
+  if (amtIsInvalid) fieldErrors.amtInput = `Ange ett heltal mellan 1 och ${MAX_AMT_VALUE}.`;
 
   const dose = parseFloat(doseRaw.replace(',', '.'));
   const doseIsInvalid = doseRaw !== '' && (isNaN(dose) || dose < MIN_DOSE_VALUE || dose > MAX_DOSE_VALUE);
-  if (doseIsInvalid) fieldErrors.doseInput = 'Ange ett tal mellan 0,1 och 50.';
+  if (doseIsInvalid) fieldErrors.doseInput = `Ange ett tal mellan ${MIN_DOSE_VALUE} och ${MAX_DOSE_VALUE}.`;
 
   const refNum = Number(safeRefRaw);
   const refIsInvalid  = safeRefRaw !== '' && (!Number.isFinite(refNum) || !Number.isInteger(refNum) || refNum < MIN_REF_VALUE || refNum > MAX_REF_VALUE);
   const refOutOfRange = Number.isFinite(refNum) && Number.isInteger(refNum) && refNum > MAX_REF_VALUE;
-  if (refOutOfRange)    fieldErrors.refInput = 'Max 12 uttag stöds.';
-  else if (refIsInvalid) fieldErrors.refInput = 'Ange ett heltal mellan 1 och 12.';
+  if (refOutOfRange)    fieldErrors.refInput = `Max ${MAX_REF_VALUE} uttag stöds.`;
+  else if (refIsInvalid) fieldErrors.refInput = `Ange ett heltal mellan ${MIN_REF_VALUE} och ${MAX_REF_VALUE}.`;
 
   const pDate = dateVal ? parseDateUTC(dateVal) : null;
   if (dateVal && !pDate) fieldErrors.dateInput = 'Ogiltigt datum.';

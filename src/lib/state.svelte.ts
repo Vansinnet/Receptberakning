@@ -262,7 +262,7 @@ const _texts = $derived.by((): TextResult => {
     }
 
     const fp = [f.medRaw, f.dateVal, f.doseRaw, f.amtRaw, f.refRaw, f.leftRaw,
-      f.doseUnit, f.doseInterval, f.notCalculable, card.earlyRenewalDecision].join('\x00');
+      f.doseUnit, f.doseInterval, f.notCalculable, card.earlyRenewalDecision, _app.currentDate].join('\x00');
 
     const cached = _cardResultsCache.get(card._cardId);
     if (cached && cached.fp === fp) {

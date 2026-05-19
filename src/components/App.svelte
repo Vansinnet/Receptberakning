@@ -123,6 +123,7 @@
 
   $effect(() => {
     if (typeof document === 'undefined') return;
+    void medCards.length;
     for (const el of document.querySelectorAll('[data-tooltip]')) {
       const tip = el.getAttribute('data-tooltip');
       if (tip && !el.hasAttribute('aria-label')) {
@@ -184,6 +185,11 @@
 </script>
 
 <svelte:boundary>
+  {#snippet failed(error)}
+    <div class="boundary-error" role="alert">
+      <strong>Ett internt fel har uppstått.</strong> Vänligen ladda om sidan. Om problemet kvarstår, kontakta support.
+    </div>
+  {/snippet}
   <a href="#main-content" class="skip-link">Hoppa till innehåll</a>
 
   <noscript>

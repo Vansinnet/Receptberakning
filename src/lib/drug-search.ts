@@ -51,8 +51,9 @@ async function loadFromCache(): Promise<CacheData | null> {
         } else {
           resolve(null);
         }
+        db.close();
       };
-      req.onerror = () => resolve(null);
+      req.onerror = () => { resolve(null); db.close(); };
     });
   } catch {
     return null;
@@ -63,15 +64,18 @@ async function fetchAndCache(serverVersion: number): Promise<DrugEntry[]> {
   const resp = await fetch('/data/drugs.json');
   if (!resp.ok) throw new Error(`drugs.json: ${resp.status}`);
   const entries = await resp.json();
-  // Cache-skrivning är best-effort — data finns redan i minnet.
-  openDB().then(db => {
-    try {
-      const tx = db.transaction(STORE_NAME, 'readwrite');
-      const store = tx.objectStore(STORE_NAME);
-      const req = store.put({ id: CACHE_NAME, version: serverVersion, entries, ts: Date.now() }, CACHE_NAME);
-      req.onerror = () => console.warn('[drug-search] IndexedDB cache write failed:', req.error);
-    } catch (e) { console.warn('[drug-search] IndexedDB transaction failed:', e); }
-  }).catch(e => { console.warn('[drug-search] IndexedDB open failed:', e); });
+  if (!Array.isArray(entries)) throw new Error('drugs.json: unexpected format');
+  if (serverVersion > 0) {
+    openDB().then(db => {
+      try {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.put({ id: CACHE_NAME, version: serverVersion, entries, ts: Date.now() }, CACHE_NAME);
+        req.onsuccess = () => db.close();
+        req.onerror = () => { console.warn('[drug-search] IndexedDB cache write failed:', req.error); db.close(); };
+      } catch (e) { console.warn('[drug-search] IndexedDB transaction failed:', e); }
+    }).catch(e => { console.warn('[drug-search] IndexedDB open failed:', e); });
+  }
   return entries;
 }
 

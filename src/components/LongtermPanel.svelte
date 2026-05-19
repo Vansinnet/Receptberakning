@@ -2,6 +2,7 @@
   import { ltPeriods, pushLtPeriod, spliceLtPeriod, resetLtPeriods } from '$lib/state.svelte';
   import { calcLongtermCore } from '$lib/calc-longterm';
   import { pctClass } from '$lib/utils';
+  import { MAX_LT_PERIODS, LT_BAR_TEXT_THRESHOLD_PCT } from '$lib/constants';
   import type { LTResult, LTCardPeriod } from '$lib/types';
 
   let medRaw = $state('');
@@ -23,11 +24,26 @@
 
   function handleDateInput(field: 'start' | 'end', idx: number, e: Event) {
     const input = e.target as HTMLInputElement;
-    let val = input.value.replace(/\D/g, '').substring(0, 8);
+    const originalVal = input.value;
+    let val = originalVal.replace(/\D/g, '').substring(0, 8);
     if (val.length > 4) val = val.substring(0, 4) + '-' + val.substring(4);
     if (val.length > 7) val = val.substring(0, 7) + '-' + val.substring(7);
+    const sel = input.selectionStart ?? 0;
+    const digitsBefore = originalVal.substring(0, sel).replace(/\D/g, '').length;
     if (ltPeriods[idx]) {
       ltPeriods[idx][field] = val;
+    }
+    if (val !== originalVal) {
+      let newPos = 0, count = 0;
+      for (let i = 0; i < val.length; i++) {
+        if (/\d/.test(val[i])) count++;
+        if (count === digitsBefore) { newPos = i + 1; break; }
+      }
+      if (count < digitsBefore) newPos = val.length;
+      const target = newPos;
+      requestAnimationFrame(() => {
+        try { input.setSelectionRange(target, target); } catch (_) {}
+      });
     }
   }
 
@@ -35,6 +51,8 @@
     const v = parseFloat(doseRaw.replace(',', '.'));
     return isNaN(v) ? 0 : v;
   });
+
+  let doseInvalid = $derived(doseRaw !== '' && ordDose <= 0);
 
   let result = $derived.by((): LTResult => {
     // Läs ltPeriods för att registrera beroende
@@ -49,7 +67,7 @@
         ltCopied = true;
         if (ltCopiedTimeout) clearTimeout(ltCopiedTimeout);
         ltCopiedTimeout = setTimeout(() => { ltCopied = false; }, 2000);
-      });
+      }).catch(() => {});
     }
   }
 
@@ -88,7 +106,12 @@
           </div>
           <div class="field">
             <label for="lt-dose" data-tooltip="Patientens ordinerade dygnsdos i enheter per dag.">Ordinerad dos (enheter/dag)</label>
-            <input id="lt-dose" type="text" inputmode="decimal" placeholder="T.ex. 1" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" bind:value={doseRaw} />
+            <input id="lt-dose" type="text" inputmode="decimal" placeholder="T.ex. 1" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" bind:value={doseRaw} class:input-error={doseInvalid} aria-invalid={doseInvalid} />
+            {#if doseInvalid}
+              <span class="field-error-msg visible">Ange ett positivt tal</span>
+            {:else}
+              <span class="field-error-msg"></span>
+            {/if}
           </div>
         </div>
 
@@ -137,7 +160,7 @@
           {/each}
         </div>
 
-        <button id="addPeriodBtn" class="btn btn-ghost btn-add-period" data-tooltip="Lägg till ytterligare en period." onclick={handleAddPeriod}>＋ Lägg till period</button>
+        <button id="addPeriodBtn" class="btn btn-ghost btn-add-period" class:is-hidden={ltPeriods.length >= MAX_LT_PERIODS} data-tooltip="Lägg till ytterligare en period." onclick={handleAddPeriod}>＋ Lägg till period</button>
 
         <div class="lt-form-actions">
           <a class="btn fass-link btn-ghost {result.valid ? '' : 'is-hidden'}" id="lt-fassBtn" href={result.fassUrl ?? '#'} target="_blank" rel="noopener noreferrer" data-tooltip="Öppnar FASS produktresumé.">FASS</a>
@@ -183,7 +206,7 @@
           <div id="lt-bar-section">
             <div class="section-label section-label-spaced">Förbrukning relativt ordination</div>
             <div class="consumption-bar-wrap">
-              <div class="consumption-bar {result.overallStatus} {barWidthClass}" role="progressbar" aria-valuenow={Math.round(result.barPct ?? 0)} aria-valuemin="0" aria-valuemax="150" aria-label="Förbrukning relativt ordination">{((result.barPct ?? 0) > 20 ? `${(result.consumptionPct ?? 0).toFixed(0)}%` : '')}</div>
+              <div class="consumption-bar {result.overallStatus} {barWidthClass}" role="progressbar" aria-valuenow={Math.round(result.barPct ?? 0)} aria-valuemin="0" aria-valuemax="150" aria-label="Förbrukning relativt ordination">{((result.barPct ?? 0) > LT_BAR_TEXT_THRESHOLD_PCT ? `${(result.consumptionPct ?? 0).toFixed(0)}%` : '')}</div>
             </div>
             <div class="bar-ticks">
               <span>0%</span><span>50%</span><span>100%</span><span>150%</span>

@@ -170,7 +170,7 @@ export const SINGLE_MFR_NAMES: string[] = [
   "SUN", "Amarox", "Aurobindo", "Hexal", "HEXAL", "Alternova",
   "Mylan", "Bijon", "Grindeks", "Newbury", "Jubilant", "Strides",
   "Holsten", "Vitabalans", "Medartuum", "Abcur", "2care4",
-  "Amdipharm", "Brown", "Pfizer", "Xiromed", "Accordpharma", "Pilum",
+  "Amdipharm", "Brown", "Pfizer", "Xiromed", "Pilum",
   "Rivopharm", "Novum", "Aristo", "Tillomed", "Waymade", "Baxter",
 ];
 

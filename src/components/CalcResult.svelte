@@ -50,7 +50,7 @@
         copied = true;
         if (copiedTimeout) clearTimeout(copiedTimeout);
         copiedTimeout = setTimeout(() => { copied = false; }, 2000);
-      });
+      }).catch(() => {});
     }
   }
 

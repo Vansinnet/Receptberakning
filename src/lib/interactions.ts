@@ -193,11 +193,7 @@ export function atcMatches(atcCode: string | null | undefined, pattern: string):
 
 export function CHECK_INTERACTIONS(atcEntries: Array<{ a: string; i: string }>): InteractionWarning[] {
   const warnings: InteractionWarning[] = [];
-  // Deduplicering baseras på (titel, läkemedel1, läkemedel2).
-  // Designmässigt medvetet val: vid redundanta regelpar (specifik + generisk regel
-  // med samma titel) behålls den FÖRSTA regeln som matchar — dess beskrivning och
-  // rekommendation vinner. Detta är säkert så länge specifika regler ligger före
-  // generiska i INTERACTIONS-arrayen, vilket de gör idag (se t.ex. rad 68 före 139).
+  const seen = new Set<string>();
   for (let i = 0; i < INTERACTIONS.length; i++) {
     const ix = INTERACTIONS[i];
     for (let x = 0; x < atcEntries.length; x++) {
@@ -207,14 +203,9 @@ export function CHECK_INTERACTIONS(atcEntries: Array<{ a: string; i: string }>):
         const matchBA = ix.a.some(p => atcMatches(atcEntries[y].a, p))
                      && ix.b.some(p => atcMatches(atcEntries[x].a, p));
         if ((matchAB || matchBA) && atcEntries[x].a !== atcEntries[y].a) {
-          let already = false;
-          for (let w = 0; w < warnings.length; w++) {
-            if (warnings[w].t === ix.t && warnings[w].drugs[0] === atcEntries[x].i && warnings[w].drugs[1] === atcEntries[y].i) {
-              already = true;
-              break;
-            }
-          }
-          if (!already) {
+          const key = `${ix.t}|${atcEntries[x].i}|${atcEntries[y].i}`;
+          if (!seen.has(key)) {
+            seen.add(key);
             warnings.push({
               s: ix.s,
               t: ix.t,
