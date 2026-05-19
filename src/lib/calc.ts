@@ -202,7 +202,7 @@ export function calcCore(inputData: CalcInput, prev: PrevCalcResult): CalcResult
       const minB = Math.ceil(remaining! / inputData.amt);
       calcBase = Math.min(minB, inputData.ref) * inputData.amt;
     } else {
-      calcBase = total;
+      calcBase = total; // AKTIVT DESIGNVAL: total istället för accessibleTotal — patienten förutsätts ha alla uttag hemma vid rapporterad kvarvarande mängd
     }
     const consumed = calcBase - remaining!;
     if (consumed < 0) {

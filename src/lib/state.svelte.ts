@@ -88,7 +88,9 @@ export function spliceMedCard(i: number): void {
   medCards.splice(i, 1);
   _cardStatus.delete(removedCardId);
   delete _prescribeState[removedCardId];
-  if (_app.activeMedIdx >= medCards.length) {
+  if (_app.activeMedIdx > i) {
+    _app.activeMedIdx -= 1;
+  } else if (_app.activeMedIdx >= medCards.length) {
     _app.activeMedIdx = medCards.length - 1;
   }
 }
@@ -164,6 +166,7 @@ type CardStatusCache = {
   valid: boolean;
   calculable: boolean;
   statusText: string;
+  prescribedEndDateStr: string;
 };
 
 // _cardStatus är en icke-reaktiv cache som skrivs i _texts-derivaten och läses
@@ -237,6 +240,7 @@ const _texts = $derived.by((): TextResult => {
         isOveruse: false, isTooEarly: false, earlyRenewalDecision: null,
         valid: calc.valid, calculable: calc.calculable ?? false,
         statusText: calc.statusText || '—',
+        prescribedEndDateStr: '',
       });
       continue;
     }
@@ -251,6 +255,7 @@ const _texts = $derived.by((): TextResult => {
       valid: true,
       calculable: true,
       statusText: calc.statusText || 'OK',
+      prescribedEndDateStr: calc.prescribedEndDateStr,
     });
   }
 

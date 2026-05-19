@@ -194,7 +194,7 @@
                   dose: d,
                   doseInterval: c.form.doseInterval,
                   doseUnit: c.form.doseUnit,
-                  prescribedEndDateStr: '',
+                  prescribedEndDateStr: status?.prescribedEndDateStr ?? '',
                 }, getPrescribeState(c._cardId) ?? null)}
                 <button type="button" class="prescribe-summary-row {i === activeIdx ? 'active' : ''}">
                   <span class="prescribe-summary-name">{c.form.medRaw || `Läkemedel ${i + 1}`}</span>

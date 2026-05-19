@@ -96,13 +96,14 @@
 
   function handleDateInput(e: Event) {
     const input = e.target as HTMLInputElement;
-    let val = input.value.replace(/\D/g, '').substring(0, 8);
+    const originalVal = input.value;
+    let val = originalVal.replace(/\D/g, '').substring(0, 8);
     if (val.length > 4) val = val.substring(0, 4) + '-' + val.substring(4);
     if (val.length > 7) val = val.substring(0, 7) + '-' + val.substring(7);
     const sel = input.selectionStart ?? 0;
-    const digitsBefore = input.value.substring(0, sel).replace(/\D/g, '').length;
+    const digitsBefore = originalVal.substring(0, sel).replace(/\D/g, '').length;
     input.value = val;
-    if (val !== input.value) {
+    if (val !== originalVal) {
       let newPos = 0, count = 0;
       for (let i = 0; i < val.length; i++) {
         if (/\d/.test(val[i])) count++;
