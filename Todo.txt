@@ -65,3 +65,13 @@ Summaryloopen — {#if getPrescribeState(...)} utökad med && canRenewMed({...})
 
 canRenewMed returnerar false när isTooEarly är sant och earlyRenewalDecision !== 'yes', vilket exakt matchar "Nej, avslå"-fallet.
 
+#3 — earlyRenewalDecision nollställs inte för inaktiva kort vid midnattsbyte
+(Bekräftad sedan tidigare, men mer preciserad nu)
+$effect i App.svelte som nollställer earlyRenewalDecision reagerar bara på det aktiva kortets result. Om en session pågår över midnatt och ett inaktivt korts isTooEarly ändras (t.ex. receptperioden löper ut just vid midnatt), uppdateras _cardStatus korrekt via _texts, men medCards[inactiveIdx].earlyRenewalDecision förblir 'yes'. Journaltexten för det kortet anger då felaktigt att receptet förnyas.
+
+#4 — hasSummary i App.svelte filtrerar inte bort avslagskort
+App.svelte har en egen hasSummary-derivat (rad ~49) som styr om PrescribePanel överhuvudtaget visas (showPrescribe = prescribeVisible || hasSummary). Hör till viss del ihop med bugg #2. PrescribePanel.svelte — dvs. den räknar ett avslaget kort med prescribe-state som giltigt. Det gör att panelen förblir öppen och synlig trots att det inuti (efter en fix enligt bugg #2) inte visas något i listan. Inte kliniskt farligt, men panelen visas utan innehåll vilket är förvirrande.
+Fix: samma canRenewMed-filter som i bugg #2, PrescribePanel.hasSummary behöver appliceras på App.svelte-kopian.
+
+#5 — Lithium-interaktionsregel kan matcha mot sig själv
+Interaktionsregeln { a: ["N05AN01"], b: ["N05A"] } (Litium + antipsykotika) har en hierarkisk ATC-överlappning: N05AN01.startsWith("N05A") är sant. Om en användare lägger till Litium på två kort flaggar CHECK_INTERACTIONS en falsk interaktionsvarning "Ökad risk för neurotoxicitet" med drugs: [Lithium, Lithium]. Ovanligt scenario men möjligt, och en falsk klinisk varning är allvarligare än en missad UI-detalj. Fix: lägg till ett explicit x !== y-check på ATC-kod-nivå, eller skydda mot identiska ATC-koder i loopen.
