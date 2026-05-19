@@ -152,12 +152,16 @@
     }
   });
 
-  // Nollställ earlyRenewalDecision i medCards när flagsChanged i calcCore återställer returvärdet
+  // Nollställ earlyRenewalDecision för ALLA kort när calcCore återställer via flagsChanged.
+  // Synkar med _cardStatus (uppdateras av _texts under render, före $effect körs).
+  // Reaktivt beroende: result (ny referens vid midnattsbyte och formulärändringar).
   $effect(() => {
-    const idx = getActiveMedIdx();
-    if (!result || idx < 0 || idx >= medCards.length) return;
-    if (result.earlyRenewalDecision === null && medCards[idx].earlyRenewalDecision !== null) {
-      medCards[idx].earlyRenewalDecision = null;
+    const r = result;
+    for (let i = 0; i < medCards.length; i++) {
+      const status = getCardStatus(medCards[i]._cardId);
+      if (status?.earlyRenewalDecision === null && medCards[i].earlyRenewalDecision !== null) {
+        medCards[i].earlyRenewalDecision = null;
+      }
     }
   });
 
