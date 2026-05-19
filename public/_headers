@@ -18,7 +18,7 @@
 
   # Content Security Policy — maximal strikthet.
   # Verifierad mot Cloudflare Pages runtime. Varje direktiv är testat.
-  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; frame-src 'none'; worker-src 'none'; media-src 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; frame-src 'none'; worker-src 'self'; media-src 'none'; upgrade-insecure-requests
 
   # Isolerar fönstret från cross-origin-kontexter — skyddar mot Spectre-liknande sidokanalsattacker
   Cross-Origin-Opener-Policy: same-origin
