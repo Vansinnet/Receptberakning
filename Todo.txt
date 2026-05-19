@@ -1,5 +1,5 @@
 Buggar:
-#1 Jag fyller i läkemedel. Diazepam Accord 5 mg, senaste recept 2025-10-31, dos 1, förpackningsstorlek 100, antal uttag 3. Om jag sedan fyller i kvarvarande dos 1 st, sjunker genomsnittlig dos på ett konstigt sätt i resultatpanelen. Från:
+#1 Jag fyller i läkemedel. Diazepam Accord 5 mg, senaste recept 2025-10-31, dos 1, förpackningsstorlek 100, antal uttag 3. Om jag sedan fyller i kvarvarande dos 1 st, sjunker genomsnittlig dos på ett konstigt sätt i resultatpanelen. Det verkar dessutom bara hända när jag aktivt tryckt "Förnya". Från:
 
 [med fältet tomt]
 Snittförbrukning
@@ -9,4 +9,83 @@ Snittförbrukning
 Snittförbrukning
 1.00 st/dag (5.0 mg/dag)
 
-Det borde vara så att verktyget räknar utifrån dagens datum, så om patienten har 0 doser eller 1 dos kvar, ska det tolkas som att man tagit alla föregående doser och därmed ska snittförbrukningen beräknas på antalet mg man tagit delat på antalet totala doser som intagits. Vid 0 har samtliga doser intagits. Vid 1 kvarvarande har samtligadoser - 1 tagits osv. 
+Det borde vara så att verktyget räknar utifrån dagens datum, så om patienten har 0 doser eller 1 dos kvar, ska det tolkas som att man tagit alla föregående doser och därmed ska snittförbrukningen beräknas på antalet mg man tagit delat på antalet totala doser som intagits. Vid 0 har samtliga doser intagits. Vid 1 kvarvarande har samtliga doser minus 1 tablett tagits osv. 
+
+Scenariot steg för steg
+Input: 2025-10-31, 100 st/uttag, 3 uttag → total = 300. Dos 1/dag → effectiveDailyDose = 1. Idag 2026-05-19 → daysSince = 199 dagar.
+Batch-modellen:
+batchDuration    = 100 / 1 = 100 dagar
+batchesDispensed = min(3, floor(199/100)+1) = min(3, 2) = 2
+accessibleTotal  = min(300, 2×100) = 200
+Eftersom 199 dagar passerats har bara 2 av 3 uttag hunnit "lösas ut" enligt batch-modellen.
+
+Varför skiljer sig resultaten?
+Utan kvarvarande (tomt fält) → else-grenen:
+tsavgNum = total / daysSince = 300 / 199 ≈ 1.51 st/dag  ✓
+Med kvarvarande = 1 → if (hasRemaining), ingen earlyPickup (1 < 200):
+tscalcBase = accessibleTotal = 200   // ← här är felet
+consumed = 200 - 1 = 199
+avgNum   = 199 / 199 = 1.00 st/dag  ✗
+calcBase sätts till accessibleTotal (200), inte total (300). Det ger att patienten "bara förbrukat 199 tabletter" trots att de uppenbarligen tagit 299 stycken (300 − 1 = 299).
+
+Rotorsaken
+Batch-modellen (accessibleTotal) skapades för fallet utan kvarvarande — för att uppskatta hur mycket som rimligen kunnat förbrukas givet hur många uttag som hunnit passera. Det är en modellantagning.
+Men när patienten faktiskt rapporterar kvarvarande mängd (t.ex. 1 tablett kvar) ger den direkta informationen: consumed = total − remaining. Batch-modellen behövs inte — och motverkar beräkningen när inte alla uttag ännu är "tillgängliga" enligt tidsmodellen.
+Koden sätter ändå calcBase = accessibleTotal i !earlyPickup-fallet, vilket kapar consumed till accessibleTotal − remaining trots att patienten implicerit att de förbrukat total − remaining.
+earlyPickup-detektionen (att remaining > accessibleTotal) är fortfarande meningsfull för att flagga misstänkt tidig uthämtning, men den ska inte styra calcBase i det normala fallet.
+
+Varför bara efter "Förnya"?
+Troligen ett observationsbias — buggen finns oavsett. Men en möjlig förklaring: flagsChanged-kontrollen nollställer earlyRenewalDecision när isOveruse/isTooEarly byter värde. När remaining fylls i sjunker avgNum → isOveruse kan sluta trigga → flagsChanged = true → verdikten ändras och uppmärksamheten dras dit. Avgvärdet i sig är dock oberoende av earlyRenewalDecision.
+
+Föreslagen fix
+I if (hasRemaining) / !earlyPickup-grenen, byt calcBase = accessibleTotal mot calcBase = total:
+ts// Nuläge:
+calcBase = accessibleTotal;
+
+// Fix:
+calcBase = total;
+// consumed = total - remaining = faktisk förbrukning
+earlyPickup-detektionen behålls som den är (skyddar mot att remaining > accessibleTotal). Men när patienten rapporterar kvarvarande ska beräkningsbasen vara hela receptmängden, inte batch-taket.
+
+#2 Jag fyller i Kort 1: Sertralin Amarox 50 mg, senaste recept 2025-12-15, 1 dos, 3 uttag. Klicka "Ja, förnya" (eftersom för tidig förnyelse detekteras)
+Jag fyller sedan i kort 2: Tramadol Actavis 50 mg, senaste recept 2025-12-31, 1 dos, antal uttag 1.
+
+Därefter ändrar jag Kort 1 där jag väljer att "Nej, avslå". Läkemedlet Sertralin försvinner då inte från prescribekolumnen utan står fortfarande kvar i "Sammanställning av läkemedel att förskriva". Det borde försvinna eftersom vi nu valt att inte förskriva det. Svar till patient och Journalanteckning är dock korrekta.
+
+I PrescribePanel.svelte — i Sammanställningen — är villkoret för att visa ett läkemedel bara:
+svelte{#if getPrescribeState(c._cardId)}
+Det kontrollerar bara om ett prescribe-state existerar, men rensar inte bort det när earlyRenewalDecision sätts till 'no'. När du klickar "Nej, avslå" försvinner inte _prescribeState[cardId] — den sitter kvar. Texterna är korrekta för att de filtrerar på decision === 'yes'/tooEarly etc., men sammanställningen gör inte det.
+
+Rotorsak: _prescribeState[cardId] rensas aldrig när användaren väljer "Nej, avslå" — den sitter kvar i minnet. Sammanställningen kollade bara om ett prescribe-state existerade (getPrescribeState(c._cardId)), inte om kortet faktiskt är godkänt för förskrivning.
+Tre ändringar i PrescribePanel.svelte:
+
+Import — lade till getCardStatus från state.
+hasSummary — räknar nu bara med kort som passerar canRenewMed()-kontrollen (samma logik som eligible-derivaten ovan). Det förhindrar att sammanställningen visas alls om det bara finns avslagskort kvar.
+Summaryloopen — {#if getPrescribeState(...)} utökad med && canRenewMed({...}) så att ett avslaget kort (t.ex. Sertralin med earlyRenewalDecision: 'no') filtreras bort från listan.
+
+canRenewMed returnerar false när isTooEarly är sant och earlyRenewalDecision !== 'yes', vilket exakt matchar "Nej, avslå"-fallet.
+
+#3 — earlyRenewalDecision nollställs inte för inaktiva kort vid midnattsbyte
+(Bekräftad sedan tidigare, men mer preciserad nu)
+$effect i App.svelte som nollställer earlyRenewalDecision reagerar bara på det aktiva kortets result. Om en session pågår över midnatt och ett inaktivt korts isTooEarly ändras (t.ex. receptperioden löper ut just vid midnatt), uppdateras _cardStatus korrekt via _texts, men medCards[inactiveIdx].earlyRenewalDecision förblir 'yes'. Journaltexten för det kortet anger då felaktigt att receptet förnyas.
+
+#4 — hasSummary i App.svelte filtrerar inte bort avslagskort
+App.svelte har en egen hasSummary-derivat (rad ~49) som styr om PrescribePanel överhuvudtaget visas (showPrescribe = prescribeVisible || hasSummary). Hör till viss del ihop med bugg #2. PrescribePanel.svelte — dvs. den räknar ett avslaget kort med prescribe-state som giltigt. Det gör att panelen förblir öppen och synlig trots att det inuti (efter en fix enligt bugg #2) inte visas något i listan. Inte kliniskt farligt, men panelen visas utan innehåll vilket är förvirrande.
+Fix: samma canRenewMed-filter som i bugg #2, PrescribePanel.hasSummary behöver appliceras på App.svelte-kopian.
+
+#5 — Lithium-interaktionsregel kan matcha mot sig själv
+Interaktionsregeln { a: ["N05AN01"], b: ["N05A"] } (Litium + antipsykotika) har en hierarkisk ATC-överlappning: N05AN01.startsWith("N05A") är sant. Om en användare lägger till Litium på två kort flaggar CHECK_INTERACTIONS en falsk interaktionsvarning "Ökad risk för neurotoxicitet" med drugs: [Lithium, Lithium]. Ovanligt scenario men möjligt, och en falsk klinisk varning är allvarligare än en missad UI-detalj. Fix: lägg till ett explicit x !== y-check på ATC-kod-nivå, eller skydda mot identiska ATC-koder i loopen.
+
+#6 Väljer jag tex Levaxin 100 mikrog så räknas inte snittförbrukning i resultatpanelen. Detta beror väl på att mikrog inte uppfattas som en styrka i verktyget och därmed beräknas inte snittförbrukning i resultatpanelen i µg. Gäller detta även för andra storleksenheter bland valbara läkemedel?
+Rotorsaken är enkel och tydlig.
+extractDoseUnit() i utils.ts har denna regex:
+ts/(mg|ml|µg|mikrogram|microgram|mcg|nanogram|gram|ng|IU|IE|g)\b/i
+mikrog finns inte i listan — bara mikrogram. "Levaxin 100 mikrog" ger null → ingen mg-konvertering visas i snittförbrukningen.
+Det påverkar 307 läkemedel i databasen med stavningen mikrog (t.ex. Levaxin, Palonosetron, Sialanar, Calcipotriol). Ytterligare 50 läkemedel med mmol (t.ex. elektrolytlösningar) saknas också ur listan.
+
+#7: 478 av 8 322 läkemedel i databasen har u: 'dos' (inhalatorer, nässprayer, ögondroppar, injektionspennor). selectDrug() mappar dessa till 'st': d.u === 'ml' ? 'ml' : 'st'. Konsekvenserna är dels att förskrivningspanelen skriver "tabletter" istället för "doser", dels att restmängd-validering kräver heltal (isDiscreteUnit = doseUnit === 'st') vilket hindrar användaren från att ange t.ex. 2,5 doser kvar.
+
+#8  Redundant class:is-hidden inuti {#if result.valid} i LongtermPanel
+Kopiasektionen har class:is-hidden={!result.valid} på ett element som redan ligger inuti ett {#if result.valid}-block. Villkoret kan aldrig vara sant, vilket är döda och potentiellt förvirrande kod — men utan funktionell påverkan. En bugg?
+
+#9 När jag skriver in 'Candesartan' ser jag inte alla läkemedel med 'Candesartan', utan ett visst antal träffar. Det gör att jag inte kan välja 'Candesartan', för de döljs av alla 'Candesartan/Hydroklortiazid'. Hur lösa det?
