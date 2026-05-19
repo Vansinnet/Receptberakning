@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { CalcResult } from '$lib/types';
   import { getActiveTexts } from '$lib/state.svelte';
+  import { pctClass } from '$lib/utils';
   import Alert from './Alert.svelte';
 
   let {
@@ -55,6 +56,8 @@
     return 'ok';
   });
 
+  let tlWidthClass = $derived(pctClass(result?.tlPct ?? 0, 'w'));
+
   // Tvinga journal-flik i sjuksköterskeläge
   $effect(() => {
     if (nurseViewActive) activeTab = 'journal';
@@ -79,7 +82,7 @@
       <div class="tl-wrap">
         <div class="tl-label" data-tooltip="Visar hur stor andel av receptperioden som förflutit sedan förskrivningsdatumet.">Receptperiod</div>
         <div class="tl-bar-bg">
-          <div class="tl-fill tl-fill-{verdictCls}" role="progressbar" aria-valuenow={Math.round(result.tlPct)} aria-valuemin="0" aria-valuemax="100" aria-label="Förfluten andel av receptperioden" style:width="{result.tlPct}%">
+          <div class="tl-fill tl-fill-{verdictCls} {tlWidthClass}" role="progressbar" aria-valuenow={Math.round(result.tlPct)} aria-valuemin="0" aria-valuemax="100" aria-label="Förfluten andel av receptperioden">
             <div class="tl-today-marker"></div>
           </div>
         </div>
@@ -139,10 +142,10 @@
         {#if !nurseViewActive && activeTab === 'patient'}
           <button class="btn btn-ghost" id="langBtnResult" data-tooltip="Växla språk på patientmeddelandet" onclick={toggleLang}>
             {#if patientLang === 'sv'}
-              <svg viewBox="0 0 22 14" width="20" height="13" aria-hidden="true" style="vertical-align:middle;margin-right:5px;border-radius:2px;display:inline-block"><rect width="22" height="14" fill="#012169"/><line x1="0" y1="0" x2="22" y2="14" stroke="#FFF" stroke-width="4.5"/><line x1="22" y1="0" x2="0" y2="14" stroke="#FFF" stroke-width="4.5"/><line x1="0" y1="0" x2="22" y2="14" stroke="#C8102E" stroke-width="2"/><line x1="22" y1="0" x2="0" y2="14" stroke="#C8102E" stroke-width="2"/><rect x="8" width="6" height="14" fill="#FFF"/><rect y="4" width="22" height="6" fill="#FFF"/><rect x="9.5" width="3" height="14" fill="#C8102E"/><rect y="5.5" width="22" height="3" fill="#C8102E"/></svg>
+              <svg viewBox="0 0 22 14" width="20" height="13" aria-hidden="true" class="flag-icon"><rect width="22" height="14" fill="#012169"/><line x1="0" y1="0" x2="22" y2="14" stroke="#FFF" stroke-width="4.5"/><line x1="22" y1="0" x2="0" y2="14" stroke="#FFF" stroke-width="4.5"/><line x1="0" y1="0" x2="22" y2="14" stroke="#C8102E" stroke-width="2"/><line x1="22" y1="0" x2="0" y2="14" stroke="#C8102E" stroke-width="2"/><rect x="8" width="6" height="14" fill="#FFF"/><rect y="4" width="22" height="6" fill="#FFF"/><rect x="9.5" width="3" height="14" fill="#C8102E"/><rect y="5.5" width="22" height="3" fill="#C8102E"/></svg>
               English
             {:else}
-              <svg viewBox="0 0 22 14" width="20" height="13" aria-hidden="true" style="vertical-align:middle;margin-right:5px;border-radius:2px;display:inline-block"><rect width="22" height="14" fill="#006AA7"/><rect x="6" width="3" height="14" fill="#FECC02"/><rect y="5.5" width="22" height="3" fill="#FECC02"/></svg>
+              <svg viewBox="0 0 22 14" width="20" height="13" aria-hidden="true" class="flag-icon"><rect width="22" height="14" fill="#006AA7"/><rect x="6" width="3" height="14" fill="#FECC02"/><rect y="5.5" width="22" height="3" fill="#FECC02"/></svg>
               Svenska
             {/if}
           </button>

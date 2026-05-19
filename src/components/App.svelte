@@ -168,39 +168,22 @@
     }
   });
 
-  // Tooltip-hantering
-  function showTooltip(e: Event) {
-    const el = (e.target as HTMLElement).closest('[data-tooltip]');
-    if (!el) return;
-    const tip = el.getAttribute('data-tooltip');
-    if (!tip) return;
-    const bubble = document.getElementById('tooltipBubble');
-    if (!bubble) return;
-    const rect = el.getBoundingClientRect();
-    bubble.textContent = tip;
-    bubble.style.left = `${rect.left}px`;
-    bubble.style.top = `${rect.bottom + 6}px`;
-    bubble.classList.add('visible');
-    el.setAttribute('aria-describedby', 'tooltipBubble');
-  }
-
-  function hideTooltip(e: Event) {
-    const el = (e.target as HTMLElement).closest('[data-tooltip]');
-    if (el) el.removeAttribute('aria-describedby');
-    document.getElementById('tooltipBubble')?.classList.remove('visible');
-  }
-
   $effect(() => {
     if (typeof document === 'undefined') return;
-    document.addEventListener('mouseover', showTooltip);
-    document.addEventListener('focusin', showTooltip);
-    document.addEventListener('mouseout', hideTooltip);
-    document.addEventListener('focusout', hideTooltip);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('pagehide', onPageHide);
+    document.addEventListener('mousemove', handleActivity);
+    document.addEventListener('keydown', handleActivity);
+    document.addEventListener('pointerdown', handleActivity);
+    resetInactivityTimer();
     return () => {
-      document.removeEventListener('mouseover', showTooltip);
-      document.removeEventListener('focusin', showTooltip);
-      document.removeEventListener('mouseout', hideTooltip);
-      document.removeEventListener('focusout', hideTooltip);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('pagehide', onPageHide);
+      document.removeEventListener('mousemove', handleActivity);
+      document.removeEventListener('keydown', handleActivity);
+      document.removeEventListener('pointerdown', handleActivity);
+      if (inactivityWarnTimer) clearTimeout(inactivityWarnTimer);
+      if (inactivityCountdownTimer) clearInterval(inactivityCountdownTimer);
     };
   });
 </script>
@@ -315,7 +298,6 @@
       </div>
     </footer>
   </div>
-  <div class="tooltip-bubble" id="tooltipBubble" role="tooltip"></div>
 
   {#if showInactivityToast}
     <div class="inactivity-toast" role="alert" aria-live="assertive">

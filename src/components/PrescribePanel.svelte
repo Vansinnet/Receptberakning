@@ -113,7 +113,7 @@
       <div id="prescribeInner">
         <div class="prescribe-med-name">{result.medRaw || `Läkemedel ${activeIdx + 1}`}</div>
 
-        <div class="field" style:margin-top="10px">
+        <div class="field prescribe-pkg-field">
           <label for="ps-pkg" data-tooltip="Antal enheter per förpackning.">Förpackningsstorlek ({UNIT_DISPLAY[(result.doseUnit ?? 'st') as keyof typeof UNIT_DISPLAY]?.long ?? 'tabletter'})</label>
           <input id="ps-pkg" type="number" min="1" step="1" placeholder="T.ex. 30" value={psEntry?.packageSize ?? ''} oninput={handlePkgInput} />
         </div>
@@ -156,7 +156,7 @@
 
     <!-- Summary -->
     {#if hasSummary}
-      <div id="prescribeSummary" style:display="block">
+      <div id="prescribeSummary">
         <div class="prescribe-summary-wrap">
           <div class="prescribe-summary-header">Sammanställning av läkemedel att förskriva</div>
           <div class="prescribe-summary-list">

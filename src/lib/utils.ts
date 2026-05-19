@@ -87,3 +87,8 @@ export function stripManufacturer(name: string): string {
   if (!name) return name;
   return name.replace(buildMfrRe(), "").replace(/\s+/g, " ").trim();
 }
+
+export function pctClass(pct: number, prefix: string): string {
+  const step = Math.round(Math.min(100, Math.max(0, pct)) / 5) * 5;
+  return `${prefix}${step}`;
+}

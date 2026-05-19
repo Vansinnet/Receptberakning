@@ -1,6 +1,7 @@
 <script lang="ts">
   import { ltPeriods, pushLtPeriod, spliceLtPeriod, resetLtPeriods } from '$lib/state.svelte';
   import { calcLongtermCore } from '$lib/calc-longterm';
+  import { pctClass } from '$lib/utils';
   import type { LTResult, LTCardPeriod } from '$lib/types';
 
   let medRaw = $state('');
@@ -52,6 +53,8 @@
   }
 
   let ltCopied = $state(false);
+
+  let barWidthClass = $derived(pctClass((result.barPct ?? 0) / 150 * 100, 'w'));
 </script>
 
 <div class="longterm-layout">
@@ -119,7 +122,7 @@
                 </div>
               </div>
               {#if i > 0}
-                <button type="button" class="btn btn-ghost" style:font-size="11px" style:margin-bottom="8px" data-action="remove-period" data-idx={i} data-tooltip="Ta bort denna period." onclick={() => handleRemovePeriod(i)}>✕ Ta bort period {i + 1}</button>
+                <button type="button" class="btn btn-ghost btn-remove-period" data-action="remove-period" data-idx={i} data-tooltip="Ta bort denna period." onclick={() => handleRemovePeriod(i)}>✕ Ta bort period {i + 1}</button>
               {/if}
             </div>
           {/each}
@@ -171,7 +174,7 @@
           <div id="lt-bar-section">
             <div class="section-label section-label-spaced">Förbrukning relativt ordination</div>
             <div class="consumption-bar-wrap">
-              <div class="consumption-bar {result.overallStatus}" role="progressbar" aria-valuenow={Math.round(result.barPct ?? 0)} aria-valuemin="0" aria-valuemax="150" aria-label="Förbrukning relativt ordination" style:width="{(result.barPct ?? 0) / 150 * 100}%">{((result.barPct ?? 0) > 20 ? `${(result.consumptionPct ?? 0).toFixed(0)}%` : '')}</div>
+              <div class="consumption-bar {result.overallStatus} {barWidthClass}" role="progressbar" aria-valuenow={Math.round(result.barPct ?? 0)} aria-valuemin="0" aria-valuemax="150" aria-label="Förbrukning relativt ordination">{((result.barPct ?? 0) > 20 ? `${(result.consumptionPct ?? 0).toFixed(0)}%` : '')}</div>
             </div>
             <div class="bar-ticks">
               <span>0%</span><span>50%</span><span>100%</span><span>150%</span>

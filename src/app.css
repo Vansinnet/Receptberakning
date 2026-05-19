@@ -864,11 +864,16 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 .is-hidden   { display: none !important; }
 .ml-auto     { margin-inline-start: auto; }
 
-/* ── Tooltip ── */
-[data-tooltip] { cursor: help; }
-.tooltip-bubble {
-  position: fixed;
-  z-index: 9999;
+/* ── Tooltip (CSS-only — CSP-kompatibel) ── */
+[data-tooltip] {
+  cursor: help;
+  position: relative;
+}
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 6px);
   background: var(--surface);
   color: var(--text);
   border: 1px solid var(--border-strong);
@@ -878,14 +883,33 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   line-height: 1.6;
   max-width: 240px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.30);
+  white-space: normal;
+  word-wrap: break-word;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.15s;
+  z-index: 9999;
   font-weight: 400;
   text-transform: none;
   letter-spacing: normal;
-  white-space: normal;
 }
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-visible::after {
+  opacity: 1;
+}
+.tooltip-bubble { display: none; }
+
+/* ── CSP-säkra breddklasser (progressbars, 5%-steg) ── */
+.w0 { width: 0%; } .w5 { width: 5%; } .w10 { width: 10%; } .w15 { width: 15%; }
+.w20 { width: 20%; } .w25 { width: 25%; } .w30 { width: 30%; } .w35 { width: 35%; }
+.w40 { width: 40%; } .w45 { width: 45%; } .w50 { width: 50%; } .w55 { width: 55%; }
+.w60 { width: 60%; } .w65 { width: 65%; } .w70 { width: 70%; } .w75 { width: 75%; }
+.w80 { width: 80%; } .w85 { width: 85%; } .w90 { width: 90%; } .w95 { width: 95%; }
+.w100 { width: 100%; }
+
+.prescribe-pkg-field { margin-top: 10px; }
+.btn-remove-period { font-size: 11px; margin-bottom: 8px; }
+.flag-icon { vertical-align: middle; margin-right: 5px; border-radius: 2px; display: inline-block; }
 .tooltip-bubble.visible { opacity: 1; }
 
 /* Toast */
