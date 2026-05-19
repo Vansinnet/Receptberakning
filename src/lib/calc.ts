@@ -51,7 +51,7 @@ export function validateValues(
   if (amtIsInvalid) fieldErrors.amtInput = `Ange ett heltal mellan 1 och ${MAX_AMT_VALUE}.`;
 
   const dose = parseFloat(doseRaw.replace(',', '.'));
-  const doseIsInvalid = doseRaw !== '' && (isNaN(dose) || dose < MIN_DOSE_VALUE || dose > MAX_DOSE_VALUE);
+  const doseIsInvalid = doseRaw !== '' && (isNaN(dose) || String(dose) !== doseRaw.replace(',', '.').trim() || dose < MIN_DOSE_VALUE || dose > MAX_DOSE_VALUE);
   if (doseIsInvalid) fieldErrors.doseInput = `Ange ett tal mellan ${MIN_DOSE_VALUE} och ${MAX_DOSE_VALUE}.`;
 
   const refNum = Number(safeRefRaw);
@@ -373,11 +373,14 @@ function _buildAlerts(
   earlyPickup: boolean
 ): CalcAlert[] {
   let alerts: CalcAlert[] = [];
-  const overuseSuppressedBy7day = !isOveruse && daysRemaining >= 0 && daysRemaining <= OVERUSE_SUPPRESSION_DAYS && avgNum > effectiveDailyDose * OVERUSE_THRESHOLD;
   const expiredWithElevatedUse = !isOveruse && daysRemaining < 0 && avgNum > effectiveDailyDose * OVERUSE_THRESHOLD;
+  const alreadyOut          = !isOveruse && daysRemaining === 0 && avgNum > effectiveDailyDose * OVERUSE_THRESHOLD;
+  const soonRunsOut         = !isOveruse && daysRemaining > 0 && daysRemaining <= OVERUSE_SUPPRESSION_DAYS && avgNum > effectiveDailyDose * OVERUSE_THRESHOLD;
   if (expiredWithElevatedUse) {
     alerts.push({ type: 'warn', title: 'Förhöjd förbrukning — receptperioden har löpt ut', message: `Snitt ${displayAvg} överstiger ordination med >10% och receptperioden har passerat. Kontrollera förbrukningsmönster och gör klinisk bedömning.` });
-  } else if (overuseSuppressedBy7day) {
+  } else if (alreadyOut) {
+    alerts.push({ type: 'warn', title: 'Förhöjd förbrukning — medicinen är slut', message: `Snitt ${displayAvg} överstiger ordination med >10% och medicinen är nu slut. Förnyelse godkänd — notera förbrukningstakten.` });
+  } else if (soonRunsOut) {
     alerts.push({ type: 'warn', title: 'Förhöjd förbrukning noterad', message: `Snitt ${displayAvg} överstiger ordination med >10%, men medicinen beräknas ta slut inom 7 dagar. Förnyelse godkänd — notera förbrukningstakten.` });
   } else if (avgNum === 0) {
     alerts.push({ type: 'danger', title: 'Ingen förbrukning registrerad', message: `Snitt 0 ${doseUnitLabel} – patienten verkar inte ha tagit medicinen. Klinisk bedömning krävs.` });

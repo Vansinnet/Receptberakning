@@ -188,33 +188,6 @@ test.describe('Sjuksköterskevy', () => {
   });
 });
 
-test.describe('Interaktionsvarningar', () => {
-
-  test('SSRI + MAO → danger-varning via autocomplete', async ({ page }) => {
-    // Lägg till SSRI via autocomplete
-    await page.fill('#medInput', 'Sertralin Krka 50 mg');
-    await page.waitForTimeout(500);
-    const item = page.locator('.autocomplete-item').first();
-    if (await item.isVisible()) {
-      await item.click();
-    }
-    // Lägg till kort 2
-    await page.click('.btn-add-med');
-    await page.waitForTimeout(200);
-    // Lägg till MAO-hämmare
-    await page.fill('#medInput', 'Aurorix 150 mg');
-    await page.waitForTimeout(500);
-    const item2 = page.locator('.autocomplete-item').first();
-    if (await item2.isVisible()) {
-      await item2.click();
-    }
-    await page.waitForTimeout(500);
-    // Ska finnas interaktionsvarning om ATC-koder matchar
-    const alerts = page.locator('#interactionAlerts .interaction-alert');
-    // Kan vara 0 om ATC-koderna inte matchar exakt, men strukturen ska finnas
-  });
-});
-
 test.describe('Långvarig förbrukning', () => {
 
   test('Fyll i period → resultat visas', async ({ page }) => {

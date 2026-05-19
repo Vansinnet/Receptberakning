@@ -106,11 +106,6 @@ test.describe('Formulärvalidering', () => {
     const hasError = await refInput.evaluate(el => el.classList.contains('input-error'));
     expect(hasError).toBe(true);
   });
-
-  test('notCalculable — sätts automatiskt via autocomplete', async ({ page }) => {
-    // notCalculable är ingen synlig checkbox i 4.0 — matchar 3.0 där det sätts automatiskt
-    // via drug-data vid autocomplete-val
-  });
 });
 
 test.describe('Temaväxling', () => {
