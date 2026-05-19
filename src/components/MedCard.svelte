@@ -143,12 +143,6 @@
 </script>
 
 {#if card}
-  <svelte:boundary>
-    {#snippet failed(error)}
-      <div class="boundary-error" role="alert">
-        <strong>Formuläret kunde inte visas.</strong> Vänligen pröva att ladda om sidan.
-      </div>
-    {/snippet}
     <div class="form-panel-header">
       <div>
         <div class="form-med-name">{card.form.medRaw || '—'}</div>
@@ -281,7 +275,6 @@
       {/if}
       <span class="field-hint">Ger exaktare snittberäkning om patienten uppger kvarvarande mängd</span>
     </div>
-  </svelte:boundary>
 {:else}
   <div class="form-empty-state">
     <div class="empty-icon">💊</div>

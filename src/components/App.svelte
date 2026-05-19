@@ -181,12 +181,7 @@
   });
 </script>
 
-<svelte:boundary>
-  {#snippet failed(error)}
-    <div class="boundary-error" role="alert">
-      <strong>Ett internt fel har uppstått.</strong> Vänligen ladda om sidan. Om problemet kvarstår, kontakta support.
-    </div>
-  {/snippet}
+<!-- BOUNDARY temporärt bort för felsökning -->
   <a href="#main-content" class="skip-link">Hoppa till innehåll</a>
 
   <noscript>
@@ -301,4 +296,4 @@
       <button class="btn btn-ghost" onclick={dismissInactivityToast}>Fortsätt</button>
     </div>
   {/if}
-</svelte:boundary>
+<!-- /BOUNDARY -->
