@@ -124,6 +124,9 @@ export function searchDrugs(query: string): DrugEntry[] {
     const aStarts = a.n.toLowerCase().startsWith(q) ? 0 : 1;
     const bStarts = b.n.toLowerCase().startsWith(q) ? 0 : 1;
     if (aStarts !== bStarts) return aStarts - bStarts;
+    const aCombi = a.n.includes('/') ? 1 : 0;
+    const bCombi = b.n.includes('/') ? 1 : 0;
+    if (aCombi !== bCombi) return aCombi - bCombi;
     return a.n.length - b.n.length;
   });
   return results.slice(0, MAX_AUTOCOMPLETE_RESULTS);
