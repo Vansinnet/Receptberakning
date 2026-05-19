@@ -75,3 +75,10 @@ Fix: samma canRenewMed-filter som i bugg #2, PrescribePanel.hasSummary behöver 
 
 #5 — Lithium-interaktionsregel kan matcha mot sig själv
 Interaktionsregeln { a: ["N05AN01"], b: ["N05A"] } (Litium + antipsykotika) har en hierarkisk ATC-överlappning: N05AN01.startsWith("N05A") är sant. Om en användare lägger till Litium på två kort flaggar CHECK_INTERACTIONS en falsk interaktionsvarning "Ökad risk för neurotoxicitet" med drugs: [Lithium, Lithium]. Ovanligt scenario men möjligt, och en falsk klinisk varning är allvarligare än en missad UI-detalj. Fix: lägg till ett explicit x !== y-check på ATC-kod-nivå, eller skydda mot identiska ATC-koder i loopen.
+
+#6 Väljer jag tex Levaxin 100 mikrog så räknas inte snittförbrukning i resultatpanelen. Detta beror väl på att mikrog inte uppfattas som en styrka i verktyget och därmed beräknas inte snittförbrukning i resultatpanelen i µg. Gäller detta även för andra storleksenheter bland valbara läkemedel?
+
+#7: 478 av 8 322 läkemedel i databasen har u: 'dos' (inhalatorer, nässprayer, ögondroppar, injektionspennor). selectDrug() mappar dessa till 'st': d.u === 'ml' ? 'ml' : 'st'. Konsekvenserna är dels att förskrivningspanelen skriver "tabletter" istället för "doser", dels att restmängd-validering kräver heltal (isDiscreteUnit = doseUnit === 'st') vilket hindrar användaren från att ange t.ex. 2,5 doser kvar.
+
+#8  Redundant class:is-hidden inuti {#if result.valid} i LongtermPanel
+Kopiasektionen har class:is-hidden={!result.valid} på ett element som redan ligger inuti ett {#if result.valid}-block. Villkoret kan aldrig vara sant, vilket är döda och potentiellt förvirrande kod — men utan funktionell påverkan. En bugg?
