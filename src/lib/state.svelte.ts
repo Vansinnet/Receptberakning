@@ -171,9 +171,35 @@ type CardStatusCache = {
   prescribedEndDateStr: string;
 };
 
-// _cardStatusPrev är en icke-reaktiv cache som skrivs i sync-$effect'en och läses
-// i _activeResult- och _texts-derivaten för prev-värden (flagsChanged-detektering).
-// _cardStatus är den reaktiva $state-spegeln — alla UI-komponenter läser härifrån.
+// ════════════════════════════════════════════════════════════════════════════
+// ⚠ KRITISK ARKITEKTUR — _cardStatusPrev + _cardResultsCache
+// ════════════════════════════════════════════════════════════════════════════
+// Dessa två Maps får ALDRIG göras till $state. De läses inne i _texts $derived.by
+// (för prev-flaggvärden respektive fingerprintcache) och skrivs i _syncCardStatus
+// $effect. Om de vore reaktiva skulle:
+//   1. .get() i $derived.by registrera ett beroende
+//   2. .set() i $effect trigga omvärdering av $derived.by
+//   3. $derived.by producera nya objekt → $effect körs → .set() → steg 2
+//   → Svelte 5 kastar effect_update_depth_exceeded (feedback-loop)
+//
+// Detta är fundamentalt: flagsChanged-detektering i calcCore kräver att
+// föregående körnings utdata används som indata till nästa körning av samma
+// $derived — en cyklisk beroendegraf som inte kan uttryckas rent deklarativt.
+// Något måste vara imperativt. Dessa icke-reaktiva Maps är den minimala lösningen.
+// ════════════════════════════════════════════════════════════════════════════
+//
+// _cardStatusPrev: lagrar prev-värden för flagsChanged (isOveruse, isTooEarly).
+//   Läses i _activeResult ($derived) och _texts ($derived.by).
+//   Skrivs i _syncCardStatus ($effect i App.svelte).
+//
+// _cardResultsCache: fingeravtryckscache för _texts ($derived.by).
+//   Läses och "skrivs" i _texts; de facto-skrivningen sker via cacheUpdates
+//   som processas i _syncCardStatus.
+//
+// _cardStatus ($state): den reaktiva spegeln — alla UI-komponenter läser
+//   härifrån via getCardStatus(). Per-nyckel-uppdateringar möjliggör
+//   fin granularitet i reaktiviteten.
+// ════════════════════════════════════════════════════════════════════════════
 const _cardStatusPrev = new Map<number, CardStatusCache>();
 let _cardStatus = $state<Record<number, CardStatusCache>>({});
 
@@ -211,6 +237,7 @@ interface CardResult {
   medNameStripped: string;
 }
 
+// ⚠ Samma icke-reaktiva mönster som _cardStatusPrev ovan (feedback-loop-risken gäller även här).
 const _cardResultsCache = new Map<number, { fp: string; cr: CardResult | null; status: CardStatusCache }>();
 
 const _texts = $derived.by((): TextResult => {
@@ -225,7 +252,14 @@ const _texts = $derived.by((): TextResult => {
     const card = medCards[i];
     if (!card) continue;
     const f = card.form;
-    if (!f.medRaw) continue;
+    if (!f.medRaw) {
+      cardStatusUpdates.push({ cardId: card._cardId, status: {
+        isOveruse: false, isTooEarly: false, earlyRenewalDecision: null,
+        valid: false, calculable: false,
+        statusText: 'Ej ifyllt', prescribedEndDateStr: '',
+      }});
+      continue;
+    }
 
     const fp = [f.medRaw, f.dateVal, f.doseRaw, f.amtRaw, f.refRaw, f.leftRaw,
       f.doseUnit, f.doseInterval, f.notCalculable, card.earlyRenewalDecision].join('\x00');
@@ -460,6 +494,10 @@ export function clearPrescribeState(): void {
   for (const key of Object.keys(_prescribeState)) {
     delete _prescribeState[Number(key)];
   }
+}
+
+export function clearCardPrescribeState(cardId: number): void {
+  delete _prescribeState[cardId];
 }
 
 // =====================================================

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { medCards, getActiveMedIdx, getActiveValidated } from '$lib/state.svelte';
+  import { medCards, getActiveMedIdx, getActiveValidated, clearCardPrescribeState } from '$lib/state.svelte';
   import { loadDrugs, searchDrugs, getDrugByName, type DrugEntry } from '$lib/drug-search';
   import { getFassUrl } from '$lib/utils';
   import { MIN_SEARCH_QUERY_LENGTH } from '$lib/constants';
@@ -20,12 +20,14 @@
   function handleClear() {
     const idx = getActiveMedIdx();
     if (idx >= 0 && idx < medCards.length) {
+      const cardId = medCards[idx]._cardId;
       medCards[idx].form = {
         medRaw: '', dateVal: '', doseRaw: '', amtRaw: '', refRaw: '', leftRaw: '',
         doseUnit: 'st', doseInterval: 1, notCalculable: false,
         atcCode: null, nplId: null,
       };
       medCards[idx].earlyRenewalDecision = null;
+      clearCardPrescribeState(cardId);
     }
     acVisible = false;
     acResults = [];
