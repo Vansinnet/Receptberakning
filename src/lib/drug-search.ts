@@ -118,10 +118,15 @@ export function searchDrugs(query: string): DrugEntry[] {
   for (let i = 0; i < _drugList.length; i++) {
     if (_drugList[i].n.toLowerCase().includes(q)) {
       results.push(_drugList[i]);
-      if (results.length >= MAX_AUTOCOMPLETE_RESULTS) break;
     }
   }
-  return results;
+  results.sort((a, b) => {
+    const aStarts = a.n.toLowerCase().startsWith(q) ? 0 : 1;
+    const bStarts = b.n.toLowerCase().startsWith(q) ? 0 : 1;
+    if (aStarts !== bStarts) return aStarts - bStarts;
+    return a.n.length - b.n.length;
+  });
+  return results.slice(0, MAX_AUTOCOMPLETE_RESULTS);
 }
 
 export function getDrugByName(name: string): DrugEntry | undefined {
