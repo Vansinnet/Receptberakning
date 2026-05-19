@@ -173,3 +173,69 @@ test.describe('Autocomplete', () => {
     await expect(page.locator('#medInput')).not.toHaveValue('');
   });
 });
+
+test.describe('$state migration — _cardStatus reaktivitet', () => {
+
+  test('Statusprickar uppdateras på alla kort vid formulärändring', async ({ page }) => {
+    await page.clock.setFixedTime(MOCK_DATE);
+    await page.goto(BASE);
+
+    // Fyll kort 1 med tidigt scenario
+    await page.fill('#medInput', 'Sertralin Krka 50 mg');
+    await page.waitForTimeout(500);
+    const item = page.locator('.autocomplete-item').first();
+    if (await item.isVisible()) await item.click();
+    await page.fill('#dateInput', '2024-12-01');
+    await page.fill('#doseInput', '1');
+    await page.fill('#amtInput', '100');
+    await page.fill('#refInput', '3');
+    await page.waitForTimeout(500);
+    await expect(page.locator('.status-dot.warn').first()).toBeVisible();
+
+    // Lägg till kort 2
+    await page.click('.btn-add-med');
+    await page.waitForTimeout(200);
+    await page.fill('#medInput', 'Metformin 500 mg');
+    await page.waitForTimeout(500);
+    const item2 = page.locator('.autocomplete-item').first();
+    if (await item2.isVisible()) await item2.click();
+    await page.fill('#dateInput', '2024-12-01');
+    await page.fill('#doseInput', '1');
+    await page.fill('#amtInput', '100');
+    await page.fill('#refInput', '3');
+    await page.waitForTimeout(500);
+
+    // Båda statusprickarna ska synas
+    const dots = page.locator('.status-dot');
+    await expect(dots).toHaveCount(2);
+  });
+
+  test('Midnattsbyte — statusprick förblir synlig efter klockframsteg', async ({ page }) => {
+    await page.clock.setFixedTime(new Date('2025-06-14T00:00:00Z'));
+    await page.goto(BASE);
+
+    await page.fill('#medInput', 'Sertralin Krka 50 mg');
+    await page.waitForTimeout(500);
+    const item = page.locator('.autocomplete-item').first();
+    if (await item.isVisible()) await item.click();
+    await page.fill('#dateInput', '2025-01-01');
+    await page.fill('#doseInput', '1');
+    await page.fill('#amtInput', '100');
+    await page.fill('#refInput', '3');
+    await page.waitForTimeout(500);
+
+    // Statusprick syns
+    const dot = page.locator('.status-dot');
+    await expect(dot).toBeVisible();
+
+    // Simulera midnatt
+    await page.clock.setFixedTime(new Date('2025-06-17T00:00:00Z'));
+    await page.evaluate(() => {
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    await page.waitForTimeout(500);
+
+    // Statusprick ska fortfarande vara synlig — page får inte krascha
+    await expect(dot).toBeVisible();
+  });
+});

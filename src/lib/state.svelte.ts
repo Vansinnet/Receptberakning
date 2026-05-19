@@ -86,7 +86,8 @@ export function spliceMedCard(i: number): void {
   if (medCards.length <= 1) return;
   const removedCardId = medCards[i]._cardId;
   medCards.splice(i, 1);
-  _cardStatus.delete(removedCardId);
+  _cardStatusPrev.delete(removedCardId);
+  delete _cardStatus[removedCardId];
   delete _prescribeState[removedCardId];
   if (_app.activeMedIdx > i) {
     _app.activeMedIdx -= 1;
@@ -169,19 +170,14 @@ type CardStatusCache = {
   prescribedEndDateStr: string;
 };
 
-// _cardStatus är en icke-reaktiv cache som skrivs i _texts-derivaten och läses
-// i _activeResult-derivaten. Mutation i $derived.by är ett Svelte 5-antimönster,
-// men cachen är ofarlig här eftersom:
-//   - _activeResult läser prev för flagsChanged-detektering — prev ska vara
-//     resultatet från FÖREGÅENDE omvärdering, vilket cachen innehåller
-//   - _texts körs efter _activeResult i renderingsordningen, så cachen
-//     uppdateras först nästa cykel
-// Framtida refaktor: flytta per-kort calcCore-resultat till en $state-struktur
-// och låt _texts vara en ren $derived.by utan sidoeffekter.
-const _cardStatus = new Map<number, CardStatusCache>();
+// _cardStatusPrev är en icke-reaktiv cache som skrivs i sync-$effect'en och läses
+// i _activeResult- och _texts-derivaten för prev-värden (flagsChanged-detektering).
+// _cardStatus är den reaktiva $state-spegeln — alla UI-komponenter läser härifrån.
+const _cardStatusPrev = new Map<number, CardStatusCache>();
+let _cardStatus = $state<Record<number, CardStatusCache>>({});
 
 export function getCardStatus(cardId: number): CardStatusCache | undefined {
-  return _cardStatus.get(cardId);
+  return _cardStatus[cardId];
 }
 
 // =====================================================
@@ -190,8 +186,8 @@ export function getCardStatus(cardId: number): CardStatusCache | undefined {
 
 const _activeResult = $derived(
   calcCore(_activeValidated, {
-    isOveruse: _cardStatus.get(medCards[_app.activeMedIdx]?._cardId ?? -1)?.isOveruse ?? false,
-    isTooEarly: _cardStatus.get(medCards[_app.activeMedIdx]?._cardId ?? -1)?.isTooEarly ?? false,
+    isOveruse: _cardStatusPrev.get(medCards[_app.activeMedIdx]?._cardId ?? -1)?.isOveruse ?? false,
+    isTooEarly: _cardStatusPrev.get(medCards[_app.activeMedIdx]?._cardId ?? -1)?.isTooEarly ?? false,
     earlyRenewalDecision: medCards[_app.activeMedIdx]?.earlyRenewalDecision ?? null,
   })
 );
@@ -204,6 +200,7 @@ interface TextResult {
   patientText: string;
   patientTextEn: string;
   journalText: string;
+  cardStatusUpdates: Array<{ cardId: number; status: CardStatusCache }>;
 }
 
 interface CardResult {
@@ -218,6 +215,7 @@ const _texts = $derived.by((): TextResult => {
 
   // 1. Beräkna calcCore för alla giltiga kort och gruppera
   const cardResults: CardResult[] = [];
+  const cardStatusUpdates: Array<{ cardId: number; status: CardStatusCache }> = [];
   for (let i = 0; i < medCards.length; i++) {
     const card = medCards[i];
     if (!card) continue;
@@ -230,25 +228,25 @@ const _texts = $derived.by((): TextResult => {
     );
 
     const calc = calcCore(validated, {
-      isOveruse: _cardStatus.get(card._cardId)?.isOveruse ?? false,
-      isTooEarly: _cardStatus.get(card._cardId)?.isTooEarly ?? false,
+      isOveruse: _cardStatusPrev.get(card._cardId)?.isOveruse ?? false,
+      isTooEarly: _cardStatusPrev.get(card._cardId)?.isTooEarly ?? false,
       earlyRenewalDecision: card.earlyRenewalDecision,
     });
 
     if (!calc.valid || calc.calculable === false) {
-      _cardStatus.set(card._cardId, {
+      cardStatusUpdates.push({ cardId: card._cardId, status: {
         isOveruse: false, isTooEarly: false, earlyRenewalDecision: null,
         valid: calc.valid, calculable: calc.calculable ?? false,
         statusText: calc.statusText || '—',
         prescribedEndDateStr: '',
-      });
+      }});
       continue;
     }
 
     const medNameStripped = stripManufacturer(f.medRaw) || f.medRaw;
 
     cardResults.push({ cardId: card._cardId, calc, medNameStripped });
-    _cardStatus.set(card._cardId, {
+    cardStatusUpdates.push({ cardId: card._cardId, status: {
       isOveruse: calc.isOveruse ?? false,
       isTooEarly: calc.isTooEarly ?? false,
       earlyRenewalDecision: calc.earlyRenewalDecision ?? null,
@@ -256,12 +254,12 @@ const _texts = $derived.by((): TextResult => {
       calculable: true,
       statusText: calc.statusText || 'OK',
       prescribedEndDateStr: calc.prescribedEndDateStr,
-    });
+    }});
   }
 
   const validCount = cardResults.length;
   if (validCount === 0) {
-    return { patientText: '', patientTextEn: '', journalText: '' };
+    return { patientText: '', patientTextEn: '', journalText: '', cardStatusUpdates: [] };
   }
 
   // 2. Gruppera
@@ -327,7 +325,7 @@ const _texts = $derived.by((): TextResult => {
       _app.nurseVitalNormal,
       _app.nurseFollowUpAdequate,
     );
-    return { patientText: '', patientTextEn: '', journalText };
+    return { patientText: '', patientTextEn: '', journalText, cardStatusUpdates };
   }
 
   // 4. Beräkna prescribeEnds för toRenew
@@ -354,11 +352,20 @@ const _texts = $derived.by((): TextResult => {
   const patientTextEn = buildPatientText('en', toRenew, tooEarly, overuse, validCount, prescribeEnds);
   const journalText   = buildJournalText(toRenew, tooEarly, overuse, validCount, prescribeEnds);
 
-  return { patientText, patientTextEn, journalText };
+  return { patientText, patientTextEn, journalText, cardStatusUpdates };
 });
 
 export function getActiveTexts(): TextResult {
-  return _texts;
+  const { patientText, patientTextEn, journalText } = _texts;
+  return { patientText, patientTextEn, journalText, cardStatusUpdates: [] };
+}
+
+export function _syncCardStatus(): void {
+  const updates = _texts.cardStatusUpdates;
+  for (const u of updates) {
+    _cardStatusPrev.set(u.cardId, u.status);
+    _cardStatus[u.cardId] = u.status;
+  }
 }
 
 // =====================================================
@@ -439,5 +446,6 @@ export function clearAllMedState(): void {
   clearPrescribeState();
   resetLtPeriods();
   resetNurseState();
-  _cardStatus.clear();
+  _cardStatusPrev.clear();
+  _cardStatus = {};
 }

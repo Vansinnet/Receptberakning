@@ -6,7 +6,7 @@
   import NurseView from './NurseView.svelte';
   import PrescribePanel from './PrescribePanel.svelte';
   import LongtermPanel from './LongtermPanel.svelte';
-  import { medCards, getNurseViewActive, setNurseViewActive, tickCurrentDate, clearAllMedState, getActiveMedIdx, getActiveResult, getPrescribeState, getCardStatus } from '$lib/state.svelte';
+  import { medCards, getNurseViewActive, setNurseViewActive, tickCurrentDate, clearAllMedState, getActiveMedIdx, getActiveResult, getPrescribeState, getCardStatus, _syncCardStatus } from '$lib/state.svelte';
   import { CHECK_INTERACTIONS } from '$lib/interactions';
   import { canRenewMed } from '$lib/prescribe-calc';
   import { INACTIVITY_WARN_MS, INACTIVITY_COUNTDOWN_SEC, COUNTDOWN_TICK_MS, ACTIVITY_RESET_DEBOUNCE_MS } from '$lib/constants';
@@ -138,6 +138,10 @@
   });
 
   $effect(() => {
+    _syncCardStatus();
+  });
+
+  $effect(() => {
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', onVisibilityChange);
       window.addEventListener('pagehide', onPageHide);
@@ -158,10 +162,8 @@
   });
 
   // Nollställ earlyRenewalDecision för ALLA kort när calcCore återställer via flagsChanged.
-  // Synkar med _cardStatus (uppdateras av _texts under render, före $effect körs).
-  // Reaktivt beroende: result (ny referens vid midnattsbyte och formulärändringar).
+  // getCardStatus() läser nu från _cardStatus ($state) — effekten triggas automatiskt vid ändring.
   $effect(() => {
-    const r = result;
     for (let i = 0; i < medCards.length; i++) {
       const status = getCardStatus(medCards[i]._cardId);
       if (status?.earlyRenewalDecision === null && medCards[i].earlyRenewalDecision !== null) {
