@@ -6,7 +6,7 @@
   import NurseView from './NurseView.svelte';
   import PrescribePanel from './PrescribePanel.svelte';
   import LongtermPanel from './LongtermPanel.svelte';
-  import { medCards, getNurseViewActive, setNurseViewActive, tickCurrentDate, clearAllMedState, getActiveMedIdx, getActiveResult, getPrescribeState, getCardStatus, _syncCardStatus } from '$lib/state.svelte';
+  import { medCards, getNurseViewActive, setNurseViewActive, tickCurrentDate, clearAllMedState, getActiveMedIdx, getActiveResult, getPrescribeState, getCardStatus, _syncCardStatus, getHasSummary } from '$lib/state.svelte';
   import { CHECK_INTERACTIONS } from '$lib/interactions';
   import { canRenewMed } from '$lib/prescribe-calc';
   import { INACTIVITY_WARN_MS, INACTIVITY_COUNTDOWN_SEC, COUNTDOWN_TICK_MS, ACTIVITY_RESET_DEBOUNCE_MS } from '$lib/constants';
@@ -46,24 +46,7 @@
     earlyRenewalDecision: card.earlyRenewalDecision,
   }) : false);
 
-  let hasSummary = $derived.by(() => {
-    let count = 0;
-    for (let i = 0; i < medCards.length; i++) {
-      const ps = getPrescribeState(medCards[i]._cardId);
-      if (!ps || !ps.packageSize) continue;
-      const status = getCardStatus(medCards[i]._cardId);
-      if (!canRenewMed({
-        _cardId: medCards[i]._cardId,
-        valid: status?.valid ?? false,
-        calculable: status?.calculable ?? false,
-        isOveruse: status?.isOveruse ?? false,
-        isTooEarly: status?.isTooEarly ?? false,
-        earlyRenewalDecision: medCards[i].earlyRenewalDecision,
-      })) continue;
-      count++;
-    }
-    return count >= 2;
-  });
+  let hasSummary = $derived(getHasSummary());
 
   let showPrescribe = $derived(prescribeVisible || hasSummary);
 
@@ -277,7 +260,6 @@
                   result={result}
                   nurseViewActive={nurseActive}
                   onEarlyDecision={handleEarlyDecision}
-                  onToggleLang={() => {}}
                 />
               {:else if result && !result.valid}
                 <div class="result-empty-state">

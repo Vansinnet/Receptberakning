@@ -1,6 +1,5 @@
 import { getNow } from './clock';
 import {
-  DEFAULT_DEBOUNCE_MS,
   MS_PER_DAY,
   MIN_VALID_YEAR,
   MAX_VALID_YEAR,
@@ -8,18 +7,6 @@ import {
   COMPOUND_MFR_NAMES,
   SINGLE_MFR_NAMES,
 } from './constants';
-
-// === DEBOUNCE ===
-
-export function debounce<T extends (...args: unknown[]) => void>(
-  fn: T,
-  wait: number = DEFAULT_DEBOUNCE_MS
-): T & { cancel: () => void } {
-  let t: ReturnType<typeof setTimeout>;
-  const d = (...args: unknown[]) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
-  (d as unknown as { cancel: () => void }).cancel = () => clearTimeout(t);
-  return d as T & { cancel: () => void };
-}
 
 // === DATUM ===
 

@@ -108,12 +108,6 @@ export const MS_PER_DAY = 86400000;
 // 6. TIMER / DEBOUNCE
 // ============================================================================
 
-export const CALC_DEBOUNCE_MS = 120;
-export const LONGTERM_DEBOUNCE_MS = 150;
-export const ADD_MED_LOCK_MS = 300;
-export const CLEAR_CARD_LOCK_MS = 300;
-export const RECALC_ON_DATE_DEBOUNCE_MS = 50;
-export const DEFAULT_DEBOUNCE_MS = 120;
 export const ACTIVITY_RESET_DEBOUNCE_MS = 2000;
 
 // AKTIVT VAL: 22 minuter — användaren varnas om inaktivitet efter denna tid.

@@ -90,11 +90,26 @@
   }
 
   function handleBlur() {
-    setTimeout(() => {
+    if (blurTimeout) clearTimeout(blurTimeout);
+    blurTimeout = setTimeout(() => {
       acVisible = false;
       acResults = [];
+      blurTimeout = null;
     }, 150);
   }
+
+  let blurTimeout: ReturnType<typeof setTimeout> | null = null;
+  $effect(() => {
+    return () => {
+      if (blurTimeout) clearTimeout(blurTimeout);
+    };
+  });
+
+  let dateDisplay = $state('');
+
+  $effect(() => {
+    dateDisplay = card?.form?.dateVal ?? '';
+  });
 
   function handleDateInput(e: Event) {
     const input = e.target as HTMLInputElement;
@@ -104,7 +119,8 @@
     if (val.length > 7) val = val.substring(0, 7) + '-' + val.substring(7);
     const sel = input.selectionStart ?? 0;
     const digitsBefore = originalVal.substring(0, sel).replace(/\D/g, '').length;
-    input.value = val;
+    dateDisplay = val;
+    if (card) card.form.dateVal = val;
     if (val !== originalVal) {
       let newPos = 0, count = 0;
       for (let i = 0; i < val.length; i++) {
@@ -112,7 +128,10 @@
         if (count === digitsBefore) { newPos = i + 1; break; }
       }
       if (count < digitsBefore) newPos = val.length;
-      try { input.setSelectionRange(newPos, newPos); } catch (_) {}
+      const target = newPos;
+      requestAnimationFrame(() => {
+        try { input.setSelectionRange(target, target); } catch (_) {}
+      });
     }
   }
 
@@ -171,7 +190,7 @@
         id="dateInput" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD"
         pattern="\d{4}-\d{2}-\d{2}" maxlength="10"
         autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-        bind:value={card.form.dateVal} oninput={handleDateInput}
+        value={dateDisplay} oninput={handleDateInput}
         class:input-error={!!(fieldErrors?.dateInput)}
         aria-invalid={!!(fieldErrors?.dateInput)}
       />

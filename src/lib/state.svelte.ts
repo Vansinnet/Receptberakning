@@ -10,7 +10,7 @@
 import type { DoseUnit, DoseInterval, CalcResult, PrevCalcResult, MedState } from './types';
 import { validateValues, calcCore } from './calc';
 import { getToday, stripManufacturer } from './utils';
-import { calcPrescribeResult } from './prescribe-calc';
+import { calcPrescribeResult, canRenewMed } from './prescribe-calc';
 import { buildPatientText, buildJournalText, buildNurseJournalText } from './text-gen';
 import { MAX_MED_CARDS } from './constants';
 
@@ -448,4 +448,23 @@ export function clearAllMedState(): void {
   resetNurseState();
   _cardStatusPrev.clear();
   _cardStatus = {};
+}
+
+export function getHasSummary(): boolean {
+  let count = 0;
+  for (let i = 0; i < medCards.length; i++) {
+    const ps = _prescribeState[medCards[i]._cardId];
+    if (!ps || !ps.packageSize) continue;
+    const status = _cardStatus[medCards[i]._cardId];
+    if (!canRenewMed({
+      _cardId: medCards[i]._cardId,
+      valid: status?.valid ?? false,
+      calculable: status?.calculable ?? false,
+      isOveruse: status?.isOveruse ?? false,
+      isTooEarly: status?.isTooEarly ?? false,
+      earlyRenewalDecision: medCards[i].earlyRenewalDecision,
+    })) continue;
+    count++;
+  }
+  return count >= 2;
 }

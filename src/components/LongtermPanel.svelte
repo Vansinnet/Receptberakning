@@ -39,9 +39,9 @@
     // Läs ltPeriods för att registrera beroende
     const periods = ltPeriods.map(p => ({ start: p.start, end: p.end, total: p.total }));
     if (!medRaw || !ordDose || ordDose <= 0) {
-      return { valid: false, periodErrors: [], periods: [] } as any;
+      return { valid: false, periodErrors: [] as any[], periods: [] } as LTResult;
     }
-    return calcLongtermCore(medRaw, ordDose, ltPeriods as any);
+    return calcLongtermCore(medRaw, ordDose, periods);
   });
 
   function copyLtText() {

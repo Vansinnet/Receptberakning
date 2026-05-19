@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { medCards, getPrescribeState, initPrescribeState, applyPrescribeStatePatch, getActiveMedIdx, getCardStatus, getActiveResult } from '$lib/state.svelte';
+  import { medCards, getPrescribeState, initPrescribeState, applyPrescribeStatePatch, getActiveMedIdx, getCardStatus, getActiveResult, getHasSummary } from '$lib/state.svelte';
   import { calcPrescribeResult, canRenewMed, prescribeValidationHint } from '$lib/prescribe-calc';
   import { UNIT_DISPLAY, DEFAULT_PRESCRIBE_MODE, DEFAULT_PRESCRIBE_MONTHS } from '$lib/constants';
   import type { MedState } from '$lib/types';
@@ -82,24 +82,7 @@
     return calcPrescribeResult(s, ps ?? null);
   });
 
-  let hasSummary = $derived.by(() => {
-    let count = 0;
-    for (let i = 0; i < medCards.length; i++) {
-      const ps = getPrescribeState(medCards[i]._cardId);
-      if (!ps || !ps.packageSize) continue;
-      const status = getCardStatus(medCards[i]._cardId);
-      if (!canRenewMed({
-        _cardId: medCards[i]._cardId,
-        valid: status?.valid ?? false,
-        calculable: status?.calculable ?? false,
-        isOveruse: status?.isOveruse ?? false,
-        isTooEarly: status?.isTooEarly ?? false,
-        earlyRenewalDecision: medCards[i].earlyRenewalDecision,
-      })) continue;
-      count++;
-    }
-    return count >= 2;
-  });
+  let hasSummary = $derived(getHasSummary());
 </script>
 
 <section class="prescribe-panel" class:is-hidden={!visible && !hasSummary} aria-label="Ny förskrivning">

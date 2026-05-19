@@ -206,7 +206,6 @@ export function calcCore(inputData: CalcInput, prev: PrevCalcResult): CalcResult
     }
     const consumed = calcBase - remaining!;
     if (consumed < 0) {
-      console.error('[calcCore] consumed < 0 — oväntat tillstånd. Kontrollera inmatningen.');
       return { valid: false, isOveruse: false, isTooEarly: false, statusText: 'Internt fel — kontrollera inmatningen.' };
     }
     avgNum        = consumed / daysSince;
