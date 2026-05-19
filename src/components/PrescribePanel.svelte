@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { medCards, getPrescribeState, initPrescribeState, applyPrescribeStatePatch, getActiveMedIdx } from '$lib/state.svelte';
+  import { medCards, getPrescribeState, initPrescribeState, applyPrescribeStatePatch, getActiveMedIdx, getCardStatus, getActiveResult } from '$lib/state.svelte';
   import { calcPrescribeResult, canRenewMed, prescribeValidationHint } from '$lib/prescribe-calc';
-  import { getActiveResult } from '$lib/state.svelte';
   import { UNIT_DISPLAY, DEFAULT_PRESCRIBE_MODE, DEFAULT_PRESCRIBE_MONTHS } from '$lib/constants';
   import type { MedState } from '$lib/types';
 
@@ -88,6 +87,15 @@
     for (let i = 0; i < medCards.length; i++) {
       const ps = getPrescribeState(medCards[i]._cardId);
       if (!ps || !ps.packageSize) continue;
+      const status = getCardStatus(medCards[i]._cardId);
+      if (!canRenewMed({
+        _cardId: medCards[i]._cardId,
+        valid: status?.valid ?? false,
+        calculable: status?.calculable ?? false,
+        isOveruse: status?.isOveruse ?? false,
+        isTooEarly: status?.isTooEarly ?? false,
+        earlyRenewalDecision: medCards[i].earlyRenewalDecision,
+      })) continue;
       count++;
     }
     return count >= 2;
@@ -171,7 +179,15 @@
           <div class="prescribe-summary-header">Sammanställning av läkemedel att förskriva</div>
           <div class="prescribe-summary-list">
             {#each medCards as c, i}
-              {#if getPrescribeState(c._cardId)}
+              {@const status = getCardStatus(c._cardId)}
+              {#if getPrescribeState(c._cardId) && canRenewMed({
+                _cardId: c._cardId,
+                valid: status?.valid ?? false,
+                calculable: status?.calculable ?? false,
+                isOveruse: status?.isOveruse ?? false,
+                isTooEarly: status?.isTooEarly ?? false,
+                earlyRenewalDecision: c.earlyRenewalDecision,
+              })}
                 {@const d = parseFloat((c.form.doseRaw || '').replace(',', '.')) || 0}
                 {@const pr = calcPrescribeResult({
                   _cardId: c._cardId,
