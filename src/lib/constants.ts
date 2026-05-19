@@ -204,4 +204,4 @@ export const SINGLE_MFR_NAMES: string[] = [
 // ============================================================================
 
 export const MIN_SEARCH_QUERY_LENGTH = 2;
-export const MAX_AUTOCOMPLETE_RESULTS = 15;
+export const MAX_AUTOCOMPLETE_RESULTS = 20;
