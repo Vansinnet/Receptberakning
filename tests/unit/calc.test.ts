@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
 import { setMockNow } from '../../src/lib/clock';
 import { calcCore, validateValues } from '../../src/lib/calc';
+import { extractDoseUnit } from '../../src/lib/utils';
 import { calcLongtermCore } from '../../src/lib/calc-longterm';
 import { calcPrescribeResult, canRenewMed, prescribeValidationHint } from '../../src/lib/prescribe-calc';
 import { buildPatientText, buildJournalText, buildNurseJournalText, remainingDosesNote, resolveState } from '../../src/lib/text-gen';
@@ -153,7 +154,7 @@ describe('calcCore — Normalfall: OK att förnya', () => {
 
 describe('calcCore — För tidigt att förnya', () => {
   it('>20 % av receptperioden kvar, normal förbrukning → isTooEarly', () => {
-    const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 30, remaining: 80 }), NO_PREV);
+    const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 200, remaining: 200 }), NO_PREV);
     expect(r.isTooEarly).toBe(true);
     expect(r.isOveruse).toBe(false);
     expect(r.verdictTitle).toContain('För tidigt');
@@ -291,7 +292,7 @@ describe('calcCore — remaining-fält', () => {
 describe('calcCore — Klinisk override', () => {
   it('isTooEarly + override "yes" → statusText innehåller "OK"', () => {
     const r = calcCore(
-      makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 30, remaining: 80 }),
+      makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 200, remaining: 200 }),
       { isOveruse: false, isTooEarly: true, earlyRenewalDecision: 'yes' }
     );
     expect(r.isTooEarly).toBe(true);
@@ -362,7 +363,7 @@ describe('calcCore — statusText-grenar', () => {
 
   it('isTooEarly + decision yes → "OK – förnyas tidigt"', () => {
     const r = calcCore(
-      makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 30, remaining: 80 }),
+      makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 200, remaining: 200 }),
       { isOveruse: false, isTooEarly: true, earlyRenewalDecision: 'yes' }
     );
     expect(r.statusText).toBe('OK – förnyas tidigt');
@@ -370,7 +371,7 @@ describe('calcCore — statusText-grenar', () => {
 
   it('isTooEarly utan beslut → statusText innehåller "För tidigt" och dagar kvar', () => {
     const r = calcCore(
-      makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 30, remaining: 80 }),
+      makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 200, remaining: 200 }),
       NO_PREV
     );
     expect(r.isTooEarly).toBe(true);
@@ -391,7 +392,7 @@ describe('calcCore — alerts (saknade grenar)', () => {
   });
 
   it('låg förbrukning + isTooEarly → båda alert-typerna genereras', () => {
-    const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 30, remaining: 80 }), NO_PREV);
+    const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 200, remaining: 200 }), NO_PREV);
     expect(r.isTooEarly).toBe(true);
     expect(r.alerts?.some(a => a.type === 'warn' && (a.title?.includes('Låg förbrukning') || false))).toBe(true);
     expect(r.alerts?.some(a => a.type === 'info' && (a.title?.includes('För tidigt') || false))).toBe(true);
@@ -422,7 +423,7 @@ describe('calcCore — output-fält', () => {
   });
 
   it('isTooEarly → renewDateStr matchar ÅÅÅÅ-MM-DD', () => {
-    const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 30, remaining: 80 }), NO_PREV);
+    const r = calcCore(makeInput({ amt: 100, dose: 1, ref: 3, daysSince: 200, remaining: 200 }), NO_PREV);
     expect(r.isTooEarly).toBe(true);
     expect(r.renewDateStr).toBeDefined();
     expect(r.renewDateStr).toMatch(/^\d{4}-\d{2}-\d{2}$/);
@@ -442,6 +443,31 @@ describe('calcCore — output-fält', () => {
 });
 
 // =====================================================
+// EXTRACTDOSEUNIT
+// =====================================================
+
+describe('extractDoseUnit', () => {
+  it('känner igen mikrog', () => {
+    expect(extractDoseUnit('Levaxin 100 mikrog')).toEqual({ amount: 100, unit: 'µg' });
+  });
+
+  it('känner igen mmol', () => {
+    expect(extractDoseUnit('Kaliumklorid 2 mmol')).toEqual({ amount: 2, unit: 'mmol' });
+  });
+
+  it('känner igen mikrogram (befintlig)', () => {
+    expect(extractDoseUnit('Levaxin 100 mikrogram')).toEqual({ amount: 100, unit: 'µg' });
+  });
+
+  it('känner igen mg', () => {
+    expect(extractDoseUnit('Metformin 500 mg')).toEqual({ amount: 500, unit: 'mg' });
+  });
+
+  it('returnerar null för namn utan enhet', () => {
+    expect(extractDoseUnit('Placebo')).toBeNull();
+  });
+});
+
 // VALIDATEVALUES
 // =====================================================
 

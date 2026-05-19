@@ -393,6 +393,15 @@ describe('Output-struktur', () => {
     expect(result.length).toBeGreaterThanOrEqual(3);
   });
 
+  it('två identiska ATC-koder → ingen självinteraktion', () => {
+    const result = CHECK_INTERACTIONS([
+      { i: 'Litium 1', a: 'N05AN01' },
+      { i: 'Litium 2', a: 'N05AN01' },
+    ]);
+    const selfMatch = result.filter(w => w.drugs[0] === w.drugs[1]);
+    expect(selfMatch.length).toBe(0);
+  });
+
   it('första läkemedlet saknar ATC → hoppar över det paret', () => {
     const result = CHECK_INTERACTIONS([
       { i: '0', a: '' },

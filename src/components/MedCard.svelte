@@ -63,7 +63,7 @@
     card.form.nplId = d.i || null;
     card.form.notCalculable = !!d.c;
     if (d.p && d.p > 0) card.form.amtRaw = String(d.p);
-    card.form.doseUnit = d.u === 'ml' ? 'ml' : 'st';
+    card.form.doseUnit = d.u === 'ml' ? 'ml' : d.u === 'dos' ? 'dos' : 'st';
     acVisible = false;
     acResults = [];
   }

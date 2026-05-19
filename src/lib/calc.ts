@@ -202,7 +202,7 @@ export function calcCore(inputData: CalcInput, prev: PrevCalcResult): CalcResult
       const minB = Math.ceil(remaining! / inputData.amt);
       calcBase = Math.min(minB, inputData.ref) * inputData.amt;
     } else {
-      calcBase = accessibleTotal;
+      calcBase = total;
     }
     const consumed = calcBase - remaining!;
     if (consumed < 0) {

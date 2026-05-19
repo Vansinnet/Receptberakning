@@ -447,12 +447,12 @@
     "expected": {
       "valid": true,
       "calculable": true,
-      "isOveruse": false,
-      "isTooEarly": true,
+      "isOveruse": true,
+      "isTooEarly": false,
       "earlyRenewalDecision": null,
-      "statusText": "För tidigt — 270d kvar",
-      "verdictTitle": "För tidigt – 270 dagar kvar",
-      "verdictSub": "Förbrukning OK. Kontakta vården närmre slutdatumet.",
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 7.33 st/dag överstiger ordination med >10%.",
       "metrics": [
         {
           "label": "Totalt förskrivet",
@@ -468,21 +468,16 @@
         },
         {
           "label": "Snittförbrukning",
-          "value": "0.67 st/dag (6.7 mg/dag)",
-          "cls": "",
+          "value": "7.33 st/dag (73.3 mg/dag)",
+          "cls": "danger",
           "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
         }
       ],
       "alerts": [
         {
           "type": "warn",
-          "title": "Låg förbrukning",
-          "message": "0.67 st/dag är 33.3% under ordinerad dos. Överväg uppföljning."
-        },
-        {
-          "type": "info",
-          "title": "För tidigt att förnya",
-          "message": "Receptperioden löper ut om 270 dagar (t.o.m. 2026-03-12). Förnyelse rekommenderas närmre slutdatumet."
+          "title": "Datakontroll",
+          "message": "Snitt 7.33 st/dag är mycket högt. Kontrollera kvarvarande mängd."
         }
       ],
       "tlPct": 10,
@@ -502,9 +497,10 @@
       "prescribedEndDateStr": "2026-03-12",
       "daysRemaining": 80,
       "daysToPrescribedEnd": 270,
-      "displayAvgStr": "0.67 st/dag (6.7 mg/dag)",
-      "avgNote": "(beräknat på faktisk förbrukning: 20 av 100 tillgängliga st)",
-      "renewDateStr": "2026-01-11"
+      "displayAvgStr": "7.33 st/dag (73.3 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 220 av 300 tillgängliga st)",
+      "prescribedContactDateStr": "2026-03-05",
+      "prescribedContactIsPast": false
     }
   },
   {
@@ -2059,12 +2055,12 @@
     "expected": {
       "valid": true,
       "calculable": true,
-      "isOveruse": false,
-      "isTooEarly": true,
-      "earlyRenewalDecision": "yes",
-      "statusText": "OK – förnyas tidigt",
-      "verdictTitle": "OK – Förnya recept",
-      "verdictSub": "Klinisk bedömning: förnyelse trots 270 dagar kvar av receptperioden.",
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 7.33 st/dag överstiger ordination med >10%.",
       "metrics": [
         {
           "label": "Totalt förskrivet",
@@ -2080,21 +2076,16 @@
         },
         {
           "label": "Snittförbrukning",
-          "value": "0.67 st/dag (6.7 mg/dag)",
-          "cls": "",
+          "value": "7.33 st/dag (73.3 mg/dag)",
+          "cls": "danger",
           "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
         }
       ],
       "alerts": [
         {
           "type": "warn",
-          "title": "Låg förbrukning",
-          "message": "0.67 st/dag är 33.3% under ordinerad dos. Överväg uppföljning."
-        },
-        {
-          "type": "info",
-          "title": "För tidigt att förnya",
-          "message": "Receptperioden löper ut om 270 dagar (t.o.m. 2026-03-12). Förnyelse rekommenderas närmre slutdatumet."
+          "title": "Datakontroll",
+          "message": "Snitt 7.33 st/dag är mycket högt. Kontrollera kvarvarande mängd."
         }
       ],
       "tlPct": 10,
@@ -2114,9 +2105,10 @@
       "prescribedEndDateStr": "2026-03-12",
       "daysRemaining": 80,
       "daysToPrescribedEnd": 270,
-      "displayAvgStr": "0.67 st/dag (6.7 mg/dag)",
-      "avgNote": "(beräknat på faktisk förbrukning: 20 av 100 tillgängliga st)",
-      "renewDateStr": "2026-01-11"
+      "displayAvgStr": "7.33 st/dag (73.3 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 220 av 300 tillgängliga st)",
+      "prescribedContactDateStr": "2026-03-05",
+      "prescribedContactIsPast": false
     }
   },
   {
@@ -5041,12 +5033,12 @@
     "expected": {
       "valid": true,
       "calculable": true,
-      "isOveruse": false,
-      "isTooEarly": true,
-      "earlyRenewalDecision": "yes",
-      "statusText": "OK – förnyas tidigt",
-      "verdictTitle": "OK – Förnya recept",
-      "verdictSub": "Klinisk bedömning: förnyelse trots 270 dagar kvar av receptperioden.",
+      "isOveruse": true,
+      "isTooEarly": false,
+      "earlyRenewalDecision": null,
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 7.33 st/dag överstiger ordination med >10%.",
       "metrics": [
         {
           "label": "Totalt förskrivet",
@@ -5062,21 +5054,16 @@
         },
         {
           "label": "Snittförbrukning",
-          "value": "0.67 st/dag (6.7 mg/dag)",
-          "cls": "",
+          "value": "7.33 st/dag (73.3 mg/dag)",
+          "cls": "danger",
           "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
         }
       ],
       "alerts": [
         {
           "type": "warn",
-          "title": "Låg förbrukning",
-          "message": "0.67 st/dag är 33.3% under ordinerad dos. Överväg uppföljning."
-        },
-        {
-          "type": "info",
-          "title": "För tidigt att förnya",
-          "message": "Receptperioden löper ut om 270 dagar (t.o.m. 2026-03-12). Förnyelse rekommenderas närmre slutdatumet."
+          "title": "Datakontroll",
+          "message": "Snitt 7.33 st/dag är mycket högt. Kontrollera kvarvarande mängd."
         }
       ],
       "tlPct": 10,
@@ -5096,9 +5083,10 @@
       "prescribedEndDateStr": "2026-03-12",
       "daysRemaining": 80,
       "daysToPrescribedEnd": 270,
-      "displayAvgStr": "0.67 st/dag (6.7 mg/dag)",
-      "avgNote": "(beräknat på faktisk förbrukning: 20 av 100 tillgängliga st)",
-      "renewDateStr": "2026-01-11"
+      "displayAvgStr": "7.33 st/dag (73.3 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 220 av 300 tillgängliga st)",
+      "prescribedContactDateStr": "2026-03-05",
+      "prescribedContactIsPast": false
     }
   },
   {
@@ -5128,12 +5116,12 @@
     "expected": {
       "valid": true,
       "calculable": true,
-      "isOveruse": false,
-      "isTooEarly": true,
+      "isOveruse": true,
+      "isTooEarly": false,
       "earlyRenewalDecision": null,
-      "statusText": "För tidigt — 270d kvar",
-      "verdictTitle": "För tidigt – 270 dagar kvar",
-      "verdictSub": "Förbrukning OK. Kontakta vården närmre slutdatumet.",
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 7.33 st/dag överstiger ordination med >10%.",
       "metrics": [
         {
           "label": "Totalt förskrivet",
@@ -5149,21 +5137,16 @@
         },
         {
           "label": "Snittförbrukning",
-          "value": "0.67 st/dag (6.7 mg/dag)",
-          "cls": "",
+          "value": "7.33 st/dag (73.3 mg/dag)",
+          "cls": "danger",
           "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
         }
       ],
       "alerts": [
         {
           "type": "warn",
-          "title": "Låg förbrukning",
-          "message": "0.67 st/dag är 33.3% under ordinerad dos. Överväg uppföljning."
-        },
-        {
-          "type": "info",
-          "title": "För tidigt att förnya",
-          "message": "Receptperioden löper ut om 270 dagar (t.o.m. 2026-03-12). Förnyelse rekommenderas närmre slutdatumet."
+          "title": "Datakontroll",
+          "message": "Snitt 7.33 st/dag är mycket högt. Kontrollera kvarvarande mängd."
         }
       ],
       "tlPct": 10,
@@ -5183,9 +5166,10 @@
       "prescribedEndDateStr": "2026-03-12",
       "daysRemaining": 80,
       "daysToPrescribedEnd": 270,
-      "displayAvgStr": "0.67 st/dag (6.7 mg/dag)",
-      "avgNote": "(beräknat på faktisk förbrukning: 20 av 100 tillgängliga st)",
-      "renewDateStr": "2026-01-11"
+      "displayAvgStr": "7.33 st/dag (73.3 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 220 av 300 tillgängliga st)",
+      "prescribedContactDateStr": "2026-03-05",
+      "prescribedContactIsPast": false
     }
   },
   {
@@ -5380,12 +5364,12 @@
     "expected": {
       "valid": true,
       "calculable": true,
-      "isOveruse": false,
-      "isTooEarly": true,
+      "isOveruse": true,
+      "isTooEarly": false,
       "earlyRenewalDecision": null,
-      "statusText": "För tidigt — 270d kvar",
-      "verdictTitle": "För tidigt – 270 dagar kvar",
-      "verdictSub": "Förbrukning OK. Kontakta vården närmre slutdatumet.",
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 7.33 st/dag överstiger ordination med >10%.",
       "metrics": [
         {
           "label": "Totalt förskrivet",
@@ -5401,21 +5385,16 @@
         },
         {
           "label": "Snittförbrukning",
-          "value": "0.67 st/dag (6.7 mg/dag)",
-          "cls": "",
+          "value": "7.33 st/dag (73.3 mg/dag)",
+          "cls": "danger",
           "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
         }
       ],
       "alerts": [
         {
           "type": "warn",
-          "title": "Låg förbrukning",
-          "message": "0.67 st/dag är 33.3% under ordinerad dos. Överväg uppföljning."
-        },
-        {
-          "type": "info",
-          "title": "För tidigt att förnya",
-          "message": "Receptperioden löper ut om 270 dagar (t.o.m. 2026-03-12). Förnyelse rekommenderas närmre slutdatumet."
+          "title": "Datakontroll",
+          "message": "Snitt 7.33 st/dag är mycket högt. Kontrollera kvarvarande mängd."
         }
       ],
       "tlPct": 10,
@@ -5435,9 +5414,10 @@
       "prescribedEndDateStr": "2026-03-12",
       "daysRemaining": 80,
       "daysToPrescribedEnd": 270,
-      "displayAvgStr": "0.67 st/dag (6.7 mg/dag)",
-      "avgNote": "(beräknat på faktisk förbrukning: 20 av 100 tillgängliga st)",
-      "renewDateStr": "2026-01-11"
+      "displayAvgStr": "7.33 st/dag (73.3 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 220 av 300 tillgängliga st)",
+      "prescribedContactDateStr": "2026-03-05",
+      "prescribedContactIsPast": false
     }
   },
   {
@@ -5625,12 +5605,12 @@
     "expected": {
       "valid": true,
       "calculable": true,
-      "isOveruse": false,
-      "isTooEarly": true,
+      "isOveruse": true,
+      "isTooEarly": false,
       "earlyRenewalDecision": null,
-      "statusText": "För tidigt — 270d kvar",
-      "verdictTitle": "För tidigt – 270 dagar kvar",
-      "verdictSub": "Förbrukning OK. Kontakta vården närmre slutdatumet.",
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 7.33 st/dag överstiger ordination med >10%.",
       "metrics": [
         {
           "label": "Totalt förskrivet",
@@ -5646,21 +5626,16 @@
         },
         {
           "label": "Snittförbrukning",
-          "value": "0.67 st/dag (6.7 mg/dag)",
-          "cls": "",
+          "value": "7.33 st/dag (73.3 mg/dag)",
+          "cls": "danger",
           "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
         }
       ],
       "alerts": [
         {
           "type": "warn",
-          "title": "Låg förbrukning",
-          "message": "0.67 st/dag är 33.3% under ordinerad dos. Överväg uppföljning."
-        },
-        {
-          "type": "info",
-          "title": "För tidigt att förnya",
-          "message": "Receptperioden löper ut om 270 dagar (t.o.m. 2026-03-12). Förnyelse rekommenderas närmre slutdatumet."
+          "title": "Datakontroll",
+          "message": "Snitt 7.33 st/dag är mycket högt. Kontrollera kvarvarande mängd."
         }
       ],
       "tlPct": 10,
@@ -5680,9 +5655,10 @@
       "prescribedEndDateStr": "2026-03-12",
       "daysRemaining": 80,
       "daysToPrescribedEnd": 270,
-      "displayAvgStr": "0.67 st/dag (6.7 mg/dag)",
-      "avgNote": "(beräknat på faktisk förbrukning: 20 av 100 tillgängliga st)",
-      "renewDateStr": "2026-01-11"
+      "displayAvgStr": "7.33 st/dag (73.3 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 220 av 300 tillgängliga st)",
+      "prescribedContactDateStr": "2026-03-05",
+      "prescribedContactIsPast": false
     }
   },
   {
@@ -5789,12 +5765,12 @@
     "expected": {
       "valid": true,
       "calculable": true,
-      "isOveruse": false,
-      "isTooEarly": true,
+      "isOveruse": true,
+      "isTooEarly": false,
       "earlyRenewalDecision": null,
-      "statusText": "För tidigt — 270d kvar",
-      "verdictTitle": "För tidigt – 270 dagar kvar",
-      "verdictSub": "Förbrukning OK. Kontakta vården närmre slutdatumet.",
+      "statusText": "För tidig förnyelse",
+      "verdictTitle": "För tidig förnyelse – bedömning krävs",
+      "verdictSub": "Snitt 7.33 st/dag överstiger ordination med >10%.",
       "metrics": [
         {
           "label": "Totalt förskrivet",
@@ -5810,21 +5786,16 @@
         },
         {
           "label": "Snittförbrukning",
-          "value": "0.67 st/dag (6.7 mg/dag)",
-          "cls": "",
+          "value": "7.33 st/dag (73.3 mg/dag)",
+          "cls": "danger",
           "tooltip": "Genomsnittlig förbrukning per dag sedan receptet utfärdades. Mer än 10% över ordination kräver klinisk bedömning om mer än 7 dagsmotsvarigheter återstår eller receptperioden har mer än 14 dagar kvar."
         }
       ],
       "alerts": [
         {
           "type": "warn",
-          "title": "Låg förbrukning",
-          "message": "0.67 st/dag är 33.3% under ordinerad dos. Överväg uppföljning."
-        },
-        {
-          "type": "info",
-          "title": "För tidigt att förnya",
-          "message": "Receptperioden löper ut om 270 dagar (t.o.m. 2026-03-12). Förnyelse rekommenderas närmre slutdatumet."
+          "title": "Datakontroll",
+          "message": "Snitt 7.33 st/dag är mycket högt. Kontrollera kvarvarande mängd."
         }
       ],
       "tlPct": 10,
@@ -5844,9 +5815,10 @@
       "prescribedEndDateStr": "2026-03-12",
       "daysRemaining": 80,
       "daysToPrescribedEnd": 270,
-      "displayAvgStr": "0.67 st/dag (6.7 mg/dag)",
-      "avgNote": "(beräknat på faktisk förbrukning: 20 av 100 tillgängliga st)",
-      "renewDateStr": "2026-01-11"
+      "displayAvgStr": "7.33 st/dag (73.3 mg/dag)",
+      "avgNote": "(beräknat på faktisk förbrukning: 220 av 300 tillgängliga st)",
+      "prescribedContactDateStr": "2026-03-05",
+      "prescribedContactIsPast": false
     }
   },
   {

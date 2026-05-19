@@ -164,8 +164,9 @@ export const UNIT_DISPLAY = {
 
 // Dos-enhetsnormalisering: rå enhet → kanonisk enhet.
 export const DOSE_UNIT_NORMALIZE: Record<string, string> = {
-  mikrogram: 'µg', microgram: 'µg', mcg: 'µg',
+  mikrogram: 'µg', mikrog: 'µg', microgram: 'µg', mcg: 'µg',
   nanogram: 'ng', gram: 'g', ie: 'IE', iu: 'IE',
+  mmol: 'mmol',
 };
 
 // ============================================================================

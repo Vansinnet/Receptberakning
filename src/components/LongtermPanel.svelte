@@ -191,7 +191,7 @@
           {/if}
 
           <!-- Copy section -->
-          <div class="copy-section" class:is-hidden={!result.valid}>
+          <div class="copy-section">
             <div class="copy-tabs-row">
               <div class="copy-tab">Journalanteckning (förslag)</div>
             </div>

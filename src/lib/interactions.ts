@@ -206,7 +206,7 @@ export function CHECK_INTERACTIONS(atcEntries: Array<{ a: string; i: string }>):
                      && ix.b.some(p => atcMatches(atcEntries[y].a, p));
         const matchBA = ix.a.some(p => atcMatches(atcEntries[y].a, p))
                      && ix.b.some(p => atcMatches(atcEntries[x].a, p));
-        if (matchAB || matchBA) {
+        if ((matchAB || matchBA) && atcEntries[x].a !== atcEntries[y].a) {
           let already = false;
           for (let w = 0; w < warnings.length; w++) {
             if (warnings[w].t === ix.t && warnings[w].drugs[0] === atcEntries[x].i && warnings[w].drugs[1] === atcEntries[y].i) {
