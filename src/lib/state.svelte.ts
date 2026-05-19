@@ -12,7 +12,7 @@ import { validateValues, calcCore } from './calc';
 import { getToday, stripManufacturer } from './utils';
 import { calcPrescribeResult, canRenewMed } from './prescribe-calc';
 import { buildPatientText, buildJournalText, buildNurseJournalText } from './text-gen';
-import { MAX_MED_CARDS } from './constants';
+import { MAX_MED_CARDS, MAX_LT_PERIODS, MIN_LT_PERIODS } from './constants';
 
 // =====================================================
 // TYPER
@@ -87,6 +87,7 @@ export function spliceMedCard(i: number): void {
   const removedCardId = medCards[i]._cardId;
   medCards.splice(i, 1);
   _cardStatusPrev.delete(removedCardId);
+  _cardResultsCache.delete(removedCardId);
   delete _cardStatus[removedCardId];
   delete _prescribeState[removedCardId];
   if (_app.activeMedIdx > i) {
@@ -209,6 +210,8 @@ interface CardResult {
   medNameStripped: string;
 }
 
+const _cardResultsCache = new Map<number, { fp: string; cr: CardResult | null; status: CardStatusCache }>();
+
 const _texts = $derived.by((): TextResult => {
   // Tvinga omvärdering vid midnattsbyte — texterna ska alltid spegla dagens datum.
   void _app.currentDate;
@@ -220,7 +223,17 @@ const _texts = $derived.by((): TextResult => {
     const card = medCards[i];
     if (!card) continue;
     const f = card.form;
-    if (!f.medRaw) continue; // tomt kort
+    if (!f.medRaw) continue;
+
+    const fp = [f.medRaw, f.dateVal, f.doseRaw, f.amtRaw, f.refRaw, f.leftRaw,
+      f.doseUnit, f.doseInterval, f.notCalculable, card.earlyRenewalDecision].join('\x00');
+
+    const cached = _cardResultsCache.get(card._cardId);
+    if (cached && cached.fp === fp) {
+      cardStatusUpdates.push({ cardId: card._cardId, status: cached.status });
+      if (cached.cr) cardResults.push(cached.cr);
+      continue;
+    }
 
     const validated = validateValues(
       f.medRaw, f.dateVal, f.doseRaw, f.amtRaw, f.refRaw, f.leftRaw,
@@ -234,27 +247,32 @@ const _texts = $derived.by((): TextResult => {
     });
 
     if (!calc.valid || calc.calculable === false) {
-      cardStatusUpdates.push({ cardId: card._cardId, status: {
+      const status: CardStatusCache = {
         isOveruse: false, isTooEarly: false, earlyRenewalDecision: null,
         valid: calc.valid, calculable: calc.calculable ?? false,
         statusText: calc.statusText || '—',
         prescribedEndDateStr: '',
-      }});
+      };
+      cardStatusUpdates.push({ cardId: card._cardId, status });
+      _cardResultsCache.set(card._cardId, { fp, cr: null, status });
       continue;
     }
 
     const medNameStripped = stripManufacturer(f.medRaw) || f.medRaw;
 
-    cardResults.push({ cardId: card._cardId, calc, medNameStripped });
-    cardStatusUpdates.push({ cardId: card._cardId, status: {
+    const cr: CardResult = { cardId: card._cardId, calc, medNameStripped };
+    const status: CardStatusCache = {
       isOveruse: calc.isOveruse ?? false,
       isTooEarly: calc.isTooEarly ?? false,
       earlyRenewalDecision: calc.earlyRenewalDecision ?? null,
       valid: true,
       calculable: true,
       statusText: calc.statusText || 'OK',
-      prescribedEndDateStr: calc.prescribedEndDateStr,
-    }});
+      prescribedEndDateStr: calc.prescribedEndDateStr ?? '',
+    };
+    cardResults.push(cr);
+    cardStatusUpdates.push({ cardId: card._cardId, status });
+    _cardResultsCache.set(card._cardId, { fp, cr, status });
   }
 
   const validCount = cardResults.length;
@@ -368,6 +386,10 @@ export function _syncCardStatus(): void {
   }
 }
 
+export function _textsVersion(): number {
+  return _texts.cardStatusUpdates.length;
+}
+
 // =====================================================
 // LÄNGVARIG FÖRBRUKNING — PERIODER
 // =====================================================
@@ -385,13 +407,13 @@ export function setLtPeriodField(i: number, field: keyof LTPeriod, value: string
 }
 
 export function pushLtPeriod(): boolean {
-  if (ltPeriods.length >= 10) return false;
+  if (ltPeriods.length >= MAX_LT_PERIODS) return false;
   ltPeriods.push({ start: '', total: '', end: '' });
   return true;
 }
 
 export function spliceLtPeriod(i: number): boolean {
-  if (ltPeriods.length <= 1) return false;
+  if (ltPeriods.length <= MIN_LT_PERIODS) return false;
   ltPeriods.splice(i, 1);
   return true;
 }
@@ -447,6 +469,7 @@ export function clearAllMedState(): void {
   resetLtPeriods();
   resetNurseState();
   _cardStatusPrev.clear();
+  _cardResultsCache.clear();
   _cardStatus = {};
 }
 

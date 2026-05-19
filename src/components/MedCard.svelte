@@ -2,6 +2,7 @@
   import { medCards, getActiveMedIdx, getActiveValidated } from '$lib/state.svelte';
   import { loadDrugs, searchDrugs, getDrugByName, type DrugEntry } from '$lib/drug-search';
   import { getFassUrl } from '$lib/utils';
+  import { MIN_SEARCH_QUERY_LENGTH } from '$lib/constants';
 
   let activeIdx = $derived(getActiveMedIdx());
   let card = $derived(medCards[activeIdx] ?? null);
@@ -43,7 +44,7 @@
     card.form.doseUnit = 'st';
     }
 
-    if (q.length < 2) {
+    if (q.length < MIN_SEARCH_QUERY_LENGTH) {
       acResults = [];
       acVisible = false;
       acHighlight = -1;
@@ -168,9 +169,9 @@
         aria-expanded={acVisible}
       />
         {#if acVisible && acResults.length > 0}
-          <div id="ac-dropdown" class="autocomplete-dropdown" role="listbox">
+          <div id="ac-dropdown" class="autocomplete-dropdown" role="listbox" tabindex="0" aria-activedescendant={acHighlight >= 0 ? `ac-option-${acHighlight}` : undefined}>
             {#each acResults as d, i}
-              <div class="autocomplete-item {i === acHighlight ? 'active' : ''}" role="option" tabindex="-1" aria-selected={i === acHighlight} onmousedown={(e) => { e.preventDefault(); selectDrug(d); }} onmouseenter={() => acHighlight = i}>
+              <div id="ac-option-{i}" class="autocomplete-item {i === acHighlight ? 'active' : ''}" role="option" tabindex="-1" aria-selected={i === acHighlight} onmousedown={(e) => { e.preventDefault(); selectDrug(d); }} onmouseenter={() => acHighlight = i}>
                 <span class="ac-drug-name">{d.n}</span>
                 <span class="ac-drug-meta">{d.p ?? ''} {d.u || 'st'} · {d.f || ''}</span>
               </div>
@@ -180,7 +181,7 @@
       {#if fieldErrors?.medInput}
         <span class="field-error-msg visible" aria-live="polite">{fieldErrors.medInput}</span>
       {:else}
-        <span class="field-error-msg" aria-live="polite"></span>
+        <span class="field-error-msg"></span>
       {/if}
     </div>
 
@@ -197,7 +198,7 @@
       {#if fieldErrors?.dateInput}
         <span class="field-error-msg visible" aria-live="polite">{fieldErrors.dateInput}</span>
       {:else}
-        <span class="field-error-msg" aria-live="polite"></span>
+        <span class="field-error-msg"></span>
       {/if}
     </div>
 
@@ -221,7 +222,7 @@
         {#if fieldErrors?.doseInput}
           <span class="field-error-msg visible" aria-live="polite">{fieldErrors.doseInput}</span>
         {:else}
-          <span class="field-error-msg" aria-live="polite"></span>
+          <span class="field-error-msg"></span>
         {/if}
       </div>
       <div class="field">
@@ -235,7 +236,7 @@
         {#if fieldErrors?.amtInput}
           <span class="field-error-msg visible" aria-live="polite">{fieldErrors.amtInput}</span>
         {:else}
-          <span class="field-error-msg" aria-live="polite"></span>
+          <span class="field-error-msg"></span>
         {/if}
       </div>
     </div>
@@ -251,7 +252,7 @@
       {#if fieldErrors?.refInput}
         <span class="field-error-msg visible" aria-live="polite">{fieldErrors.refInput}</span>
       {:else}
-        <span class="field-error-msg" aria-live="polite"></span>
+        <span class="field-error-msg"></span>
       {/if}
     </div>
 
@@ -266,7 +267,7 @@
       {#if fieldErrors?.leftInput}
         <span class="field-error-msg visible" aria-live="polite">{fieldErrors.leftInput}</span>
       {:else}
-        <span class="field-error-msg" aria-live="polite"></span>
+        <span class="field-error-msg"></span>
       {/if}
       <span class="field-hint">Ger exaktare snittberäkning om patienten uppger kvarvarande mängd</span>
     </div>

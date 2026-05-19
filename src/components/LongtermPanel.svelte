@@ -38,9 +38,6 @@
   let result = $derived.by((): LTResult => {
     // Läs ltPeriods för att registrera beroende
     const periods = ltPeriods.map(p => ({ start: p.start, end: p.end, total: p.total }));
-    if (!medRaw || !ordDose || ordDose <= 0) {
-      return { valid: false, periodErrors: [] as any[], periods: [] } as LTResult;
-    }
     return calcLongtermCore(medRaw, ordDose, periods);
   });
 
@@ -87,20 +84,38 @@
         <div class="section-label">Receptperioder</div>
         <div id="lt-periods-container">
           {#each ltPeriods as period, i}
+            {@const pe = result.periodErrors[i]}
             <div id="lt-period-wrap-{i}">
               <div class="section-label">Period {i + 1}</div>
               <div class="form-row-3" id="lt-period-{i}">
                 <div class="field">
                   <label for="lt-start-{i}" data-tooltip="Startdatum för perioden.">Startdatum</label>
-                  <input id="lt-start-{i}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" maxlength="10" autocomplete="off" value={period.start} oninput={(e) => handleDateInput('start', i, e)} />
+                  <input id="lt-start-{i}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" maxlength="10" autocomplete="off" value={period.start} oninput={(e) => handleDateInput('start', i, e)} class:input-error={pe?.startError} aria-invalid={pe?.startError} />
+                  {#if pe?.startError}
+                    <span class="field-error-msg visible">Ogiltigt datum</span>
+                  {:else}
+                    <span class="field-error-msg"></span>
+                  {/if}
                 </div>
                 <div class="field">
                   <label for="lt-total-{i}" data-tooltip="Totalt antal enheter uttagna under perioden.">Antal uttagna enheter</label>
-                  <input id="lt-total-{i}" type="number" placeholder="100" min="1" step="1" bind:value={period.total} />
+                  <input id="lt-total-{i}" type="number" placeholder="100" min="1" step="1" bind:value={period.total} class:input-error={pe?.totalError || pe?.spanError} aria-invalid={pe?.totalError || pe?.spanError} />
+                  {#if pe?.totalError}
+                    <span class="field-error-msg visible">Ange ett positivt heltal</span>
+                  {:else if pe?.spanError}
+                    <span class="field-error-msg visible">Perioden är orimligt lång eller omöjlig</span>
+                  {:else}
+                    <span class="field-error-msg"></span>
+                  {/if}
                 </div>
                 <div class="field">
                   <label for="lt-end-{i}" data-tooltip="Slutdatum för perioden.">Slutdatum</label>
-                  <input id="lt-end-{i}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" maxlength="10" autocomplete="off" value={period.end} oninput={(e) => handleDateInput('end', i, e)} />
+                  <input id="lt-end-{i}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" maxlength="10" autocomplete="off" value={period.end} oninput={(e) => handleDateInput('end', i, e)} class:input-error={pe?.endError} aria-invalid={pe?.endError} />
+                  {#if pe?.endError}
+                    <span class="field-error-msg visible">Slutdatum måste vara efter startdatum och ej i framtiden</span>
+                  {:else}
+                    <span class="field-error-msg"></span>
+                  {/if}
                 </div>
               </div>
               {#if i > 0}

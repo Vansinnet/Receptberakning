@@ -65,7 +65,6 @@
     let val = input.value.replace(/\D/g, '').substring(0, 8);
     if (val.length > 4) val = val.substring(0, 4) + '-' + val.substring(4);
     if (val.length > 7) val = val.substring(0, 7) + '-' + val.substring(7);
-    input.value = val;
     applyPrescribeStatePatch(card._cardId, { endDate: val });
   }
 

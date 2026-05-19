@@ -6,10 +6,10 @@
   import NurseView from './NurseView.svelte';
   import PrescribePanel from './PrescribePanel.svelte';
   import LongtermPanel from './LongtermPanel.svelte';
-  import { medCards, getNurseViewActive, setNurseViewActive, tickCurrentDate, clearAllMedState, getActiveMedIdx, getActiveResult, getPrescribeState, getCardStatus, _syncCardStatus, getHasSummary } from '$lib/state.svelte';
+  import { medCards, getNurseViewActive, setNurseViewActive, tickCurrentDate, clearAllMedState, getActiveMedIdx, getActiveResult, getPrescribeState, getCardStatus, _syncCardStatus, _textsVersion, getHasSummary } from '$lib/state.svelte';
   import { CHECK_INTERACTIONS } from '$lib/interactions';
   import { canRenewMed } from '$lib/prescribe-calc';
-  import { INACTIVITY_WARN_MS, INACTIVITY_COUNTDOWN_SEC, COUNTDOWN_TICK_MS, ACTIVITY_RESET_DEBOUNCE_MS } from '$lib/constants';
+  import { INACTIVITY_WARN_MS, INACTIVITY_COUNTDOWN_SEC, COUNTDOWN_TICK_MS, ACTIVITY_RESET_DEBOUNCE_MS, VALID_THEMES } from '$lib/constants';
 
   let activeTab = $state<'renew' | 'longterm'>('renew');
   let theme = $state('klinisk');
@@ -59,6 +59,7 @@
   }
 
   function handleThemeChange(t: string) {
+    if (!VALID_THEMES.has(t)) return;
     theme = t;
     if (typeof document !== 'undefined') {
       document.documentElement.setAttribute('data-theme', t);
@@ -121,6 +122,7 @@
   });
 
   $effect(() => {
+    void _textsVersion();
     _syncCardStatus();
   });
 
@@ -179,9 +181,12 @@
     bubble.style.left = `${rect.left}px`;
     bubble.style.top = `${rect.bottom + 6}px`;
     bubble.classList.add('visible');
+    el.setAttribute('aria-describedby', 'tooltipBubble');
   }
 
-  function hideTooltip() {
+  function hideTooltip(e: Event) {
+    const el = (e.target as HTMLElement).closest('[data-tooltip]');
+    if (el) el.removeAttribute('aria-describedby');
     document.getElementById('tooltipBubble')?.classList.remove('visible');
   }
 
@@ -310,7 +315,7 @@
       </div>
     </footer>
   </div>
-  <div class="tooltip-bubble" id="tooltipBubble"></div>
+  <div class="tooltip-bubble" id="tooltipBubble" role="tooltip"></div>
 
   {#if showInactivityToast}
     <div class="inactivity-toast" role="alert" aria-live="assertive">

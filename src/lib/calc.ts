@@ -141,7 +141,7 @@ export function calcCore(inputData: CalcInput, prev: PrevCalcResult): CalcResult
   }
 
   // Beräkna enhetsbeteckning för dos
-  const INTERVAL_LABELS: Record<number, string> = { 1: 'dag', 7: 'vecka', 30: 'månad' };
+  const INTERVAL_LABELS: Record<DoseInterval, string> = { 1: 'dag', 7: 'vecka', 30: 'månad' };
   const doseInterval     = inputData.doseInterval || 1;
   const doseUnit: DoseUnit = inputData.doseUnit     || 'st';
   const intervalLabel    = INTERVAL_LABELS[doseInterval] || 'dag';
@@ -206,7 +206,7 @@ export function calcCore(inputData: CalcInput, prev: PrevCalcResult): CalcResult
     }
     const consumed = calcBase - remaining!;
     if (consumed < 0) {
-      return { valid: false, isOveruse: false, isTooEarly: false, statusText: 'Internt fel — kontrollera inmatningen.' };
+      return { valid: false, statusText: 'Internt fel — kontrollera inmatningen.' };
     }
     avgNum        = consumed / daysSince;
     daysRemaining = Math.floor(remaining! / effectiveDailyDose);

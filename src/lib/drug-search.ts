@@ -26,6 +26,7 @@ export interface DrugEntry {
 
 let _drugList: DrugEntry[] | null = null;
 let _drugMap: Map<string, DrugEntry> | null = null;
+let _drugListLower: string[] | null = null;
 let _loadPromise: Promise<void> | null = null;
 
 function openDB(): Promise<IDBDatabase> {
@@ -102,34 +103,39 @@ export async function loadDrugs(): Promise<void> {
       return;
     }
     _drugMap = new Map();
+    _drugListLower = [];
     for (let i = 0; i < _drugList.length; i++) {
       const key = _drugList[i].n.toLowerCase().trim();
       if (!_drugMap.has(key)) _drugMap.set(key, _drugList[i]);
+      _drugListLower.push(key);
     }
   })();
   return _loadPromise;
 }
 
 export function searchDrugs(query: string): DrugEntry[] {
-  if (!_drugList) return [];
+  if (!_drugList || !_drugListLower) return [];
   if (!query || query.length < MIN_SEARCH_QUERY_LENGTH) return [];
   const q = query.toLowerCase().trim();
-  const results: DrugEntry[] = [];
+  const results: Array<{ entry: DrugEntry; idx: number }> = [];
+  const lower = _drugListLower;
   for (let i = 0; i < _drugList.length; i++) {
-    if (_drugList[i].n.toLowerCase().includes(q)) {
-      results.push(_drugList[i]);
+    if (lower[i].includes(q)) {
+      results.push({ entry: _drugList[i], idx: i });
     }
   }
   results.sort((a, b) => {
-    const aStarts = a.n.toLowerCase().startsWith(q) ? 0 : 1;
-    const bStarts = b.n.toLowerCase().startsWith(q) ? 0 : 1;
+    const aName = lower[a.idx];
+    const bName = lower[b.idx];
+    const aStarts = aName.startsWith(q) ? 0 : 1;
+    const bStarts = bName.startsWith(q) ? 0 : 1;
     if (aStarts !== bStarts) return aStarts - bStarts;
-    const aCombi = a.n.includes('/') ? 1 : 0;
-    const bCombi = b.n.includes('/') ? 1 : 0;
+    const aCombi = a.entry.n.includes('/') ? 1 : 0;
+    const bCombi = b.entry.n.includes('/') ? 1 : 0;
     if (aCombi !== bCombi) return aCombi - bCombi;
-    return a.n.length - b.n.length;
+    return a.entry.n.length - b.entry.n.length;
   });
-  return results.slice(0, MAX_AUTOCOMPLETE_RESULTS);
+  return results.slice(0, MAX_AUTOCOMPLETE_RESULTS).map(r => r.entry);
 }
 
 export function getDrugByName(name: string): DrugEntry | undefined {

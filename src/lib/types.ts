@@ -1,9 +1,3 @@
-// === Branded types — förhindrar enhetsblandning vid kompilering ===
-
-export type Days = number & { readonly _brand: 'Days' };
-export type Doses = number & { readonly _brand: 'Doses' };
-export type DosesPerDay = number & { readonly _brand: 'DosesPerDay' };
-
 // === Kliniska typer ===
 
 export type DoseUnit = 'st' | 'ml' | 'dos';
