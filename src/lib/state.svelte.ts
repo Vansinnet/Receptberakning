@@ -183,7 +183,13 @@ export function getCardStatus(cardId: number): CardStatusCache | undefined {
 // $derived: BERÄKNING
 // =====================================================
 
-const _activeResult = $derived(calcCore(_activeValidated));
+const _activeResult = $derived(
+  (() => {
+    const r = calcCore(_activeValidated);
+    if (typeof window !== 'undefined') console.log('[v3 result]', r?.valid, r?.calculable, r?.statusText, r?.consumptionPct);
+    return r;
+  })()
+);
 
 // =====================================================
 // $derived: TEXTORKESTRERING (ersätter generateAndDistribute)
