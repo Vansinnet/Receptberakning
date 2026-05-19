@@ -46,21 +46,54 @@ const PATIENT_TEXT: Record<string, { greeting: string; closing: string }> = {
 
 export function buildPatientText(
   lang: string,
-  cards: Array<{ name: string; i: number; state?: MedState | null }>,
-  decision: 'yes' | 'no' | null,
-  prescribeEndDate?: string
+  cards: Array<{ name: string; prescribedEndDateStr?: string; decision: 'yes' | 'no' | null }>
 ): string {
   const t = PATIENT_TEXT[lang] || PATIENT_TEXT.sv;
+  const en = lang === 'en';
   const lines: string[] = [t.greeting, ''];
-  const name = cards[0]?.name || '';
-  if (decision === 'yes') {
-    const endDate = prescribeEndDate ? ` så att läkemedlet räcker till och med ${prescribeEndDate}` : '';
-    lines.push(`Vi har tagit emot din förfrågan om receptförnyelse för ${name} och kommer att förnya ditt recept inom 2–3 arbetsdagar${endDate}. Du kan därefter hämta ut din medicin på valfritt apotek.`);
-  } else if (decision === 'no') {
-    lines.push(`Vi har tagit emot din förfrågan om receptförnyelse för ${name}. Vi kan tyvärr inte förnya receptet vid detta tillfälle.`);
-  } else {
-    lines.push(`Vi har tagit emot din förfrågan om receptförnyelse för ${name}. Din förfrågan är under bedömning.`);
+
+  const list = cards.map(c => c.name).join(', ');
+  const first = cards[0];
+
+  if (cards.length === 1 && first) {
+    if (first.decision === 'yes') {
+      lines.push(en
+        ? `We have received your prescription renewal request for ${first.name} and will renew your prescription within 2–3 working days. You can then collect your medication at any pharmacy.`
+        : `Vi har tagit emot din förfrågan om receptförnyelse för ${first.name} och kommer att förnya ditt recept inom 2–3 arbetsdagar. Du kan därefter hämta ut din medicin på valfritt apotek.`);
+    } else if (first.decision === 'no') {
+      if (en) {
+        lines.push(`We have received your prescription renewal request for ${first.name}. We are unfortunately unable to renew the prescription at this time.`);
+        if (first.prescribedEndDateStr) {
+          lines.push(`The current prescription is expected to last until ${first.prescribedEndDateStr}. Please contact us again closer to that date.`);
+        }
+      } else {
+        lines.push(`Vi har tagit emot din förfrågan om receptförnyelse för ${first.name}. Vi kan tyvärr inte förnya receptet vid detta tillfälle.`);
+        if (first.prescribedEndDateStr) {
+          lines.push(`Nuvarande recept beräknas räcka t.o.m. ${first.prescribedEndDateStr}. Hör av dig närmare detta datum.`);
+        }
+      }
+    } else {
+      lines.push(en
+        ? `We have received your prescription renewal request for ${first.name}. Your request is currently being assessed.`
+        : `Vi har tagit emot din förfrågan om receptförnyelse för ${first.name}. Din förfrågan är under bedömning.`);
+    }
+  } else if (cards.length > 1) {
+    lines.push(en
+      ? `We have received your prescription renewal request for the following medications: ${list}.`
+      : `Vi har tagit emot din förfrågan om receptförnyelse för följande läkemedel: ${list}.`);
+    for (const c of cards) {
+      if (c.decision === 'yes') {
+        lines.push(en ? `  ${c.name}: We will renew your prescription.` : `  ${c.name}: Vi förnyar ditt recept.`);
+      } else if (c.decision === 'no') {
+        if (en) {
+          lines.push(`  ${c.name}: We are unable to renew the prescription at this time.${c.prescribedEndDateStr ? ` Current prescription lasts until ${c.prescribedEndDateStr}.` : ''}`);
+        } else {
+          lines.push(`  ${c.name}: Vi kan tyvärr inte förnya receptet.${c.prescribedEndDateStr ? ` Nuvarande recept beräknas räcka t.o.m. ${c.prescribedEndDateStr}.` : ''}`);
+        }
+      }
+    }
   }
+
   lines.push('', t.closing);
   return lines.join('\n');
 }

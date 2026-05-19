@@ -305,8 +305,9 @@ const _texts = $derived.by((): TextResult => {
 
   let patientText = '', patientTextEn = '', journalText = '';
   try {
-    patientText   = buildPatientText('sv', cardsForText, activeDecision);
-    patientTextEn = buildPatientText('en', cardsForText, activeDecision);
+    const ptCards = cardsForText.map(c => ({ name: c.name, prescribedEndDateStr: c.prescribedEndDateStr, decision: c.decision }));
+    patientText   = buildPatientText('sv', ptCards);
+    patientTextEn = buildPatientText('en', ptCards);
     journalText   = buildJournalText(cardsForText, validCount);
   } catch (e) {
     console.error('[v3 _texts] Textgenerering kraschade:', e);
