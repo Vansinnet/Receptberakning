@@ -38,6 +38,19 @@
   $effect(() => {
     if (nurseViewActive) activeTab = 'journal';
   });
+
+  function copyText() {
+    const body = activeTab === 'patient'
+      ? (patientLang === 'en' ? texts.patientTextEn : texts.patientText)
+      : texts.journalText;
+    if (body && navigator.clipboard) {
+      navigator.clipboard.writeText(body).then(() => {
+        copied = true;
+        if (copiedTimeout) clearTimeout(copiedTimeout);
+        copiedTimeout = setTimeout(() => { copied = false; }, 2000);
+      }).catch(() => {});
+    }
+  }
 </script>
 
 {#if result && result.valid && result.calculable !== false}
