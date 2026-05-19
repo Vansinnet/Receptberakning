@@ -36,9 +36,11 @@
     const seq = acSearchSeq;
 
     if (card) {
-      card.form.atcCode = null;
-      card.form.nplId = null;
-      card.form.notCalculable = false;
+    card.form.atcCode = null;
+    card.form.nplId = null;
+    card.form.notCalculable = false;
+    card.form.amtRaw = '';
+    card.form.doseUnit = 'st';
     }
 
     if (q.length < 2) {
@@ -141,10 +143,13 @@
         bind:value={card.form.medRaw} oninput={handleMedInput} onkeydown={handleAcKeydown} onblur={handleBlur}
         class:input-error={!!(fieldErrors?.medInput)}
         aria-invalid={!!(fieldErrors?.medInput)}
+        role="combobox"
         aria-autocomplete="list"
+        aria-controls="ac-dropdown"
+        aria-expanded={acVisible}
       />
         {#if acVisible && acResults.length > 0}
-          <div class="autocomplete-dropdown" role="listbox">
+          <div id="ac-dropdown" class="autocomplete-dropdown" role="listbox">
             {#each acResults as d, i}
               <div class="autocomplete-item {i === acHighlight ? 'active' : ''}" role="option" tabindex="-1" aria-selected={i === acHighlight} onmousedown={(e) => { e.preventDefault(); selectDrug(d); }} onmouseenter={() => acHighlight = i}>
                 <span class="ac-drug-name">{d.n}</span>

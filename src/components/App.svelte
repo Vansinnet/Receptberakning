@@ -134,6 +134,11 @@
   $effect(() => {
     if (typeof document !== 'undefined') {
       document.documentElement.setAttribute('data-theme', theme);
+    }
+  });
+
+  $effect(() => {
+    if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', onVisibilityChange);
       window.addEventListener('pagehide', onPageHide);
       document.addEventListener('mousemove', handleActivity);

@@ -271,7 +271,6 @@ const _texts = $derived.by((): TextResult => {
 
   for (let idx = 0; idx < cardResults.length; idx++) {
     const cr = cardResults[idx];
-    const decision = medCards.find(mc => mc._cardId === cr.cardId)?.earlyRenewalDecision ?? null;
     const name = cr.medNameStripped;
     const state: MedState = {
       _cardId: cr.cardId,
@@ -294,16 +293,16 @@ const _texts = $derived.by((): TextResult => {
       prescribedContactIsPast: cr.calc.prescribedContactIsPast,
         isOveruse: cr.calc.isOveruse,
         isTooEarly: cr.calc.isTooEarly,
-        earlyRenewalDecision: medCards.find(mc => mc._cardId === cr.cardId)?.earlyRenewalDecision ?? null,
+        earlyRenewalDecision: cr.calc.earlyRenewalDecision,
       valid: true,
       calculable: true,
     };
 
-    if (cr.calc.isOveruse && (cr.calc.earlyRenewalDecision === 'yes' || decision === 'yes'))
+    if (cr.calc.isOveruse && cr.calc.earlyRenewalDecision === 'yes')
       toRenew.push({ name, i: cr.cardId, state, earlyRenewal: 'overuse' });
     else if (cr.calc.isOveruse)
       overuse.push({ name, i: cr.cardId, state });
-    else if (cr.calc.isTooEarly && (cr.calc.earlyRenewalDecision === 'yes' || decision === 'yes'))
+    else if (cr.calc.isTooEarly && cr.calc.earlyRenewalDecision === 'yes')
       toRenew.push({ name, i: cr.cardId, state, earlyRenewal: 'tooEarly' });
     else if (cr.calc.isTooEarly)
       tooEarly.push({ name, i: cr.cardId, state });
