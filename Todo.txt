@@ -87,3 +87,5 @@ Det påverkar 307 läkemedel i databasen med stavningen mikrog (t.ex. Levaxin, P
 
 #8  Redundant class:is-hidden inuti {#if result.valid} i LongtermPanel
 Kopiasektionen har class:is-hidden={!result.valid} på ett element som redan ligger inuti ett {#if result.valid}-block. Villkoret kan aldrig vara sant, vilket är döda och potentiellt förvirrande kod — men utan funktionell påverkan. En bugg?
+
+#9 När jag skriver in 'Candesartan' ser jag inte alla läkemedel med 'Candesartan', utan ett visst antal träffar. Det gör att jag inte kan välja 'Candesartan', för de döljs av alla 'Candesartan/Hydroklortiazid'. Hur lösa det?
