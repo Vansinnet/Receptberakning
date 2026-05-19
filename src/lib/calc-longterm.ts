@@ -40,7 +40,7 @@ export function calcLongtermCore(
 
     if (startDate && endDate && endDate <= today && !isNaN(totalVal) && totalVal > 0 && Number.isInteger(totalVal) && startDate < endDate) {
       const days = getDaysDiff(endDate, startDate);
-      if (days === 0 || days > MAX_PERIOD_SPAN_DAYS) {
+      if (days <= 0 || days > MAX_PERIOD_SPAN_DAYS) {
         periodErrors[periodErrors.length - 1].spanError = true;
         continue;
       }

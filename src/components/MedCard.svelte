@@ -167,9 +167,10 @@
         aria-autocomplete="list"
         aria-controls="ac-dropdown"
         aria-expanded={acVisible}
+        aria-activedescendant={acHighlight >= 0 ? `ac-option-${acHighlight}` : undefined}
       />
         {#if acVisible && acResults.length > 0}
-          <div id="ac-dropdown" class="autocomplete-dropdown" role="listbox" tabindex="0" aria-activedescendant={acHighlight >= 0 ? `ac-option-${acHighlight}` : undefined}>
+          <div id="ac-dropdown" class="autocomplete-dropdown" role="listbox">
             {#each acResults as d, i}
               <div id="ac-option-{i}" class="autocomplete-item {i === acHighlight ? 'active' : ''}" role="option" tabindex="-1" aria-selected={i === acHighlight} onmousedown={(e) => { e.preventDefault(); selectDrug(d); }} onmouseenter={() => acHighlight = i}>
                 <span class="ac-drug-name">{d.n}</span>

@@ -47,12 +47,20 @@
     if (text && navigator.clipboard) {
       navigator.clipboard.writeText(text).then(() => {
         ltCopied = true;
-        setTimeout(() => { ltCopied = false; }, 2000);
+        if (ltCopiedTimeout) clearTimeout(ltCopiedTimeout);
+        ltCopiedTimeout = setTimeout(() => { ltCopied = false; }, 2000);
       });
     }
   }
 
   let ltCopied = $state(false);
+  let ltCopiedTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  $effect(() => {
+    return () => {
+      if (ltCopiedTimeout) clearTimeout(ltCopiedTimeout);
+    };
+  });
 
   let barWidthClass = $derived(pctClass((result.barPct ?? 0) / 150 * 100, 'w'));
 </script>
@@ -102,11 +110,9 @@
                 </div>
                 <div class="field">
                   <label for="lt-total-{i}" data-tooltip="Totalt antal enheter uttagna under perioden.">Antal uttagna enheter</label>
-                  <input id="lt-total-{i}" type="number" placeholder="100" min="1" step="1" bind:value={period.total} class:input-error={pe?.totalError || pe?.spanError} aria-invalid={pe?.totalError || pe?.spanError} />
+                  <input id="lt-total-{i}" type="number" placeholder="100" min="1" step="1" bind:value={period.total} class:input-error={!!pe?.totalError} aria-invalid={!!pe?.totalError} />
                   {#if pe?.totalError}
                     <span class="field-error-msg visible">Ange ett positivt heltal</span>
-                  {:else if pe?.spanError}
-                    <span class="field-error-msg visible">Perioden är orimligt lång eller omöjlig</span>
                   {:else}
                     <span class="field-error-msg"></span>
                   {/if}
@@ -121,6 +127,9 @@
                   {/if}
                 </div>
               </div>
+              {#if pe?.spanError}
+                <span class="field-error-msg visible">Periodens längd är orimlig — kontrollera start- och slutdatum.</span>
+              {/if}
               {#if i > 0}
                 <button type="button" class="btn btn-ghost btn-remove-period" data-action="remove-period" data-idx={i} data-tooltip="Ta bort denna period." onclick={() => handleRemovePeriod(i)}>✕ Ta bort period {i + 1}</button>
               {/if}

@@ -122,6 +122,16 @@
   });
 
   $effect(() => {
+    if (typeof document === 'undefined') return;
+    for (const el of document.querySelectorAll('[data-tooltip]')) {
+      const tip = el.getAttribute('data-tooltip');
+      if (tip && !el.hasAttribute('aria-label')) {
+        el.setAttribute('aria-label', tip);
+      }
+    }
+  });
+
+  $effect(() => {
     void _textsVersion();
     _syncCardStatus();
   });
@@ -133,7 +143,6 @@
       document.addEventListener('mousemove', handleActivity);
       document.addEventListener('keydown', handleActivity);
       document.addEventListener('pointerdown', handleActivity);
-      resetInactivityTimer();
       return () => {
         document.removeEventListener('visibilitychange', onVisibilityChange);
         window.removeEventListener('pagehide', onPageHide);
@@ -144,6 +153,11 @@
         if (inactivityCountdownTimer) clearInterval(inactivityCountdownTimer);
       };
     }
+  });
+
+  $effect(() => {
+    void medCards.length;
+    resetInactivityTimer();
   });
 
   // Nollställ earlyRenewalDecision för ALLA kort när calcCore återställer via flagsChanged.

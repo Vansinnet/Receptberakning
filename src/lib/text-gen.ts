@@ -12,7 +12,9 @@ const EMPTY_STATE: MedState = {
   displayAvgStr: '', avgNote: '', remainingDoses: null, daysRemaining: 0,
   daysToPrescribedEnd: 0, renewDateStr: '', prescribedContactDateStr: '',
   prescribedContactIsPast: false, valid: false, calculable: false,
-  earlyRenewalDecision: null,
+  earlyRenewalDecision: null, isOveruse: false, isTooEarly: false,
+  statusText: '', verdictTitle: '', verdictSub: '',
+  metrics: [], alerts: [], doseInterval: 1, endDateStr: '',
 };
 
 export function resolveState(item: { state?: MedState | null; i: number }, states?: MedState[]): MedState {
@@ -31,7 +33,26 @@ export function remainingDosesNote(s: MedState, leading: string = ' '): string {
 
 // === PATIENT TEXT TEMPLATES ===
 
-const PATIENT_TEXT: Record<string, Record<string, unknown>> = {
+interface PatientTemplates {
+  greeting: string;
+  closing: string;
+  multiIntro: string;
+  singleRenew: (name: string, endDate?: string) => string;
+  singleTooEarly: (name: string, s: MedState) => string;
+  singleOveruse: (name: string, s: MedState, c: string) => string;
+  singleOverusePast: (name: string, s: MedState) => string;
+  closingEndPast: string;
+  closingContactPast: string;
+  closingFuture: (s: MedState) => string;
+  multiRenew: (name: string, endDate?: string) => string;
+  multiTooEarly: (name: string, s: MedState) => string;
+  multiOverusePast: (name: string, s: MedState) => string;
+  multiOveruseNotPast: (name: string, s: MedState, c: string) => string;
+  multiContactPast: string;
+  multiFuture: (s: MedState) => string;
+}
+
+const PATIENT_TEXT: Record<string, PatientTemplates> = {
   sv: {
     greeting:          'Hej,',
     closing:           'Vid frågor är du välkommen att kontakta oss via 1177.',
@@ -81,47 +102,47 @@ export function buildPatientText(
   prescribeEnds: Record<number, string> = {},
   states?: MedState[]
 ): string {
-  const t: Record<string, unknown> = PATIENT_TEXT[lang] || PATIENT_TEXT.sv;
-  const lines: string[] = [t.greeting as string, ''];
+  const t = PATIENT_TEXT[lang] || PATIENT_TEXT.sv;
+  const lines: string[] = [t.greeting, ''];
 
   if (validCount === 1) {
     if (toRenew.length === 1) {
       const endDate = prescribeEnds[toRenew[0].i];
-      lines.push((t.singleRenew as Function)(toRenew[0].name, endDate), '', t.closing as string);
+      lines.push(t.singleRenew(toRenew[0].name, endDate), '', t.closing);
     } else if (tooEarly.length === 1) {
       const s = resolveState(tooEarly[0], states);
-      lines.push((t.singleTooEarly as Function)(tooEarly[0].name, s), '', t.closing as string);
+      lines.push(t.singleTooEarly(tooEarly[0].name, s), '', t.closing);
     } else if (overuse.length === 1) {
       const s = resolveState(overuse[0], states);
       const parsedEnd = parseDateUTC(s.prescribedEndDateStr || '');
       const prescribedEndPast = parsedEnd && parsedEnd < getToday();
       if (prescribedEndPast) {
-        lines.push((t.singleOverusePast as Function)(overuse[0].name, s), '', t.closing as string);
+        lines.push(t.singleOverusePast(overuse[0].name, s), '', t.closing);
       } else {
-        const closing = s.prescribedContactIsPast ? t.closingContactPast : (t.closingFuture as Function)(s);
-        lines.push((t.singleOveruse as Function)(overuse[0].name, s, closing), '', t.closing as string);
+        const closing = s.prescribedContactIsPast ? t.closingContactPast : t.closingFuture(s);
+        lines.push(t.singleOveruse(overuse[0].name, s, closing), '', t.closing);
       }
     }
   } else {
-    lines.push(t.multiIntro as string, '');
+    lines.push(t.multiIntro, '');
     for (const { name, i } of toRenew) {
-      lines.push((t.multiRenew as Function)(name, prescribeEnds[i]));
+      lines.push(t.multiRenew(name, prescribeEnds[i]));
     }
     for (const item of tooEarly) {
-      lines.push((t.multiTooEarly as Function)(item.name, resolveState(item, states)));
+      lines.push(t.multiTooEarly(item.name, resolveState(item, states)));
     }
     for (const item of overuse) {
       const s = resolveState(item, states);
       const parsedEpast = parseDateUTC(s.prescribedEndDateStr || '');
       const epast = parsedEpast && parsedEpast < getToday();
       if (epast) {
-        lines.push((t.multiOverusePast as Function)(item.name, s));
+        lines.push(t.multiOverusePast(item.name, s));
       } else {
-        const c = s.prescribedContactIsPast ? t.multiContactPast : (t.multiFuture as Function)(s);
-        lines.push((t.multiOveruseNotPast as Function)(item.name, s, c));
+        const c = s.prescribedContactIsPast ? t.multiContactPast : t.multiFuture(s);
+        lines.push(t.multiOveruseNotPast(item.name, s, c));
       }
     }
-    lines.push('', t.closing as string);
+    lines.push('', t.closing);
   }
 
   return lines.join('\n');

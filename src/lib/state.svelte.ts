@@ -202,6 +202,7 @@ interface TextResult {
   patientTextEn: string;
   journalText: string;
   cardStatusUpdates: Array<{ cardId: number; status: CardStatusCache }>;
+  cacheUpdates: Array<{ cardId: number; entry: { fp: string; cr: CardResult | null; status: CardStatusCache } }>;
 }
 
 interface CardResult {
@@ -219,6 +220,7 @@ const _texts = $derived.by((): TextResult => {
   // 1. Beräkna calcCore för alla giltiga kort och gruppera
   const cardResults: CardResult[] = [];
   const cardStatusUpdates: Array<{ cardId: number; status: CardStatusCache }> = [];
+  const cacheUpdates: Array<{ cardId: number; entry: { fp: string; cr: CardResult | null; status: CardStatusCache } }> = [];
   for (let i = 0; i < medCards.length; i++) {
     const card = medCards[i];
     if (!card) continue;
@@ -254,7 +256,7 @@ const _texts = $derived.by((): TextResult => {
         prescribedEndDateStr: '',
       };
       cardStatusUpdates.push({ cardId: card._cardId, status });
-      _cardResultsCache.set(card._cardId, { fp, cr: null, status });
+      cacheUpdates.push({ cardId: card._cardId, entry: { fp, cr: null, status } });
       continue;
     }
 
@@ -272,12 +274,12 @@ const _texts = $derived.by((): TextResult => {
     };
     cardResults.push(cr);
     cardStatusUpdates.push({ cardId: card._cardId, status });
-    _cardResultsCache.set(card._cardId, { fp, cr, status });
+    cacheUpdates.push({ cardId: card._cardId, entry: { fp, cr, status } });
   }
 
   const validCount = cardResults.length;
   if (validCount === 0) {
-    return { patientText: '', patientTextEn: '', journalText: '', cardStatusUpdates: [] };
+    return { patientText: '', patientTextEn: '', journalText: '', cardStatusUpdates, cacheUpdates };
   }
 
   // 2. Gruppera
@@ -343,7 +345,7 @@ const _texts = $derived.by((): TextResult => {
       _app.nurseVitalNormal,
       _app.nurseFollowUpAdequate,
     );
-    return { patientText: '', patientTextEn: '', journalText, cardStatusUpdates };
+    return { patientText: '', patientTextEn: '', journalText, cardStatusUpdates, cacheUpdates };
   }
 
   // 4. Beräkna prescribeEnds för toRenew
@@ -355,8 +357,8 @@ const _texts = $derived.by((): TextResult => {
         const s: MedState = {
           _cardId: item.i,
           dose: item.state?.dose,
-          doseInterval: item.state?.doseInterval as DoseInterval,
-          doseUnit: item.state?.doseUnit as DoseUnit,
+          doseInterval: (item.state?.doseInterval ?? 1) as DoseInterval,
+          doseUnit: (item.state?.doseUnit ?? 'st') as DoseUnit,
           prescribedEndDateStr: item.state?.prescribedEndDateStr,
         };
         const pr = calcPrescribeResult(s, ps);
@@ -370,12 +372,12 @@ const _texts = $derived.by((): TextResult => {
   const patientTextEn = buildPatientText('en', toRenew, tooEarly, overuse, validCount, prescribeEnds);
   const journalText   = buildJournalText(toRenew, tooEarly, overuse, validCount, prescribeEnds);
 
-  return { patientText, patientTextEn, journalText, cardStatusUpdates };
+  return { patientText, patientTextEn, journalText, cardStatusUpdates, cacheUpdates };
 });
 
 export function getActiveTexts(): TextResult {
   const { patientText, patientTextEn, journalText } = _texts;
-  return { patientText, patientTextEn, journalText, cardStatusUpdates: [] };
+  return { patientText, patientTextEn, journalText, cardStatusUpdates: [], cacheUpdates: [] };
 }
 
 export function _syncCardStatus(): void {
@@ -383,6 +385,10 @@ export function _syncCardStatus(): void {
   for (const u of updates) {
     _cardStatusPrev.set(u.cardId, u.status);
     _cardStatus[u.cardId] = u.status;
+  }
+  const caches = _texts.cacheUpdates;
+  for (const c of caches) {
+    _cardResultsCache.set(c.cardId, c.entry);
   }
 }
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { CalcResult } from '$lib/types';
-  import { getActiveTexts } from '$lib/state.svelte';
+  import { getActiveTexts, medCards, getActiveMedIdx } from '$lib/state.svelte';
   import { pctClass } from '$lib/utils';
   import Alert from './Alert.svelte';
 
@@ -8,20 +8,29 @@
     result = null as CalcResult | null,
     nurseViewActive = false,
     onEarlyDecision = (_decision: 'yes' | 'no') => {},
-    onCopy = () => {},
-    onToggleLang = () => {},
   } = $props();
 
-  let patientLang = $state<'sv' | 'en'>('sv');
+  let activeIdx = $derived(getActiveMedIdx());
+  let card = $derived(medCards[activeIdx] ?? null);
+  let patientLang = $derived(card?.patientLang ?? 'sv');
 
   function toggleLang() {
-    patientLang = patientLang === 'sv' ? 'en' : 'sv';
-    onToggleLang();
+    const idx = getActiveMedIdx();
+    if (idx >= 0 && idx < medCards.length) {
+      medCards[idx].patientLang = patientLang === 'sv' ? 'en' : 'sv';
+    }
   }
 
   let activeTab = $state<'patient' | 'journal'>('patient');
   let texts = $derived(getActiveTexts());
   let copied = $state(false);
+  let copiedTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  $effect(() => {
+    return () => {
+      if (copiedTimeout) clearTimeout(copiedTimeout);
+    };
+  });
 
   function getVerdictIcon(): string {
     if (!result?.valid || !result?.calculable) return '⚠';
@@ -39,10 +48,10 @@
     if (body && navigator.clipboard) {
       navigator.clipboard.writeText(body).then(() => {
         copied = true;
-        setTimeout(() => { copied = false; }, 2000);
+        if (copiedTimeout) clearTimeout(copiedTimeout);
+        copiedTimeout = setTimeout(() => { copied = false; }, 2000);
       });
     }
-    onCopy();
   }
 
   let verdictIcon = $derived(getVerdictIcon());

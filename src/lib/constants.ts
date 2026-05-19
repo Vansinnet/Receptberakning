@@ -73,6 +73,10 @@ export const LT_BAR_MAX_PCT = 150;
 // döljs (för liten för att vara läsbar).
 export const LT_BAR_TEXT_THRESHOLD_PCT = 20;
 
+// AKTIVT VAL: 5 procentenheter — stegstorlek för CSP-säkra breddklasser
+// (w0, w5, w10...w100) som används av progressbars istället för inline style:width.
+export const PROGRESS_BAR_STEP_PCT = 5;
+
 // ============================================================================
 // 3. GRÄNSVÄRDEN — ANTAL / MÄNGDER
 // ============================================================================

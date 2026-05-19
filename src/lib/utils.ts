@@ -6,6 +6,7 @@ import {
   DOSE_UNIT_NORMALIZE,
   COMPOUND_MFR_NAMES,
   SINGLE_MFR_NAMES,
+  PROGRESS_BAR_STEP_PCT,
 } from './constants';
 
 // === DATUM ===
@@ -89,6 +90,6 @@ export function stripManufacturer(name: string): string {
 }
 
 export function pctClass(pct: number, prefix: string): string {
-  const step = Math.round(Math.min(100, Math.max(0, pct)) / 5) * 5;
+  const step = Math.round(Math.min(100, Math.max(0, pct)) / PROGRESS_BAR_STEP_PCT) * PROGRESS_BAR_STEP_PCT;
   return `${prefix}${step}`;
 }
