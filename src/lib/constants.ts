@@ -8,30 +8,18 @@
 // 1. KLINISKA TRÖSKLAR — RECEPTFÖRNYELSE
 // ============================================================================
 
-// AKTIVT VAL: 1.10 (10% marginal) balanserar mellan att fånga verklig
-// överkonsumtion och att undvika falsklarm vid naturlig dosvariation.
-// Sänkning ökar falsklarmrisken; höjning riskerar missad överkonsumtion.
-export const OVERUSE_THRESHOLD = 1.10;
+// AKTIVT VAL: 80% — undre gräns för normal förbrukning. Vid 80–110% av
+// ordinerad dos visas snittförbrukningen grönt. Under 80% visas gul.
+export const CONSUMPTION_NORMAL_LOW = 80;
 
-// AKTIVT VAL: 0.20 (20% av receptperioden) — vid denna gräns är det för tidigt
-// att förnya eftersom >80% av perioden återstår. Balanserar mellan att undvika
-// onödiga förnyelser och att inte tvinga patienten till akutbesök vid gränsfall.
-export const EARLY_RENEWAL_THRESHOLD = 0.20;
+// AKTIVT VAL: 110% — övre gräns för normal förbrukning. Vid 80–110% av
+// ordinerad dos visas snittförbrukningen grönt. Över 110% visas gul.
+export const CONSUMPTION_NORMAL_HIGH = 110;
 
-// AKTIVT VAL: 7 dagar — överanvändningsvarning undertrycks när medicinen
-// beräknas ta slut inom 7 dagar. Patienten ska inte nekas förnyelse för att
-// hen tagit lite mer sista veckan.
-export const OVERUSE_SUPPRESSION_DAYS = 7;
-
-// AKTIVT VAL: 14 dagar — undanträngningsskydd för recept med >14 dagar kvar.
-// Se calcCore() för fullständig motivering (hasRemaining-fallet).
-export const OVERUSE_MIN_RECEPT_DAYS = 14;
-
-// AKTIVT VAL: 1.5x — tröskel för att flagga överanvändning när medicinen är helt
-// slut (daysRemaining = 0) och snittförbrukningen överstiger ordination med minst 50%.
-// Lägre än VERY_HIGH_CONSUMPTION_MULTIPLIER (2.5x) eftersom slut på medicin + förhöjd
-// förbrukning alltid kräver klinisk uppmärksamhet, även vid måttlig överskridning.
-export const OVERUSE_ZERO_STOCK_MULTIPLIER = 1.5;
+// AKTIVT VAL: 14 dagar — tröskel för "Räcker t.o.m."-radens färg.
+// Vid 14 dagar eller mer kvar av receptperioden blir raden gul.
+// Under 14 dagar kvar visas raden grön.
+export const DAYS_REMAINING_WARN = 14;
 
 // AKTIVT VAL: 2.5x — vid denna multiplikator av ordinerad dos triggas en
 // datakontrollsvarning. Fångar orimlig inmatning (t.ex. fel enhet) utan att
@@ -41,14 +29,6 @@ export const VERY_HIGH_CONSUMPTION_MULTIPLIER = 2.5;
 // AKTIVT VAL: 10 år (3650 dagar) — maximal rimlig recepttid. Överstiger
 // förskrivningen 10 år är indata med hög sannolikhet felaktig.
 export const MAX_TOTAL_DAYS = 3650;
-
-// AKTIVT VAL: 80% — vid förbrukning under 80% av ordinerad dos triggas
-// en varning för låg förbrukning. Tröskeln är satt för att fånga kliniskt
-// relevant underanvändning (t.ex. följsamhetsproblem).
-export const LOW_CONSUMPTION_PCT = 80;
-
-// Kontaktdatum vid överanvändning sätts till 7 dagar före förskrivet slutdatum.
-export const CONTACT_DATE_OFFSET_DAYS = 7;
 
 // ============================================================================
 // 2. KLINISKA TRÖSKLAR — LÅNGVARIG FÖRBRUKNING

@@ -7,7 +7,7 @@
   let {
     result = null as CalcResult | null,
     nurseViewActive = false,
-    onEarlyDecision = (_decision: 'yes' | 'no') => {},
+    onDecision = (_decision: 'yes' | 'no') => {},
   } = $props();
 
   let activeIdx = $derived(getActiveMedIdx());
@@ -32,28 +32,6 @@
     };
   });
 
-  let verdict = $derived.by((): { icon: string; cls: string } => {
-    if (!result?.valid || !result?.calculable) return { icon: '⚠', cls: '' };
-    if (result.isOveruse && result.earlyRenewalDecision === 'yes') return { icon: '✓', cls: 'ok' };
-    if (result.isOveruse) return { icon: '⚠', cls: 'danger' };
-    if (result.isTooEarly && result.earlyRenewalDecision === 'yes') return { icon: '✓', cls: 'ok' };
-    if (result.isTooEarly) return { icon: '⏱', cls: 'warn' };
-    return { icon: '✓', cls: 'ok' };
-  });
-
-  function copyText() {
-    const body = activeTab === 'patient'
-      ? (patientLang === 'en' ? texts.patientTextEn : texts.patientText)
-      : texts.journalText;
-    if (body && navigator.clipboard) {
-      navigator.clipboard.writeText(body).then(() => {
-        copied = true;
-        if (copiedTimeout) clearTimeout(copiedTimeout);
-        copiedTimeout = setTimeout(() => { copied = false; }, 2000);
-      }).catch(() => {});
-    }
-  }
-
   let tlWidthClass = $derived(pctClass(result?.tlPct ?? 0, 'w'));
 
   // Tvinga journal-flik i sjuksköterskeläge
@@ -64,23 +42,22 @@
 
 {#if result && result.valid && result.calculable !== false}
   <div class="result-content">
-    <!-- Verdict -->
-    <div class="verdict verdict-{verdict.cls}" aria-live="polite" aria-atomic="true">
-      <div class="verdict-icon" aria-hidden="true">{verdict.icon}</div>
-      <div>
-        <div class="verdict-title">{result.verdictTitle ?? '—'}</div>
-        {#if result.verdictSub}
-          <div class="verdict-sub">{result.verdictSub}</div>
-        {/if}
+    <!-- Metrics -->
+    {#if result.metrics?.length}
+      <div class="result-grid">
+        {#each result.metrics as m}
+          <span class="rk" data-tooltip={m.tooltip}>{m.label}</span>
+          <span class="rv {m.cls}">{m.value}</span>
+        {/each}
       </div>
-    </div>
+    {/if}
 
     <!-- Timeline -->
     {#if result.tlPct != null && result.tlStart && result.tlEnd}
       <div class="tl-wrap">
         <div class="tl-label" data-tooltip="Visar hur stor andel av receptperioden som förflutit sedan förskrivningsdatumet.">Receptperiod</div>
         <div class="tl-bar-bg">
-          <div class="tl-fill tl-fill-{verdict.cls} {tlWidthClass}" role="progressbar" aria-valuenow={Math.round(result.tlPct)} aria-valuemin="0" aria-valuemax="100" aria-label="Förfluten andel av receptperioden">
+          <div class="tl-fill tl-fill-{result.metrics?.[1]?.cls ?? 'ok'} {tlWidthClass}" role="progressbar" aria-valuenow={Math.round(result.tlPct)} aria-valuemin="0" aria-valuemax="100" aria-label="Förfluten andel av receptperioden">
             <div class="tl-today-marker"></div>
           </div>
         </div>
@@ -89,16 +66,6 @@
           <span class="tl-today-label">Idag</span>
           <span>{result.tlEnd}</span>
         </div>
-      </div>
-    {/if}
-
-    <!-- Metrics -->
-    {#if result.metrics?.length}
-      <div class="result-grid">
-        {#each result.metrics as m}
-          <span class="rk" data-tooltip={m.tooltip}>{m.label}</span>
-          <span class="rv {m.cls}">{m.value}</span>
-        {/each}
       </div>
     {/if}
 
@@ -111,17 +78,15 @@
       </div>
     {/if}
 
-    <!-- Early Decision -->
-    {#if (result.isOveruse || result.isTooEarly) && !nurseViewActive}
-      <div class="early-decision-box">
-        <div class="early-decision-label">⚑ Åtgärd krävs</div>
-        <div class="early-decision-q">Mot bakgrund av ovanstående och patientens unika fall — bedömer du att receptet ska förnyas?</div>
-        <div class="early-decision-actions">
-          <button type="button" class="btn early-btn early-btn-yes {result.earlyRenewalDecision === 'yes' ? 'selected' : ''}" data-tooltip="Godkänn förnyelse trots avvikelse" onclick={() => onEarlyDecision('yes')}>✓ Ja, förnya</button>
-          <button type="button" class="btn early-btn early-btn-no {result.earlyRenewalDecision === 'no' ? 'selected' : ''}" data-tooltip="Avslå förnyelse" onclick={() => onEarlyDecision('no')}>✕ Nej, avslå</button>
-        </div>
+    <!-- Åtgärd krävs — alltid synlig -->
+    <div class="early-decision-box">
+      <div class="early-decision-label">⚑ Åtgärd krävs för medicinsk personal</div>
+      <div class="early-decision-q">Bedöm om receptet ska förnyas.</div>
+      <div class="early-decision-actions">
+        <button type="button" class="btn early-btn early-btn-yes {card?.decision === 'yes' ? 'selected' : ''}" data-tooltip="Förnya receptet" onclick={() => onDecision('yes')}>✓ Förnya</button>
+        <button type="button" class="btn early-btn early-btn-no {card?.decision === 'no' ? 'selected' : ''}" data-tooltip="Avslå förnyelse" onclick={() => onDecision('no')}>✕ Avslå</button>
       </div>
-    {/if}
+    </div>
 
     <!-- Copy Section -->
     <div class="copy-section">

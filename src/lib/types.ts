@@ -56,27 +56,15 @@ export interface CalcMetric {
   tooltip: string;
 }
 
-export interface PrevCalcResult {
-  isOveruse: boolean;
-  isTooEarly: boolean;
-  earlyRenewalDecision: 'yes' | 'no' | null;
-}
-
 export interface CalcResult {
   valid: boolean;
   calculable?: boolean;
-  isOveruse?: boolean;
-  isTooEarly?: boolean;
-  earlyRenewalDecision?: 'yes' | 'no' | null;
   statusText: string;
-  verdictTitle?: string;
-  verdictSub?: string;
   metrics?: CalcMetric[];
   alerts?: CalcAlert[];
   tlPct?: number;
   tlStart?: string;
   tlEnd?: string;
-  earlyThreshold?: number;
   medRaw?: string;
   amt?: number;
   dose?: number;
@@ -92,9 +80,7 @@ export interface CalcResult {
   daysToPrescribedEnd?: number;
   displayAvgStr?: string;
   avgNote?: string;
-  prescribedContactDateStr?: string;
-  prescribedContactIsPast?: boolean;
-  renewDateStr?: string;
+  consumptionPct: number;
   patientText?: string;
   patientTextEn?: string;
   journalText?: string;
@@ -118,18 +104,13 @@ export interface MedState {
   // calcCore output fields (cached in state)
   valid?: boolean;
   calculable?: boolean;
-  isOveruse?: boolean;
-  isTooEarly?: boolean;
-  earlyRenewalDecision?: 'yes' | 'no' | null;
+  decision?: 'yes' | 'no' | null;
   statusText?: string;
-  verdictTitle?: string;
-  verdictSub?: string;
   metrics?: CalcMetric[];
   alerts?: CalcAlert[];
   tlPct?: number;
   tlStart?: string;
   tlEnd?: string;
-  earlyThreshold?: number;
   dose?: number;
   doseUnitLabel?: string;
   pDateStr?: string;
@@ -141,9 +122,7 @@ export interface MedState {
   daysToPrescribedEnd?: number;
   displayAvgStr?: string;
   avgNote?: string;
-  prescribedContactDateStr?: string;
-  prescribedContactIsPast?: boolean;
-  renewDateStr?: string;
+  consumptionPct?: number;
   patientText?: string;
   patientTextEn?: string;
   journalText?: string;

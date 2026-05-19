@@ -21,7 +21,7 @@
     calculable: result.calculable ?? false,
     isOveruse: result.isOveruse ?? false,
     isTooEarly: result.isTooEarly ?? false,
-    earlyRenewalDecision: card.earlyRenewalDecision,
+    decision: card.decision,
   }) : false);
 
   // AMT-spegling: kopiera amt till packageSize vid init eller ändring

@@ -7,7 +7,7 @@
 //    - `export let x = $state()` är INTE tillåtet — använd wrapper-objekt
 //      eller getter/setter-funktioner för primitiver som ska exporteras
 
-import type { DoseUnit, DoseInterval, CalcResult, PrevCalcResult, MedState } from './types';
+import type { DoseUnit, DoseInterval, CalcResult, MedState } from './types';
 import { validateValues, calcCore } from './calc';
 import { getToday, stripManufacturer } from './utils';
 import { calcPrescribeResult, canRenewMed } from './prescribe-calc';
@@ -35,7 +35,7 @@ export interface FormValues {
 export interface MedCard {
   _cardId: number;
   form: FormValues;
-  earlyRenewalDecision: 'yes' | 'no' | null;
+  decision: 'yes' | 'no' | null;
   activeTab: 'patient' | 'journal';
   patientLang: 'sv' | 'en';
 }
@@ -48,7 +48,7 @@ function createEmptyCard(cardId: number): MedCard {
       doseUnit: 'st', doseInterval: 1, notCalculable: false,
       atcCode: null, nplId: null,
     },
-    earlyRenewalDecision: null,
+    decision: null,
     activeTab: 'patient',
     patientLang: 'sv',
   };
@@ -86,7 +86,6 @@ export function spliceMedCard(i: number): void {
   if (medCards.length <= 1) return;
   const removedCardId = medCards[i]._cardId;
   medCards.splice(i, 1);
-  _cardStatusPrev.delete(removedCardId);
   _cardResultsCache.delete(removedCardId);
   delete _cardStatus[removedCardId];
   delete _prescribeState[removedCardId];
@@ -162,45 +161,18 @@ export function getActiveResult() {
 // =====================================================
 
 type CardStatusCache = {
-  isOveruse: boolean;
-  isTooEarly: boolean;
-  earlyRenewalDecision: 'yes' | 'no' | null;
   valid: boolean;
   calculable: boolean;
   statusText: string;
+  consumptionPct: number;
+  daysToPrescribedEnd: number;
   prescribedEndDateStr: string;
 };
 
 // ════════════════════════════════════════════════════════════════════════════
-// ⚠ KRITISK ARKITEKTUR — _cardStatusPrev + _cardResultsCache
+// ⚠ _cardResultsCache får ALDRIG göras till $state — feedback-loop-risk
+// (samma mönster som tidigare _cardStatusPrev, se git-loggen för detaljer).
 // ════════════════════════════════════════════════════════════════════════════
-// Dessa två Maps får ALDRIG göras till $state. De läses inne i _texts $derived.by
-// (för prev-flaggvärden respektive fingerprintcache) och skrivs i _syncCardStatus
-// $effect. Om de vore reaktiva skulle:
-//   1. .get() i $derived.by registrera ett beroende
-//   2. .set() i $effect trigga omvärdering av $derived.by
-//   3. $derived.by producera nya objekt → $effect körs → .set() → steg 2
-//   → Svelte 5 kastar effect_update_depth_exceeded (feedback-loop)
-//
-// Detta är fundamentalt: flagsChanged-detektering i calcCore kräver att
-// föregående körnings utdata används som indata till nästa körning av samma
-// $derived — en cyklisk beroendegraf som inte kan uttryckas rent deklarativt.
-// Något måste vara imperativt. Dessa icke-reaktiva Maps är den minimala lösningen.
-// ════════════════════════════════════════════════════════════════════════════
-//
-// _cardStatusPrev: lagrar prev-värden för flagsChanged (isOveruse, isTooEarly).
-//   Läses i _activeResult ($derived) och _texts ($derived.by).
-//   Skrivs i _syncCardStatus ($effect i App.svelte).
-//
-// _cardResultsCache: fingeravtryckscache för _texts ($derived.by).
-//   Läses och "skrivs" i _texts; de facto-skrivningen sker via cacheUpdates
-//   som processas i _syncCardStatus.
-//
-// _cardStatus ($state): den reaktiva spegeln — alla UI-komponenter läser
-//   härifrån via getCardStatus(). Per-nyckel-uppdateringar möjliggör
-//   fin granularitet i reaktiviteten.
-// ════════════════════════════════════════════════════════════════════════════
-const _cardStatusPrev = new Map<number, CardStatusCache>();
 let _cardStatus = $state<Record<number, CardStatusCache>>({});
 
 export function getCardStatus(cardId: number): CardStatusCache | undefined {
@@ -211,13 +183,7 @@ export function getCardStatus(cardId: number): CardStatusCache | undefined {
 // $derived: BERÄKNING
 // =====================================================
 
-const _activeResult = $derived(
-  calcCore(_activeValidated, {
-    isOveruse: _cardStatusPrev.get(medCards[_app.activeMedIdx]?._cardId ?? -1)?.isOveruse ?? false,
-    isTooEarly: _cardStatusPrev.get(medCards[_app.activeMedIdx]?._cardId ?? -1)?.isTooEarly ?? false,
-    earlyRenewalDecision: medCards[_app.activeMedIdx]?.earlyRenewalDecision ?? null,
-  })
-);
+const _activeResult = $derived(calcCore(_activeValidated));
 
 // =====================================================
 // $derived: TEXTORKESTRERING (ersätter generateAndDistribute)
@@ -254,15 +220,15 @@ const _texts = $derived.by((): TextResult => {
     const f = card.form;
     if (!f.medRaw) {
       cardStatusUpdates.push({ cardId: card._cardId, status: {
-        isOveruse: false, isTooEarly: false, earlyRenewalDecision: null,
         valid: false, calculable: false,
-        statusText: 'Ej ifyllt', prescribedEndDateStr: '',
+        statusText: 'Ej ifyllt', consumptionPct: 0, daysToPrescribedEnd: 0,
+        prescribedEndDateStr: '',
       }});
       continue;
     }
 
     const fp = [f.medRaw, f.dateVal, f.doseRaw, f.amtRaw, f.refRaw, f.leftRaw,
-      f.doseUnit, f.doseInterval, f.notCalculable, card.earlyRenewalDecision, _app.currentDate].join('\x00');
+      f.doseUnit, f.doseInterval, f.notCalculable, card.decision, _app.currentDate].join('\x00');
 
     const cached = _cardResultsCache.get(card._cardId);
     if (cached && cached.fp === fp) {
@@ -276,17 +242,14 @@ const _texts = $derived.by((): TextResult => {
       String(f.doseInterval), f.doseUnit, f.notCalculable,
     );
 
-    const calc = calcCore(validated, {
-      isOveruse: _cardStatusPrev.get(card._cardId)?.isOveruse ?? false,
-      isTooEarly: _cardStatusPrev.get(card._cardId)?.isTooEarly ?? false,
-      earlyRenewalDecision: card.earlyRenewalDecision,
-    });
+    const calc = calcCore(validated);
 
     if (!calc.valid || calc.calculable === false) {
       const status: CardStatusCache = {
-        isOveruse: false, isTooEarly: false, earlyRenewalDecision: null,
         valid: calc.valid, calculable: calc.calculable ?? false,
         statusText: calc.statusText || '—',
+        consumptionPct: calc.consumptionPct,
+        daysToPrescribedEnd: calc.daysToPrescribedEnd ?? 0,
         prescribedEndDateStr: '',
       };
       cardStatusUpdates.push({ cardId: card._cardId, status });
@@ -298,12 +261,11 @@ const _texts = $derived.by((): TextResult => {
 
     const cr: CardResult = { cardId: card._cardId, calc, medNameStripped };
     const status: CardStatusCache = {
-      isOveruse: calc.isOveruse ?? false,
-      isTooEarly: calc.isTooEarly ?? false,
-      earlyRenewalDecision: calc.earlyRenewalDecision ?? null,
       valid: true,
       calculable: true,
       statusText: calc.statusText || 'OK',
+      consumptionPct: calc.consumptionPct,
+      daysToPrescribedEnd: calc.daysToPrescribedEnd ?? 0,
       prescribedEndDateStr: calc.prescribedEndDateStr ?? '',
     };
     cardResults.push(cr);
@@ -316,95 +278,42 @@ const _texts = $derived.by((): TextResult => {
     return { patientText: '', patientTextEn: '', journalText: '', cardStatusUpdates, cacheUpdates };
   }
 
-  // 2. Gruppera
-  const toRenew: Array<{ name: string; i: number; state: MedState | null; earlyRenewal?: string }> = [];
-  const tooEarly: Array<{ name: string; i: number; state: MedState | null }> = [];
-  const overuse: Array<{ name: string; i: number; state: MedState | null }> = [];
-
-  for (let idx = 0; idx < cardResults.length; idx++) {
-    const cr = cardResults[idx];
-    const name = cr.medNameStripped;
-    const state: MedState = {
-      _cardId: cr.cardId,
-      medRaw: cr.medNameStripped,
-      medNameStripped: cr.medNameStripped,
-      pDateStr: cr.calc.pDateStr,
-      total: cr.calc.total,
-      dose: cr.calc.dose,
-      doseInterval: cr.calc.doseInterval,
-      doseUnit: cr.calc.doseUnit,
-      doseUnitLabel: cr.calc.doseUnitLabel,
-      prescribedEndDateStr: cr.calc.prescribedEndDateStr,
-      displayAvgStr: cr.calc.displayAvgStr,
-      avgNote: cr.calc.avgNote,
-      remainingDoses: cr.calc.remainingDoses,
-      daysRemaining: cr.calc.daysRemaining,
-      daysToPrescribedEnd: cr.calc.daysToPrescribedEnd,
-      renewDateStr: cr.calc.renewDateStr,
-      prescribedContactDateStr: cr.calc.prescribedContactDateStr,
-      prescribedContactIsPast: cr.calc.prescribedContactIsPast,
-        isOveruse: cr.calc.isOveruse,
-        isTooEarly: cr.calc.isTooEarly,
-        earlyRenewalDecision: cr.calc.earlyRenewalDecision,
-      valid: true,
-      calculable: true,
-    };
-
-    if (cr.calc.isOveruse && cr.calc.earlyRenewalDecision === 'yes')
-      toRenew.push({ name, i: cr.cardId, state, earlyRenewal: 'overuse' });
-    else if (cr.calc.isOveruse)
-      overuse.push({ name, i: cr.cardId, state });
-    else if (cr.calc.isTooEarly && cr.calc.earlyRenewalDecision === 'yes')
-      toRenew.push({ name, i: cr.cardId, state, earlyRenewal: 'tooEarly' });
-    else if (cr.calc.isTooEarly)
-      tooEarly.push({ name, i: cr.cardId, state });
-    else
-      toRenew.push({ name, i: cr.cardId, state });
+  // 2. Bygg enkel patient- och journaltext
+  const cardsForText: Array<{ name: string; i: number; dose: number; doseUnitLabel: string; doseUnit: string; total: number; pDateStr: string; prescribedEndDateStr: string; displayAvgStr: string; avgNote: string; daysToPrescribedEnd: number; consumptionPct: number; decision: 'yes' | 'no' | null }> = [];
+  for (const cr of cardResults) {
+    const mc = medCards.find(m => m._cardId === cr.cardId);
+    cardsForText.push({
+      name: cr.medNameStripped, i: cr.cardId,
+      dose: cr.calc.dose ?? 0, doseUnitLabel: cr.calc.doseUnitLabel ?? 'st/dag',
+      doseUnit: cr.calc.doseUnit ?? 'st', total: cr.calc.total ?? 0,
+      pDateStr: cr.calc.pDateStr ?? '', prescribedEndDateStr: cr.calc.prescribedEndDateStr ?? '',
+      displayAvgStr: cr.calc.displayAvgStr ?? '', avgNote: cr.calc.avgNote ?? '',
+      daysToPrescribedEnd: cr.calc.daysToPrescribedEnd ?? 0,
+      consumptionPct: cr.calc.consumptionPct,
+      decision: mc?.decision ?? null,
+    });
   }
 
-  // 3. Sjuksköterskeläge
+  const activeDecision = medCards[_app.activeMedIdx]?.decision ?? null;
+
+  const patientText   = buildPatientText('sv', cardsForText, activeDecision);
+  const patientTextEn = buildPatientText('en', cardsForText, activeDecision);
+  const journalText   = buildJournalText(cardsForText, validCount);
+
   if (_app.nurseViewActive) {
-    const journalText = buildNurseJournalText(
+    const nurseJournalText = buildNurseJournalText(
       cardResults.map(cr => ({
-        _cardId: cr.cardId,
-        medRaw: cr.medNameStripped,
-        medNameStripped: cr.medNameStripped,
-        valid: true,
-        calculable: true,
-        isOveruse: cr.calc.isOveruse,
-        isTooEarly: cr.calc.isTooEarly,
-        earlyRenewalDecision: medCards.find(mc => mc._cardId === cr.cardId)?.earlyRenewalDecision ?? null,
+        _cardId: cr.cardId, medRaw: cr.medNameStripped,
+        valid: true, calculable: true,
         prescribedEndDateStr: cr.calc.prescribedEndDateStr,
+        consumptionPct: cr.calc.consumptionPct,
+        decision: medCards.find(mc => mc._cardId === cr.cardId)?.decision ?? null,
       })),
       _app.nurseVitalNormal,
       _app.nurseFollowUpAdequate,
     );
-    return { patientText: '', patientTextEn: '', journalText, cardStatusUpdates, cacheUpdates };
+    return { patientText: '', patientTextEn: '', journalText: nurseJournalText, cardStatusUpdates, cacheUpdates };
   }
-
-  // 4. Beräkna prescribeEnds för toRenew
-  const prescribeEnds: Record<number, string> = {};
-  for (const item of toRenew) {
-    try {
-      const ps = _prescribeState[item.i];
-      if (ps) {
-        const s: MedState = {
-          _cardId: item.i,
-          dose: item.state?.dose,
-          doseInterval: (item.state?.doseInterval ?? 1) as DoseInterval,
-          doseUnit: (item.state?.doseUnit ?? 'st') as DoseUnit,
-          prescribedEndDateStr: item.state?.prescribedEndDateStr,
-        };
-        const pr = calcPrescribeResult(s, ps);
-        if (pr && pr.endDateStr) prescribeEnds[item.i] = pr.endDateStr;
-      }
-    } catch { /* ignore */ }
-  }
-
-  // 5. Generera texter
-  const patientText   = buildPatientText('sv', toRenew, tooEarly, overuse, validCount, prescribeEnds);
-  const patientTextEn = buildPatientText('en', toRenew, tooEarly, overuse, validCount, prescribeEnds);
-  const journalText   = buildJournalText(toRenew, tooEarly, overuse, validCount, prescribeEnds);
 
   return { patientText, patientTextEn, journalText, cardStatusUpdates, cacheUpdates };
 });
@@ -417,7 +326,6 @@ export function getActiveTexts(): TextResult {
 export function _syncCardStatus(): void {
   const updates = _texts.cardStatusUpdates;
   for (const u of updates) {
-    _cardStatusPrev.set(u.cardId, u.status);
     _cardStatus[u.cardId] = u.status;
   }
   const caches = _texts.cacheUpdates;
@@ -512,7 +420,6 @@ export function clearAllMedState(): void {
   clearPrescribeState();
   resetLtPeriods();
   resetNurseState();
-  _cardStatusPrev.clear();
   _cardResultsCache.clear();
   _cardStatus = {};
 }
@@ -529,7 +436,7 @@ const _hasSummary = $derived.by(() => {
       calculable: status?.calculable ?? false,
       isOveruse: status?.isOveruse ?? false,
       isTooEarly: status?.isTooEarly ?? false,
-      earlyRenewalDecision: medCards[i].earlyRenewalDecision,
+      decision: medCards[i].decision,
     })) continue;
     count++;
   }

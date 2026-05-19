@@ -26,7 +26,7 @@
         doseUnit: 'st', doseInterval: 1, notCalculable: false,
         atcCode: null, nplId: null,
       };
-      medCards[idx].earlyRenewalDecision = null;
+      medCards[idx].decision = null;
       clearCardPrescribeState(cardId);
     }
     acVisible = false;

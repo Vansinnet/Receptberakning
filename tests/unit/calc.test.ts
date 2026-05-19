@@ -6,7 +6,7 @@ import { calcLongtermCore } from '../../src/lib/calc-longterm';
 import { calcPrescribeResult, canRenewMed, prescribeValidationHint } from '../../src/lib/prescribe-calc';
 import { buildPatientText, buildJournalText, buildNurseJournalText, remainingDosesNote, resolveState } from '../../src/lib/text-gen';
 import goldenFixtures from '../fixtures/calccore-golden.json';
-import type { MedState, PrevCalcResult } from '../../src/lib/types';
+import type { MedState, CalcMetric } from '../../src/lib/types';
 
 const MOCK_TODAY_MS = new Date('2025-06-15T00:00:00.000Z').getTime();
 

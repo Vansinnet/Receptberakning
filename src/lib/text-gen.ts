@@ -99,33 +99,79 @@ const PATIENT_TEXT: Record<string, PatientTemplates> = {
 
 export function buildPatientText(
   lang: string,
-  toRenew: Array<{ name: string; i: number; state?: MedState | null }>,
-  tooEarly: Array<{ name: string; i: number; state?: MedState | null }>,
-  overuse: Array<{ name: string; i: number; state?: MedState | null }>,
-  validCount: number,
-  prescribeEnds: Record<number, string> = {},
-  states?: MedState[]
+  cards: Array<{ name: string; i: number; state?: MedState | null }>,
+  decision: 'yes' | 'no' | null,
+  prescribeEndDate?: string
 ): string {
   const t = PATIENT_TEXT[lang] || PATIENT_TEXT.sv;
   const lines: string[] = [t.greeting, ''];
+  const name = cards[0]?.name || '';
+  if (decision === 'yes') {
+    const endDate = prescribeEndDate ? ` så att läkemedlet räcker till och med ${prescribeEndDate}` : '';
+    lines.push(`Vi har tagit emot din förfrågan om receptförnyelse för ${name} och kommer att förnya ditt recept inom 2–3 arbetsdagar${endDate}. Du kan därefter hämta ut din medicin på valfritt apotek.`);
+  } else if (decision === 'no') {
+    lines.push(`Vi har tagit emot din förfrågan om receptförnyelse för ${name}. Vi kan tyvärr inte förnya receptet vid detta tillfälle.`);
+  } else {
+    lines.push(`Vi har tagit emot din förfrågan om receptförnyelse för ${name}. Din förfrågan är under bedömning.`);
+  }
+  lines.push('', t.closing);
+  return lines.join('\n');
+}
 
-  if (validCount === 1) {
-    if (toRenew.length === 1) {
-      const endDate = prescribeEnds[toRenew[0].i];
-      lines.push(t.singleRenew(toRenew[0].name, endDate), '', t.closing);
-    } else if (tooEarly.length === 1) {
-      const s = resolveState(tooEarly[0], states);
-      lines.push(t.singleTooEarly(tooEarly[0].name, s), '', t.closing);
-    } else if (overuse.length === 1) {
-      const s = resolveState(overuse[0], states);
-      const parsedEnd = parseDateUTC(s.prescribedEndDateStr || '');
-      const prescribedEndPast = parsedEnd && parsedEnd < getToday();
-      if (prescribedEndPast) {
-        lines.push(t.singleOverusePast(overuse[0].name, s), '', t.closing);
-      } else {
-        const closing = s.prescribedContactIsPast ? t.closingContactPast : t.closingFuture(s);
-        lines.push(t.singleOveruse(overuse[0].name, s, closing), '', t.closing);
-      }
+export function buildJournalText(
+  cards: Array<{ name: string; i: number; dose: number; doseUnitLabel: string; doseUnit: string; total: number; pDateStr: string; prescribedEndDateStr: string; displayAvgStr: string; avgNote: string; daysToPrescribedEnd: number; consumptionPct: number; decision: 'yes' | 'no' | null }>,
+  validCount: number,
+  prescribeEndDate?: string
+): string {
+  const lines: string[] = [];
+  lines.push('Kontaktorsak: Receptförnyelse via 1177.', '');
+
+  for (const c of cards) {
+    const endSuffix = prescribeEndDate ? ` (förskrivs t.o.m. ${prescribeEndDate})` : '';
+    const consumptionStr = `${c.consumptionPct.toFixed(1)}% av ordinerad dos`;
+    const note = c.daysToPrescribedEnd > 0 ? ` (${c.daysToPrescribedEnd} dagar kvar)` : ' (receptperioden är slut)';
+    const atgard = c.decision === 'yes' ? 'Åtgärd: Förnyat.'
+      : c.decision === 'no' ? 'Åtgärd: Ej förnyat efter klinisk bedömning.'
+      : 'Åtgärd: Klinisk bedömning krävs.';
+
+    lines.push(`Bedömning: Patienten begär förnyelse av ${c.name}. Senaste receptet utfärdades ${c.pDateStr} (totalt ${c.total} ${c.doseUnit || 'st'}, ordination ${c.dose} ${c.doseUnitLabel || 'st/dag'}) och beräknas räcka till ${c.prescribedEndDateStr}${note}.`);
+    lines.push(`Snittförbrukning: ${c.displayAvgStr} ${c.avgNote} (${consumptionStr}).`);
+    lines.push(atgard, '');
+  }
+  return lines.join('\n');
+}
+
+export function buildNurseJournalText(
+  states: Array<{ _cardId: number; medRaw?: string; valid?: boolean; calculable?: boolean; prescribedEndDateStr?: string; consumptionPct?: number; decision?: 'yes' | 'no' | null }>,
+  nurseVitalNormal?: boolean,
+  nurseFollowUpAdequate?: boolean
+): string {
+  const allMeds: Array<{ name: string; endDate: string }> = [];
+  for (const s of states) {
+    if (!s || !s.valid || s.calculable === false) continue;
+    allMeds.push({ name: s.medRaw || 'Läkemedel', endDate: s.prescribedEndDateStr || '' });
+  }
+  if (allMeds.length === 0) return '';
+
+  const nvn = nurseVitalNormal ?? false;
+  const nfu = nurseFollowUpAdequate ?? false;
+  const lines: string[] = [];
+  lines.push(`Patient önskar förnyelse av ${allMeds.map(m => m.name).join(', ')}.`);
+  for (const m of allMeds) {
+    lines.push(`  ${m.name} beräknas räcka t.o.m. ${m.endDate || '—'}.`);
+  }
+
+  const missing: string[] = [];
+  if (!nvn) missing.push('vitalparametrar');
+  if (!nfu) missing.push('medicinska uppföljning');
+  if (missing.length === 0) {
+    lines.push('Patientens vitalparametrar och medicinska uppföljning bedöms adekvata.');
+  } else {
+    lines.push(`${missing.length === 2 ? 'Patientens vitalparametrar och medicinska uppföljning' : `Patientens ${missing[0]}`} bedöms vara avvikande.`);
+  }
+  lines.push('Lägger receptärendet till läkare för slutlig bedömning.');
+  return lines.join('\n');
+}
     }
   } else {
     lines.push(t.multiIntro, '');

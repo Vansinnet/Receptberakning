@@ -41,9 +41,7 @@
     _cardId: card._cardId,
     valid: result.valid ?? false,
     calculable: result.calculable ?? false,
-    isOveruse: result.isOveruse ?? false,
-    isTooEarly: result.isTooEarly ?? false,
-    earlyRenewalDecision: card.earlyRenewalDecision,
+    decision: card.decision,
   }) : false);
 
   let hasSummary = $derived(getHasSummary());
@@ -69,7 +67,7 @@
   function handleEarlyDecision(decision: 'yes' | 'no') {
     const idx = getActiveMedIdx();
     if (idx >= 0 && idx < medCards.length) {
-      medCards[idx].earlyRenewalDecision = decision;
+      medCards[idx].decision = decision;
     }
   }
 
@@ -161,13 +159,12 @@
     resetInactivityTimer();
   });
 
-  // Nollställ earlyRenewalDecision för ALLA kort när calcCore återställer via flagsChanged.
-  // getCardStatus() läser nu från _cardStatus ($state) — effekten triggas automatiskt vid ändring.
+  // Nollställ decision när formulärdata ändras för ett kort
   $effect(() => {
     for (let i = 0; i < medCards.length; i++) {
       const status = getCardStatus(medCards[i]._cardId);
-      if (status?.earlyRenewalDecision === null && medCards[i].earlyRenewalDecision !== null) {
-        medCards[i].earlyRenewalDecision = null;
+      if (status?.valid === false && medCards[i].decision !== null) {
+        medCards[i].decision = null;
       }
     }
   });
@@ -248,7 +245,7 @@
                 <CalcResult
                   result={result}
                   nurseViewActive={nurseActive}
-                  onEarlyDecision={handleEarlyDecision}
+                  onDecision={handleEarlyDecision}
                 />
               {:else if result && !result.valid}
                 <div class="result-empty-state">
@@ -258,10 +255,7 @@
               {:else if result?.valid && result?.calculable === false}
                 <div class="result-empty-state">
                   <div class="empty-icon">📋</div>
-                  <div>{result.verdictTitle || result.statusText || 'Kan ej beräknas'}</div>
-                  {#if result.verdictSub}
-                    <div class="result-verdict-sub">{result.verdictSub}</div>
-                  {/if}
+                  <div>{result.statusText || 'Kan ej beräknas'}</div>
                 </div>
               {:else}
                 <div class="result-empty-state">
