@@ -207,6 +207,7 @@ interface CardResult {
 const _cardResultsCache = new Map<number, { fp: string; cr: CardResult | null; status: CardStatusCache }>();
 
 const _texts = $derived.by((): TextResult => {
+  try {
   // Tvinga omvärdering vid midnattsbyte — texterna ska alltid spegla dagens datum.
   void _app.currentDate;
 
@@ -296,9 +297,15 @@ const _texts = $derived.by((): TextResult => {
 
   const activeDecision = medCards[_app.activeMedIdx]?.decision ?? null;
 
-  const patientText   = buildPatientText('sv', cardsForText, activeDecision);
-  const patientTextEn = buildPatientText('en', cardsForText, activeDecision);
-  const journalText   = buildJournalText(cardsForText, validCount);
+  let patientText = '', patientTextEn = '', journalText = '';
+  try {
+    patientText   = buildPatientText('sv', cardsForText, activeDecision);
+    patientTextEn = buildPatientText('en', cardsForText, activeDecision);
+    journalText   = buildJournalText(cardsForText, validCount);
+  } catch (e) {
+    console.error('[v3 _texts] Textgenerering kraschade:', e);
+    patientText = patientTextEn = journalText = 'Ett internt fel uppstod vid textgenerering.';
+  }
 
   if (_app.nurseViewActive) {
     const nurseJournalText = buildNurseJournalText(
@@ -316,6 +323,10 @@ const _texts = $derived.by((): TextResult => {
   }
 
   return { patientText, patientTextEn, journalText, cardStatusUpdates, cacheUpdates };
+  } catch (e) {
+    console.error('[v3 _texts] KRASCH:', e instanceof Error ? e.stack : String(e));
+    return { patientText: '', patientTextEn: '', journalText: 'Textgenerering misslyckades', cardStatusUpdates: [], cacheUpdates: [] };
+  }
 });
 
 export function getActiveTexts(): TextResult {
