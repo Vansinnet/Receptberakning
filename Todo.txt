@@ -10,3 +10,9 @@ Snittförbrukning
 1.00 st/dag (5.0 mg/dag)
 
 Det borde vara så att verktyget räknar utifrån dagens datum, så om patienten har 0 doser eller 1 dos kvar, ska det tolkas som att man tagit alla föregående doser och därmed ska snittförbrukningen beräknas på antalet mg man tagit delat på antalet totala doser som intagits. Vid 0 har samtliga doser intagits. Vid 1 kvarvarande har samtligadoser - 1 tagits osv. 
+
+#2 Jag fyller i Kort 1: Sertralin Amarox 50 mg, senaste recept 2025-12-15, 1 dos, 3 uttag. Klicka "Ja, förnya" (eftersom för tidig förnyelse detekteras)
+Jag fyller sedan i kort 2: Tramadol Actavis 50 mg, senaste recept 2025-12-31, 1 dos, antal uttag 1.
+
+Därefter ändrar jag Kort 1 där jag väljer att "Nej, avslå". Läkemedlet Sertralin försvinner då inte från prescribekolumnen utan står fortfarande kvar i "Sammanställning av läkemedel att förskriva". Det borde försvinna eftersom vi nu valt att inte förskriva det. Svar till patient och Journalanteckning är dock korrekta.
+
