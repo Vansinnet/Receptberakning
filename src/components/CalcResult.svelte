@@ -91,7 +91,8 @@
       </div>
     {/if}
 
-    <!-- Åtgärd krävs — alltid synlig -->
+    <!-- Åtgärd krävs — endast i läkarläge -->
+    {#if !nurseViewActive}
     <div class="early-decision-box">
       <div class="early-decision-label">⚑ Åtgärd krävs av medicinsk personal</div>
       <div class="early-decision-q">Utifrån ovanstående och patientens unika situation, bedöm om receptet ska förnyas.</div>
@@ -100,6 +101,7 @@
         <button type="button" class="btn early-btn early-btn-no {card?.decision === 'no' ? 'selected' : ''}" data-tooltip="Avslå förnyelse" onclick={() => onDecision('no')}>✕ Avslå</button>
       </div>
     </div>
+    {/if}
 
     <!-- Copy Section -->
     <div class="copy-section">
