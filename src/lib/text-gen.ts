@@ -46,7 +46,7 @@ const PATIENT_TEXT: Record<string, { greeting: string; closing: string }> = {
 
 export function buildPatientText(
   lang: string,
-  cards: Array<{ name: string; prescribedEndDateStr?: string; decision: 'yes' | 'no' | null; daysToPrescribedEnd?: number; contactDateStr?: string }>
+  cards: Array<{ name: string; prescribedEndDateStr?: string; decision: 'yes' | 'no' | null; daysToPrescribedEnd?: number; contactDateStr?: string; prescribeEnd?: string }>
 ): string {
   const t = PATIENT_TEXT[lang] || PATIENT_TEXT.sv;
   const en = lang === 'en';
@@ -57,12 +57,13 @@ export function buildPatientText(
 
   if (cards.length === 1 && first) {
     if (first.decision === 'yes') {
+      const endText = first.prescribeEnd ? ` så att det räcker till ${first.prescribeEnd}` : '';
       lines.push(en
-        ? `We have received your prescription renewal request for ${first.name}. We will renew your prescription.`
-        : `Vi har tagit emot din förfrågan om receptförnyelse för ${first.name}. Vi förnyar ditt recept.`);
+        ? `We have received your prescription renewal request for ${first.name}. We will renew your prescription${first.prescribeEnd ? ` to last until ${first.prescribeEnd}` : ''}.`
+        : `Vi har tagit emot din förfrågan om receptförnyelse för ${first.name}. Vi förnyar ditt recept${endText}.`);
       lines.push(en
         ? `You can collect your medication at any pharmacy within 2–3 working days.`
-        : `Du kan inom 2–3 arbetsdagar hämta ut ditt recept på valfritt apotek.`);
+        : `Du kan inom 2–3 arbetsdagar hämta ut det på valfritt apotek.`);
     } else if (first.decision === 'no') {
       const prescribedEnd = first.prescribedEndDateStr;
       const days = first.daysToPrescribedEnd ?? 0;
@@ -100,9 +101,10 @@ export function buildPatientText(
       : `Vi har tagit emot din förfrågan om receptförnyelse för följande läkemedel: ${list}.`);
     for (const c of cards) {
       if (c.decision === 'yes') {
+        const endText = c.prescribeEnd ? ` så att det räcker till ${c.prescribeEnd}` : '';
         lines.push(en
-          ? `  ${c.name}: We will renew your prescription. You can collect it within 2–3 working days.`
-          : `  ${c.name}: Vi förnyar ditt recept. Du kan inom 2–3 arbetsdagar hämta ut det på valfritt apotek.`);
+          ? `  ${c.name}: We will renew your prescription${c.prescribeEnd ? ` to last until ${c.prescribeEnd}` : ''}. You can collect it within 2–3 working days.`
+          : `  ${c.name}: Vi förnyar ditt recept${endText}. Du kan inom 2–3 arbetsdagar hämta ut det på valfritt apotek.`);
       } else if (c.decision === 'no') {
         const prescribedEnd = c.prescribedEndDateStr;
         const days = c.daysToPrescribedEnd ?? 0;
@@ -140,21 +142,22 @@ export function buildPatientText(
 export function buildJournalText(
   cards: Array<{ name: string; i: number; dose: number; doseUnitLabel: string; doseUnit: string; total: number; pDateStr: string; prescribedEndDateStr: string; displayAvgStr: string; avgNote: string; daysToPrescribedEnd: number; consumptionPct: number; decision: 'yes' | 'no' | null }>,
   validCount: number,
-  prescribeEndDate?: string
+  prescribeEnds?: Record<number, string>
 ): string {
   const lines: string[] = [];
   lines.push('Kontaktorsak: Receptförnyelse via 1177.', '');
 
   for (const c of cards) {
-    const endSuffix = prescribeEndDate ? ` (förskrivs t.o.m. ${prescribeEndDate})` : '';
-    const consumptionStr = `${c.consumptionPct.toFixed(1)}% av ordinerad dos`;
     const note = c.daysToPrescribedEnd > 0 ? ` (${c.daysToPrescribedEnd} dagar kvar)` : ' (receptperioden är slut)';
     const verb = c.daysToPrescribedEnd < 0 ? 'beräknades' : 'beräknas';
-    const atgard = c.decision === 'yes' ? 'Åtgärd: Förnyat.'
+    const prescribeEnd = prescribeEnds?.[c.i] ?? '';
+    const atgard = c.decision === 'yes'
+      ? (prescribeEnd ? `Åtgärd: Förnyat så att läkemedlet räcker till ${prescribeEnd}.` : 'Åtgärd: Förnyat.')
       : c.decision === 'no' ? 'Åtgärd: Ej förnyat efter klinisk bedömning.'
       : 'Åtgärd: Klinisk bedömning krävs.';
 
     lines.push(`Bedömning: Patienten begär förnyelse av ${c.name}. Senaste receptet utfärdades ${c.pDateStr} (totalt ${c.total} ${c.doseUnit || 'st'}, ordination ${c.dose} ${c.doseUnitLabel || 'st/dag'}) och ${verb} räcka till ${c.prescribedEndDateStr}${note}.`);
+    const consumptionStr = `${c.consumptionPct.toFixed(1)}% av ordinerad dos`;
     lines.push(`Snittförbrukning: ${c.displayAvgStr} ${c.avgNote} (${consumptionStr}).`);
     lines.push(atgard, '');
   }

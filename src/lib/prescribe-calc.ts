@@ -34,16 +34,22 @@ export interface PrescribeResult {
 
 export function calcPrescribeResult(
   s: MedState,
-  ps: { packageSize: string; mode?: string; months?: number; endDate?: string } | null
+  ps: { packageSize: string; mode?: string; months?: number; endDate?: string; startFromToday?: boolean } | null
 ): PrescribeResult | null {
   if (!ps) return null;
 
   const today         = getToday();
   const prescribedEnd = parseDateUTC(s.prescribedEndDateStr || '');
 
-  const startDate          = (prescribedEnd && prescribedEnd > today) ? prescribedEnd : today;
-  const startDateStr       = fmtDate(startDate);
-  const daysAlreadyCovered = (prescribedEnd && prescribedEnd > today) ? getDaysDiff(prescribedEnd, today) : 0;
+  let startDate          = (prescribedEnd && prescribedEnd > today) ? prescribedEnd : today;
+  let startDateStr       = fmtDate(startDate);
+  let daysAlreadyCovered = (prescribedEnd && prescribedEnd > today) ? getDaysDiff(prescribedEnd, today) : 0;
+
+  if (ps.startFromToday) {
+    startDate = today;
+    daysAlreadyCovered = 0;
+    startDateStr = fmtDate(startDate);
+  }
 
   let endDate: Date | null = null;
   let totalDays = 0;

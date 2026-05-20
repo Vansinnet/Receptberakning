@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { CalcResult } from '$lib/types';
-  import { getActiveTexts, medCards, getActiveMedIdx } from '$lib/state.svelte';
+  import { getActiveTexts, medCards, getActiveMedIdx, getPrescribeState, applyPrescribeStatePatch } from '$lib/state.svelte';
   import { pctClass } from '$lib/utils';
+  import { DAYS_REMAINING_WARN } from '$lib/constants';
   import Alert from './Alert.svelte';
 
   let {
@@ -13,6 +14,12 @@
   let activeIdx = $derived(getActiveMedIdx());
   let card = $derived(medCards[activeIdx] ?? null);
   let patientLang = $derived(card?.patientLang ?? 'sv');
+  let psEntry = $derived(card ? getPrescribeState(card._cardId) : null);
+
+  function handleStartChoice(fromToday: boolean) {
+    if (!card) return;
+    applyPrescribeStatePatch(card._cardId, { startFromToday: fromToday });
+  }
 
   function toggleLang() {
     const idx = getActiveMedIdx();
@@ -101,6 +108,25 @@
         <button type="button" class="btn early-btn early-btn-no {card?.decision === 'no' ? 'selected' : ''}" data-tooltip="Avslå förnyelse" onclick={() => onDecision('no')}>✕ Avslå</button>
       </div>
     </div>
+    {/if}
+
+    {#if card?.decision === 'yes' && result.daysToPrescribedEnd != null && result.daysToPrescribedEnd >= DAYS_REMAINING_WARN}
+      <div class="start-date-choice">
+        <div class="start-date-choice-label">
+          Patienten har recept för {result.daysToPrescribedEnd} dagar till (t.o.m. {result.prescribedEndDateStr}).
+          Vill du beräkna antalet förpackningar att förskriva utifrån dagens datum, eller då patienten borde ha slut på läkemedlet?
+        </div>
+        <div class="start-date-choice-actions">
+          <button onclick={() => handleStartChoice(true)}
+                  class:selected={psEntry?.startFromToday === true}>
+            📅 Från dagens datum
+          </button>
+          <button onclick={() => handleStartChoice(false)}
+                  class:selected={psEntry?.startFromToday === false}>
+            🏁 Från beräknat slutdatum
+          </button>
+        </div>
+      </div>
     {/if}
 
     <!-- Copy Section -->

@@ -305,6 +305,21 @@ const _texts = $derived.by((): TextResult => {
 
   let patientText = '', patientTextEn = '', journalText = '';
   try {
+    const prescribeEnds: Record<number, string> = {};
+    for (const cr of cardResults) {
+      const ps = _prescribeState[cr.cardId];
+      if (ps?.packageSize) {
+        const s: MedState = {
+          _cardId: cr.cardId,
+          dose: cr.calc.dose,
+          doseInterval: cr.calc.doseInterval,
+          doseUnit: cr.calc.doseUnit,
+          prescribedEndDateStr: cr.calc.prescribedEndDateStr,
+        };
+        const pr = calcPrescribeResult(s, ps);
+        if (pr?.endDateStr) prescribeEnds[cr.cardId] = pr.endDateStr;
+      }
+    }
     const ptCards = cardsForText.map(c => {
       let contactDateStr = '';
       if (c.daysToPrescribedEnd >= 14 && c.prescribedEndDateStr) {
@@ -317,11 +332,12 @@ const _texts = $derived.by((): TextResult => {
       return {
         name: c.name, prescribedEndDateStr: c.prescribedEndDateStr, decision: c.decision,
         daysToPrescribedEnd: c.daysToPrescribedEnd, contactDateStr,
+        prescribeEnd: prescribeEnds[c.i] ?? '',
       };
     });
     patientText   = buildPatientText('sv', ptCards);
     patientTextEn = buildPatientText('en', ptCards);
-    journalText   = buildJournalText(cardsForText, validCount);
+    journalText   = buildJournalText(cardsForText, validCount, prescribeEnds);
   } catch (e) {
     console.error('[v3 _texts] Textgenerering kraschade:', e);
     patientText = patientTextEn = journalText = 'Ett internt fel uppstod vid textgenerering.';
@@ -413,6 +429,7 @@ export interface PrescribeEntry {
   mode?: string;
   months?: number;
   endDate?: string;
+  startFromToday?: boolean;
 }
 
 const _prescribeState = $state<Record<number, PrescribeEntry>>({});

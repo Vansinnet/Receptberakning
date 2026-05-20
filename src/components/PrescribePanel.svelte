@@ -139,6 +139,8 @@
           <div class="prescribe-info-val">{prescResult?.startDateStr ?? '—'}</div>
           {#if prescResult && prescResult.daysAlreadyCovered > 0}
             <div class="prescribe-info-sub">Nuv. recept täcker {prescResult.daysAlreadyCovered} dagar</div>
+          {:else if prescResult && psEntry?.startFromToday}
+            <div class="prescribe-info-sub">Beräknas från dagens datum</div>
           {:else}
             <div class="prescribe-info-sub is-hidden"></div>
           {/if}
