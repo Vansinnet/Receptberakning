@@ -42,11 +42,6 @@
     card.form.atcCode = null;
     card.form.nplId = null;
     card.form.notCalculable = false;
-    card.form.amtRaw = '';
-    card.form.doseUnit = 'st';
-    card.form.doseRaw = '';
-    card.form.doseInterval = 1;
-    card.form.leftRaw = '';
     }
 
     if (q.length < MIN_SEARCH_QUERY_LENGTH) {
@@ -70,8 +65,11 @@
     card.form.atcCode = d.a || null;
     card.form.nplId = d.i || null;
     card.form.notCalculable = !!d.c;
-    if (d.p && d.p > 0) card.form.amtRaw = String(d.p);
+    if (d.p && d.p > 0) card.form.amtRaw = String(d.p); else card.form.amtRaw = '';
     card.form.doseUnit = d.u === 'ml' ? 'ml' : d.u === 'dos' ? 'dos' : 'st';
+    card.form.doseRaw = '';
+    card.form.doseInterval = 1;
+    card.form.leftRaw = '';
     acVisible = false;
     acResults = [];
   }

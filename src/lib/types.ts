@@ -74,7 +74,7 @@ export interface CalcResult {
   pDateStr?: string;
   total?: number;
   remainingDoses?: number | null;
-  endDateStr?: string;
+  estimatedEndDateStr?: string;
   prescribedEndDateStr?: string;
   daysRemaining?: number;
   daysToPrescribedEnd?: number;

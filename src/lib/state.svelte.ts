@@ -240,6 +240,21 @@ const _prescribeEnds = $derived.by((): Record<number, string> => {
   return newEnds;
 });
 
+// ════════════════════════════════════════════════════════════════════════════
+// DERIVED-FLÖDE (medveten 1-cykels staleness):
+//
+//   formulärändring
+//     → _texts $derived.by (använder stale _cardResultsCache, icke-reaktiv Map)
+//     → _textsVersion ändras → $effect kör _syncCardStatus()
+//     → _cardResultsCache + _cardStatus uppdateras
+//     → _prescribeEnds $derived.by läser uppdaterad cache → nytt värde
+//     → _texts räknas om igen (nu med aktuella prescribeEnds)
+//
+// Detta ger en andra omräkning av _texts per formulärändring men bryter
+// feedback-loopen som annars uppstår om _cardResultsCache vore reaktiv.
+// Första renderingen visar texter med tomma prescribe-slutdatum, andra
+// renderingen visar korrekta. Acceptabelt för max 8 kort.
+// ════════════════════════════════════════════════════════════════════════════
 const _texts = $derived.by((): TextResult => {
   try {
   // Tvinga omvärdering vid midnattsbyte — texterna ska alltid spegla dagens datum.

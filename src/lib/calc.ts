@@ -165,7 +165,8 @@ export function calcCore(inputData: CalcInput): CalcResult {
   const batchesDispensed = Math.min(inputData.ref, Math.floor(daysSince / batchDuration) + 1);
   const accessibleTotal  = Math.min(total, batchesDispensed * inputData.amt);
 
-  let endDate: Date, daysRemaining: number, avgNum: number, earlyPickup = false, calcBase = accessibleTotal;
+  let estimatedEndDate: Date, daysRemaining: number, avgNum: number, calcBase = accessibleTotal;
+  let earlyPickup = false;
 
   if (hasRemaining) {
     if (remaining! > total) {
@@ -190,12 +191,12 @@ export function calcCore(inputData: CalcInput): CalcResult {
     avgNum        = consumed / daysSince;
     daysRemaining = Math.floor(remaining! / effectiveDailyDose);
     daysRemaining = Math.min(daysRemaining, MAX_TOTAL_DAYS);
-    endDate = new Date(today);
-    endDate.setUTCDate(today.getUTCDate() + daysRemaining);
+    estimatedEndDate = new Date(today);
+    estimatedEndDate.setUTCDate(today.getUTCDate() + daysRemaining);
   } else {
-    endDate = new Date(inputData.pDate);
-    endDate.setUTCDate(endDate.getUTCDate() + Math.round(totalDays));
-    daysRemaining = getDaysDiff(endDate, today);
+    estimatedEndDate = new Date(inputData.pDate);
+    estimatedEndDate.setUTCDate(estimatedEndDate.getUTCDate() + Math.round(totalDays));
+    daysRemaining = getDaysDiff(estimatedEndDate, today);
     avgNum = total / daysSince;
   }
 
@@ -239,7 +240,7 @@ export function calcCore(inputData: CalcInput): CalcResult {
     pDateStr,
     total,
     remainingDoses:       hasRemaining ? remaining : null,
-    endDateStr:           fmtDate(endDate),
+    estimatedEndDateStr:    fmtDate(estimatedEndDate),
     prescribedEndDateStr,
     daysRemaining,
     daysToPrescribedEnd,

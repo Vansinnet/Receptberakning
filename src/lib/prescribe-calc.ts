@@ -81,7 +81,7 @@ export function calcPrescribeResult(
     if (ed && ed > startDate) { endDate = ed; totalDays = getDaysDiff(ed, startDate); }
   }
 
-  const dose            = s.dose || 0;
+  const dose            = s.dose || 0;  // || 0 istället för ?? 0: fångar även NaN från calcCore vid edge-case-indata
   const doseInterval    = s.doseInterval || 1;
   const effectiveDose   = dose / doseInterval;
   const packageSize     = parseFloat(ps.packageSize) || 0;

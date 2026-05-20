@@ -1,46 +1,11 @@
-import type { MedState } from './types';
 import { getToday, parseDateUTC } from './utils';
 
-// === STATE RESOLVER ===
-
-// Sentry-MedState med tomma strängar för alla datumfält — används som fallback
-// för att undvika att "undefined" renderas i patient/journal-texter.
-const EMPTY_STATE: MedState = {
-  _cardId: 0,
-  medRaw: '', medNameStripped: '', pDateStr: '', total: 0, dose: 0,
-  doseUnit: 'st', doseUnitLabel: '', prescribedEndDateStr: '',
-  displayAvgStr: '', avgNote: '', remainingDoses: null, daysRemaining: 0,
-  daysToPrescribedEnd: 0, valid: false, calculable: false,
-  decision: null, consumptionPct: 0,
-  statusText: '', metrics: [], alerts: [], doseInterval: 1, endDateStr: '',
-};
-
-export function resolveState(item: { state?: MedState | null; i: number }, states?: MedState[]): MedState {
-  return (item.state || (states ? states[item.i] : null) || EMPTY_STATE) as MedState;
-}
-
-// === REMAINING DOSES NOTE ===
-
-export function remainingDosesNote(s: MedState, leading: string = ' '): string {
-  if (s.remainingDoses == null) return '';
-  const u: string = s.doseUnit || 'st';
-  if (s.daysRemaining != null && s.daysRemaining > 0) {
-    return `${leading}Vid förnyelse framkommer att patienten har ${s.remainingDoses} ${u} (${s.daysRemaining} dagar) kvar.`;
-  }
-  if (Number(s.remainingDoses) > 0) {
-    return `${leading}Vid förnyelse framkommer att patienten har ${s.remainingDoses} ${u} kvar (under ett dygn).`;
-  }
-  return `${leading}Vid förnyelse framkommer att patienten uppger att medicinen är slut.`;
-}
-
-// === PATIENT TEXT — enkel version utan klinisk bedömning ===
+// === PATIENT TEXT ===
 
 const PATIENT_TEXT: Record<string, { greeting: string; closing: string }> = {
   sv: { greeting: 'Hej,', closing: 'Vid frågor är du välkommen att kontakta oss via 1177.' },
   en: { greeting: 'Hello,', closing: 'If you have questions, please contact us through 1177.' },
 };
-
-// === PATIENT TEXT ===
 
 export function buildPatientText(
   lang: string,

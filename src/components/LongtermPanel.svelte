@@ -2,11 +2,13 @@
   import { ltPeriods, pushLtPeriod, spliceLtPeriod, resetLtPeriods, getLtMedRaw, setLtMedRaw, getLtDoseRaw, setLtDoseRaw, setLtPeriodField } from '$lib/state.svelte';
   import { calcLongtermCore } from '$lib/calc-longterm';
   import { pctClass } from '$lib/utils';
+  import { getDrugByName } from '$lib/drug-search';
   import { MAX_LT_PERIODS, LT_BAR_TEXT_THRESHOLD_PCT } from '$lib/constants';
   import type { LTResult, LTCardPeriod } from '$lib/types';
 
   let medRaw = $derived(getLtMedRaw());
   let doseRaw = $derived(getLtDoseRaw());
+  let nplId = $derived(getDrugByName(medRaw)?.i ?? null);
 
   function handleAddPeriod() {
     pushLtPeriod();
@@ -57,7 +59,7 @@
   let result = $derived.by((): LTResult => {
     // Läs ltPeriods för att registrera beroende
     const periods = ltPeriods.map(p => ({ start: p.start, end: p.end, total: p.total }));
-    return calcLongtermCore(medRaw, ordDose, periods);
+    return calcLongtermCore(medRaw, ordDose, periods, nplId);
   });
 
   let ltCopied = $state(false);

@@ -2,9 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { calcCore, validateValues } from '../../src/lib/calc';
 import { calcLongtermCore } from '../../src/lib/calc-longterm';
 import { calcPrescribeResult, canRenewMed } from '../../src/lib/prescribe-calc';
-import { buildPatientText, buildJournalText, buildNurseJournalText, remainingDosesNote, resolveState } from '../../src/lib/text-gen';
+import { buildPatientText, buildJournalText, buildNurseJournalText } from '../../src/lib/text-gen';
 import { setMockNow } from '../../src/lib/clock';
-import type { MedState } from '../../src/lib/types';
 
 const MOCK_NOW = new Date('2025-05-20T00:00:00Z').getTime();
 setMockNow(MOCK_NOW);
@@ -27,19 +26,6 @@ function v(inp: any) {
   const r = validateValues(inp.medRaw, inp.dateVal, inp.doseRaw, inp.amtRaw, inp.refRaw, inp.leftRaw, String(inp.doseInterval), inp.doseUnit, inp.notCalculable);
   if (!r.valid) throw new Error('Expected valid input');
   return r;
-}
-
-function makeRenewState(s: Partial<MedState> = {}): MedState {
-  return {
-    _cardId: 1, decision: null,
-    medRaw: 'Elvanse 50 mg', medNameStripped: 'Elvanse 50 mg', pDateStr: '2025-01-15',
-    total: 300, dose: 1, doseUnit: 'st', doseUnitLabel: 'st/dag',
-    prescribedEndDateStr: '2025-11-12', displayAvgStr: '1.00 st/dag',
-    avgNote: '(beräknat...)', remainingDoses: null, daysRemaining: 180,
-    daysToPrescribedEnd: 180, valid: true, calculable: true,
-    metrics: [], alerts: [], consumptionPct: 100,
-    ...s,
-  };
 }
 
 // =====================================================
@@ -162,7 +148,7 @@ describe('calcCore (v3)', () => {
   });
   it('hasRemaining endDateStr', () => {
     const inp = makeInput({dose:1,amt:100,ref:1,remaining:50,dateVal:'2025-05-19'});
-    expect(calcCore(v(inp)).endDateStr).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(calcCore(v(inp)).estimatedEndDateStr).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
   it('zero use → alert', () => {
     const inp = makeInput({dose:1,amt:100,ref:1,remaining:100});
@@ -253,19 +239,4 @@ describe('buildNurseJournalText', () => {
   it('invalid→excluded',()=>{expect(buildNurseJournalText([{_cardId:1,medRaw:'Sertralin',valid:false,calculable:false}])).toBe('');});
   it('vitals ok→adekvata',()=>{expect(buildNurseJournalText([{_cardId:1,medRaw:'Sertralin',valid:true,calculable:true,prescribedEndDateStr:'2025-11-12',daysToPrescribedEnd:180}],true,true)).toContain('adekvata');});
   it('vitals no→avvikande',()=>{expect(buildNurseJournalText([{_cardId:1,medRaw:'Sertralin',valid:true,calculable:true,prescribedEndDateStr:'2025-11-12',daysToPrescribedEnd:180}],false,false)).toContain('avvikande');});
-});
-
-// =====================================================
-describe('remainingDosesNote', () => {
-  it('null→""',()=>{expect(remainingDosesNote(makeRenewState({remainingDoses:null}))).toBe('');});
-  it('has doses+days',()=>{expect(remainingDosesNote(makeRenewState({remainingDoses:30,daysRemaining:30,doseUnit:'st'}))).toContain('30 dagar');});
-  it('>0 + days=0→under dygn',()=>{expect(remainingDosesNote(makeRenewState({remainingDoses:0.5,daysRemaining:0,doseUnit:'st'}))).toContain('under ett dygn');});
-  it('0→slut',()=>{expect(remainingDosesNote(makeRenewState({remainingDoses:0,daysRemaining:0,doseUnit:'st'}))).toContain('slut');});
-});
-
-// =====================================================
-describe('resolveState', () => {
-  it('direct',()=>{const s=makeRenewState();expect(resolveState({state:s,i:0})).toBe(s);});
-  it('fallback via states[i]',()=>{const s=makeRenewState();expect(resolveState({state:null,i:0},[s])._cardId).toBe(s._cardId);});
-  it('fallback EMPTY',()=>{expect(resolveState({state:null,i:0}).valid).toBe(false);});
 });

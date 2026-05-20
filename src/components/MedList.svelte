@@ -35,7 +35,7 @@
     if (!result) return { cls: '', text: '—' };
     if (!result.valid) return { cls: '', text: 'Ej ifyllt' };
     if (!result.calculable) return { cls: '', text: result.statusText || '—' };
-    const warn = result.consumptionPct < CONSUMPTION_NORMAL_LOW || result.consumptionPct > CONSUMPTION_NORMAL_HIGH || result.daysToPrescribedEnd! >= DAYS_REMAINING_WARN;
+    const warn = result.consumptionPct < CONSUMPTION_NORMAL_LOW || result.consumptionPct > CONSUMPTION_NORMAL_HIGH || (result.daysToPrescribedEnd ?? 0) >= DAYS_REMAINING_WARN;
     return { cls: warn ? 'warn' : 'ok', text: result.statusText || '' };
   }
 </script>
