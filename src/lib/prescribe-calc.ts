@@ -59,9 +59,12 @@ export function calcPrescribeResult(
   const endDateRaw = ps.endDate ?? DEFAULT_PRESCRIBE_END_DATE;
 
   if (mode === 'months' && months > 0) {
-    const tYear  = today.getUTCFullYear();
-    const tMonth = today.getUTCMonth() + months;
-    const tDay   = today.getUTCDate();
+    // AKTIVT DESIGNVAL: räkna N månader från startDate (inte today).
+    // Om nuvarande recept fortfarande gäller är startDate = prescribedEndDate,
+    // och förskrivningen ska täcka N månader från DÅ, inte från idag.
+    const tYear  = startDate.getUTCFullYear();
+    const tMonth = startDate.getUTCMonth() + months;
+    const tDay   = startDate.getUTCDate();
     const lastDayOfTargetMonth = new Date(Date.UTC(tYear, tMonth + 1, 0)).getUTCDate();
     const targetEnd = new Date(Date.UTC(tYear, tMonth, Math.min(tDay, lastDayOfTargetMonth)));
     totalDays = getDaysDiff(targetEnd, startDate);

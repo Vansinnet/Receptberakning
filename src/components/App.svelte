@@ -202,8 +202,7 @@
     />
 
     <main id="main-content">
-      {#if activeTab === 'renew'}
-        <div id="panel-renew" class="tab-panel active" role="tabpanel" aria-labelledby="heading-renew">
+        <div id="panel-renew" class="tab-panel" class:active={activeTab === 'renew'} class:is-hidden={activeTab !== 'renew'} role="tabpanel" aria-labelledby="heading-renew">
           <h2 class="sr-only" id="heading-renew">Receptförnyelse</h2>
           <div class="renew-layout">
             <!-- KOLUMN 1: Läkemedelslista -->
@@ -264,12 +263,11 @@
             <PrescribePanel visible={showPrescribe && !nurseActive} />
           </div>
         </div>
-      {:else}
-        <div id="panel-longterm" class="tab-panel active" role="tabpanel" aria-labelledby="heading-longterm">
+
+        <div id="panel-longterm" class="tab-panel" class:active={activeTab === 'longterm'} class:is-hidden={activeTab !== 'longterm'} role="tabpanel" aria-labelledby="heading-longterm">
           <h2 class="sr-only" id="heading-longterm">Långvarig förbrukningsanalys</h2>
           <LongtermPanel />
         </div>
-      {/if}
     </main>
 
     <footer class="site-footer">

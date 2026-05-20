@@ -419,8 +419,6 @@ export function spliceLtPeriod(i: number): boolean {
 export function resetLtPeriods(): void {
   ltPeriods.length = 0;
   ltPeriods.push({ start: '', total: '', end: '' });
-  _ltMedRaw = '';
-  _ltDoseRaw = '';
 }
 
 // =====================================================
@@ -472,6 +470,8 @@ export function clearAllMedState(): void {
   _app.nextCardId = 2;
   clearPrescribeState();
   resetLtPeriods();
+  _ltMedRaw = '';
+  _ltDoseRaw = '';
   resetNurseState();
   _cardResultsCache.clear();
   _cardStatus = {};

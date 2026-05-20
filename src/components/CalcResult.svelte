@@ -43,7 +43,7 @@
 
   // Tvinga journal-flik i sjuksköterskeläge
   $effect(() => {
-    if (nurseViewActive) activeTab = 'journal';
+    activeTab = nurseViewActive ? 'journal' : 'patient';
   });
 
   function copyText() {

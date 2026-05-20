@@ -46,6 +46,7 @@
     card.form.doseUnit = 'st';
     card.form.doseRaw = '';
     card.form.doseInterval = 1;
+    card.form.leftRaw = '';
     }
 
     if (q.length < MIN_SEARCH_QUERY_LENGTH) {
@@ -110,11 +111,7 @@
     };
   });
 
-  let dateDisplay = $state('');
-
-  $effect(() => {
-    dateDisplay = card?.form?.dateVal ?? '';
-  });
+  let dateDisplay = $derived(card?.form?.dateVal ?? '');
 
   function handleDateInput(e: Event) {
     const input = e.target as HTMLInputElement;
@@ -124,7 +121,6 @@
     if (val.length > 7) val = val.substring(0, 7) + '-' + val.substring(7);
     const sel = input.selectionStart ?? 0;
     const digitsBefore = originalVal.substring(0, sel).replace(/\D/g, '').length;
-    dateDisplay = val;
     if (card) card.form.dateVal = val;
     if (val !== originalVal) {
       let newPos = 0, count = 0;
