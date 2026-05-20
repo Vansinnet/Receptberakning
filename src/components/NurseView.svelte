@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { getNurseViewActive, getNurseVitalNormal, setNurseVitalNormal, getNurseFollowUpAdequate, setNurseFollowUpAdequate } from '$lib/state.svelte';
+  import { appState } from '$lib/state.svelte';
 
-  let vitalNormal = $derived(getNurseVitalNormal());
-  let followUpAdequate = $derived(getNurseFollowUpAdequate());
+  let vitalNormal = $derived(appState.nurseVitalNormal);
+  let followUpAdequate = $derived(appState.nurseFollowUpAdequate);
 
-  function toggleVital() { setNurseVitalNormal(!vitalNormal); }
-  function toggleFollowUp() { setNurseFollowUpAdequate(!followUpAdequate); }
+  function toggleVital() { appState.nurseVitalNormal = !vitalNormal; }
+  function toggleFollowUp() { appState.nurseFollowUpAdequate = !followUpAdequate; }
 </script>
 
 <section class="nurse-col" aria-label="Sjuksköterskebedömning">

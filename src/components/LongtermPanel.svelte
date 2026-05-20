@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ltPeriods, pushLtPeriod, spliceLtPeriod, resetLtPeriods, getLtMedRaw, setLtMedRaw, getLtDoseRaw, setLtDoseRaw, setLtPeriodField } from '$lib/state.svelte';
+  import { ltPeriods, pushLtPeriod, spliceLtPeriod, resetLtPeriods, ltState, setLtPeriodField } from '$lib/state.svelte';
   import { calcLongtermCore } from '$lib/calc-longterm';
   import { pctClass, applyDateMask, copyToClipboard } from '$lib/utils';
   import { getDrugByName } from '$lib/drug-search';
@@ -7,8 +7,8 @@
   import FieldError from './FieldError.svelte';
   import type { LTResult, LTCardPeriod } from '$lib/types';
 
-  let medRaw = $derived(getLtMedRaw());
-  let doseRaw = $derived(getLtDoseRaw());
+  let medRaw = $derived(ltState.medRaw);
+  let doseRaw = $derived(ltState.doseRaw);
   let nplId = $derived(getDrugByName(medRaw)?.i ?? null);
 
   function handleAddPeriod() {
@@ -20,8 +20,8 @@
   }
 
   function handleClear() {
-    setLtMedRaw('');
-    setLtDoseRaw('');
+    ltState.medRaw = '';
+    ltState.doseRaw = '';
     resetLtPeriods();
   }
 
@@ -87,11 +87,11 @@
         <div class="form-row-2">
           <div class="field">
             <label for="lt-med" data-tooltip="Ange läkemedelsnamn och styrka.">Läkemedel och styrka</label>
-            <input id="lt-med" type="text" placeholder="T.ex. Tramadol 100 mg" maxlength="100" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value={medRaw} oninput={(e) => setLtMedRaw((e.target as HTMLInputElement).value)} />
+            <input id="lt-med" type="text" placeholder="T.ex. Tramadol 100 mg" maxlength="100" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value={medRaw} oninput={(e) => ltState.medRaw = (e.target as HTMLInputElement).value} />
           </div>
           <div class="field">
             <label for="lt-dose" data-tooltip="Patientens ordinerade dygnsdos i enheter per dag.">Ordinerad dos (enheter/dag)</label>
-            <input id="lt-dose" type="text" inputmode="decimal" placeholder="T.ex. 1" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value={doseRaw} oninput={(e) => setLtDoseRaw((e.target as HTMLInputElement).value)} class:input-error={doseInvalid} aria-invalid={doseInvalid} />
+            <input id="lt-dose" type="text" inputmode="decimal" placeholder="T.ex. 1" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value={doseRaw} oninput={(e) => ltState.doseRaw = (e.target as HTMLInputElement).value} class:input-error={doseInvalid} aria-invalid={doseInvalid} />
             <FieldError error={doseInvalid ? 'Ange ett positivt tal' : ''} />
           </div>
         </div>

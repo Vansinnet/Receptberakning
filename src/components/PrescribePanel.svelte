@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { medCards, getPrescribeState, initPrescribeState, applyPrescribeStatePatch, getActiveMedIdx, setActiveMedIdx, getCardStatus, getActiveResult, getHasSummary, getCachedResult } from '$lib/state.svelte';
+  import { medCards, getPrescribeState, initPrescribeState, applyPrescribeStatePatch, appState, getCardStatus, getActiveResult, getHasSummary, getCachedResult } from '$lib/state.svelte';
   import { calcPrescribeResult, canRenewMed, prescribeValidationHint } from '$lib/prescribe-calc';
   import { UNIT_DISPLAY, DEFAULT_PRESCRIBE_MODE, DEFAULT_PRESCRIBE_MONTHS } from '$lib/constants';
   import { applyDateMask } from '$lib/utils';
@@ -7,7 +7,7 @@
 
   let { visible = false } = $props();
 
-  let activeIdx = $derived(getActiveMedIdx()); // keep for template display
+  let activeIdx = $derived(appState.activeMedIdx);
   let card = $derived(medCards[activeIdx] ?? null);
   let result = $derived(getActiveResult());
 
@@ -177,7 +177,7 @@
                   doseUnit: cached.calc.doseUnit,
                   prescribedEndDateStr: cached.calc.prescribedEndDateStr,
                 }, getPrescribeState(c._cardId) ?? null) : null}
-                <button type="button" class="prescribe-summary-row {i === activeIdx ? 'active' : ''}" onclick={() => setActiveMedIdx(i)}>
+                <button type="button" class="prescribe-summary-row {i === activeIdx ? 'active' : ''}" onclick={() => appState.activeMedIdx = i}>
                   <span class="prescribe-summary-name">{c.form.medRaw || `Läkemedel ${i + 1}`}</span>
                   <span class="prescribe-summary-right">
                     <span class="prescribe-summary-pkg">{pr?.packages ?? '—'} förp.</span>

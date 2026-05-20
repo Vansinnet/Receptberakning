@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { medCards, getActiveMedIdx, setActiveMedIdx, pushMedCard, getActiveResult, clearAllMedState, getCardStatus } from '$lib/state.svelte';
+  import { medCards, appState, pushMedCard, getActiveResult, clearAllMedState, getCardStatus } from '$lib/state.svelte';
   import { MAX_MED_CARDS, CONSUMPTION_NORMAL_LOW, CONSUMPTION_NORMAL_HIGH, DAYS_REMAINING_WARN } from '$lib/constants';
 
   function handleSelectMed(idx: number) {
-    setActiveMedIdx(idx);
+    appState.activeMedIdx = idx;
   }
 
   function handleAddMed() {
     if (medCards.length >= MAX_MED_CARDS) return;
     pushMedCard();
-    setActiveMedIdx(medCards.length - 1);
+    appState.activeMedIdx = medCards.length - 1;
   }
 
   function handleNewPatient() {
@@ -18,7 +18,7 @@
     }
   }
 
-  let activeIdx = $derived(getActiveMedIdx());
+  let activeIdx = $derived(appState.activeMedIdx);
   let result = $derived(getActiveResult());
 
   function getStatusDot(idx: number): { cls: string; text: string } {

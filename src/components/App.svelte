@@ -6,7 +6,7 @@
   import NurseView from './NurseView.svelte';
   import PrescribePanel from './PrescribePanel.svelte';
   import LongtermPanel from './LongtermPanel.svelte';
-  import { medCards, getNurseViewActive, setNurseViewActive, tickCurrentDate, clearAllMedState, getActiveMedIdx, getActiveResult, getPrescribeState, getCardStatus, _syncCardStatus, _textsVersion, getHasSummary } from '$lib/state.svelte';
+  import { medCards, appState, tickCurrentDate, clearAllMedState, getActiveResult, getPrescribeState, getCardStatus, _syncCardStatus, _textsVersion, getHasSummary } from '$lib/state.svelte';
   import { CHECK_INTERACTIONS } from '$lib/interactions';
   import { canRenewMed } from '$lib/prescribe-calc';
   import { VALID_THEMES } from '$lib/constants';
@@ -23,9 +23,9 @@
   let showInactivityToast = $derived(inactivityTimer.showToast);
   let inactivityCountdown = $derived(inactivityTimer.countdown);
 
-  let nurseActive = $derived(getNurseViewActive());
+  let nurseActive = $derived(appState.nurseViewActive);
   let result = $derived(getActiveResult());
-  let activeIdx = $derived(getActiveMedIdx());
+  let activeIdx = $derived(appState.activeMedIdx);
   let card = $derived(medCards[activeIdx] ?? null);
 
   let interactionWarnings = $derived.by(() => {
@@ -47,16 +47,16 @@
     decision: card.decision,
   }) : false);
 
-  let hasSummary = $derived(getHasSummary());
+  let hasSummaryDerived = $derived(getHasSummary());
 
-  let showPrescribe = $derived(prescribeVisible || hasSummary);
+  let showPrescribe = $derived(prescribeVisible || hasSummaryDerived);
 
   function handleTabChange(tab: 'renew' | 'longterm') {
     activeTab = tab;
   }
 
   function handleNurseToggle() {
-    setNurseViewActive(!nurseActive);
+    appState.nurseViewActive = !nurseActive;
   }
 
   function handleThemeChange(t: string) {
@@ -68,7 +68,7 @@
   }
 
   function handleEarlyDecision(decision: 'yes' | 'no') {
-    const idx = getActiveMedIdx();
+    const idx = appState.activeMedIdx;
     if (idx >= 0 && idx < medCards.length) {
       medCards[idx].decision = decision;
     }
@@ -106,7 +106,7 @@
   // som triggar Svelte 5:s iterationsgräns. Se Bug 3 i bugg-dokumentationen.
   $effect(() => {
     void _textsVersion();
-    void hasSummary;
+    void hasSummaryDerived;
     _syncCardStatus();
   });
 

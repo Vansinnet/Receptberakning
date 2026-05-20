@@ -117,11 +117,11 @@ const SEQUENCES: Scenario[] = [
   // Byt till: date 2025-04-15 (61d): avg=100/61=1.64 → overuse ✓
   {
     med: 'Waran 2.5 mg', date: '2025-04-15', dose: '1', amt: '100', ref: '1', left: '0', expected: 'valid',
-    extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.getActiveMedIdx()].decision = 'yes'; }); },
+    extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.appState.activeMedIdx].decision = 'yes'; }); },
   },
   {
     med: 'Metformin 500 mg', date: '2025-02-15', dose: '1', amt: '100', ref: '2', left: '5', expected: 'valid',
-    extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.getActiveMedIdx()].decision = 'yes'; }); },
+    extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.appState.activeMedIdx].decision = 'yes'; }); },
   },
 
   // ==================== 8× FÖR TIDIG FÖRNYELSE (isTooEarly) ====================
@@ -142,11 +142,11 @@ const SEQUENCES: Scenario[] = [
   // 35–36 Too early + klinisk override (förnya ändå)
   {
     med: 'Losartan 50 mg', date: '2025-05-15', dose: '1', amt: '100', ref: '3', left: '280', expected: 'valid',
-    extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.getActiveMedIdx()].decision = 'yes'; }); },
+    extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.appState.activeMedIdx].decision = 'yes'; }); },
   },
   {
     med: 'Omeprazol 20 mg', date: '2025-06-01', dose: '1', amt: '100', ref: '3', left: '290', expected: 'valid',
-    extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.getActiveMedIdx()].decision = 'yes'; }); },
+    extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.appState.activeMedIdx].decision = 'yes'; }); },
   },
 
   // 37–38 Låg dos — Waran varannan dag
@@ -181,9 +181,9 @@ const SEQUENCES: Scenario[] = [
     extra: async (p) => {
       await p.evaluate(async () => {
         const mod = await import('/src/lib/state.svelte.ts');
-        mod.setNurseViewActive(true);
-        mod.setNurseVitalNormal(true);
-        mod.setNurseFollowUpAdequate(true);
+        mod.appState.nurseViewActive = true;
+        mod.appState.nurseVitalNormal = true;
+        mod.appState.nurseFollowUpAdequate = true;
       });
       await p.waitForTimeout(150);
     },
@@ -193,7 +193,7 @@ const SEQUENCES: Scenario[] = [
     extra: async (p) => {
       await p.evaluate(async () => {
         const mod = await import('/src/lib/state.svelte.ts');
-        if (!mod.getNurseViewActive()) mod.setNurseViewActive(true);
+        if (!mod.appState.nurseViewActive) mod.appState.nurseViewActive = true;
       });
     },
   },
@@ -202,9 +202,9 @@ const SEQUENCES: Scenario[] = [
     extra: async (p) => {
       await p.evaluate(async () => {
         const mod = await import('/src/lib/state.svelte.ts');
-        mod.setNurseViewActive(false);
-        mod.setNurseVitalNormal(false);
-        mod.setNurseFollowUpAdequate(false);
+        mod.appState.nurseViewActive = false;
+        mod.appState.nurseVitalNormal = false;
+        mod.appState.nurseFollowUpAdequate = false;
       });
     },
   },
@@ -258,7 +258,7 @@ const SEQUENCES: Scenario[] = [
     extra: async (p) => {
       await p.evaluate(async () => {
         const mod = await import('/src/lib/state.svelte.ts');
-        const idx = mod.getActiveMedIdx();
+        const idx = mod.appState.activeMedIdx;
         if (idx >= 0 && idx < mod.medCards.length) {
           mod.medCards[idx].form.notCalculable = true;
         }
@@ -301,7 +301,7 @@ async function fillForm(page: Page, seq: number, s: Scenario, errors: LogEntry[]
     const patched = await page.evaluate(async ({ med, date, dose, doseInterval, amt, ref, left }) => {
       try {
         const mod = await import('/src/lib/state.svelte.ts');
-        const idx = mod.getActiveMedIdx();
+        const idx = mod.appState.activeMedIdx;
         if (idx < 0 || idx >= mod.medCards.length) return 'bad_idx:' + idx;
         const form = mod.medCards[idx].form;
         form.medRaw = med;
@@ -427,13 +427,13 @@ test.describe('Fuzz — 200 realistiska kliniska användningar', () => {
           await page.evaluate(async () => {
             const mod = await import('/src/lib/state.svelte.ts');
             mod.pushMedCard();
-            mod.setActiveMedIdx(mod.medCards.length - 1);
+            mod.appState.activeMedIdx = mod.medCards.length - 1;
           });
         } else {
           // Switch to card 0
           await page.evaluate(async () => {
             const mod = await import('/src/lib/state.svelte.ts');
-            mod.setActiveMedIdx(0);
+            mod.appState.activeMedIdx = 0;
           });
         }
       } else if (seq === 50) {

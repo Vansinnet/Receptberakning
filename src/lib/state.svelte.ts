@@ -55,17 +55,15 @@ function createEmptyCard(cardId: number): MedCard {
 }
 
 // =====================================================
-// WRAPPER-OBJEKT FÖR PRIMITIV $state (export-optimerad)
+// APP-STATE — exporterat $state-objekt för direkt access
 // =====================================================
 
-const _app = $state({
+export const appState = $state({
   nextCardId: 2,
   activeMedIdx: 0,
   nurseViewActive: false,
   nurseVitalNormal: false,
   nurseFollowUpAdequate: false,
-  // currentDate används för att trigga om $derived-kedjan vid midnattsbyte.
-  // Uppdateras av visibilitychange-handler i App.svelte.
   currentDate: new Date().toDateString(),
 });
 
@@ -77,7 +75,7 @@ export const medCards = $state<MedCard[]>([createEmptyCard(1)]);
 
 export function pushMedCard(): number | null {
   if (medCards.length >= MAX_MED_CARDS) return null;
-  const cardId = _app.nextCardId++;
+  const cardId = appState.nextCardId++;
   medCards.push(createEmptyCard(cardId));
   return cardId;
 }
@@ -89,33 +87,21 @@ export function spliceMedCard(i: number): void {
   _cardResultsCache.delete(removedCardId);
   delete _cardStatus[removedCardId];
   delete _prescribeState[removedCardId];
-  if (_app.activeMedIdx > i) {
-    _app.activeMedIdx -= 1;
-  } else if (_app.activeMedIdx >= medCards.length) {
-    _app.activeMedIdx = medCards.length - 1;
+  if (appState.activeMedIdx > i) {
+    appState.activeMedIdx -= 1;
+  } else if (appState.activeMedIdx >= medCards.length) {
+    appState.activeMedIdx = medCards.length - 1;
   }
 }
 
 // =====================================================
-// ACTIVE INDEX + NURSE
+// NURSE — RESET
 // =====================================================
 
-export function getActiveMedIdx(): number { return _app.activeMedIdx; }
-export function setActiveMedIdx(i: number): void { _app.activeMedIdx = i; }
-
-export function getNurseViewActive(): boolean { return _app.nurseViewActive; }
-export function setNurseViewActive(v: boolean): void { _app.nurseViewActive = v; }
-
-export function getNurseVitalNormal(): boolean { return _app.nurseVitalNormal; }
-export function setNurseVitalNormal(v: boolean): void { _app.nurseVitalNormal = v; }
-
-export function getNurseFollowUpAdequate(): boolean { return _app.nurseFollowUpAdequate; }
-export function setNurseFollowUpAdequate(v: boolean): void { _app.nurseFollowUpAdequate = v; }
-
 export function resetNurseState(): void {
-  _app.nurseViewActive = false;
-  _app.nurseVitalNormal = false;
-  _app.nurseFollowUpAdequate = false;
+  appState.nurseViewActive = false;
+  appState.nurseVitalNormal = false;
+  appState.nurseFollowUpAdequate = false;
 }
 
 // =====================================================
@@ -124,40 +110,38 @@ export function resetNurseState(): void {
 
 export function tickCurrentDate(): void {
   const newKey = new Date().toDateString();
-  if (_app.currentDate !== newKey) {
-    _app.currentDate = newKey;
+  if (appState.currentDate !== newKey) {
+    appState.currentDate = newKey;
   }
 }
 
 // =====================================================
-// $derived: VALIDERING
+// $derived: VALIDERING + BERÄKNING
 // =====================================================
 
 const _activeValidated = $derived.by(() => {
-  void _app.currentDate;
+  void appState.currentDate;
   return validateValues(
-    medCards[_app.activeMedIdx]?.form?.medRaw ?? '',
-    medCards[_app.activeMedIdx]?.form?.dateVal ?? '',
-    medCards[_app.activeMedIdx]?.form?.doseRaw ?? '',
-    medCards[_app.activeMedIdx]?.form?.amtRaw ?? '',
-    medCards[_app.activeMedIdx]?.form?.refRaw ?? '',
-    medCards[_app.activeMedIdx]?.form?.leftRaw ?? '',
-    String(medCards[_app.activeMedIdx]?.form?.doseInterval ?? 1),
-    medCards[_app.activeMedIdx]?.form?.doseUnit ?? 'st',
-    medCards[_app.activeMedIdx]?.form?.notCalculable ?? false,
+    medCards[appState.activeMedIdx]?.form?.medRaw ?? '',
+    medCards[appState.activeMedIdx]?.form?.dateVal ?? '',
+    medCards[appState.activeMedIdx]?.form?.doseRaw ?? '',
+    medCards[appState.activeMedIdx]?.form?.amtRaw ?? '',
+    medCards[appState.activeMedIdx]?.form?.refRaw ?? '',
+    medCards[appState.activeMedIdx]?.form?.leftRaw ?? '',
+    String(medCards[appState.activeMedIdx]?.form?.doseInterval ?? 1),
+    medCards[appState.activeMedIdx]?.form?.doseUnit ?? 'st',
+    medCards[appState.activeMedIdx]?.form?.notCalculable ?? false,
   );
 });
 
-export function getActiveValidated() {
-  return _activeValidated;
-}
+export function getActiveValidated() { return _activeValidated; }
 
-export function getActiveResult() {
-  return _activeResult;
-}
+const _activeResult = $derived(calcCore(_activeValidated));
+
+export function getActiveResult() { return _activeResult; }
 
 // =====================================================
-// PER-KORT RESULTATCACHE (från textorkestreringen)
+// $derived: TEXTORKESTRERING
 // =====================================================
 
 type CardStatusCache = {
@@ -168,30 +152,6 @@ type CardStatusCache = {
   daysToPrescribedEnd: number;
   prescribedEndDateStr: string;
 };
-
-// ════════════════════════════════════════════════════════════════════════════
-// ⚠ _cardResultsCache får ALDRIG göras till $state — feedback-loop-risk
-// (samma mönster som tidigare _cardStatusPrev, se git-loggen för detaljer).
-// ════════════════════════════════════════════════════════════════════════════
-let _cardStatus = $state<Record<number, CardStatusCache>>({});
-
-export function getCardStatus(cardId: number): CardStatusCache | undefined {
-  return _cardStatus[cardId];
-}
-
-export function getCachedResult(cardId: number): CardResult | null {
-  return _cardResultsCache.get(cardId)?.cr ?? null;
-}
-
-// =====================================================
-// $derived: BERÄKNING
-// =====================================================
-
-const _activeResult = $derived(calcCore(_activeValidated));
-
-// =====================================================
-// $derived: TEXTORKESTRERING (ersätter generateAndDistribute)
-// =====================================================
 
 interface TextResult {
   patientText: string;
@@ -210,6 +170,16 @@ export interface CardResult {
 // ⚠ Samma icke-reaktiva mönster som _cardStatusPrev ovan (feedback-loop-risken gäller även här).
 const _cardResultsCache = new Map<number, { fp: string; cr: CardResult | null; status: CardStatusCache }>();
 
+let _cardStatus = $state<Record<number, CardStatusCache>>({});
+
+export function getCardStatus(cardId: number): CardStatusCache | undefined {
+  return _cardStatus[cardId];
+}
+
+export function getCachedResult(cardId: number): CardResult | null {
+  return _cardResultsCache.get(cardId)?.cr ?? null;
+}
+
 let _lastPrescribeEnds: Record<number, string> = {};
 
 function _shallowEqualRecord(a: Record<number, string>, b: Record<number, string>): boolean {
@@ -220,7 +190,7 @@ function _shallowEqualRecord(a: Record<number, string>, b: Record<number, string
 }
 
 const _prescribeEnds = $derived.by((): Record<number, string> => {
-  void _app.currentDate;
+  void appState.currentDate;
   const newEnds: Record<number, string> = {};
   for (let i = 0; i < medCards.length; i++) {
     const cardId = medCards[i]._cardId;
@@ -288,7 +258,7 @@ function _computeAllCards(): {
     }
 
     const fp = [f.medRaw, f.dateVal, f.doseRaw, f.amtRaw, f.refRaw, f.leftRaw,
-      f.doseUnit, f.doseInterval, f.notCalculable, card.decision, _app.currentDate].join('\x00');
+      f.doseUnit, f.doseInterval, f.notCalculable, card.decision, appState.currentDate].join('\x00');
 
     const cached = _cardResultsCache.get(card._cardId);
     if (cached && cached.fp === fp) {
@@ -387,7 +357,7 @@ function _buildTextResult(
     patientText = patientTextEn = journalText = 'Ett internt fel uppstod vid textgenerering.';
   }
 
-  if (_app.nurseViewActive) {
+  if (appState.nurseViewActive) {
     const nurseJournalText = buildNurseJournalText(
       cardResults.map(cr => ({
         _cardId: cr.cardId, medRaw: cr.medNameStripped,
@@ -397,8 +367,8 @@ function _buildTextResult(
         consumptionPct: cr.calc.consumptionPct,
         decision: medCards.find(mc => mc._cardId === cr.cardId)?.decision ?? null,
       })),
-      _app.nurseVitalNormal,
-      _app.nurseFollowUpAdequate,
+      appState.nurseVitalNormal,
+      appState.nurseFollowUpAdequate,
     );
     return { patientText: '', patientTextEn: '', journalText: nurseJournalText, cardStatusUpdates, cacheUpdates };
   }
@@ -408,7 +378,7 @@ function _buildTextResult(
 
 const _texts = $derived.by((): TextResult => {
   try {
-    void _app.currentDate;
+    void appState.currentDate;
     const computed = _computeAllCards();
     if (computed.cardResults.length === 0) {
       return { patientText: '', patientTextEn: '', journalText: '', cardStatusUpdates: computed.cardStatusUpdates, cacheUpdates: computed.cacheUpdates };
@@ -454,13 +424,10 @@ export interface LTPeriod {
 
 export const ltPeriods = $state<LTPeriod[]>([{ start: '', total: 0, end: '' }]);
 
-let _ltMedRaw = $state('');
-let _ltDoseRaw = $state('');
-
-export function getLtMedRaw(): string { return _ltMedRaw; }
-export function setLtMedRaw(v: string): void { _ltMedRaw = v; }
-export function getLtDoseRaw(): string { return _ltDoseRaw; }
-export function setLtDoseRaw(v: string): void { _ltDoseRaw = v; }
+export const ltState = $state({
+  medRaw: '',
+  doseRaw: '',
+});
 
 export function setLtPeriodField(i: number, field: keyof LTPeriod, value: string): void {
   if (!ltPeriods[i]) return;
@@ -528,10 +495,6 @@ export function clearCardPrescribeState(cardId: number): void {
   delete _prescribeState[cardId];
 }
 
-export function getPrescribeEnds(): Record<number, string> {
-  return _prescribeEnds;
-}
-
 // =====================================================
 // ÅTERSTÄLLNING (pagehide / clearAll)
 // =====================================================
@@ -539,12 +502,12 @@ export function getPrescribeEnds(): Record<number, string> {
 export function clearAllMedState(): void {
   medCards.length = 0;
   medCards.push(createEmptyCard(1));
-  _app.activeMedIdx = 0;
-  _app.nextCardId = 2;
+  appState.activeMedIdx = 0;
+  appState.nextCardId = 2;
   clearPrescribeState();
   resetLtPeriods();
-  _ltMedRaw = '';
-  _ltDoseRaw = '';
+  ltState.medRaw = '';
+  ltState.doseRaw = '';
   resetNurseState();
   _cardResultsCache.clear();
   _cardStatus = {};

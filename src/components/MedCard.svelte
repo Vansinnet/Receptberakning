@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { medCards, getActiveMedIdx, getActiveValidated, clearCardPrescribeState } from '$lib/state.svelte';
+  import { medCards, appState, getActiveValidated, clearCardPrescribeState } from '$lib/state.svelte';
   import { loadDrugs, searchDrugs, getDrugByName, type DrugEntry } from '$lib/drug-search';
   import { getFassUrl, applyDateMask } from '$lib/utils';
   import { createAutocomplete } from '$lib/autocomplete.svelte';
   import FieldError from './FieldError.svelte';
 
-  let activeIdx = $derived(getActiveMedIdx());
+  let activeIdx = $derived(appState.activeMedIdx);
   let card = $derived(medCards[activeIdx] ?? null);
   let validated = $derived(getActiveValidated());
   let fieldErrors = $derived(!validated.valid && validated.fieldErrors ? validated.fieldErrors : null);
@@ -32,7 +32,7 @@
   });
 
   function handleClear() {
-    const idx = getActiveMedIdx();
+    const idx = appState.activeMedIdx;
     if (idx >= 0 && idx < medCards.length) {
       const cardId = medCards[idx]._cardId;
       medCards[idx].form = {

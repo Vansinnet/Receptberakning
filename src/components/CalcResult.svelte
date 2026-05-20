@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { CalcResult } from '$lib/types';
-  import { getActiveTexts, medCards, getActiveMedIdx, getPrescribeState, applyPrescribeStatePatch } from '$lib/state.svelte';
+  import { getActiveTexts, medCards, appState, getPrescribeState, applyPrescribeStatePatch } from '$lib/state.svelte';
   import { pctClass, copyToClipboard } from '$lib/utils';
   import { DAYS_REMAINING_WARN } from '$lib/constants';
   import Alert from './Alert.svelte';
@@ -11,7 +11,7 @@
     onDecision = (_decision: 'yes' | 'no') => {},
   } = $props();
 
-  let activeIdx = $derived(getActiveMedIdx());
+  let activeIdx = $derived(appState.activeMedIdx);
   let card = $derived(medCards[activeIdx] ?? null);
   let patientLang = $derived(card?.patientLang ?? 'sv');
   let psEntry = $derived(card ? getPrescribeState(card._cardId) : null);
@@ -22,7 +22,7 @@
   }
 
   function toggleLang() {
-    const idx = getActiveMedIdx();
+    const idx = appState.activeMedIdx;
     if (idx >= 0 && idx < medCards.length) {
       medCards[idx].patientLang = patientLang === 'sv' ? 'en' : 'sv';
     }
