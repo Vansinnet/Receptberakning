@@ -212,6 +212,22 @@ const _cardResultsCache = new Map<number, { fp: string; cr: CardResult | null; s
 
 let _lastPrescribeEnds: Record<number, string> = {};
 
+/**
+ * Härledd karta över förskrivningsslutdatum per kort.
+ *
+ * **Referensstabilitet:**
+ * Svelte 5 saknar `$derived.cache`. För att undvika onödiga omräkningar i
+ * nedströms `_texts` $derived används manuell referensstabilitetsjämförelse:
+ * om `newEnds` är identisk med `_lastPrescribeEnds` returneras den gamla
+ * referensen, vilket gör att `_texts` inte triggas i onödan.
+ *
+ * `_lastPrescribeEnds` är en closures-variabel (ej `$state`) — mutation av
+ * denna är säker eftersom den inte triggar reaktivitet. Endast returvärdet
+ * från denna $derived driver nedströms omräkningar.
+ *
+ * Relaterat: `_cardResultsCache` är en icke-reaktiv `Map` av samma skäl.
+ * Feedback-loop-risk: $state cache → derived → _texts → cache update → loop.
+ */
 const _prescribeEnds = $derived.by((): Record<number, string> => {
   void _app.currentDate;
   const newEnds: Record<number, string> = {};

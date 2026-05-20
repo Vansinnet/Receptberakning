@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { CalcResult } from '$lib/types';
   import { getActiveTexts, medCards, getActiveMedIdx, getPrescribeState, applyPrescribeStatePatch } from '$lib/state.svelte';
-  import { pctClass } from '$lib/utils';
+  import { pctClass, copyToClipboard } from '$lib/utils';
   import { DAYS_REMAINING_WARN } from '$lib/constants';
   import Alert from './Alert.svelte';
 
@@ -46,16 +46,15 @@
     activeTab = nurseViewActive ? 'journal' : 'patient';
   });
 
-  function copyText() {
+  async function copyText() {
     const body = activeTab === 'patient'
       ? (patientLang === 'en' ? texts.patientTextEn : texts.patientText)
       : texts.journalText;
-    if (body && navigator.clipboard) {
-      navigator.clipboard.writeText(body).then(() => {
-        copied = true;
-        if (copiedTimeout) clearTimeout(copiedTimeout);
-        copiedTimeout = setTimeout(() => { copied = false; }, 2000);
-      }).catch(() => {});
+    const ok = await copyToClipboard(body);
+    if (ok) {
+      copied = true;
+      if (copiedTimeout) clearTimeout(copiedTimeout);
+      copiedTimeout = setTimeout(() => { copied = false; }, 2000);
     }
   }
 </script>

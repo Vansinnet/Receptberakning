@@ -1,8 +1,9 @@
 <script lang="ts">
   import { medCards, getActiveMedIdx, getActiveValidated, clearCardPrescribeState } from '$lib/state.svelte';
   import { loadDrugs, searchDrugs, getDrugByName, type DrugEntry } from '$lib/drug-search';
-  import { getFassUrl } from '$lib/utils';
+  import { getFassUrl, applyDateMask } from '$lib/utils';
   import { MIN_SEARCH_QUERY_LENGTH } from '$lib/constants';
+  import FieldError from './FieldError.svelte';
 
   let activeIdx = $derived(getActiveMedIdx());
   let card = $derived(medCards[activeIdx] ?? null);
@@ -112,26 +113,9 @@
   let dateDisplay = $derived(card?.form?.dateVal ?? '');
 
   function handleDateInput(e: Event) {
-    const input = e.target as HTMLInputElement;
-    const originalVal = input.value;
-    let val = originalVal.replace(/\D/g, '').substring(0, 8);
-    if (val.length > 4) val = val.substring(0, 4) + '-' + val.substring(4);
-    if (val.length > 7) val = val.substring(0, 7) + '-' + val.substring(7);
-    const sel = input.selectionStart ?? 0;
-    const digitsBefore = originalVal.substring(0, sel).replace(/\D/g, '').length;
-    if (card) card.form.dateVal = val;
-    if (val !== originalVal) {
-      let newPos = 0, count = 0;
-      for (let i = 0; i < val.length; i++) {
-        if (/\d/.test(val[i])) count++;
-        if (count === digitsBefore) { newPos = i + 1; break; }
-      }
-      if (count < digitsBefore) newPos = val.length;
-      const target = newPos;
-      requestAnimationFrame(() => {
-        try { input.setSelectionRange(target, target); } catch (_) {}
-      });
-    }
+    applyDateMask(e.target as HTMLInputElement, (val) => {
+      if (card) card.form.dateVal = val;
+    });
   }
 
 </script>
@@ -177,11 +161,7 @@
             {/each}
           </div>
         {/if}
-      {#if fieldErrors?.medInput}
-        <span class="field-error-msg visible" aria-live="polite">{fieldErrors.medInput}</span>
-      {:else}
-        <span class="field-error-msg"></span>
-      {/if}
+      <FieldError error={fieldErrors?.medInput} />
     </div>
 
     <div class="field">
@@ -194,11 +174,7 @@
         class:input-error={!!(fieldErrors?.dateInput)}
         aria-invalid={!!(fieldErrors?.dateInput)}
       />
-      {#if fieldErrors?.dateInput}
-        <span class="field-error-msg visible" aria-live="polite">{fieldErrors.dateInput}</span>
-      {:else}
-        <span class="field-error-msg"></span>
-      {/if}
+      <FieldError error={fieldErrors?.dateInput} />
     </div>
 
     <div class="form-row-2 form-row-2-uneven">
@@ -218,11 +194,7 @@
             <option value={30}>per månad</option>
           </select>
         </div>
-        {#if fieldErrors?.doseInput}
-          <span class="field-error-msg visible" aria-live="polite">{fieldErrors.doseInput}</span>
-        {:else}
-          <span class="field-error-msg"></span>
-        {/if}
+        <FieldError error={fieldErrors?.doseInput} />
       </div>
       <div class="field">
         <label for="amtInput" data-tooltip="Mängd per förpackning (expediering).">Förpackningsstorlek</label>
@@ -232,11 +204,7 @@
           class:input-error={!!(fieldErrors?.amtInput)}
           aria-invalid={!!(fieldErrors?.amtInput)}
         />
-        {#if fieldErrors?.amtInput}
-          <span class="field-error-msg visible" aria-live="polite">{fieldErrors.amtInput}</span>
-        {:else}
-          <span class="field-error-msg"></span>
-        {/if}
+        <FieldError error={fieldErrors?.amtInput} />
       </div>
     </div>
 
@@ -248,11 +216,7 @@
         class:input-error={!!(fieldErrors?.refInput)}
         aria-invalid={!!(fieldErrors?.refInput)}
       />
-      {#if fieldErrors?.refInput}
-        <span class="field-error-msg visible" aria-live="polite">{fieldErrors.refInput}</span>
-      {:else}
-        <span class="field-error-msg"></span>
-      {/if}
+      <FieldError error={fieldErrors?.refInput} />
     </div>
 
     <div class="field field-optional">
@@ -263,11 +227,7 @@
         class:input-error={!!(fieldErrors?.leftInput)}
         aria-invalid={!!(fieldErrors?.leftInput)}
       />
-      {#if fieldErrors?.leftInput}
-        <span class="field-error-msg visible" aria-live="polite">{fieldErrors.leftInput}</span>
-      {:else}
-        <span class="field-error-msg"></span>
-      {/if}
+      <FieldError error={fieldErrors?.leftInput} />
       <span class="field-hint">Ger exaktare snittberäkning om patienten uppger kvarvarande mängd</span>
     </div>
 {:else}

@@ -9,16 +9,18 @@
   import { medCards, getNurseViewActive, setNurseViewActive, tickCurrentDate, clearAllMedState, getActiveMedIdx, getActiveResult, getPrescribeState, getCardStatus, _syncCardStatus, _textsVersion, getHasSummary } from '$lib/state.svelte';
   import { CHECK_INTERACTIONS } from '$lib/interactions';
   import { canRenewMed } from '$lib/prescribe-calc';
-  import { INACTIVITY_WARN_MS, INACTIVITY_COUNTDOWN_SEC, COUNTDOWN_TICK_MS, ACTIVITY_RESET_DEBOUNCE_MS, VALID_THEMES } from '$lib/constants';
+  import { VALID_THEMES } from '$lib/constants';
+  import { createInactivityTimer } from '$lib/inactivity.svelte';
 
   let activeTab = $state<'renew' | 'longterm'>('renew');
   let theme = $state('klinisk');
 
-  let inactivityWarnTimer: ReturnType<typeof setTimeout> | null = null;
-  let inactivityCountdownTimer: ReturnType<typeof setInterval> | null = null;
-  let lastActivityTs = 0;
-  let inactivityCountdown = $state(INACTIVITY_COUNTDOWN_SEC);
-  let showInactivityToast = $state(false);
+  const inactivityTimer = createInactivityTimer(
+    () => clearAllMedState(),
+    () => medCards.some(c => c.form.medRaw !== ''),
+  );
+  let showInactivityToast = $derived(inactivityTimer.showToast);
+  let inactivityCountdown = $derived(inactivityTimer.countdown);
 
   let nurseActive = $derived(getNurseViewActive());
   let result = $derived(getActiveResult());
@@ -81,38 +83,6 @@
     clearAllMedState();
   }
 
-  function resetInactivityTimer() {
-    if (inactivityWarnTimer) clearTimeout(inactivityWarnTimer);
-    if (inactivityCountdownTimer) clearInterval(inactivityCountdownTimer);
-    showInactivityToast = false;
-
-    const hasData = medCards.some(c => c.form.medRaw !== '');
-    if (!hasData) return;
-
-    inactivityCountdown = INACTIVITY_COUNTDOWN_SEC;
-    inactivityWarnTimer = setTimeout(() => {
-      showInactivityToast = true;
-      inactivityCountdownTimer = setInterval(() => {
-        inactivityCountdown--;
-        if (inactivityCountdown <= 0) {
-          if (inactivityCountdownTimer) clearInterval(inactivityCountdownTimer);
-          clearAllMedState();
-        }
-      }, COUNTDOWN_TICK_MS);
-    }, INACTIVITY_WARN_MS);
-  }
-
-  function handleActivity() {
-    const now = Date.now();
-    if (now - lastActivityTs < ACTIVITY_RESET_DEBOUNCE_MS) return;
-    lastActivityTs = now;
-    resetInactivityTimer();
-  }
-
-  function dismissInactivityToast() {
-    resetInactivityTimer();
-  }
-
   $effect(() => {
     if (typeof document !== 'undefined') {
       document.documentElement.setAttribute('data-theme', theme);
@@ -143,24 +113,16 @@
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', onVisibilityChange);
       window.addEventListener('pagehide', onPageHide);
-      document.addEventListener('mousemove', handleActivity);
-      document.addEventListener('keydown', handleActivity);
-      document.addEventListener('pointerdown', handleActivity);
       return () => {
         document.removeEventListener('visibilitychange', onVisibilityChange);
         window.removeEventListener('pagehide', onPageHide);
-        document.removeEventListener('mousemove', handleActivity);
-        document.removeEventListener('keydown', handleActivity);
-        document.removeEventListener('pointerdown', handleActivity);
-        if (inactivityWarnTimer) clearTimeout(inactivityWarnTimer);
-        if (inactivityCountdownTimer) clearInterval(inactivityCountdownTimer);
       };
     }
   });
 
   $effect(() => {
     void medCards.length;
-    resetInactivityTimer();
+    inactivityTimer.reset();
   });
 
   // Notera: hålls separat från _syncCardStatus-effekten ovan —
@@ -171,17 +133,6 @@
       if (status?.valid === false && medCards[i].decision !== null) {
         medCards[i].decision = null;
       }
-    }
-  });
-
-  // Nollställ inaktivitetstimers när alla kort rensats
-  $effect(() => {
-    medCards;
-    const hasData = medCards.some(c => c.form.medRaw !== '');
-    if (!hasData) {
-      if (inactivityWarnTimer) clearTimeout(inactivityWarnTimer);
-      if (inactivityCountdownTimer) clearInterval(inactivityCountdownTimer);
-      showInactivityToast = false;
     }
   });
 </script>
@@ -296,7 +247,7 @@
     <div class="inactivity-toast" role="alert" aria-live="assertive">
       <span class="toast-icon" aria-hidden="true">⏰</span>
       <span>Inaktivitet — sessionen rensas om <strong>{inactivityCountdown}s</strong></span>
-      <button class="btn btn-ghost" onclick={dismissInactivityToast}>Fortsätt</button>
+      <button class="btn btn-ghost" onclick={() => inactivityTimer.dismiss()}>Fortsätt</button>
     </div>
   {/if}
 <!-- /BOUNDARY -->

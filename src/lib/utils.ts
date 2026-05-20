@@ -92,3 +92,35 @@ export function pctClass(pct: number, prefix: string): string {
   const step = Math.round(Math.min(100, Math.max(0, pct)) / PROGRESS_BAR_STEP_PCT) * PROGRESS_BAR_STEP_PCT;
   return `${prefix}${step}`;
 }
+
+export async function copyToClipboard(text: string): Promise<boolean> {
+  if (!text || !navigator.clipboard) return false;
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function applyDateMask(input: HTMLInputElement, onChanged: (val: string) => void): void {
+  const originalVal = input.value;
+  let val = originalVal.replace(/\D/g, '').substring(0, 8);
+  if (val.length > 4) val = val.substring(0, 4) + '-' + val.substring(4);
+  if (val.length > 7) val = val.substring(0, 7) + '-' + val.substring(7);
+  const sel = input.selectionStart ?? 0;
+  const digitsBefore = originalVal.substring(0, sel).replace(/\D/g, '').length;
+  onChanged(val);
+  if (val !== originalVal) {
+    let newPos = 0, count = 0;
+    for (let i = 0; i < val.length; i++) {
+      if (/\d/.test(val[i])) count++;
+      if (count === digitsBefore) { newPos = i + 1; break; }
+    }
+    if (count < digitsBefore) newPos = val.length;
+    const target = newPos;
+    requestAnimationFrame(() => {
+      try { input.setSelectionRange(target, target); } catch (_) {}
+    });
+  }
+}

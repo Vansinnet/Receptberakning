@@ -1,9 +1,10 @@
 <script lang="ts">
   import { ltPeriods, pushLtPeriod, spliceLtPeriod, resetLtPeriods, getLtMedRaw, setLtMedRaw, getLtDoseRaw, setLtDoseRaw, setLtPeriodField } from '$lib/state.svelte';
   import { calcLongtermCore } from '$lib/calc-longterm';
-  import { pctClass } from '$lib/utils';
+  import { pctClass, applyDateMask, copyToClipboard } from '$lib/utils';
   import { getDrugByName } from '$lib/drug-search';
   import { MAX_LT_PERIODS, LT_BAR_TEXT_THRESHOLD_PCT } from '$lib/constants';
+  import FieldError from './FieldError.svelte';
   import type { LTResult, LTCardPeriod } from '$lib/types';
 
   let medRaw = $derived(getLtMedRaw());
@@ -25,28 +26,11 @@
   }
 
   function handleDateInput(field: 'start' | 'end', idx: number, e: Event) {
-    const input = e.target as HTMLInputElement;
-    const originalVal = input.value;
-    let val = originalVal.replace(/\D/g, '').substring(0, 8);
-    if (val.length > 4) val = val.substring(0, 4) + '-' + val.substring(4);
-    if (val.length > 7) val = val.substring(0, 7) + '-' + val.substring(7);
-    const sel = input.selectionStart ?? 0;
-    const digitsBefore = originalVal.substring(0, sel).replace(/\D/g, '').length;
-    if (ltPeriods[idx]) {
-      ltPeriods[idx][field] = val;
-    }
-    if (val !== originalVal) {
-      let newPos = 0, count = 0;
-      for (let i = 0; i < val.length; i++) {
-        if (/\d/.test(val[i])) count++;
-        if (count === digitsBefore) { newPos = i + 1; break; }
+    applyDateMask(e.target as HTMLInputElement, (val) => {
+      if (ltPeriods[idx]) {
+        ltPeriods[idx][field] = val;
       }
-      if (count < digitsBefore) newPos = val.length;
-      const target = newPos;
-      requestAnimationFrame(() => {
-        try { input.setSelectionRange(target, target); } catch (_) {}
-      });
-    }
+    });
   }
 
   let ordDose = $derived.by(() => {
@@ -65,14 +49,13 @@
   let ltCopied = $state(false);
   let ltCopiedTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  function copyLtText() {
+  async function copyLtText() {
     const text = result.journalText ?? '';
-    if (text && navigator.clipboard) {
-      navigator.clipboard.writeText(text).then(() => {
-        ltCopied = true;
-        if (ltCopiedTimeout) clearTimeout(ltCopiedTimeout);
-        ltCopiedTimeout = setTimeout(() => { ltCopied = false; }, 2000);
-      }).catch(() => {});
+    const ok = await copyToClipboard(text);
+    if (ok) {
+      ltCopied = true;
+      if (ltCopiedTimeout) clearTimeout(ltCopiedTimeout);
+      ltCopiedTimeout = setTimeout(() => { ltCopied = false; }, 2000);
     }
   }
 
@@ -109,11 +92,7 @@
           <div class="field">
             <label for="lt-dose" data-tooltip="Patientens ordinerade dygnsdos i enheter per dag.">Ordinerad dos (enheter/dag)</label>
             <input id="lt-dose" type="text" inputmode="decimal" placeholder="T.ex. 1" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value={doseRaw} oninput={(e) => setLtDoseRaw((e.target as HTMLInputElement).value)} class:input-error={doseInvalid} aria-invalid={doseInvalid} />
-            {#if doseInvalid}
-              <span class="field-error-msg visible">Ange ett positivt tal</span>
-            {:else}
-              <span class="field-error-msg"></span>
-            {/if}
+            <FieldError error={doseInvalid ? 'Ange ett positivt tal' : ''} />
           </div>
         </div>
 
@@ -127,33 +106,21 @@
                 <div class="field">
                   <label for="lt-start-{i}" data-tooltip="Startdatum för perioden.">Startdatum</label>
                   <input id="lt-start-{i}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" maxlength="10" autocomplete="off" value={period.start} oninput={(e) => handleDateInput('start', i, e)} class:input-error={pe?.startError} aria-invalid={pe?.startError} />
-                  {#if pe?.startError}
-                    <span class="field-error-msg visible">Ogiltigt datum</span>
-                  {:else}
-                    <span class="field-error-msg"></span>
-                  {/if}
+                   <FieldError error={pe?.startError ? 'Ogiltigt datum' : ''} />
                 </div>
                 <div class="field">
                   <label for="lt-total-{i}" data-tooltip="Totalt antal enheter uttagna under perioden.">Antal uttagna enheter</label>
                   <input id="lt-total-{i}" type="number" placeholder="100" min="1" step="1" value={period.total} oninput={(e) => setLtPeriodField(i, 'total', (e.target as HTMLInputElement).value)} class:input-error={!!pe?.totalError} aria-invalid={!!pe?.totalError} />
-                  {#if pe?.totalError}
-                    <span class="field-error-msg visible">Ange ett positivt heltal</span>
-                  {:else}
-                    <span class="field-error-msg"></span>
-                  {/if}
+                  <FieldError error={pe?.totalError ? 'Ange ett positivt heltal' : ''} />
                 </div>
                 <div class="field">
                   <label for="lt-end-{i}" data-tooltip="Slutdatum för perioden.">Slutdatum</label>
                   <input id="lt-end-{i}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" maxlength="10" autocomplete="off" value={period.end} oninput={(e) => handleDateInput('end', i, e)} class:input-error={pe?.endError} aria-invalid={pe?.endError} />
-                  {#if pe?.endError}
-                    <span class="field-error-msg visible">Slutdatum måste vara efter startdatum och ej i framtiden</span>
-                  {:else}
-                    <span class="field-error-msg"></span>
-                  {/if}
+                  <FieldError error={pe?.endError ? 'Slutdatum måste vara efter startdatum och ej i framtiden' : ''} />
                 </div>
               </div>
               {#if pe?.spanError}
-                <span class="field-error-msg visible">Periodens längd är orimlig — kontrollera start- och slutdatum.</span>
+                <FieldError error="Periodens längd är orimlig — kontrollera start- och slutdatum." />
               {/if}
               {#if i > 0}
                 <button type="button" class="btn btn-ghost btn-remove-period" data-action="remove-period" data-idx={i} data-tooltip="Ta bort denna period." onclick={() => handleRemovePeriod(i)}>✕ Ta bort period {i + 1}</button>

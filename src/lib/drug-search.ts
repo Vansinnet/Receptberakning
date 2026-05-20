@@ -28,19 +28,23 @@ let _drugList: DrugEntry[] | null = null;
 let _drugMap: Map<string, DrugEntry> | null = null;
 let _drugListLower: string[] | null = null;
 let _loadPromise: Promise<void> | null = null;
+let _dbPromise: Promise<IDBDatabase> | null = null;
 
-function openDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 1);
-    req.onupgradeneeded = () => { req.result.createObjectStore(STORE_NAME); };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
+function getDB(): Promise<IDBDatabase> {
+  if (!_dbPromise) {
+    _dbPromise = new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = () => { req.result.createObjectStore(STORE_NAME); };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  return _dbPromise;
 }
 
 async function loadFromCache(): Promise<CacheData | null> {
   try {
-    const db = await openDB();
+    const db = await getDB();
     return new Promise((resolve) => {
       const tx = db.transaction(STORE_NAME, 'readonly');
       const req = tx.objectStore(STORE_NAME).get(CACHE_NAME);
@@ -66,7 +70,7 @@ async function fetchAndCache(serverVersion: number): Promise<DrugEntry[]> {
   if (!resp.ok) throw new Error(`drugs.json: ${resp.status}`);
   const entries = await resp.json();
   if (!Array.isArray(entries)) throw new Error('drugs.json: unexpected format');
-  openDB().then(db => {
+  getDB().then(db => {
       try {
         const tx = db.transaction(STORE_NAME, 'readwrite');
         const store = tx.objectStore(STORE_NAME);
