@@ -1,6 +1,6 @@
 ﻿# Receptberäkning 4.0
 
-> Beräkningshjälpmedel för läkare vid handläggning av receptförnyelser via 1177, nyförskrivning samt analys av långvarig förbrukning.
+> Beräkningshjälpmedel för läkare vid handläggning av receptförnyelser via 1177. Verktyget beräknar förbrukning och slutsiffror — läkaren fattar alla kliniska beslut.
 
 **Live:** [receptberakning.pages.dev](https://receptberakning.pages.dev/)
 
@@ -15,14 +15,13 @@
 Verktyget består av två huvudflikar:
 
 ### 1. 💊 Receptförnyelse
-Läkaren matar in ordinationsinformation (läkemedel + styrka, senaste receptdatum, mängd per uttag, antal uttag och ordinerad dos). Verktyget beräknar patientens förbrukningstakt och bedömer om förnyelse är lämplig.
+Läkaren matar in ordinationsinformation (läkemedel + styrka, senaste receptdatum, mängd per uttag, antal uttag och ordinerad dos). Verktyget beräknar patientens förbrukningstakt och visar resultatet med färgindikatorer:
 
-Baserat på beräkningen visas ett **utlåtande** med:
-- **OK att förnya** – förbrukning inom ±10 % av ordination, eller ≤20 % av receptperioden kvar.
-- **För tidigt att förnya** – normal förbrukning men mer än 20 % av receptperioden kvar.
-- **Överförbrukning** – snittförbrukning >10 % över ordinerad dos och (mer än 7 dosdagar kvar *eller* mer än 14 perioddagar kvar).
+- **Snittförbrukning** — grön vid 80–110% av ordinerad dos, gul annars.
+- **Räcker t.o.m.** — grön om <14 dagar kvar (eller slut), gul om ≥14 dagar kvar.
+- **Datakontroll** — varning vid >2.5× ordinerad dos.
 
-För överförbrukning eller för tidig förnyelse kan läkaren **aktivt överstyra** via knapparna **Ja, förnya** / **Nej, avslå**. Detta påverkar både statusfärg, sidomeny och de genererade texterna.
+Läkaren fattar alltid det **kliniska beslutet** via knapparna **Förnya / Avslå** som visas för varje läkemedel. Vid "Förnya" på recept med ≥14 dagar kvar får läkaren en följdfråga om förpackningsberäkningen ska utgå från dagens datum eller beräknat slutdatum.
 
 För varje läkemedel genereras direkt:
 - **Svar till patient (svenska)** – redo att skickas via 1177.
@@ -59,8 +58,8 @@ Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder
 - **Narkotikavarning** – identifierar narkotikaklassade preparat enligt LVFS 2011:10 och visar en badge (Förteckning II–V).
 - **Tidslinje** – visar hur stor del av receptperioden som förflutit.
 - **Mätvärden** med verktygstips (totalt förskrivet, slutdatum, snittförbrukning i aktuell enhet).
-- **Alerter** – varning vid låg förbrukning, förhöjd förbrukning inom 7 dagar, tidig uthämtning, avvikande data.
-- **Kliniskt överstyrande** – vid överförbrukning eller för tidig begäran kan läkaren manuellt godkänna förnyelse (Ja/Nej). Beslutet bevaras vid kortväxling.
+- **Alerter** – varning vid ingen förbrukning registrerad, datakontroll (>2.5× dos), tidig uthämtning.
+- **Kliniskt beslut** – läkaren väljer Förnya eller Avslå för varje läkemedel. Vid Förnya med ≥14 dagar kvar: följdfråga om förskrivning ska räknas från dagens datum eller receptets slutdatum.
 - **Svar till patient på svenska och engelska** – växla med SVG-flaggor, ingen översättningstjänst krävs.
 - **Journalanteckning** – anpassas efter förnyelsebeslut och klinisk bedömning.
 - **Interaktionsvarningar** – 89 regler fördelade på kategorier: serotonergt syndrom, blödningsrisk, hyperkalemi, bradykardi/AV-block, smal terapeutisk bredd, CYP-interaktioner, QT-förlängning, triple whammy, psykofarmaka och övriga. Varningarna graderas danger/warn med beskrivning och åtgärdsrekommendation.
@@ -183,18 +182,18 @@ Bör köras kvartalsvis eller vid större förändringar i FASS sortiment.
 
 ## Genererade texter – exempel
 
-**OK att förnya – svar till patient (sv)**
-> Vi har tagit emot din begäran på Elvanse 50 mg och kommer att förnya ditt recept inom 2–3 arbetsdagar. Du kan därefter hämta ut din medicin på valfritt apotek.
+**Förnya – svar till patient (sv)**
+> Vi har tagit emot din förfrågan om receptförnyelse för Sertralin 50 mg. Vi förnyar ditt recept så att det räcker till 2025-12-15. Du kan inom 2–3 arbetsdagar hämta ut det på valfritt apotek.
 
-**För tidigt – svar till patient (sv)**
-> Vi har tagit emot din förfrågan om receptförnyelse för Elvanse 50 mg. Enligt din ordination (1 st/dag) beräknas medicinen räcka till den 2025-06-14. Eftersom det datumet inte ännu har passerat kan vi inte förnya receptet just nu. Vänligen hör av dig igen runt den 2025-06-07 så hjälper vi dig då med nytt recept.
+**Avslå – svar till patient (sv)**
+> Vi har tagit emot din förfrågan. Nuvarande recept beräknas räcka t.o.m. 2025-12-31. Hör av dig närmare 2025-12-24. Vi kan tyvärr inte förnya receptet vid detta tillfälle efter klinisk individuell bedömning av läkare.
 
-**Överförbrukning – journalanteckning (efter klinisk bedömning)**
+**Förnya – journalanteckning**
 > Kontaktorsak: Receptförnyelse via 1177.
 >
-> Bedömning: Patienten begär förnyelse av Elvanse 50 mg. Senaste receptet utfärdades 2025-01-15 (totalt 300 doser, ordination 1 st/dag) och borde räcka till 2025-11-12. Beräknad snittförbrukning: 1,72 st/dag (beräknat på faktisk förbrukning…) – överstiger ordination. Receptet förnyas på klinisk indikation.
+> Bedömning: Patienten begär förnyelse av Sertralin 50 mg. Senaste receptet utfärdades 2025-01-15 (totalt 300 st, ordination 1 st/dag) och beräknas räcka till 2025-11-12 (180 dagar kvar). Snittförbrukning: 1.00 st/dag (50.0 mg/dag) (beräknat under antagandet att alla förskrivna st är förbrukade) (100.0% av ordinerad dos).
 >
-> Åtgärd: Nytt recept utfärdat (räcker t.o.m. 2025-12-15). Svar skickat till patient via 1177.
+> Åtgärd: Förnyat så att läkemedlet räcker till 2026-06-15.
 
 ---
 
