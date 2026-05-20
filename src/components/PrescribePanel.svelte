@@ -100,7 +100,7 @@
   let hasSummary = $derived(getHasSummary());
 </script>
 
-<section class="prescribe-panel" class:is-hidden={!visible && !hasSummary} aria-label="Ny förskrivning">
+<section class="prescribe-panel" class:is-hidden={!visible} aria-label="Ny förskrivning">
   <!-- Duration -->
     <div id="prescribeDuration">
       <div class="prescribe-mode-toggle">
