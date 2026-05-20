@@ -180,7 +180,7 @@ export function getCachedResult(cardId: number): CardResult | null {
   return _cardResultsCache.get(cardId)?.cr ?? null;
 }
 
-let _lastPrescribeEnds: Record<number, string> = {};
+let _prescribeEndsState = $state<Record<number, string>>({});
 
 function _shallowEqualRecord(a: Record<number, string>, b: Record<number, string>): boolean {
   const aKeys = Object.keys(a);
@@ -189,8 +189,7 @@ function _shallowEqualRecord(a: Record<number, string>, b: Record<number, string
   return aKeys.every(k => a[Number(k)] === b[Number(k)]);
 }
 
-const _prescribeEnds = $derived.by((): Record<number, string> => {
-  void appState.currentDate;
+function _recomputePrescribeEnds(): void {
   const newEnds: Record<number, string> = {};
   for (let i = 0; i < medCards.length; i++) {
     const cardId = medCards[i]._cardId;
@@ -208,25 +207,23 @@ const _prescribeEnds = $derived.by((): Record<number, string> => {
     const pr = calcPrescribeResult(s, ps);
     if (pr?.endDateStr) newEnds[cardId] = pr.endDateStr;
   }
-  if (_shallowEqualRecord(newEnds, _lastPrescribeEnds)) return _lastPrescribeEnds;
-  _lastPrescribeEnds = newEnds;
-  return newEnds;
-});
+  if (!_shallowEqualRecord(newEnds, _prescribeEndsState)) {
+    _prescribeEndsState = newEnds;
+  }
+}
 
 // ════════════════════════════════════════════════════════════════════════════
-// DERIVED-FLÖDE (medveten 1-cykels staleness):
+// DERIVED-FLÖDE (1-cykels staleness):
 //
 //   formulärändring
 //     → _texts $derived.by (använder stale _cardResultsCache, icke-reaktiv Map)
-//     → _textsGen ändras → $effect kör _syncCardStatus()
+//     → _texts ändras → $effect kör _syncCardStatus()
 //     → _cardResultsCache + _cardStatus uppdateras
-//     → _prescribeEnds $derived.by läser uppdaterad cache → nytt värde
-//     → _texts räknas om igen (nu med aktuella prescribeEnds)
+//     → _recomputePrescribeEnds() körs → _prescribeEndsState uppdateras ($state!)
+//     → _texts räknas om igen (reaktiv trigger via _prescribeEndsState)
 //
-// Detta ger en andra omräkning av _texts per formulärändring men bryter
-// feedback-loopen som annars uppstår om _cardResultsCache vore reaktiv.
-// Första renderingen visar texter med tomma prescribe-slutdatum, andra
-// renderingen visar korrekta. Acceptabelt för max 8 kort.
+//   Feedback-loop förhindras av _shallowEqualRecord i _recomputePrescribeEnds:
+//   andra anropet skriver samma data → ingen $state-ändring → loop bryts.
 // ════════════════════════════════════════════════════════════════════════════
 
 interface CardsForTextEntry {
@@ -328,7 +325,7 @@ function _buildTextResult(
   cardStatusUpdates: TextResult['cardStatusUpdates'],
   cacheUpdates: TextResult['cacheUpdates'],
 ): TextResult {
-  const prescribeEnds = _prescribeEnds;
+  const prescribeEnds = _prescribeEndsState;
   const validCount = cardResults.length;
 
   const ptCards = cardsForText.map(c => {
@@ -405,6 +402,7 @@ export function _syncCardStatus(): void {
   for (const c of caches) {
     _cardResultsCache.set(c.cardId, c.entry);
   }
+  _recomputePrescribeEnds();
 }
 
 export function _textsVersion(): number {
@@ -511,7 +509,7 @@ export function clearAllMedState(): void {
   resetNurseState();
   _cardResultsCache.clear();
   _cardStatus = {};
-  _lastPrescribeEnds = {};
+  _prescribeEndsState = {};
 }
 
 const _hasSummary = $derived.by(() => {
