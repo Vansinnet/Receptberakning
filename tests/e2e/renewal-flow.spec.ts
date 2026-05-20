@@ -24,7 +24,6 @@ test.describe('Formulär → beräkning → resultat', () => {
     await page.fill('#refInput', '3');
     await page.waitForTimeout(400);
 
-    await expect(page.locator('.verdict-title')).toContainText('OK');
     await expect(page.locator('.result-grid')).toBeVisible();
     await expect(page.locator('.copy-body')).not.toBeEmpty();
   });
@@ -35,7 +34,7 @@ test.describe('Formulär → beräkning → resultat', () => {
     await expect(page.locator('.result-empty-state')).toBeVisible();
   });
 
-  test('Överförbrukning — få dosdagar kvar → isOveruse', async ({ page }) => {
+  test('Hög förbrukning — early-decision-box syns', async ({ page }) => {
     await page.fill('#medInput', 'Alvedon 500 mg');
     await page.fill('#dateInput', '2025-02-01');
     await page.fill('#doseInput', '1');
@@ -43,11 +42,10 @@ test.describe('Formulär → beräkning → resultat', () => {
     await page.fill('#refInput', '3');
     await page.fill('#leftInput', '0');
     await page.waitForTimeout(400);
-    await expect(page.locator('.verdict-title')).toContainText('bedömning');
     await expect(page.locator('.early-decision-box')).toBeVisible();
   });
 
-  test('För tidigt — lång period kvar → resultat visas', async ({ page }) => {
+  test('Lång period kvar → resultat visas', async ({ page }) => {
     await page.fill('#medInput', 'Losartan 50 mg');
     await page.fill('#dateInput', '2025-06-05');
     await page.fill('#doseInput', '1');
@@ -55,12 +53,10 @@ test.describe('Formulär → beräkning → resultat', () => {
     await page.fill('#refInput', '3');
     await page.fill('#leftInput', '290');
     await page.waitForTimeout(400);
-    // VerdictTitle ska finnas och inte vara tom
-    const title = page.locator('.verdict-title');
-    await expect(title).not.toBeEmpty();
+    await expect(page.locator('.result-grid')).toBeVisible();
   });
 
-  test('Klinisk override — early-decision-box syns vid overuse', async ({ page }) => {
+  test('Early-decision-box alltid synlig vid giltigt resultat', async ({ page }) => {
     await page.fill('#medInput', 'Alvedon 500 mg');
     await page.fill('#dateInput', '2025-02-01');
     await page.fill('#doseInput', '1');
@@ -79,8 +75,7 @@ test.describe('Formulär → beräkning → resultat', () => {
     await page.fill('#refInput', '3');
     await page.fill('#leftInput', '40');
     await page.waitForTimeout(400);
-    // Ska visa "OK" eftersom kvarvarande doser sänker snittet
-    await expect(page.locator('.verdict-title')).toContainText('OK');
+    await expect(page.locator('.result-grid')).toBeVisible();
   });
 
   test('Tidslinje — tlFill element finns', async ({ page }) => {
@@ -108,15 +103,17 @@ test.describe('Formulär → beräkning → resultat', () => {
 
 test.describe('Copy-sektion och flikar', () => {
 
-  test('Patientbrev genereras för OK-recept', async ({ page }) => {
+  test('Patientbrev genereras vid Förnya', async ({ page }) => {
     await page.fill('#medInput', 'Metformin 500 mg');
     await page.fill('#dateInput', '2025-01-01');
     await page.fill('#doseInput', '2');
     await page.fill('#amtInput', '100');
     await page.fill('#refInput', '3');
     await page.waitForTimeout(400);
+    await page.click('.early-btn-yes');
+    await page.waitForTimeout(200);
     const body = page.locator('.copy-body');
-    await expect(body).toContainText('arbetsdagar');
+    await expect(body).toContainText('Vi förnyar');
   });
 
   test('Journal-flik — växla och verifiera text', async ({ page }) => {

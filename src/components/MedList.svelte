@@ -29,20 +29,14 @@
       if (!cs) return { cls: '', text: '—' };
       if (!cs.valid) return { cls: '', text: 'Ej ifyllt' };
       if (!cs.calculable) return { cls: '', text: cs.statusText || '—' };
-      if (cs.isOveruse && cs.earlyRenewalDecision === 'yes') return { cls: 'ok', text: cs.statusText };
-      if (cs.isOveruse) return { cls: 'warn', text: cs.statusText };
-      if (cs.isTooEarly && cs.earlyRenewalDecision === 'yes') return { cls: 'ok', text: cs.statusText };
-      if (cs.isTooEarly) return { cls: 'warn', text: cs.statusText };
-      return { cls: 'ok', text: cs.statusText };
+      const warn = cs.consumptionPct < 80 || cs.consumptionPct > 110 || cs.daysToPrescribedEnd >= 14;
+      return { cls: warn ? 'warn' : 'ok', text: cs.statusText };
     }
     if (!result) return { cls: '', text: '—' };
     if (!result.valid) return { cls: '', text: 'Ej ifyllt' };
     if (!result.calculable) return { cls: '', text: result.statusText || '—' };
-    if (result.isOveruse && result.earlyRenewalDecision === 'yes') return { cls: 'ok', text: result.statusText || '' };
-    if (result.isOveruse) return { cls: 'warn', text: result.statusText || '' };
-    if (result.isTooEarly && result.earlyRenewalDecision === 'yes') return { cls: 'ok', text: result.statusText || '' };
-    if (result.isTooEarly) return { cls: 'warn', text: result.statusText || '' };
-    return { cls: 'ok', text: result.statusText || '' };
+    const warn = result.consumptionPct < 80 || result.consumptionPct > 110 || result.daysToPrescribedEnd! >= 14;
+    return { cls: warn ? 'warn' : 'ok', text: result.statusText || '' };
   }
 </script>
 
