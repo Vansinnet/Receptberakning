@@ -6,10 +6,10 @@
   let {
     activeTab = 'renew' as 'renew' | 'longterm',
     nurseViewActive = false,
-    theme = 'klinisk' as string,
-    onTabChange = (_tab: 'renew' | 'longterm') => {},
-    onNurseToggle = () => {},
-    onThemeChange = (_theme: string) => {},
+    theme = 'klinisk' as 'dark' | 'klinisk' | 'sakura',
+    onTabChange = (_tab: 'renew' | 'longterm'): void => {},
+    onNurseToggle = (): void => {},
+    onThemeChange = (_theme: string): void => {},
   } = $props();
 
   const version = __APP_VERSION__;

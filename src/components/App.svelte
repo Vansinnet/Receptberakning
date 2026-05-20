@@ -14,7 +14,7 @@
   import GitHubIcon from './GitHubIcon.svelte';
 
   let activeTab = $state<'renew' | 'longterm'>('renew');
-  let theme = $state('klinisk');
+  let theme = $state<'dark' | 'klinisk' | 'sakura'>('klinisk');
 
   const inactivityTimer = createInactivityTimer(
     () => clearAllMedState(),
@@ -61,7 +61,7 @@
 
   function handleThemeChange(t: string) {
     if (!VALID_THEMES.has(t)) return;
-    theme = t;
+    theme = t as 'dark' | 'klinisk' | 'sakura';
     if (typeof document !== 'undefined') {
       document.documentElement.setAttribute('data-theme', t);
     }
@@ -101,9 +101,6 @@
     }
   });
 
-  // Notera: dessa två $effect är avsiktligt separata.
-  // Sammanslagning orsakar feedback-loop (decision → _texts → _textsVersion → effect igen)
-  // som triggar Svelte 5:s iterationsgräns. Se Bug 3 i bugg-dokumentationen.
   $effect(() => {
     void _textsVersion();
     void hasSummaryDerived;
@@ -115,8 +112,6 @@
     inactivityTimer.reset();
   });
 
-  // Notera: hålls separat från _syncCardStatus-effekten ovan —
-  // sammanslagning orsakar Svelte 5 feedback-loop (se Bug 3).
   $effect(() => {
     for (let i = 0; i < medCards.length; i++) {
       const status = getCardStatus(medCards[i]._cardId);

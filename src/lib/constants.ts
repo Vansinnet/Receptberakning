@@ -109,7 +109,7 @@ export const COUNTDOWN_TICK_MS = 1000;
 // 7. ENHETER / DISPLAY-MAPPNINGAR
 // ============================================================================
 
-export const VALID_THEMES = new Set(['dark', 'klinisk', 'sakura']);
+export const VALID_THEMES: ReadonlySet<string> = new Set(['dark', 'klinisk', 'sakura']);
 
 export const UNIT_DISPLAY = {
   st:  { short: 'st',  long: 'tabletter' },

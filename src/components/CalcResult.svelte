@@ -8,7 +8,7 @@
   let {
     result = null as CalcResult | null,
     nurseViewActive = false,
-    onDecision = (_decision: 'yes' | 'no') => {},
+    onDecision = (_decision: 'yes' | 'no'): void => {},
   } = $props();
 
   let activeIdx = $derived(appState.activeMedIdx);

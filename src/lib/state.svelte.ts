@@ -8,6 +8,7 @@
 //      eller getter/setter-funktioner för primitiver som ska exporteras
 
 import type { DoseUnit, DoseInterval, CalcResult, MedState } from './types';
+import type { PrescribeResult } from './prescribe-calc';
 import { validateValues, calcCore } from './calc';
 import { getToday, stripManufacturer, parseDateUTC, fmtDate } from './utils';
 import { calcPrescribeResult, canRenewMed } from './prescribe-calc';
@@ -84,7 +85,7 @@ export function spliceMedCard(i: number): void {
   if (medCards.length <= 1) return;
   const removedCardId = medCards[i]._cardId;
   medCards.splice(i, 1);
-  _cardResultsCache.delete(removedCardId);
+  delete _cardResultsCache[removedCardId];
   delete _cardStatus[removedCardId];
   delete _prescribeState[removedCardId];
   if (appState.activeMedIdx > i) {
@@ -157,7 +158,7 @@ interface TextResult {
   patientText: string;
   patientTextEn: string;
   journalText: string;
-  cardStatusUpdates: Array<{ cardId: number; status: CardStatusCache }>;
+  cardStatuses: Record<number, CardStatusCache>;
   cacheUpdates: Array<{ cardId: number; entry: { fp: string; cr: CardResult | null; status: CardStatusCache } }>;
 }
 
@@ -167,8 +168,7 @@ export interface CardResult {
   medNameStripped: string;
 }
 
-// ⚠ Samma icke-reaktiva mönster som _cardStatusPrev ovan (feedback-loop-risken gäller även här).
-const _cardResultsCache = new Map<number, { fp: string; cr: CardResult | null; status: CardStatusCache }>();
+let _cardResultsCache = $state<Record<number, { fp: string; cr: CardResult | null; status: CardStatusCache }>>({});
 
 let _cardStatus = $state<Record<number, CardStatusCache>>({});
 
@@ -177,54 +177,47 @@ export function getCardStatus(cardId: number): CardStatusCache | undefined {
 }
 
 export function getCachedResult(cardId: number): CardResult | null {
-  return _cardResultsCache.get(cardId)?.cr ?? null;
+  return _cardResultsCache[cardId]?.cr ?? null;
 }
 
-let _prescribeEndsState = $state<Record<number, string>>({});
-
-function _shallowEqualRecord(a: Record<number, string>, b: Record<number, string>): boolean {
-  const aKeys = Object.keys(a);
-  const bKeys = Object.keys(b);
-  if (aKeys.length !== bKeys.length) return false;
-  return aKeys.every(k => a[Number(k)] === b[Number(k)]);
-}
-
-function _recomputePrescribeEnds(): void {
-  const newEnds: Record<number, string> = {};
-  for (let i = 0; i < medCards.length; i++) {
-    const cardId = medCards[i]._cardId;
-    const ps = _prescribeState[cardId];
+const _prescribeEnds = $derived.by((): Record<number, string> => {
+  const result: Record<number, string> = {};
+  for (const card of medCards) {
+    const ps = _prescribeState[card._cardId];
     if (!ps?.packageSize) continue;
-    const cached = _cardResultsCache.get(cardId);
+    const cached = _cardResultsCache[card._cardId];
     if (!cached?.cr) continue;
     const s: MedState = {
-      _cardId: cardId,
+      _cardId: card._cardId,
       dose: cached.cr.calc.dose,
       doseInterval: cached.cr.calc.doseInterval,
       doseUnit: cached.cr.calc.doseUnit,
       prescribedEndDateStr: cached.cr.calc.prescribedEndDateStr,
     };
     const pr = calcPrescribeResult(s, ps);
-    if (pr?.endDateStr) newEnds[cardId] = pr.endDateStr;
+    if (pr?.endDateStr) result[card._cardId] = pr.endDateStr;
   }
-  if (!_shallowEqualRecord(newEnds, _prescribeEndsState)) {
-    _prescribeEndsState = newEnds;
-  }
-}
+  return result;
+});
 
-// ════════════════════════════════════════════════════════════════════════════
-// DERIVED-FLÖDE (1-cykels staleness):
-//
-//   formulärändring
-//     → _texts $derived.by (använder stale _cardResultsCache, icke-reaktiv Map)
-//     → _texts ändras → $effect kör _syncCardStatus()
-//     → _cardResultsCache + _cardStatus uppdateras
-//     → _recomputePrescribeEnds() körs → _prescribeEndsState uppdateras ($state!)
-//     → _texts räknas om igen (reaktiv trigger via _prescribeEndsState)
-//
-//   Feedback-loop förhindras av _shallowEqualRecord i _recomputePrescribeEnds:
-//   andra anropet skriver samma data → ingen $state-ändring → loop bryts.
-// ════════════════════════════════════════════════════════════════════════════
+const _prescribeSummary = $derived.by((): Record<number, PrescribeResult | null> => {
+  const result: Record<number, PrescribeResult | null> = {};
+  for (const card of medCards) {
+    const ps = _prescribeState[card._cardId];
+    const cached = _cardResultsCache[card._cardId];
+    if (!ps || !cached?.cr) { result[card._cardId] = null; continue; }
+    result[card._cardId] = calcPrescribeResult({
+      _cardId: card._cardId,
+      dose: cached.cr.calc.dose,
+      doseInterval: cached.cr.calc.doseInterval,
+      doseUnit: cached.cr.calc.doseUnit,
+      prescribedEndDateStr: cached.cr.calc.prescribedEndDateStr,
+    }, ps);
+  }
+  return result;
+});
+
+export function getPrescribeSummary() { return _prescribeSummary; }
 
 interface CardsForTextEntry {
   name: string; i: number; dose: number; doseUnitLabel: string; doseUnit: string;
@@ -235,31 +228,33 @@ interface CardsForTextEntry {
 
 function _computeAllCards(): {
   cardResults: CardResult[];
-  cardStatusUpdates: TextResult['cardStatusUpdates'];
-  cacheUpdates: TextResult['cacheUpdates'];
+  cardStatuses: Record<number, CardStatusCache>;
+  cacheUpdates: Array<{ cardId: number; entry: { fp: string; cr: CardResult | null; status: CardStatusCache } }>;
+  medCardMap: Map<number, MedCard>;
 } {
   const cardResults: CardResult[] = [];
-  const cardStatusUpdates: TextResult['cardStatusUpdates'] = [];
-  const cacheUpdates: TextResult['cacheUpdates'] = [];
+  const cardStatuses: Record<number, CardStatusCache> = {};
+  const cacheUpdates: Array<{ cardId: number; entry: { fp: string; cr: CardResult | null; status: CardStatusCache } }> = [];
+  const medCardMap = new Map(medCards.map(m => [m._cardId, m]));
   for (let i = 0; i < medCards.length; i++) {
     const card = medCards[i];
     if (!card) continue;
     const f = card.form;
     if (!f.medRaw) {
-      cardStatusUpdates.push({ cardId: card._cardId, status: {
+      cardStatuses[card._cardId] = {
         valid: false, calculable: false,
         statusText: 'Ej ifyllt', consumptionPct: 0, daysToPrescribedEnd: 0,
         prescribedEndDateStr: '',
-      }});
+      };
       continue;
     }
 
     const fp = [f.medRaw, f.dateVal, f.doseRaw, f.amtRaw, f.refRaw, f.leftRaw,
       f.doseUnit, f.doseInterval, f.notCalculable, card.decision, appState.currentDate].join('\x00');
 
-    const cached = _cardResultsCache.get(card._cardId);
+    const cached = _cardResultsCache[card._cardId];
     if (cached && cached.fp === fp) {
-      cardStatusUpdates.push({ cardId: card._cardId, status: cached.status });
+      cardStatuses[card._cardId] = cached.status;
       if (cached.cr) cardResults.push(cached.cr);
       continue;
     }
@@ -279,7 +274,7 @@ function _computeAllCards(): {
         daysToPrescribedEnd: calc.daysToPrescribedEnd ?? 0,
         prescribedEndDateStr: '',
       };
-      cardStatusUpdates.push({ cardId: card._cardId, status });
+      cardStatuses[card._cardId] = status;
       cacheUpdates.push({ cardId: card._cardId, entry: { fp, cr: null, status } });
       continue;
     }
@@ -295,16 +290,16 @@ function _computeAllCards(): {
       prescribedEndDateStr: calc.prescribedEndDateStr ?? '',
     };
     cardResults.push(cr);
-    cardStatusUpdates.push({ cardId: card._cardId, status });
+    cardStatuses[card._cardId] = status;
     cacheUpdates.push({ cardId: card._cardId, entry: { fp, cr, status } });
   }
-  return { cardResults, cardStatusUpdates, cacheUpdates };
+  return { cardResults, cardStatuses, cacheUpdates, medCardMap };
 }
 
-function _buildCardsForText(cardResults: CardResult[]): CardsForTextEntry[] {
+function _buildCardsForText(cardResults: CardResult[], medCardMap: Map<number, MedCard>): CardsForTextEntry[] {
   const entries: CardsForTextEntry[] = [];
   for (const cr of cardResults) {
-    const mc = medCards.find(m => m._cardId === cr.cardId);
+    const mc = medCardMap.get(cr.cardId);
     entries.push({
       name: cr.medNameStripped, i: cr.cardId,
       dose: cr.calc.dose ?? 0, doseUnitLabel: cr.calc.doseUnitLabel ?? 'st/dag',
@@ -322,10 +317,10 @@ function _buildCardsForText(cardResults: CardResult[]): CardsForTextEntry[] {
 function _buildTextResult(
   cardResults: CardResult[],
   cardsForText: CardsForTextEntry[],
-  cardStatusUpdates: TextResult['cardStatusUpdates'],
-  cacheUpdates: TextResult['cacheUpdates'],
+  cardStatuses: Record<number, CardStatusCache>,
+  cacheUpdates: Array<{ cardId: number; entry: { fp: string; cr: CardResult | null; status: CardStatusCache } }>,
+  prescribeEnds: Record<number, string>,
 ): TextResult {
-  const prescribeEnds = _prescribeEndsState;
   const validCount = cardResults.length;
 
   const ptCards = cardsForText.map(c => {
@@ -355,6 +350,7 @@ function _buildTextResult(
   }
 
   if (appState.nurseViewActive) {
+    const nurseDecisionMap = new Map(medCards.map(mc => [mc._cardId, mc.decision]));
     const nurseJournalText = buildNurseJournalText(
       cardResults.map(cr => ({
         _cardId: cr.cardId, medRaw: cr.medNameStripped,
@@ -362,15 +358,15 @@ function _buildTextResult(
         prescribedEndDateStr: cr.calc.prescribedEndDateStr,
         daysToPrescribedEnd: cr.calc.daysToPrescribedEnd ?? 0,
         consumptionPct: cr.calc.consumptionPct,
-        decision: medCards.find(mc => mc._cardId === cr.cardId)?.decision ?? null,
+        decision: nurseDecisionMap.get(cr.cardId) ?? null,
       })),
       appState.nurseVitalNormal,
       appState.nurseFollowUpAdequate,
     );
-    return { patientText: '', patientTextEn: '', journalText: nurseJournalText, cardStatusUpdates, cacheUpdates };
+    return { patientText: '', patientTextEn: '', journalText: nurseJournalText, cardStatuses, cacheUpdates };
   }
 
-  return { patientText, patientTextEn, journalText, cardStatusUpdates, cacheUpdates };
+  return { patientText, patientTextEn, journalText, cardStatuses, cacheUpdates };
 }
 
 const _texts = $derived.by((): TextResult => {
@@ -378,36 +374,35 @@ const _texts = $derived.by((): TextResult => {
     void appState.currentDate;
     const computed = _computeAllCards();
     if (computed.cardResults.length === 0) {
-      return { patientText: '', patientTextEn: '', journalText: '', cardStatusUpdates: computed.cardStatusUpdates, cacheUpdates: computed.cacheUpdates };
+      return { patientText: '', patientTextEn: '', journalText: '', cardStatuses: computed.cardStatuses, cacheUpdates: computed.cacheUpdates };
     }
-    const cardsForText = _buildCardsForText(computed.cardResults);
-    return _buildTextResult(computed.cardResults, cardsForText, computed.cardStatusUpdates, computed.cacheUpdates);
+    const cardsForText = _buildCardsForText(computed.cardResults, computed.medCardMap);
+    return _buildTextResult(computed.cardResults, cardsForText, computed.cardStatuses, computed.cacheUpdates, _prescribeEnds);
   } catch (e) {
     console.error('[v3 _texts] KRASCH:', e instanceof Error ? e.stack : String(e));
-    return { patientText: '', patientTextEn: '', journalText: 'Textgenerering misslyckades', cardStatusUpdates: [], cacheUpdates: [] };
+    return { patientText: '', patientTextEn: '', journalText: 'Textgenerering misslyckades', cardStatuses: {} as Record<number, CardStatusCache>, cacheUpdates: [] };
   }
 });
 
 export function getActiveTexts(): TextResult {
   const { patientText, patientTextEn, journalText } = _texts;
-  return { patientText, patientTextEn, journalText, cardStatusUpdates: [], cacheUpdates: [] };
+  return { patientText, patientTextEn, journalText, cardStatuses: {}, cacheUpdates: [] };
 }
 
 export function _syncCardStatus(): void {
-  const updates = _texts.cardStatusUpdates;
-  for (const u of updates) {
-    _cardStatus[u.cardId] = u.status;
+  const statuses = _texts.cardStatuses;
+  for (const cardId of Object.keys(statuses)) {
+    _cardStatus[Number(cardId)] = statuses[Number(cardId)];
   }
   const caches = _texts.cacheUpdates;
   for (const c of caches) {
-    _cardResultsCache.set(c.cardId, c.entry);
+    _cardResultsCache[c.cardId] = c.entry;
   }
-  _recomputePrescribeEnds();
 }
 
 export function _textsVersion(): number {
   void _texts.patientText;
-  return _texts.cardStatusUpdates.length;
+  return Object.keys(_texts.cardStatuses).length;
 }
 
 // =====================================================
@@ -507,9 +502,8 @@ export function clearAllMedState(): void {
   ltState.medRaw = '';
   ltState.doseRaw = '';
   resetNurseState();
-  _cardResultsCache.clear();
+  _cardResultsCache = {};
   _cardStatus = {};
-  _prescribeEndsState = {};
 }
 
 const _hasSummary = $derived.by(() => {

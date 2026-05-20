@@ -2,14 +2,7 @@ import { getToday, parseDateUTC } from './utils';
 
 // === PATIENT TEXT ===
 
-type CardView = {
-  name: string;
-  prescribedEndDateStr?: string;
-  decision: 'yes' | 'no' | null;
-  daysToPrescribedEnd?: number;
-  contactDateStr?: string;
-  prescribeEnd?: string;
-};
+import type { CardView } from './types';
 
 const TPL = {
   sv: {
@@ -56,33 +49,28 @@ const TPL = {
   },
 };
 
-function _noBody(lang: typeof TPL.sv, days: number, date: string, contact?: string): string {
-  const verb = days < 0 ? 'beräknades' : 'beräknas';
-  const contactStr = days >= 14 && contact ? ` Hör av dig närmare ${contact}.` : '';
-  return lang.single_no_body(verb, date, contactStr);
+function _noBody(tpl: typeof TPL.sv | typeof TPL.en, days: number, date: string, contact?: string): string {
+  const isSv = tpl === TPL.sv;
+  const verb = days < 0 ? (isSv ? 'beräknades' : 'was expected') : (isSv ? 'beräknas' : 'is expected');
+  const contactStr = days >= 14 && contact
+    ? (isSv ? ` Hör av dig närmare ${contact}.` : ` Please contact us again closer to ${contact}.`)
+    : '';
+  return tpl.single_no_body(verb, date, contactStr);
 }
 
-function _noBodyEn(lang: typeof TPL.en, days: number, date: string, contact?: string): string {
-  const verb = days < 0 ? 'was expected' : 'is expected';
-  const contactStr = days >= 14 && contact ? ` Please contact us again closer to ${contact}.` : '';
-  return lang.single_no_body(verb, date, contactStr);
+function _itemNoBody(tpl: typeof TPL.sv | typeof TPL.en, name: string, days: number, date: string, contact?: string): string {
+  const isSv = tpl === TPL.sv;
+  const verb = days < 0 ? (isSv ? 'beräknades' : 'was expected') : (isSv ? 'beräknas' : 'is expected');
+  const contactStr = days >= 14 && contact
+    ? (isSv ? ` Hör av dig närmare ${contact}.` : ` Please contact us again closer to ${contact}.`)
+    : '';
+  return tpl.multi_item_no(name, verb, date, contactStr);
 }
 
-function _itemNoBody(lang: typeof TPL.sv, name: string, days: number, date: string, contact?: string): string {
-  const verb = days < 0 ? 'beräknades' : 'beräknas';
-  const contactStr = days >= 14 && contact ? ` Hör av dig närmare ${contact}.` : '';
-  return lang.multi_item_no(name, verb, date, contactStr);
-}
-
-function _itemNoBodyEn(lang: typeof TPL.en, name: string, days: number, date: string, contact?: string): string {
-  const verb = days < 0 ? 'was expected' : 'is expected';
-  const contactStr = days >= 14 && contact ? ` Please contact us again closer to ${contact}.` : '';
-  return lang.multi_item_no(name, verb, date, contactStr);
-}
-
-function _buildSingle(lang: typeof TPL.sv, card: CardView, en: boolean): string[] {
+function _buildSingle(lang: typeof TPL.sv, card: CardView): string[] {
+  const isSv = lang === TPL.sv;
   if (card.decision === 'yes') {
-    const end = card.prescribeEnd ? (en ? ` to last until ${card.prescribeEnd}` : ` så att det räcker till ${card.prescribeEnd}`) : '';
+    const end = card.prescribeEnd ? (isSv ? ` så att det räcker till ${card.prescribeEnd}` : ` to last until ${card.prescribeEnd}`) : '';
     return [lang.single_yes(card.name, end), lang.single_yes_footer];
   }
   if (card.decision === 'no') {
@@ -90,7 +78,7 @@ function _buildSingle(lang: typeof TPL.sv, card: CardView, en: boolean): string[
     const date = card.prescribedEndDateStr;
     if (date) {
       const days = card.daysToPrescribedEnd ?? 0;
-      lines.push(en ? _noBodyEn(TPL.en, days, date, card.contactDateStr) : _noBody(lang, days, date, card.contactDateStr));
+      lines.push(_noBody(lang, days, date, card.contactDateStr));
     }
     lines.push(lang.single_no_footer);
     return lines;
@@ -98,11 +86,12 @@ function _buildSingle(lang: typeof TPL.sv, card: CardView, en: boolean): string[
   return [lang.single_null(card.name)];
 }
 
-function _buildMulti(lang: typeof TPL.sv, cards: CardView[], en: boolean): string[] {
+function _buildMulti(lang: typeof TPL.sv, cards: CardView[]): string[] {
+  const isSv = lang === TPL.sv;
   const lines: string[] = [lang.multi_intro(cards.map(c => c.name).join(', '))];
   for (const c of cards) {
     if (c.decision === 'yes') {
-      const end = c.prescribeEnd ? (en ? ` to last until ${c.prescribeEnd}` : ` så att det räcker till ${c.prescribeEnd}`) : '';
+      const end = c.prescribeEnd ? (isSv ? ` så att det räcker till ${c.prescribeEnd}` : ` to last until ${c.prescribeEnd}`) : '';
       lines.push(lang.multi_item_yes(c.name, end));
     } else if (c.decision === 'no') {
       const date = c.prescribedEndDateStr;
@@ -110,7 +99,7 @@ function _buildMulti(lang: typeof TPL.sv, cards: CardView[], en: boolean): strin
         lines.push(lang.multi_item_no_nodate(c.name));
       } else {
         const days = c.daysToPrescribedEnd ?? 0;
-        lines.push(en ? _itemNoBodyEn(TPL.en, c.name, days, date, c.contactDateStr) : _itemNoBody(lang, c.name, days, date, c.contactDateStr));
+        lines.push(_itemNoBody(lang, c.name, days, date, c.contactDateStr));
       }
     }
   }
@@ -118,14 +107,13 @@ function _buildMulti(lang: typeof TPL.sv, cards: CardView[], en: boolean): strin
 }
 
 export function buildPatientText(lang: string, cards: CardView[]): string {
-  const en = lang === 'en';
-  const tpl = en ? TPL.en : TPL.sv;
+  const tpl = lang === 'en' ? TPL.en : TPL.sv;
   const lines = [tpl.greeting, ''];
 
   if (cards.length === 1) {
-    lines.push(..._buildSingle(tpl, cards[0], en));
+    lines.push(..._buildSingle(tpl, cards[0]));
   } else if (cards.length > 1) {
-    lines.push(..._buildMulti(tpl, cards, en));
+    lines.push(..._buildMulti(tpl, cards));
   }
 
   lines.push('', tpl.closing);

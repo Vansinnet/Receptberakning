@@ -41,7 +41,7 @@ export function calcLongtermCore(
     if (startDate && endDate && endDate <= today && totalVal > 0 && Number.isInteger(totalVal) && startDate < endDate) {
       const days = getDaysDiff(endDate, startDate);
       if (days <= 0 || days > MAX_PERIOD_SPAN_DAYS) {
-        periodErrors[periodErrors.length - 1].spanError = true;
+        periodErrors.at(-1)!.spanError = true;
         continue;
       }
       periods.push({ startDate, endDate, total: totalVal, days, avgPerDay: totalVal / days });

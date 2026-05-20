@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { medCards, getPrescribeState, initPrescribeState, applyPrescribeStatePatch, appState, getCardStatus, getActiveResult, getHasSummary, getCachedResult } from '$lib/state.svelte';
+  import { medCards, getPrescribeState, initPrescribeState, applyPrescribeStatePatch, appState, getCardStatus, getActiveResult, getHasSummary, getCachedResult, getPrescribeSummary } from '$lib/state.svelte';
   import { calcPrescribeResult, canRenewMed, prescribeValidationHint } from '$lib/prescribe-calc';
   import { UNIT_DISPLAY, DEFAULT_PRESCRIBE_MODE, DEFAULT_PRESCRIBE_MONTHS } from '$lib/constants';
   import { applyDateMask } from '$lib/utils';
@@ -81,6 +81,7 @@
   });
 
   let hasSummary = $derived(getHasSummary());
+  let prescribeSummaries = $derived(getPrescribeSummary());
 </script>
 
 <section class="prescribe-panel" class:is-hidden={!visible} aria-label="Ny förskrivning">
@@ -169,14 +170,7 @@
                 calculable: status?.calculable ?? false,
                 decision: c.decision,
               })}
-                {@const cached = getCachedResult(c._cardId)}
-                {@const pr = cached?.calc?.dose != null ? calcPrescribeResult({
-                  _cardId: c._cardId,
-                  dose: cached.calc.dose,
-                  doseInterval: cached.calc.doseInterval,
-                  doseUnit: cached.calc.doseUnit,
-                  prescribedEndDateStr: cached.calc.prescribedEndDateStr,
-                }, getPrescribeState(c._cardId) ?? null) : null}
+                {@const pr = prescribeSummaries[c._cardId]}
                 <button type="button" class="prescribe-summary-row {i === activeIdx ? 'active' : ''}" onclick={() => appState.activeMedIdx = i}>
                   <span class="prescribe-summary-name">{c.form.medRaw || `Läkemedel ${i + 1}`}</span>
                   <span class="prescribe-summary-right">

@@ -18,6 +18,49 @@ import {
 
 // === VALIDATEVALUES ===
 
+function _validateMedName(medRaw: string): string {
+  return medRaw.length > MAX_MED_NAME_LENGTH
+    ? `Läkemedelsnamnet får inte överstiga ${MAX_MED_NAME_LENGTH} tecken.`
+    : '';
+}
+
+function _validateDate(dateVal: string, pDate: Date | null, today: Date): { error: string; invalidDate: boolean } {
+  if (dateVal.length > MAX_DATE_LENGTH) return { error: 'Ogiltigt datum.', invalidDate: true };
+  if (dateVal && !pDate) return { error: 'Ogiltigt datum.', invalidDate: true };
+  if (pDate && pDate > today) return { error: 'Datumet är satt i framtiden.', invalidDate: true };
+  return { error: '', invalidDate: false };
+}
+
+function _validateAmt(safeAmtRaw: string, amt: number): string {
+  if (safeAmtRaw === '') return '';
+  const invalid = isNaN(amt) || amt <= 0 || amt > MAX_AMT_VALUE || !Number.isInteger(Number(safeAmtRaw));
+  return invalid ? `Ange ett heltal mellan 1 och ${MAX_AMT_VALUE}.` : '';
+}
+
+function _validateDose(doseRaw: string, dose: number): string {
+  if (doseRaw === '') return '';
+  const invalid = isNaN(dose) || dose < MIN_DOSE_VALUE || dose > MAX_DOSE_VALUE;
+  return invalid ? `Ange ett tal mellan ${MIN_DOSE_VALUE} och ${MAX_DOSE_VALUE}.` : '';
+}
+
+function _validateRef(safeRefRaw: string, refNum: number): { error: string; outOfRange: boolean } {
+  if (safeRefRaw === '') return { error: '', outOfRange: false };
+  const outOfRange = Number.isFinite(refNum) && Number.isInteger(refNum) && refNum > MAX_REF_VALUE;
+  if (outOfRange) return { error: `Max ${MAX_REF_VALUE} uttag stöds.`, outOfRange: true };
+  const invalid = !Number.isFinite(refNum) || !Number.isInteger(refNum) || refNum < MIN_REF_VALUE;
+  return { error: invalid ? `Ange ett heltal mellan ${MIN_REF_VALUE} och ${MAX_REF_VALUE}.` : '', outOfRange: false };
+}
+
+function _validateLeft(safeLeftRaw: string, remaining: number | null, isDiscreteUnit: boolean): string {
+  if (remaining === null) return '';
+  const invalid = isNaN(remaining) || remaining < 0 || remaining > MAX_AMT_VALUE
+    || (isDiscreteUnit && !Number.isInteger(remaining));
+  if (!invalid) return '';
+  return isDiscreteUnit
+    ? 'Ange ett heltal (0 eller fler), eller lämna tomt.'
+    : 'Ange ett tal (0 eller fler), eller lämna tomt.';
+}
+
 export function validateValues(
   medRaw: string,
   dateVal: string,
@@ -45,44 +88,28 @@ export function validateValues(
   const remaining = safeLeftRaw !== '' ? parseFloat(safeLeftRaw.replace(',', '.')) : null;
 
   // ── Steg 3: Validate fields ──
-  const fieldErrors = { medInput: '', dateInput: '', doseInput: '', amtInput: '', refInput: '', leftInput: '' };
+  const fieldErrors = {
+    medInput: _validateMedName(medRaw),
+    dateInput: _validateDate(dateVal, pDate, today).error,
+    doseInput: _validateDose(doseRaw, dose),
+    amtInput: _validateAmt(safeAmtRaw, amt),
+    refInput: '',
+    leftInput: _validateLeft(safeLeftRaw, remaining, isDiscreteUnit),
+  };
 
-  if (medRaw.length > MAX_MED_NAME_LENGTH) {
-    fieldErrors.medInput = `Läkemedelsnamnet får inte överstiga ${MAX_MED_NAME_LENGTH} tecken.`;
-  }
-  if (dateVal.length > MAX_DATE_LENGTH) {
-    fieldErrors.dateInput = 'Ogiltigt datum.';
-  }
-
-  const amtIsInvalid = safeAmtRaw !== '' && (isNaN(amt) || amt <= 0 || amt > MAX_AMT_VALUE || !Number.isInteger(Number(safeAmtRaw)));
-  if (amtIsInvalid) fieldErrors.amtInput = `Ange ett heltal mellan 1 och ${MAX_AMT_VALUE}.`;
-
-  const doseIsInvalid = doseRaw !== '' && (isNaN(dose) || dose < MIN_DOSE_VALUE || dose > MAX_DOSE_VALUE);
-  if (doseIsInvalid) fieldErrors.doseInput = `Ange ett tal mellan ${MIN_DOSE_VALUE} och ${MAX_DOSE_VALUE}.`;
-
-  const refIsInvalid  = safeRefRaw !== '' && (!Number.isFinite(refNum) || !Number.isInteger(refNum) || refNum < MIN_REF_VALUE || refNum > MAX_REF_VALUE);
-  const refOutOfRange = Number.isFinite(refNum) && Number.isInteger(refNum) && refNum > MAX_REF_VALUE;
-  if (refOutOfRange)    fieldErrors.refInput = `Max ${MAX_REF_VALUE} uttag stöds.`;
-  else if (refIsInvalid) fieldErrors.refInput = `Ange ett heltal mellan ${MIN_REF_VALUE} och ${MAX_REF_VALUE}.`;
-
-  if (dateVal && !pDate) fieldErrors.dateInput = 'Ogiltigt datum.';
-  if (pDate && pDate > today) fieldErrors.dateInput = 'Datumet är satt i framtiden.';
-
-  let leftIsInvalid = false;
-  if (remaining !== null) {
-    leftIsInvalid = isNaN(remaining) || remaining < 0 || remaining > MAX_AMT_VALUE
-      || (isDiscreteUnit && !Number.isInteger(remaining));
-  }
-  if (leftIsInvalid) {
-    fieldErrors.leftInput = isDiscreteUnit
-      ? 'Ange ett heltal (0 eller fler), eller lämna tomt.'
-      : 'Ange ett tal (0 eller fler), eller lämna tomt.';
-  }
+  const { outOfRange } = _validateRef(safeRefRaw, refNum);
+  fieldErrors.refInput = _validateRef(safeRefRaw, refNum).error;
 
   // ── Steg 4: Build result ──
-  if (refOutOfRange) return { valid: false, reason: 'too_many_refs', fieldErrors };
+  if (outOfRange) return { valid: false, reason: 'too_many_refs', fieldErrors };
 
-  const otherMissing = !medRaw || !dateVal || isNaN(dose) || doseIsInvalid || isNaN(amt) || amtIsInvalid || refIsInvalid || !refNum || refNum < 1;
+  const amtIsInvalid = fieldErrors.amtInput !== '';
+  const doseIsInvalid = fieldErrors.doseInput !== '';
+  const refIsInvalid = fieldErrors.refInput !== '';
+  const leftIsInvalid = fieldErrors.leftInput !== '';
+  const refNumTooLow = !refNum || refNum < 1;
+
+  const otherMissing = !medRaw || !dateVal || isNaN(dose) || doseIsInvalid || isNaN(amt) || amtIsInvalid || refIsInvalid || refNumTooLow;
   const hasFieldError = Object.values(fieldErrors).some(e => e !== '');
   if (otherMissing || !pDate || hasFieldError || (pDate && pDate > today) || leftIsInvalid) {
     const dateOnly = (!pDate || (pDate && pDate > today)) && dateVal && !otherMissing && !leftIsInvalid;
@@ -91,7 +118,7 @@ export function validateValues(
     return { valid: false, reason, fieldErrors };
   }
 
-  const parsedInterval = parseInt(doseIntervalRaw || '', 10);
+  const parsedInterval = parseInt(doseIntervalRaw ?? '', 10);
   const doseInterval = VALID_INTERVALS.includes(parsedInterval) ? parsedInterval : 1;
 
   return { valid: true, medRaw, dateVal, pDate, amt, dose, ref: refNum, remaining, doseRaw, amtRaw: safeAmtRaw, refRaw: safeRefRaw, leftRaw: safeLeftRaw, doseInterval: doseInterval as DoseInterval, doseUnit, notCalculable: !!notCalculable };

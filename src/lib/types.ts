@@ -134,6 +134,17 @@ export interface MedState {
   ref?: number;
 }
 
+// === Textgenerering ===
+
+export type CardView = {
+  name: string;
+  prescribedEndDateStr?: string;
+  decision: 'yes' | 'no' | null;
+  daysToPrescribedEnd?: number;
+  contactDateStr?: string;
+  prescribeEnd?: string;
+};
+
 // === Långvarig förbrukning ===
 
 export interface LTCardInput {
