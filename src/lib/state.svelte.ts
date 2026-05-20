@@ -133,9 +133,9 @@ export function tickCurrentDate(): void {
 // $derived: VALIDERING
 // =====================================================
 
-const _activeValidated = $derived(
-  (_app.currentDate,
-  validateValues(
+const _activeValidated = $derived.by(() => {
+  void _app.currentDate;
+  return validateValues(
     medCards[_app.activeMedIdx]?.form?.medRaw ?? '',
     medCards[_app.activeMedIdx]?.form?.dateVal ?? '',
     medCards[_app.activeMedIdx]?.form?.doseRaw ?? '',
@@ -145,8 +145,8 @@ const _activeValidated = $derived(
     String(medCards[_app.activeMedIdx]?.form?.doseInterval ?? 1),
     medCards[_app.activeMedIdx]?.form?.doseUnit ?? 'st',
     medCards[_app.activeMedIdx]?.form?.notCalculable ?? false,
-  ))
-);
+  );
+});
 
 export function getActiveValidated() {
   return _activeValidated;
@@ -179,6 +179,10 @@ export function getCardStatus(cardId: number): CardStatusCache | undefined {
   return _cardStatus[cardId];
 }
 
+export function getCachedResult(cardId: number): CardResult | null {
+  return _cardResultsCache.get(cardId)?.cr ?? null;
+}
+
 // =====================================================
 // $derived: BERÄKNING
 // =====================================================
@@ -197,7 +201,7 @@ interface TextResult {
   cacheUpdates: Array<{ cardId: number; entry: { fp: string; cr: CardResult | null; status: CardStatusCache } }>;
 }
 
-interface CardResult {
+export interface CardResult {
   cardId: number;
   calc: CalcResult;
   medNameStripped: string;
@@ -205,6 +209,9 @@ interface CardResult {
 
 // ⚠ Samma icke-reaktiva mönster som _cardStatusPrev ovan (feedback-loop-risken gäller även här).
 const _cardResultsCache = new Map<number, { fp: string; cr: CardResult | null; status: CardStatusCache }>();
+
+const _prescribeEnds = $state<Record<number, string>>({});
+let _cacheVersion = $state(0);
 
 const _texts = $derived.by((): TextResult => {
   try {
@@ -442,17 +449,17 @@ export interface PrescribeEntry {
 
 const _prescribeState = $state<Record<number, PrescribeEntry>>({});
 
-export function getPrescribeState(i: number): PrescribeEntry | undefined {
-  return _prescribeState[i];
+export function getPrescribeState(cardId: number): PrescribeEntry | undefined {
+  return _prescribeState[cardId];
 }
 
-export function initPrescribeState(i: number, initial: PrescribeEntry): void {
-  _prescribeState[i] = initial;
+export function initPrescribeState(cardId: number, initial: PrescribeEntry): void {
+  _prescribeState[cardId] = initial;
 }
 
-export function applyPrescribeStatePatch(i: number, patch: Partial<PrescribeEntry>): void {
-  if (!_prescribeState[i]) return;
-  Object.assign(_prescribeState[i], patch);
+export function applyPrescribeStatePatch(cardId: number, patch: Partial<PrescribeEntry>): void {
+  if (!_prescribeState[cardId]) return;
+  Object.assign(_prescribeState[cardId], patch);
 }
 
 export function clearPrescribeState(): void {
@@ -463,6 +470,10 @@ export function clearPrescribeState(): void {
 
 export function clearCardPrescribeState(cardId: number): void {
   delete _prescribeState[cardId];
+}
+
+export function getPrescribeEnds(): Record<number, string> {
+  return _prescribeEnds;
 }
 
 // =====================================================
@@ -481,6 +492,8 @@ export function clearAllMedState(): void {
   resetNurseState();
   _cardResultsCache.clear();
   _cardStatus = {};
+  for (const key of Object.keys(_prescribeEnds)) { delete _prescribeEnds[Number(key)]; }
+  _cacheVersion = 0;
 }
 
 const _hasSummary = $derived.by(() => {

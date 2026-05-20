@@ -132,6 +132,7 @@
 
   $effect(() => {
     void _textsVersion();
+    void hasSummary;
     _syncCardStatus();
   });
 
@@ -225,7 +226,7 @@
                   {#each interactionWarnings as w}
                     <div class="interaction-alert interaction-{w.s}">
                       <div class="interaction-header">
-                        <span class="interaction-icon">{w.s === 'danger' ? '⚠' : '⚡'}</span>
+                        <span class="interaction-icon" aria-hidden="true">{w.s === 'danger' ? '⚠' : '⚡'}</span>
                         <strong>{w.t}</strong>
                         <span class="interaction-drugs">{w.drugs.join(', ')}</span>
                       </div>

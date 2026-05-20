@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { medCards, getPrescribeState, initPrescribeState, applyPrescribeStatePatch, getActiveMedIdx, setActiveMedIdx, getCardStatus, getActiveResult, getHasSummary } from '$lib/state.svelte';
+  import { medCards, getPrescribeState, initPrescribeState, applyPrescribeStatePatch, getActiveMedIdx, setActiveMedIdx, getCardStatus, getActiveResult, getHasSummary, getCachedResult } from '$lib/state.svelte';
   import { calcPrescribeResult, canRenewMed, prescribeValidationHint } from '$lib/prescribe-calc';
   import { UNIT_DISPLAY, DEFAULT_PRESCRIBE_MODE, DEFAULT_PRESCRIBE_MONTHS } from '$lib/constants';
   import type { MedState } from '$lib/types';
@@ -27,7 +27,8 @@
     if (!card) return;
     const s = result;
     if (!s?.valid || !s?.calculable) return;
-    const currentAmt = String(s.amt ?? '');
+    if (s.amt == null || isNaN(s.amt) || s.amt <= 0) return;
+    const currentAmt = String(s.amt);
     const ps = getPrescribeState(card._cardId);
     if (ps && ps._lastAmt === currentAmt && ps.packageSize !== '') return;
     if (!ps) {
@@ -184,14 +185,14 @@
                 calculable: status?.calculable ?? false,
                 decision: c.decision,
               })}
-                {@const d = parseFloat((c.form.doseRaw || '').replace(',', '.')) || 0}
-                {@const pr = calcPrescribeResult({
+                {@const cached = getCachedResult(c._cardId)}
+                {@const pr = cached ? calcPrescribeResult({
                   _cardId: c._cardId,
-                  dose: d,
-                  doseInterval: c.form.doseInterval,
-                  doseUnit: c.form.doseUnit,
-                  prescribedEndDateStr: status?.prescribedEndDateStr ?? '',
-                }, getPrescribeState(c._cardId) ?? null)}
+                  dose: cached.calc.dose,
+                  doseInterval: cached.calc.doseInterval,
+                  doseUnit: cached.calc.doseUnit,
+                  prescribedEndDateStr: cached.calc.prescribedEndDateStr,
+                }, getPrescribeState(c._cardId) ?? null) : null}
                 <button type="button" class="prescribe-summary-row {i === activeIdx ? 'active' : ''}" onclick={() => setActiveMedIdx(i)}>
                   <span class="prescribe-summary-name">{c.form.medRaw || `Läkemedel ${i + 1}`}</span>
                   <span class="prescribe-summary-right">
