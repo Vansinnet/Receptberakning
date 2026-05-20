@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { ltPeriods, pushLtPeriod, spliceLtPeriod, resetLtPeriods } from '$lib/state.svelte';
+  import { ltPeriods, pushLtPeriod, spliceLtPeriod, resetLtPeriods, getLtMedRaw, setLtMedRaw, getLtDoseRaw, setLtDoseRaw } from '$lib/state.svelte';
   import { calcLongtermCore } from '$lib/calc-longterm';
   import { pctClass } from '$lib/utils';
   import { MAX_LT_PERIODS, LT_BAR_TEXT_THRESHOLD_PCT } from '$lib/constants';
   import type { LTResult, LTCardPeriod } from '$lib/types';
 
-  let medRaw = $state('');
-  let doseRaw = $state('');
+  let medRaw = $derived(getLtMedRaw());
+  let doseRaw = $derived(getLtDoseRaw());
 
   function handleAddPeriod() {
     pushLtPeriod();
@@ -17,8 +17,8 @@
   }
 
   function handleClear() {
-    medRaw = '';
-    doseRaw = '';
+    setLtMedRaw('');
+    setLtDoseRaw('');
     resetLtPeriods();
   }
 
@@ -60,6 +60,9 @@
     return calcLongtermCore(medRaw, ordDose, periods);
   });
 
+  let ltCopied = $state(false);
+  let ltCopiedTimeout: ReturnType<typeof setTimeout> | null = null;
+
   function copyLtText() {
     const text = result.journalText ?? '';
     if (text && navigator.clipboard) {
@@ -71,16 +74,13 @@
     }
   }
 
-  let ltCopied = $state(false);
-  let ltCopiedTimeout: ReturnType<typeof setTimeout> | null = null;
+  let barWidthClass = $derived(pctClass((result.barPct ?? 0) / 150 * 100, 'w'));
 
   $effect(() => {
     return () => {
       if (ltCopiedTimeout) clearTimeout(ltCopiedTimeout);
     };
   });
-
-  let barWidthClass = $derived(pctClass((result.barPct ?? 0) / 150 * 100, 'w'));
 </script>
 
 <div class="longterm-layout">
@@ -102,11 +102,11 @@
         <div class="form-row-2">
           <div class="field">
             <label for="lt-med" data-tooltip="Ange läkemedelsnamn och styrka.">Läkemedel och styrka</label>
-            <input id="lt-med" type="text" placeholder="T.ex. Tramadol 100 mg" maxlength="100" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" bind:value={medRaw} />
+            <input id="lt-med" type="text" placeholder="T.ex. Tramadol 100 mg" maxlength="100" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value={medRaw} oninput={(e) => setLtMedRaw((e.target as HTMLInputElement).value)} />
           </div>
           <div class="field">
             <label for="lt-dose" data-tooltip="Patientens ordinerade dygnsdos i enheter per dag.">Ordinerad dos (enheter/dag)</label>
-            <input id="lt-dose" type="text" inputmode="decimal" placeholder="T.ex. 1" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" bind:value={doseRaw} class:input-error={doseInvalid} aria-invalid={doseInvalid} />
+            <input id="lt-dose" type="text" inputmode="decimal" placeholder="T.ex. 1" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value={doseRaw} oninput={(e) => setLtDoseRaw((e.target as HTMLInputElement).value)} class:input-error={doseInvalid} aria-invalid={doseInvalid} />
             {#if doseInvalid}
               <span class="field-error-msg visible">Ange ett positivt tal</span>
             {:else}

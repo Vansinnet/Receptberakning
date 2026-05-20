@@ -392,6 +392,14 @@ export interface LTPeriod {
 
 export const ltPeriods = $state<LTPeriod[]>([{ start: '', total: '', end: '' }]);
 
+let _ltMedRaw = $state('');
+let _ltDoseRaw = $state('');
+
+export function getLtMedRaw(): string { return _ltMedRaw; }
+export function setLtMedRaw(v: string): void { _ltMedRaw = v; }
+export function getLtDoseRaw(): string { return _ltDoseRaw; }
+export function setLtDoseRaw(v: string): void { _ltDoseRaw = v; }
+
 export function setLtPeriodField(i: number, field: keyof LTPeriod, value: string): void {
   if (ltPeriods[i]) ltPeriods[i][field] = value;
 }
@@ -411,6 +419,8 @@ export function spliceLtPeriod(i: number): boolean {
 export function resetLtPeriods(): void {
   ltPeriods.length = 0;
   ltPeriods.push({ start: '', total: '', end: '' });
+  _ltMedRaw = '';
+  _ltDoseRaw = '';
 }
 
 // =====================================================

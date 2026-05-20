@@ -67,6 +67,19 @@ test.describe('Formulär → beräkning → resultat', () => {
     await expect(page.locator('.early-decision-box')).toBeVisible();
   });
 
+  test('Avslå döljer inte PrescribePanel för det kortet', async ({ page }) => {
+    await page.fill('#medInput', 'Alvedon 500 mg');
+    await page.fill('#dateInput', '2025-02-01');
+    await page.fill('#doseInput', '1');
+    await page.fill('#amtInput', '100');
+    await page.fill('#refInput', '3');
+    await page.fill('#leftInput', '0');
+    await page.waitForTimeout(400);
+    await page.click('.early-btn-no');
+    await page.waitForTimeout(200);
+    await expect(page.locator('.early-btn-no.selected')).toBeVisible();
+  });
+
   test('Kvarvarande doser — fyll i leftInput → faktisk förbrukning', async ({ page }) => {
     await page.fill('#medInput', 'Metformin 500 mg');
     await page.fill('#dateInput', '2025-01-01');

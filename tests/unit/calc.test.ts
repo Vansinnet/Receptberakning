@@ -72,6 +72,17 @@ describe('validateValues', () => {
   it('doseInterval=30 → valid', () => {
     expect(validateValues('Sertralin 50 mg','2024-08-13','1','100','3','','30','st').valid).toBe(true);
   });
+
+  // regression: trailing nollor
+  it('dos med trailing zero (1.0) → valid', () => {
+    expect(validateValues('Test 50 mg','2024-08-13','1.0','100','3','').valid).toBe(true);
+  });
+  it('dos med trailing zero (1.50) → valid', () => {
+    expect(validateValues('Test 50 mg','2024-08-13','1.50','100','3','').valid).toBe(true);
+  });
+  it('dos med trailing zero (2.00) → valid', () => {
+    expect(validateValues('Test 50 mg','2024-08-13','2.00','100','3','').valid).toBe(true);
+  });
 });
 
 // =====================================================
