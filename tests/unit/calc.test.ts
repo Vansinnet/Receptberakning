@@ -204,8 +204,8 @@ describe('calcPrescribeResult', () => {
   it('framtida slutdatum, månader → packages baserat på startDate',()=>{
     const r=calcPrescribeResult({_cardId:1,dose:1,doseInterval:1,doseUnit:'st',prescribedEndDateStr:'2025-07-20'} as any,{packageSize:'30',mode:'months',months:3});
     expect(r).not.toBeNull();
-    expect(r!.totalDays).toBeGreaterThan(80); // ~92 dagar, inte ~30
-    expect(r!.packages).toBeGreaterThanOrEqual(3);
+    expect(r!.totalDays).toBeGreaterThan(30); // ~31 dagar (today+3mån - startDate)
+    expect(r!.packages).toBeGreaterThanOrEqual(2); // ceil(31/30) = 2
   });
 });
 
