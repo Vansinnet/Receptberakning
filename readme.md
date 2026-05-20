@@ -110,7 +110,7 @@ Tre inbyggda teman som växlas direkt:
 
 - **Svelte 5 + TypeScript** — reaktiva komponenter med `$state`/`$derived`, strict type-checking
 - **Vite** — byggsystem med HMR i dev, tree-shaking och code-splitting i production
-- **Vitest** — 133 enhetstester (77 calc + 43 interactions + 5 properties + 8 card-status)
+- **Vitest** — 139 enhetstester (83 calc + 43 interactions + 5 properties + 8 card-status)
 - **Playwright** — 32 E2E-tester + 200 fuzz-simuleringar
 - **PWA** — offline-first via `vite-plugin-pwa` + Workbox, precache av alla assets
 
@@ -148,7 +148,7 @@ public/
 npm install               # Installera beroenden
 npm run dev               # Starta Vite dev-server (HMR)
 npm run build             # Production build → dist/
-npm test                  # Kör 133 vitest-tester
+npm test                  # Kör 139 vitest-tester
 npm run test:e2e          # Kör 33 Playwright E2E-tester
 npm run check             # TypeScript-kontroll (svelte-check)
 npm run build:db          # Crawla FASS och bygg product-db.json (~45 min)
