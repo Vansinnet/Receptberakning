@@ -333,6 +333,7 @@ const _texts = $derived.by((): TextResult => {
         _cardId: cr.cardId, medRaw: cr.medNameStripped,
         valid: true, calculable: true,
         prescribedEndDateStr: cr.calc.prescribedEndDateStr,
+        daysToPrescribedEnd: cr.calc.daysToPrescribedEnd ?? 0,
         consumptionPct: cr.calc.consumptionPct,
         decision: medCards.find(mc => mc._cardId === cr.cardId)?.decision ?? null,
       })),

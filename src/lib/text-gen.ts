@@ -162,14 +162,14 @@ export function buildJournalText(
 }
 
 export function buildNurseJournalText(
-  states: Array<{ _cardId: number; medRaw?: string; valid?: boolean; calculable?: boolean; prescribedEndDateStr?: string; consumptionPct?: number; decision?: 'yes' | 'no' | null }>,
+  states: Array<{ _cardId: number; medRaw?: string; valid?: boolean; calculable?: boolean; prescribedEndDateStr?: string; daysToPrescribedEnd?: number; consumptionPct?: number; decision?: 'yes' | 'no' | null }>,
   nurseVitalNormal?: boolean,
   nurseFollowUpAdequate?: boolean
 ): string {
-  const allMeds: Array<{ name: string; endDate: string }> = [];
+  const allMeds: Array<{ name: string; endDate: string; days: number }> = [];
   for (const s of states) {
     if (!s || !s.valid || s.calculable === false) continue;
-    allMeds.push({ name: s.medRaw || 'Läkemedel', endDate: s.prescribedEndDateStr || '' });
+    allMeds.push({ name: s.medRaw || 'Läkemedel', endDate: s.prescribedEndDateStr || '', days: s.daysToPrescribedEnd ?? 0 });
   }
   if (allMeds.length === 0) return '';
 
@@ -178,7 +178,8 @@ export function buildNurseJournalText(
   const lines: string[] = [];
   lines.push(`Patient önskar förnyelse av ${allMeds.map(m => m.name).join(', ')}.`);
   for (const m of allMeds) {
-    lines.push(`  ${m.name} beräknas räcka t.o.m. ${m.endDate || '—'}.`);
+    const verb = m.days < 0 ? 'beräknades' : 'beräknas';
+    lines.push(`  ${m.name} ${verb} räcka t.o.m. ${m.endDate || '—'}.`);
   }
 
   const missing: string[] = [];
