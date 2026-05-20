@@ -210,8 +210,35 @@ export interface CardResult {
 // ⚠ Samma icke-reaktiva mönster som _cardStatusPrev ovan (feedback-loop-risken gäller även här).
 const _cardResultsCache = new Map<number, { fp: string; cr: CardResult | null; status: CardStatusCache }>();
 
-const _prescribeEnds = $state<Record<number, string>>({});
-let _cacheVersion = $state(0);
+let _lastPrescribeEnds: Record<number, string> = {};
+
+const _prescribeEnds = $derived.by((): Record<number, string> => {
+  void _app.currentDate;
+  const newEnds: Record<number, string> = {};
+  for (let i = 0; i < medCards.length; i++) {
+    const cardId = medCards[i]._cardId;
+    const ps = _prescribeState[cardId];
+    if (!ps?.packageSize) continue;
+    const cached = _cardResultsCache.get(cardId);  // icke-reaktiv Map — medvetet val: $state skulle skapa feedback-loop (cache update → derived → _texts → cache update). Max 1 cykels staleness, acceptabelt.
+    if (!cached?.cr) continue;
+    const s: MedState = {
+      _cardId: cardId,
+      dose: cached.cr.calc.dose,
+      doseInterval: cached.cr.calc.doseInterval,
+      doseUnit: cached.cr.calc.doseUnit,
+      prescribedEndDateStr: cached.cr.calc.prescribedEndDateStr,
+    };
+    const pr = calcPrescribeResult(s, ps);
+    if (pr?.endDateStr) newEnds[cardId] = pr.endDateStr;
+  }
+  const keys = Object.keys(newEnds);
+  const lastKeys = Object.keys(_lastPrescribeEnds);
+  if (keys.length === lastKeys.length && keys.every(k => newEnds[Number(k)] === _lastPrescribeEnds[Number(k)])) {
+    return _lastPrescribeEnds;
+  }
+  _lastPrescribeEnds = newEnds;  // mutation i $derived.by — etablerat "stable reference"-mönster. Byt till $derived.cache vid Svelte ≥5.13.
+  return newEnds;
+});
 
 const _texts = $derived.by((): TextResult => {
   try {
@@ -306,21 +333,7 @@ const _texts = $derived.by((): TextResult => {
 
   let patientText = '', patientTextEn = '', journalText = '';
   try {
-    const prescribeEnds: Record<number, string> = {};
-    for (const cr of cardResults) {
-      const ps = _prescribeState[cr.cardId];
-      if (ps?.packageSize) {
-        const s: MedState = {
-          _cardId: cr.cardId,
-          dose: cr.calc.dose,
-          doseInterval: cr.calc.doseInterval,
-          doseUnit: cr.calc.doseUnit,
-          prescribedEndDateStr: cr.calc.prescribedEndDateStr,
-        };
-        const pr = calcPrescribeResult(s, ps);
-        if (pr?.endDateStr) prescribeEnds[cr.cardId] = pr.endDateStr;
-      }
-    }
+    const prescribeEnds = _prescribeEnds;
     const ptCards = cardsForText.map(c => {
       let contactDateStr = '';
       if (c.daysToPrescribedEnd >= 14 && c.prescribedEndDateStr) {
@@ -408,12 +421,13 @@ export function getLtDoseRaw(): string { return _ltDoseRaw; }
 export function setLtDoseRaw(v: string): void { _ltDoseRaw = v; }
 
 export function setLtPeriodField(i: number, field: keyof LTPeriod, value: string): void {
-  if (ltPeriods[i]) {
-    if (field === 'total') {
-      ltPeriods[i][field] = parseFloat(value) || 0;
-    } else {
-      ltPeriods[i][field] = value as any;
-    }
+  if (!ltPeriods[i]) return;
+  if (field === 'total') {
+    ltPeriods[i].total = parseFloat(value) || 0;
+  } else if (field === 'start') {
+    ltPeriods[i].start = value;
+  } else if (field === 'end') {
+    ltPeriods[i].end = value;
   }
 }
 
@@ -492,8 +506,7 @@ export function clearAllMedState(): void {
   resetNurseState();
   _cardResultsCache.clear();
   _cardStatus = {};
-  for (const key of Object.keys(_prescribeEnds)) { delete _prescribeEnds[Number(key)]; }
-  _cacheVersion = 0;
+  _lastPrescribeEnds = {};
 }
 
 const _hasSummary = $derived.by(() => {

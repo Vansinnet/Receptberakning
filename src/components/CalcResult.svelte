@@ -101,7 +101,7 @@
     <!-- Åtgärd krävs — endast i läkarläge -->
     {#if !nurseViewActive}
     <div class="early-decision-box">
-      <div class="early-decision-label">⚑ Åtgärd krävs av medicinsk personal</div>
+      <div class="early-decision-label"><span aria-hidden="true">⚑ </span>Åtgärd krävs av medicinsk personal</div>
       <div class="early-decision-q">Utifrån ovanstående och patientens unika situation, bedöm om receptet ska förnyas.</div>
       <div class="early-decision-actions">
         <button type="button" class="btn early-btn early-btn-yes {card?.decision === 'yes' ? 'selected' : ''}" data-tooltip="Förnya receptet" onclick={() => onDecision('yes')}>✓ Förnya</button>
@@ -159,12 +159,12 @@
   </div>
 {:else if result && !result.valid}
   <div class="result-empty-state">
-    <div class="empty-icon">📋</div>
+    <div class="empty-icon" aria-hidden="true">📋</div>
     <div>{result.statusText || 'Resultatet visas här'}</div>
   </div>
 {:else}
   <div class="result-empty-state">
-    <div class="empty-icon">📋</div>
+    <div class="empty-icon" aria-hidden="true">📋</div>
     <div>Fyll i formuläret för att se resultatet</div>
   </div>
 {/if}

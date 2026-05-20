@@ -130,6 +130,9 @@
     }
   });
 
+  // Notera: dessa två $effect är avsiktligt separata.
+  // Sammanslagning orsakar feedback-loop (decision → _texts → _textsVersion → effect igen)
+  // som triggar Svelte 5:s iterationsgräns. Se Bug 3 i bugg-dokumentationen.
   $effect(() => {
     void _textsVersion();
     void hasSummary;
@@ -160,7 +163,8 @@
     resetInactivityTimer();
   });
 
-  // Nollställ decision när formulärdata ändras för ett kort
+  // Notera: hålls separat från _syncCardStatus-effekten ovan —
+  // sammanslagning orsakar Svelte 5 feedback-loop (se Bug 3).
   $effect(() => {
     for (let i = 0; i < medCards.length; i++) {
       const status = getCardStatus(medCards[i]._cardId);
@@ -244,17 +248,17 @@
                 />
               {:else if result && !result.valid}
                 <div class="result-empty-state">
-                  <div class="empty-icon">📋</div>
+                  <div class="empty-icon" aria-hidden="true">📋</div>
                   <div>{result.statusText || 'Fyll i formuläret för att se resultatet'}</div>
                 </div>
               {:else if result?.valid && result?.calculable === false}
                 <div class="result-empty-state">
-                  <div class="empty-icon">📋</div>
+                  <div class="empty-icon" aria-hidden="true">📋</div>
                   <div>{result.statusText || 'Kan ej beräknas'}</div>
                 </div>
               {:else}
                 <div class="result-empty-state">
-                  <div class="empty-icon">📋</div>
+                  <div class="empty-icon" aria-hidden="true">📋</div>
                   <div>Fyll i formuläret för att se resultatet</div>
                 </div>
               {/if}
@@ -273,7 +277,7 @@
 
     <footer class="site-footer">
       <div class="footer-disclaimer" role="note">
-        <span class="footer-disclaimer-icon">⚠</span>
+        <span class="footer-disclaimer-icon" aria-hidden="true">⚠</span>
         <span>Verktyget är ett beräkningshjälpmedel — förskrivaren ansvarar alltid för kliniska beslut.
           <a href="https://github.com/Vansinnet/Receptberakning/blob/main/disclaimer.md" target="_blank" rel="noopener noreferrer">Läs ansvarsfriskrivningen</a>
         </span>
@@ -290,7 +294,7 @@
 
   {#if showInactivityToast}
     <div class="inactivity-toast" role="alert" aria-live="assertive">
-      <span class="toast-icon">⏰</span>
+      <span class="toast-icon" aria-hidden="true">⏰</span>
       <span>Inaktivitet — sessionen rensas om <strong>{inactivityCountdown}s</strong></span>
       <button class="btn btn-ghost" onclick={dismissInactivityToast}>Fortsätt</button>
     </div>

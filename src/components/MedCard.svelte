@@ -273,7 +273,7 @@
     </div>
 {:else}
   <div class="form-empty-state">
-    <div class="empty-icon">💊</div>
+    <div class="empty-icon" aria-hidden="true">💊</div>
     <div>Välj ett läkemedel i listan</div>
   </div>
 {/if}

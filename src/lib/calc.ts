@@ -64,7 +64,7 @@ export function validateValues(
     fieldErrors.dateInput = 'Datumet är satt i framtiden.';
   }
 
-  const doseUnit = doseUnitRaw || 'st';
+  const doseUnit: DoseUnit = (doseUnitRaw === 'st' || doseUnitRaw === 'ml' || doseUnitRaw === 'dos') ? doseUnitRaw : 'st';
   const isDiscreteUnit = (doseUnit === 'st');
   const remaining = safeLeftRaw !== '' ? parseFloat(safeLeftRaw.replace(',', '.')) : null;
   const leftIsInvalid = safeLeftRaw !== '' && (
@@ -94,7 +94,7 @@ export function validateValues(
 
   const ref = refNum;
 
-  return { valid: true, medRaw, dateVal, pDate, amt, dose, ref, remaining, doseRaw, amtRaw: safeAmtRaw, refRaw: safeRefRaw, leftRaw: safeLeftRaw, doseInterval: doseInterval as DoseInterval, doseUnit: doseUnit as DoseUnit, notCalculable: !!notCalculable };
+  return { valid: true, medRaw, dateVal, pDate, amt, dose, ref, remaining, doseRaw, amtRaw: safeAmtRaw, refRaw: safeRefRaw, leftRaw: safeLeftRaw, doseInterval: doseInterval as DoseInterval, doseUnit, notCalculable: !!notCalculable };
 }
 
 // === CALCCORE ===

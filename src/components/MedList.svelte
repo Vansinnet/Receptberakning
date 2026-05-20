@@ -60,7 +60,7 @@
     {/each}
   </div>
   <button class="btn-add-med" class:is-hidden={medCards.length >= MAX_MED_CARDS} aria-label="Lägg till läkemedel" data-tooltip="Lägg till ett nytt läkemedel." onclick={handleAddMed}>
-    <span>＋</span> Lägg till
+    <span aria-hidden="true">＋ </span>Lägg till
   </button>
   <button class="btn btn-ghost" data-tooltip="Rensa all data och börja om med en ny patient." onclick={handleNewPatient}>Ny patient</button>
 </aside>
