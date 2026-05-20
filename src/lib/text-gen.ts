@@ -10,11 +10,9 @@ const EMPTY_STATE: MedState = {
   medRaw: '', medNameStripped: '', pDateStr: '', total: 0, dose: 0,
   doseUnit: 'st', doseUnitLabel: '', prescribedEndDateStr: '',
   displayAvgStr: '', avgNote: '', remainingDoses: null, daysRemaining: 0,
-  daysToPrescribedEnd: 0, renewDateStr: '', prescribedContactDateStr: '',
-  prescribedContactIsPast: false, valid: false, calculable: false,
-  earlyRenewalDecision: null, isOveruse: false, isTooEarly: false,
-  statusText: '', verdictTitle: '', verdictSub: '',
-  metrics: [], alerts: [], doseInterval: 1, endDateStr: '',
+  daysToPrescribedEnd: 0, valid: false, calculable: false,
+  decision: null, consumptionPct: 0,
+  statusText: '', metrics: [], alerts: [], doseInterval: 1, endDateStr: '',
 };
 
 export function resolveState(item: { state?: MedState | null; i: number }, states?: MedState[]): MedState {

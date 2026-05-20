@@ -47,7 +47,7 @@ export function validateValues(
   if (amtIsInvalid) fieldErrors.amtInput = `Ange ett heltal mellan 1 och ${MAX_AMT_VALUE}.`;
 
   const dose = parseFloat(doseRaw.replace(',', '.'));
-  const doseIsInvalid = doseRaw !== '' && (isNaN(dose) || String(dose) !== doseRaw.replace(',', '.').trim() || dose < MIN_DOSE_VALUE || dose > MAX_DOSE_VALUE);
+  const doseIsInvalid = doseRaw !== '' && (isNaN(dose) || dose < MIN_DOSE_VALUE || dose > MAX_DOSE_VALUE);
   if (doseIsInvalid) fieldErrors.doseInput = `Ange ett tal mellan ${MIN_DOSE_VALUE} och ${MAX_DOSE_VALUE}.`;
 
   const refNum = Number(safeRefRaw);

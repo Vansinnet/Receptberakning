@@ -1,6 +1,6 @@
 <script lang="ts">
   import { medCards, getActiveMedIdx, setActiveMedIdx, pushMedCard, getActiveResult, clearAllMedState, getCardStatus } from '$lib/state.svelte';
-  import { MAX_MED_CARDS } from '$lib/constants';
+  import { MAX_MED_CARDS, CONSUMPTION_NORMAL_LOW, CONSUMPTION_NORMAL_HIGH, DAYS_REMAINING_WARN } from '$lib/constants';
 
   function handleSelectMed(idx: number) {
     setActiveMedIdx(idx);
@@ -29,13 +29,13 @@
       if (!cs) return { cls: '', text: '—' };
       if (!cs.valid) return { cls: '', text: 'Ej ifyllt' };
       if (!cs.calculable) return { cls: '', text: cs.statusText || '—' };
-      const warn = cs.consumptionPct < 80 || cs.consumptionPct > 110 || cs.daysToPrescribedEnd >= 14;
+      const warn = cs.consumptionPct < CONSUMPTION_NORMAL_LOW || cs.consumptionPct > CONSUMPTION_NORMAL_HIGH || cs.daysToPrescribedEnd >= DAYS_REMAINING_WARN;
       return { cls: warn ? 'warn' : 'ok', text: cs.statusText };
     }
     if (!result) return { cls: '', text: '—' };
     if (!result.valid) return { cls: '', text: 'Ej ifyllt' };
     if (!result.calculable) return { cls: '', text: result.statusText || '—' };
-    const warn = result.consumptionPct < 80 || result.consumptionPct > 110 || result.daysToPrescribedEnd! >= 14;
+    const warn = result.consumptionPct < CONSUMPTION_NORMAL_LOW || result.consumptionPct > CONSUMPTION_NORMAL_HIGH || result.daysToPrescribedEnd! >= DAYS_REMAINING_WARN;
     return { cls: warn ? 'warn' : 'ok', text: result.statusText || '' };
   }
 </script>

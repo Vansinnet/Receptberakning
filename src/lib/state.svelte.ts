@@ -183,13 +183,7 @@ export function getCardStatus(cardId: number): CardStatusCache | undefined {
 // $derived: BERÄKNING
 // =====================================================
 
-const _activeResult = $derived(
-  (() => {
-    const r = calcCore(_activeValidated);
-    if (typeof window !== 'undefined') console.log('[v3 result]', r?.valid, r?.calculable, r?.statusText, r?.consumptionPct);
-    return r;
-  })()
-);
+const _activeResult = $derived(calcCore(_activeValidated));
 
 // =====================================================
 // $derived: TEXTORKESTRERING (ersätter generateAndDistribute)
@@ -483,8 +477,6 @@ const _hasSummary = $derived.by(() => {
       _cardId: medCards[i]._cardId,
       valid: status?.valid ?? false,
       calculable: status?.calculable ?? false,
-      isOveruse: status?.isOveruse ?? false,
-      isTooEarly: status?.isTooEarly ?? false,
       decision: medCards[i].decision,
     })) continue;
     count++;

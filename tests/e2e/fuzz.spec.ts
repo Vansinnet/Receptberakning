@@ -117,11 +117,11 @@ const SEQUENCES: Scenario[] = [
   // Byt till: date 2025-04-15 (61d): avg=100/61=1.64 → overuse ✓
   {
     med: 'Waran 2.5 mg', date: '2025-04-15', dose: '1', amt: '100', ref: '1', left: '0', expected: 'valid',
-    extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.getActiveMedIdx()].earlyRenewalDecision = 'yes'; }); },
+    extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.getActiveMedIdx()].decision = 'yes'; }); },
   },
   {
     med: 'Metformin 500 mg', date: '2025-02-15', dose: '1', amt: '100', ref: '2', left: '5', expected: 'valid',
-    extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.getActiveMedIdx()].earlyRenewalDecision = 'yes'; }); },
+    extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.getActiveMedIdx()].decision = 'yes'; }); },
   },
 
   // ==================== 8× FÖR TIDIG FÖRNYELSE (isTooEarly) ====================
@@ -142,11 +142,11 @@ const SEQUENCES: Scenario[] = [
   // 35–36 Too early + klinisk override (förnya ändå)
   {
     med: 'Losartan 50 mg', date: '2025-05-15', dose: '1', amt: '100', ref: '3', left: '280', expected: 'valid',
-    extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.getActiveMedIdx()].earlyRenewalDecision = 'yes'; }); },
+    extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.getActiveMedIdx()].decision = 'yes'; }); },
   },
   {
     med: 'Omeprazol 20 mg', date: '2025-06-01', dose: '1', amt: '100', ref: '3', left: '290', expected: 'valid',
-    extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.getActiveMedIdx()].earlyRenewalDecision = 'yes'; }); },
+    extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.getActiveMedIdx()].decision = 'yes'; }); },
   },
 
   // 37–38 Låg dos — Waran varannan dag

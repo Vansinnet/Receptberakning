@@ -11,7 +11,7 @@ import {
 // === CAN RENEW ===
 
 export function canRenewMed(s: MedState): boolean {
-  return !!(s.valid && s.calculable !== false);
+  return !!(s.valid && s.calculable !== false && s.decision !== 'no');
 }
 
 // === CALC PRESCRIBE RESULT ===

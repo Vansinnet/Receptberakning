@@ -19,8 +19,6 @@
     _cardId: card._cardId,
     valid: result.valid ?? false,
     calculable: result.calculable ?? false,
-    isOveruse: result.isOveruse ?? false,
-    isTooEarly: result.isTooEarly ?? false,
     decision: card.decision,
   }) : false);
 
@@ -184,9 +182,7 @@
                 _cardId: c._cardId,
                 valid: status?.valid ?? false,
                 calculable: status?.calculable ?? false,
-                isOveruse: status?.isOveruse ?? false,
-                isTooEarly: status?.isTooEarly ?? false,
-                earlyRenewalDecision: c.earlyRenewalDecision,
+                decision: c.decision,
               })}
                 {@const d = parseFloat((c.form.doseRaw || '').replace(',', '.')) || 0}
                 {@const pr = calcPrescribeResult({
