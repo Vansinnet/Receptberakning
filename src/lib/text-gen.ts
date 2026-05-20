@@ -149,11 +149,12 @@ export function buildJournalText(
     const endSuffix = prescribeEndDate ? ` (förskrivs t.o.m. ${prescribeEndDate})` : '';
     const consumptionStr = `${c.consumptionPct.toFixed(1)}% av ordinerad dos`;
     const note = c.daysToPrescribedEnd > 0 ? ` (${c.daysToPrescribedEnd} dagar kvar)` : ' (receptperioden är slut)';
+    const verb = c.daysToPrescribedEnd < 0 ? 'beräknades' : 'beräknas';
     const atgard = c.decision === 'yes' ? 'Åtgärd: Förnyat.'
       : c.decision === 'no' ? 'Åtgärd: Ej förnyat efter klinisk bedömning.'
       : 'Åtgärd: Klinisk bedömning krävs.';
 
-    lines.push(`Bedömning: Patienten begär förnyelse av ${c.name}. Senaste receptet utfärdades ${c.pDateStr} (totalt ${c.total} ${c.doseUnit || 'st'}, ordination ${c.dose} ${c.doseUnitLabel || 'st/dag'}) och beräknas räcka till ${c.prescribedEndDateStr}${note}.`);
+    lines.push(`Bedömning: Patienten begär förnyelse av ${c.name}. Senaste receptet utfärdades ${c.pDateStr} (totalt ${c.total} ${c.doseUnit || 'st'}, ordination ${c.dose} ${c.doseUnitLabel || 'st/dag'}) och ${verb} räcka till ${c.prescribedEndDateStr}${note}.`);
     lines.push(`Snittförbrukning: ${c.displayAvgStr} ${c.avgNote} (${consumptionStr}).`);
     lines.push(atgard, '');
   }
