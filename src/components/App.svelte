@@ -261,7 +261,7 @@
             </section>
 
             <!-- KOLUMN 5: Förskrivningspanel (alltid i DOM, reserverar plats) -->
-            <PrescribePanel visible={showPrescribe} />
+            <PrescribePanel visible={showPrescribe && !nurseActive} />
           </div>
         </div>
       {:else}
