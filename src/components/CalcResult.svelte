@@ -93,8 +93,8 @@
 
     <!-- Åtgärd krävs — alltid synlig -->
     <div class="early-decision-box">
-      <div class="early-decision-label">⚑ Åtgärd krävs för medicinsk personal</div>
-      <div class="early-decision-q">Bedöm om receptet ska förnyas.</div>
+      <div class="early-decision-label">⚑ Åtgärd krävs av medicinsk personal</div>
+      <div class="early-decision-q">Utifrån ovanstående och patientens unika situation, bedöm om receptet ska förnyas.</div>
       <div class="early-decision-actions">
         <button type="button" class="btn early-btn early-btn-yes {card?.decision === 'yes' ? 'selected' : ''}" data-tooltip="Förnya receptet" onclick={() => onDecision('yes')}>✓ Förnya</button>
         <button type="button" class="btn early-btn early-btn-no {card?.decision === 'no' ? 'selected' : ''}" data-tooltip="Avslå förnyelse" onclick={() => onDecision('no')}>✕ Avslå</button>
