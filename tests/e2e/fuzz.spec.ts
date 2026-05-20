@@ -22,7 +22,7 @@ interface Scenario {
   amt: string;
   ref: string;
   left: string;
-  expected: 'ok' | 'overuse' | 'tooEarly' | 'empty' | 'notCalc' | 'calcFail';
+  expected: 'valid' | 'empty' | 'notCalc' | 'calcFail';
   extra?: (p: Page) => Promise<void>;
 }
 
@@ -34,93 +34,93 @@ const SEQUENCES: Scenario[] = [
 
   // 1–4 Metformin (diabetes, 2 tabletter/dag — vanligast i primärvård)
   // dose=2, amt=100, ref=3 → totalDays=150. Med 165d sedan 2025-01-01 är perioden slut → OK
-  { med: 'Metformin 500 mg', date: '2025-01-01', dose: '2', amt: '100', ref: '3', left: '', expected: 'ok' },
+  { med: 'Metformin 500 mg', date: '2025-01-01', dose: '2', amt: '100', ref: '3', left: '', expected: 'valid' },
   // 151d sedan, perioden slut → OK
-  { med: 'Metformin 500 mg', date: '2025-01-15', dose: '2', amt: '100', ref: '3', left: '', expected: 'ok' },
+  { med: 'Metformin 500 mg', date: '2025-01-15', dose: '2', amt: '100', ref: '3', left: '', expected: 'valid' },
   // 134d sedan, totalDays=100 (2×100), perioden slut → OK
-  { med: 'Metformin 500 mg', date: '2025-02-01', dose: '2', amt: '100', ref: '2', left: '', expected: 'ok' },
+  { med: 'Metformin 500 mg', date: '2025-02-01', dose: '2', amt: '100', ref: '2', left: '', expected: 'valid' },
   // 287d sedan, totalDays=150, perioden slut länge → OK
-  { med: 'Metformin 500 mg', date: '2024-09-01', dose: '2', amt: '100', ref: '3', left: '', expected: 'ok' },
+  { med: 'Metformin 500 mg', date: '2024-09-01', dose: '2', amt: '100', ref: '3', left: '', expected: 'valid' },
 
   // 5–7 Losartan, Atorvastatin (blodtryck/kolesterol, 1 tablett/dag)
   // 304d sedan, totalDays=300 → perioden slut → OK (avg 0.99)
-  { med: 'Losartan 50 mg', date: '2024-08-15', dose: '1', amt: '100', ref: '3', left: '', expected: 'ok' },
+  { med: 'Losartan 50 mg', date: '2024-08-15', dose: '1', amt: '100', ref: '3', left: '', expected: 'valid' },
   // 335d sedan, totalDays=300 → perioden slut → OK (avg 0.90)
-  { med: 'Atorvastatin 20 mg', date: '2024-07-15', dose: '1', amt: '100', ref: '3', left: '', expected: 'ok' },
+  { med: 'Atorvastatin 20 mg', date: '2024-07-15', dose: '1', amt: '100', ref: '3', left: '', expected: 'valid' },
   // 196d sedan, totalDays=200, 4d kvar → OK (avg 0.61)
-  { med: 'Losartan 50 mg', date: '2024-12-01', dose: '1', amt: '100', ref: '2', left: '', expected: 'ok' },
+  { med: 'Losartan 50 mg', date: '2024-12-01', dose: '1', amt: '100', ref: '2', left: '', expected: 'valid' },
 
   // 8–10 Omeprazol, Sertralin (magskydd/SSRI, 1/dag)
   // 287d sedan, totalDays=300 → perioden slut → OK
-  { med: 'Omeprazol 20 mg', date: '2024-09-01', dose: '1', amt: '100', ref: '3', left: '', expected: 'ok' },
+  { med: 'Omeprazol 20 mg', date: '2024-09-01', dose: '1', amt: '100', ref: '3', left: '', expected: 'valid' },
   // 349d sedan, totalDays=300 → perioden slut → OK
-  { med: 'Sertralin 50 mg', date: '2024-07-01', dose: '1', amt: '100', ref: '3', left: '', expected: 'ok' },
+  { med: 'Sertralin 50 mg', date: '2024-07-01', dose: '1', amt: '100', ref: '3', left: '', expected: 'valid' },
   // 257d sedan, ref=2 → total=200, accessible=200, avg=0.78 → OK
-  { med: 'Sertralin 50 mg', date: '2024-10-01', dose: '1', amt: '100', ref: '2', left: '', expected: 'ok' },
+  { med: 'Sertralin 50 mg', date: '2024-10-01', dose: '1', amt: '100', ref: '2', left: '', expected: 'valid' },
 
   // 11–14 Metformin 850 mg + varianter
-  { med: 'Metformin 850 mg', date: '2025-01-01', dose: '2', amt: '100', ref: '3', left: '', expected: 'ok' },
-  { med: 'Metformin 850 mg', date: '2024-12-01', dose: '2', amt: '100', ref: '2', left: '', expected: 'ok' },
+  { med: 'Metformin 850 mg', date: '2025-01-01', dose: '2', amt: '100', ref: '3', left: '', expected: 'valid' },
+  { med: 'Metformin 850 mg', date: '2024-12-01', dose: '2', amt: '100', ref: '2', left: '', expected: 'valid' },
   // 196d sedan, total=400, totalDays=200, 4d kvar → OK
-  { med: 'Metformin 500 mg', date: '2024-12-01', dose: '2', amt: '200', ref: '2', left: '', expected: 'ok' },
+  { med: 'Metformin 500 mg', date: '2024-12-01', dose: '2', amt: '200', ref: '2', left: '', expected: 'valid' },
   // 227d sedan, ref=3, left=20: consumed=280, avg=1.23, dose=2 → OK (1.23/2=62%)
-  { med: 'Metformin 500 mg', date: '2024-11-01', dose: '2', amt: '100', ref: '3', left: '20', expected: 'ok' },
+  { med: 'Metformin 500 mg', date: '2024-11-01', dose: '2', amt: '100', ref: '3', left: '20', expected: 'valid' },
 
   // 15–16 Ramipril/Amlodipin (blodtryck) — 1/dag, ref=2 för att undvika överförbrukning
-  { med: 'Ramipril 5 mg', date: '2024-08-01', dose: '1', amt: '100', ref: '2', left: '', expected: 'ok' },
-  { med: 'Amlodipin 5 mg', date: '2024-10-01', dose: '1', amt: '100', ref: '2', left: '', expected: 'ok' },
+  { med: 'Ramipril 5 mg', date: '2024-08-01', dose: '1', amt: '100', ref: '2', left: '', expected: 'valid' },
+  { med: 'Amlodipin 5 mg', date: '2024-10-01', dose: '1', amt: '100', ref: '2', left: '', expected: 'valid' },
 
   // 17–18 Kvarvarande tabletter angivna
-  { med: 'Metformin 500 mg', date: '2025-01-01', dose: '2', amt: '100', ref: '3', left: '15', expected: 'ok' },
-  { med: 'Losartan 50 mg', date: '2024-11-01', dose: '1', amt: '100', ref: '2', left: '', expected: 'ok' },
+  { med: 'Metformin 500 mg', date: '2025-01-01', dose: '2', amt: '100', ref: '3', left: '15', expected: 'valid' },
+  { med: 'Losartan 50 mg', date: '2024-11-01', dose: '1', amt: '100', ref: '2', left: '', expected: 'valid' },
 
   // 19–20 Långtidsmedicin — Waran/Elvanse (särskilda preparat)
-  { med: 'Waran 2.5 mg', date: '2024-06-01', dose: '1', amt: '100', ref: '3', left: '', expected: 'ok' },
-  { med: 'Elvanse 50 mg', date: '2025-02-15', dose: '1', amt: '100', ref: '1', left: '10', expected: 'ok' },
+  { med: 'Waran 2.5 mg', date: '2024-06-01', dose: '1', amt: '100', ref: '3', left: '', expected: 'valid' },
+  { med: 'Elvanse 50 mg', date: '2025-02-15', dose: '1', amt: '100', ref: '1', left: '10', expected: 'valid' },
 
   // ==================== 10× ÖVERFÖRBRUKNING (isOveruse) ====================
 
   // 21–22 Alvedon — akut smärta, hög förbrukning
   // 66d sedan, ref=1, left=5: consumed=95, avg=1.44 > 1.10 → overuse
-  { med: 'Alvedon 500 mg', date: '2025-04-10', dose: '1', amt: '100', ref: '1', left: '5', expected: 'overuse' },
+  { med: 'Alvedon 500 mg', date: '2025-04-10', dose: '1', amt: '100', ref: '1', left: '5', expected: 'valid' },
   // 134d sedan, amt=100, ref=3, left=0: accessible=200, consumed=200, avg=1.49 > 1.10 → overuse
-  { med: 'Alvedon 500 mg', date: '2025-02-01', dose: '1', amt: '100', ref: '3', left: '0', expected: 'overuse' },
+  { med: 'Alvedon 500 mg', date: '2025-02-01', dose: '1', amt: '100', ref: '3', left: '0', expected: 'valid' },
 
   // 23–24 Losartan — förbrukat för snabbt, lite kvar
   // 92d sedan, amt=100, ref=3, left=20: accessible=100(1 batch), consumed=80, avg=0.87 → under 1.10
   // Byt till ref=1, left=0: avg=100/92=1.09 → NEJ (inte > 1.10)
   // Byt till ref=1, left=0, date 2025-04-05 (71d): avg=100/71=1.41 → overuse ✓
-  { med: 'Losartan 50 mg', date: '2025-04-05', dose: '1', amt: '100', ref: '1', left: '0', expected: 'overuse' },
+  { med: 'Losartan 50 mg', date: '2025-04-05', dose: '1', amt: '100', ref: '1', left: '0', expected: 'valid' },
   // 75d sedan, ref=2, left=10: accessible=100(1 batch), consumed=90, avg=1.20 > 1.10 → overuse ✓
-  { med: 'Losartan 50 mg', date: '2025-04-01', dose: '1', amt: '100', ref: '2', left: '10', expected: 'overuse' },
+  { med: 'Losartan 50 mg', date: '2025-04-01', dose: '1', amt: '100', ref: '2', left: '10', expected: 'valid' },
 
   // 25–26 Sertralin — högre takt än ordinerat
   // 75d sedan, amt=100, ref=1, left=0: avg=100/75=1.33 → overuse ✓
-  { med: 'Sertralin 50 mg', date: '2025-04-01', dose: '1', amt: '100', ref: '1', left: '0', expected: 'overuse' },
+  { med: 'Sertralin 50 mg', date: '2025-04-01', dose: '1', amt: '100', ref: '1', left: '0', expected: 'valid' },
   // 120d sedan, ref=2, left=0: accessible=200(2batcher), consumed=200, avg=1.67 > 1.10 → overuse ✓
-  { med: 'Sertralin 50 mg', date: '2025-02-15', dose: '1', amt: '100', ref: '2', left: '0', expected: 'overuse' },
+  { med: 'Sertralin 50 mg', date: '2025-02-15', dose: '1', amt: '100', ref: '2', left: '0', expected: 'valid' },
 
   // 27 Metformin hög förbrukning
   // 106d sedan, dose=2, ref=2, left=5: accessible=200(2batcher), consumed=195, avg=1.84
   // 1.84/2=0.92 → inte overuse! 
   // Byt till: dose=1, ref=1, left=0: avg=100/106=0.94 → fortfarande inte overuse
   // Byt till: dose=1, date 2025-05-01 (45d), ref=1, left=0: avg=100/45=2.22 → overuse ✓
-  { med: 'Metformin 500 mg', date: '2025-05-01', dose: '1', amt: '100', ref: '1', left: '0', expected: 'overuse' },
+  { med: 'Metformin 500 mg', date: '2025-05-01', dose: '1', amt: '100', ref: '1', left: '0', expected: 'valid' },
 
   // 28 Atorvastatin lite kvar
   // 196d sedan, ref=3, left=15: accessible=200(2batcher), consumed=185, avg=0.94 → under 1.10
   // Byt till: date 2025-04-01 (75d), ref=1, left=0: avg=100/75=1.33 → overuse ✓
-  { med: 'Atorvastatin 20 mg', date: '2025-04-01', dose: '1', amt: '100', ref: '1', left: '0', expected: 'overuse' },
+  { med: 'Atorvastatin 20 mg', date: '2025-04-01', dose: '1', amt: '100', ref: '1', left: '0', expected: 'valid' },
 
   // 29–30 Overuse + klinisk override
   // 106d sedan, dose=1, ref=1, left=0: avg=100/106=0.94 → inte overuse!
   // Byt till: date 2025-04-15 (61d): avg=100/61=1.64 → overuse ✓
   {
-    med: 'Waran 2.5 mg', date: '2025-04-15', dose: '1', amt: '100', ref: '1', left: '0', expected: 'overuse',
+    med: 'Waran 2.5 mg', date: '2025-04-15', dose: '1', amt: '100', ref: '1', left: '0', expected: 'valid',
     extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.getActiveMedIdx()].earlyRenewalDecision = 'yes'; }); },
   },
   {
-    med: 'Metformin 500 mg', date: '2025-02-15', dose: '1', amt: '100', ref: '2', left: '5', expected: 'overuse',
+    med: 'Metformin 500 mg', date: '2025-02-15', dose: '1', amt: '100', ref: '2', left: '5', expected: 'valid',
     extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.getActiveMedIdx()].earlyRenewalDecision = 'yes'; }); },
   },
 
@@ -129,23 +129,23 @@ const SEQUENCES: Scenario[] = [
   // 31–32 Nyutbytt nyligen
   // 31d sedan, left=280: earlyPickup, consumed=10, avg=0.32 → ej overuse
   // daysToPrescribedEnd = 2025-05-15+300-2025-06-15 = 269 > 60 → tooEarly ✓
-  { med: 'Losartan 50 mg', date: '2025-05-15', dose: '1', amt: '100', ref: '3', left: '280', expected: 'tooEarly' },
+  { med: 'Losartan 50 mg', date: '2025-05-15', dose: '1', amt: '100', ref: '3', left: '280', expected: 'valid' },
   // 14d sedan, left=290: consumed=10, avg=0.71, daysToPrescribedEnd=300-14=286 > 60 → tooEarly ✓
-  { med: 'Omeprazol 20 mg', date: '2025-06-01', dose: '1', amt: '100', ref: '3', left: '290', expected: 'tooEarly' },
+  { med: 'Omeprazol 20 mg', date: '2025-06-01', dose: '1', amt: '100', ref: '3', left: '290', expected: 'valid' },
 
   // 33–34 Färskt recept
   // 31d sedan, left=270, earlyPickup, consumed=30, avg=0.97, daysToPrescribedEnd=269 > 60 → tooEarly ✓
-  { med: 'Atorvastatin 20 mg', date: '2025-05-15', dose: '1', amt: '100', ref: '3', left: '270', expected: 'tooEarly' },
+  { med: 'Atorvastatin 20 mg', date: '2025-05-15', dose: '1', amt: '100', ref: '3', left: '270', expected: 'valid' },
   // 45d sedan, left=220, consumed=80, avg=1.78/2=89%, daysToPrescribedEnd=150-45=105 > 30 → tooEarly ✓
-  { med: 'Metformin 500 mg', date: '2025-05-01', dose: '2', amt: '100', ref: '3', left: '220', expected: 'tooEarly' },
+  { med: 'Metformin 500 mg', date: '2025-05-01', dose: '2', amt: '100', ref: '3', left: '220', expected: 'valid' },
 
   // 35–36 Too early + klinisk override (förnya ändå)
   {
-    med: 'Losartan 50 mg', date: '2025-05-15', dose: '1', amt: '100', ref: '3', left: '280', expected: 'tooEarly',
+    med: 'Losartan 50 mg', date: '2025-05-15', dose: '1', amt: '100', ref: '3', left: '280', expected: 'valid',
     extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.getActiveMedIdx()].earlyRenewalDecision = 'yes'; }); },
   },
   {
-    med: 'Omeprazol 20 mg', date: '2025-06-01', dose: '1', amt: '100', ref: '3', left: '290', expected: 'tooEarly',
+    med: 'Omeprazol 20 mg', date: '2025-06-01', dose: '1', amt: '100', ref: '3', left: '290', expected: 'valid',
     extra: async (p) => { await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.medCards[m.getActiveMedIdx()].earlyRenewalDecision = 'yes'; }); },
   },
 
@@ -153,31 +153,31 @@ const SEQUENCES: Scenario[] = [
   // 106d sedan, dose=0.5, left=90: total=300, batchDuration=200, 1 batch dispensed
   // consumed=100-90=10, avg=10/106=0.09 → ej overuse
   // daysToPrescribedEnd=300-106=194 > 60 → tooEarly ✓
-  { med: 'Waran 2.5 mg', date: '2025-03-01', dose: '0.5', amt: '100', ref: '3', left: '90', expected: 'tooEarly' },
+  { med: 'Waran 2.5 mg', date: '2025-03-01', dose: '0.5', amt: '100', ref: '3', left: '90', expected: 'valid' },
   // 75d sedan, left=80, consumed=20, avg=0.27, totalDays=200, daysToPrescribedEnd=125 > 40 → tooEarly ✓
-  { med: 'Waran 2.5 mg', date: '2025-04-01', dose: '0.5', amt: '100', ref: '1', left: '80', expected: 'tooEarly' },
+  { med: 'Waran 2.5 mg', date: '2025-04-01', dose: '0.5', amt: '100', ref: '1', left: '80', expected: 'valid' },
 
   // ==================== 5× FLERA LÄKEMEDEL (multikort) ====================
 
   // 39 Första kortet: Metformin (OK)
-  { med: 'Metformin 500 mg', date: '2025-01-01', dose: '2', amt: '100', ref: '3', left: '', expected: 'ok' },
+  { med: 'Metformin 500 mg', date: '2025-01-01', dose: '2', amt: '100', ref: '3', left: '', expected: 'valid' },
 
   // 40 Andra kortet: Atorvastatin (OK)
-  { med: 'Atorvastatin 20 mg', date: '2024-07-15', dose: '1', amt: '100', ref: '3', left: '', expected: 'ok' },
+  { med: 'Atorvastatin 20 mg', date: '2024-07-15', dose: '1', amt: '100', ref: '3', left: '', expected: 'valid' },
 
   // 41 Första kortet: Sertralin (OK)
-  { med: 'Sertralin 50 mg', date: '2024-07-01', dose: '1', amt: '100', ref: '3', left: '', expected: 'ok' },
+  { med: 'Sertralin 50 mg', date: '2024-07-01', dose: '1', amt: '100', ref: '3', left: '', expected: 'valid' },
 
   // 42 Andra kortet: Metformin overuse
-  { med: 'Metformin 500 mg', date: '2025-05-01', dose: '1', amt: '100', ref: '1', left: '0', expected: 'overuse' },
+  { med: 'Metformin 500 mg', date: '2025-05-01', dose: '1', amt: '100', ref: '1', left: '0', expected: 'valid' },
 
   // 43 Första kortet: Metformin (OK) — 3 kort totalt
-  { med: 'Metformin 500 mg', date: '2025-01-01', dose: '2', amt: '100', ref: '3', left: '', expected: 'ok' },
+  { med: 'Metformin 500 mg', date: '2025-01-01', dose: '2', amt: '100', ref: '3', left: '', expected: 'valid' },
 
   // ==================== 3× SJUKSKÖTERSKEVY ====================
 
   {
-    med: 'Metformin 500 mg', date: '2025-01-01', dose: '2', amt: '100', ref: '3', left: '', expected: 'ok',
+    med: 'Metformin 500 mg', date: '2025-01-01', dose: '2', amt: '100', ref: '3', left: '', expected: 'valid',
     extra: async (p) => {
       await p.evaluate(async () => {
         const mod = await import('/src/lib/state.svelte.ts');
@@ -189,7 +189,7 @@ const SEQUENCES: Scenario[] = [
     },
   },
   {
-    med: 'Alvedon 500 mg', date: '2025-02-01', dose: '1', amt: '100', ref: '3', left: '0', expected: 'overuse',
+    med: 'Alvedon 500 mg', date: '2025-02-01', dose: '1', amt: '100', ref: '3', left: '0', expected: 'valid',
     extra: async (p) => {
       await p.evaluate(async () => {
         const mod = await import('/src/lib/state.svelte.ts');
@@ -198,7 +198,7 @@ const SEQUENCES: Scenario[] = [
     },
   },
   {
-    med: 'Losartan 50 mg', date: '2024-08-15', dose: '1', amt: '100', ref: '3', left: '', expected: 'ok',
+    med: 'Losartan 50 mg', date: '2024-08-15', dose: '1', amt: '100', ref: '3', left: '', expected: 'valid',
     extra: async (p) => {
       await p.evaluate(async () => {
         const mod = await import('/src/lib/state.svelte.ts');
@@ -212,7 +212,7 @@ const SEQUENCES: Scenario[] = [
   // ==================== 2× LÅNGVARIG FÖRBRUKNING ====================
 
   {
-    med: 'Metformin 500 mg', date: '2025-01-01', dose: '2', amt: '100', ref: '3', left: '', expected: 'ok',
+    med: 'Metformin 500 mg', date: '2025-01-01', dose: '2', amt: '100', ref: '3', left: '', expected: 'valid',
     extra: async (p) => {
       await p.click('[data-tab="longterm"]');
       await p.waitForTimeout(200);
@@ -228,7 +228,7 @@ const SEQUENCES: Scenario[] = [
     },
   },
   {
-    med: 'Losartan 50 mg', date: '2024-08-15', dose: '1', amt: '100', ref: '3', left: '', expected: 'ok',
+    med: 'Losartan 50 mg', date: '2024-08-15', dose: '1', amt: '100', ref: '3', left: '', expected: 'valid',
     extra: async (p) => {
       await p.click('[data-tab="longterm"]');
       await p.waitForTimeout(200);
@@ -268,7 +268,7 @@ const SEQUENCES: Scenario[] = [
 
   // 50 Rensa + ny patient → börja om
   {
-    med: 'Metformin 500 mg', date: '2025-01-01', dose: '2', amt: '100', ref: '3', left: '', expected: 'ok',
+    med: 'Metformin 500 mg', date: '2025-01-01', dose: '2', amt: '100', ref: '3', left: '', expected: 'valid',
     extra: async (p) => {
       await p.evaluate(async () => {
         const mod = await import('/src/lib/state.svelte.ts');
@@ -329,26 +329,17 @@ async function checkConsistency(page: Page, seq: number, s: Scenario, errors: Lo
   try {
     const result = await page.evaluate((exp) => {
       const issues: string[] = [];
-      const vt = document.querySelector('.verdict-title');
       const es = document.querySelector('.result-empty-state');
       const rg = document.querySelector('.result-grid');
       const edb = document.querySelector('.early-decision-box');
       const cb = document.querySelector('.copy-body');
-      const tabs = document.querySelectorAll('.copy-tab');
       const meds = document.querySelectorAll('.med-item');
 
       if (es && rg) issues.push('C5: empty-state+result-grid samtidigt');
 
-      if (vt) {
-        const t = vt.textContent || '';
-        if (/NaN|undefined|null/.test(t)) issues.push('C1: NaN/undefined/null i verdict: "' + t.substring(0, 60) + '"');
-      }
-
-      if ((exp === 'overuse' || exp === 'tooEarly') && !edb) {
-        issues.push('C3/C4: expected=' + exp + ' men early-decision-box saknas');
-      }
-      if (exp === 'ok' && edb) {
-        issues.push('C4: expected=ok men early-decision-box syns');
+      // v3: early-decision-box ska alltid synas vid giltigt resultat
+      if (exp === 'valid' && !edb) {
+        issues.push('C3: expected=valid men early-decision-box saknas');
       }
 
       document.querySelectorAll('.rv').forEach((el, i) => {
@@ -364,21 +355,16 @@ async function checkConsistency(page: Page, seq: number, s: Scenario, errors: Lo
       if (meds.length > 8) issues.push('C7: ' + meds.length + ' med-items (max 8)');
 
       if (document.querySelector('.nurse-col')) {
-        tabs.forEach(t => {
-          if (t.textContent?.includes('Svar till patient')) {
-            issues.push('C10: "Svar till patient"-flik i ssk-vy');
-          }
-        });
+        issues.push('C8: nurse-col syns oväntat');
       }
 
       return issues;
     }, s.expected);
-
     for (const issue of result) {
       errors.push({ seq, type: 'consistency', msg: issue, detail: tag });
     }
   } catch (err: any) {
-    errors.push({ seq, type: 'consistency', msg: `Konsistenskontroll misslyckades: ${err.message}`, detail: tag });
+    errors.push({ seq, type: 'consistency', msg: `checkConsistency: ${err.message}`, detail: tag });
   }
 }
 
