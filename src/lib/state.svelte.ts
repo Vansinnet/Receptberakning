@@ -9,7 +9,7 @@
 
 import type { DoseUnit, DoseInterval, CalcResult, MedState } from './types';
 import { validateValues, calcCore } from './calc';
-import { getToday, stripManufacturer } from './utils';
+import { getToday, stripManufacturer, parseDateUTC, fmtDate } from './utils';
 import { calcPrescribeResult, canRenewMed } from './prescribe-calc';
 import { buildPatientText, buildJournalText, buildNurseJournalText } from './text-gen';
 import { MAX_MED_CARDS, MAX_LT_PERIODS, MIN_LT_PERIODS } from './constants';
@@ -305,7 +305,20 @@ const _texts = $derived.by((): TextResult => {
 
   let patientText = '', patientTextEn = '', journalText = '';
   try {
-    const ptCards = cardsForText.map(c => ({ name: c.name, prescribedEndDateStr: c.prescribedEndDateStr, decision: c.decision }));
+    const ptCards = cardsForText.map(c => {
+      let contactDateStr = '';
+      if (c.daysToPrescribedEnd >= 14 && c.prescribedEndDateStr) {
+        const parsed = parseDateUTC(c.prescribedEndDateStr);
+        if (parsed) {
+          parsed.setUTCDate(parsed.getUTCDate() - 7);
+          contactDateStr = fmtDate(parsed);
+        }
+      }
+      return {
+        name: c.name, prescribedEndDateStr: c.prescribedEndDateStr, decision: c.decision,
+        daysToPrescribedEnd: c.daysToPrescribedEnd, contactDateStr,
+      };
+    });
     patientText   = buildPatientText('sv', ptCards);
     patientTextEn = buildPatientText('en', ptCards);
     journalText   = buildJournalText(cardsForText, validCount);
