@@ -185,11 +185,11 @@ describe('calcCore (v3)', () => {
 describe('calcLongtermCore', () => {
   const d = (n:number) => { const dt = new Date(Date.UTC(2025,4,20)); dt.setUTCDate(dt.getUTCDate()-n); return `${dt.getUTCFullYear()}-${String(dt.getUTCMonth()+1).padStart(2,'0')}-${String(dt.getUTCDate()).padStart(2,'0')}`; };
   it('empty→false',()=>{expect(calcLongtermCore('',0,[]).valid).toBe(false);});
-  it('one period',()=>{const r=calcLongtermCore('Metformin',1,[{start:d(90),end:d(0),total:'90'}]);expect(r.valid).toBe(true);expect(r.totalDays).toBe(90);});
-  it('two periods',()=>{const r=calcLongtermCore('Metformin',1,[{start:d(180),end:d(90),total:'90'},{start:d(90),end:d(0),total:'90'}]);expect(r.totalDays).toBe(180);});
-  it('overlap',()=>{const r=calcLongtermCore('Metformin',1,[{start:d(120),end:d(30),total:'90'},{start:d(100),end:d(0),total:'100'}]);expect(r.hasOverlap).toBe(true);});
-  it('future start→error',()=>{expect(calcLongtermCore('Metformin',1,[{start:'2099-01-01',end:d(0),total:'90'}]).periodErrors[0].startError).toBe(true);});
-  it('periods length',()=>{expect(calcLongtermCore('Metformin',1,[{start:d(180),end:d(90),total:'90'},{start:d(90),end:d(0),total:'90'}]).periods).toHaveLength(2);});
+  it('one period',()=>{const r=calcLongtermCore('Metformin',1,[{start:d(90),end:d(0),total:90}]);expect(r.valid).toBe(true);expect(r.totalDays).toBe(90);});
+  it('two periods',()=>{const r=calcLongtermCore('Metformin',1,[{start:d(180),end:d(90),total:90},{start:d(90),end:d(0),total:90}]);expect(r.totalDays).toBe(180);});
+  it('overlap',()=>{const r=calcLongtermCore('Metformin',1,[{start:d(120),end:d(30),total:90},{start:d(100),end:d(0),total:100}]);expect(r.hasOverlap).toBe(true);});
+  it('future start→error',()=>{expect(calcLongtermCore('Metformin',1,[{start:'2099-01-01',end:d(0),total:90}]).periodErrors[0].startError).toBe(true);});
+  it('periods length',()=>{expect(calcLongtermCore('Metformin',1,[{start:d(180),end:d(90),total:90},{start:d(90),end:d(0),total:90}]).periods).toHaveLength(2);});
 });
 
 // =====================================================
@@ -199,6 +199,14 @@ describe('calcPrescribeResult', () => {
   it('date mode',()=>{const r=calcPrescribeResult({_cardId:1,dose:1,doseInterval:1,doseUnit:'st',prescribedEndDateStr:'2025-01-01'} as any,{packageSize:'30',mode:'date',endDate:'2025-09-20'});expect(r!.packages).toBeGreaterThan(0);});
   it('startFromToday→starts today',()=>{const r=calcPrescribeResult({_cardId:1,dose:1,doseInterval:1,doseUnit:'st',prescribedEndDateStr:'2025-09-20'} as any,{packageSize:'30',mode:'months',months:3,startFromToday:true});expect(r!.startDateStr).toBe('2025-05-20');});
   it('dose=0→packages=0',()=>{expect(calcPrescribeResult({_cardId:1,dose:0} as any,{packageSize:'30',mode:'months',months:1})!.packages).toBe(0);});
+
+  // regression Bug 36: månadsläge med kvarvarande receptdagar
+  it('framtida slutdatum, månader → packages baserat på startDate',()=>{
+    const r=calcPrescribeResult({_cardId:1,dose:1,doseInterval:1,doseUnit:'st',prescribedEndDateStr:'2025-07-20'} as any,{packageSize:'30',mode:'months',months:3});
+    expect(r).not.toBeNull();
+    expect(r!.totalDays).toBeGreaterThan(80); // ~92 dagar, inte ~30
+    expect(r!.packages).toBeGreaterThanOrEqual(3);
+  });
 });
 
 // =====================================================
@@ -206,6 +214,8 @@ describe('canRenewMed', () => {
   it('valid+calculable→true',()=>{expect(canRenewMed({_cardId:1,valid:true,calculable:true} as any)).toBe(true);});
   it('valid:false→false',()=>{expect(canRenewMed({_cardId:1,valid:false,calculable:true} as any)).toBe(false);});
   it('calculable:false→false',()=>{expect(canRenewMed({_cardId:1,valid:true,calculable:false} as any)).toBe(false);});
+  it('decision:no→false',()=>{expect(canRenewMed({_cardId:1,valid:true,calculable:true,decision:'no'} as any)).toBe(false);});
+  it('decision:yes→true',()=>{expect(canRenewMed({_cardId:1,valid:true,calculable:true,decision:'yes'} as any)).toBe(true);});
 });
 
 // =====================================================

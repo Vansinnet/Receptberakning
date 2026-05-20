@@ -54,6 +54,7 @@ async function loadFromCache(): Promise<CacheData | null> {
         db.close();
       };
       req.onerror = () => { resolve(null); db.close(); };
+      tx.onerror = () => { resolve(null); try { db.close(); } catch {} };
     });
   } catch {
     return null;
@@ -65,8 +66,7 @@ async function fetchAndCache(serverVersion: number): Promise<DrugEntry[]> {
   if (!resp.ok) throw new Error(`drugs.json: ${resp.status}`);
   const entries = await resp.json();
   if (!Array.isArray(entries)) throw new Error('drugs.json: unexpected format');
-  if (serverVersion > 0) {
-    openDB().then(db => {
+  openDB().then(db => {
       try {
         const tx = db.transaction(STORE_NAME, 'readwrite');
         const store = tx.objectStore(STORE_NAME);
@@ -75,7 +75,6 @@ async function fetchAndCache(serverVersion: number): Promise<DrugEntry[]> {
         req.onerror = () => { console.warn('[drug-search] IndexedDB cache write failed:', req.error); db.close(); };
       } catch (e) { console.warn('[drug-search] IndexedDB transaction failed:', e); }
     }).catch(e => { console.warn('[drug-search] IndexedDB open failed:', e); });
-  }
   return entries;
 }
 
@@ -95,7 +94,7 @@ export async function loadDrugs(): Promise<void> {
 
       const cached = await loadFromCache();
 
-      if (cached && cached.version === serverVersion && serverVersion > 0) {
+      if (cached && cached.version === serverVersion) {
         _drugList = cached.entries;
       } else {
         _drugList = await fetchAndCache(serverVersion);

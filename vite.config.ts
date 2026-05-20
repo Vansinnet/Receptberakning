@@ -9,7 +9,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}', 'data/drugs-version.json'],
         runtimeCaching: [{
           urlPattern: /\/data\/drugs\.json/,
           handler: 'StaleWhileRevalidate',

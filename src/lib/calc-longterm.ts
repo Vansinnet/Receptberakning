@@ -28,17 +28,17 @@ export function calcLongtermCore(
     const p         = rawPeriods[i];
     const startDate = parseDateUTC(p.start);
     const endDate   = parseDateUTC(p.end);
-    const totalVal  = parseFloat(p.total);
+    const totalVal  = p.total;
 
     periodErrors.push({
       id:         i,
       startError: !!(p.start !== '' && (!startDate || startDate > today)),
       endError:   !!(p.end   !== '' && (!endDate   || endDate > today || !startDate || endDate <= startDate)),
-      totalError: !!(p.total !== '' && (isNaN(totalVal) || totalVal <= 0 || !Number.isInteger(totalVal))),
+      totalError: !!(p.total > 0 && !Number.isInteger(p.total)),
       spanError:  false,
     });
 
-    if (startDate && endDate && endDate <= today && !isNaN(totalVal) && totalVal > 0 && Number.isInteger(totalVal) && startDate < endDate) {
+    if (startDate && endDate && endDate <= today && totalVal > 0 && Number.isInteger(totalVal) && startDate < endDate) {
       const days = getDaysDiff(endDate, startDate);
       if (days <= 0 || days > MAX_PERIOD_SPAN_DAYS) {
         periodErrors[periodErrors.length - 1].spanError = true;

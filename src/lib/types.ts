@@ -145,7 +145,7 @@ export interface LTCardInput {
 export interface LTCardPeriod {
   start: string;
   end: string;
-  total: string;
+  total: number;
 }
 
 export interface LTPeriodError {

@@ -386,11 +386,11 @@ export function _textsVersion(): number {
 
 export interface LTPeriod {
   start: string;
-  total: string;
+  total: number;
   end: string;
 }
 
-export const ltPeriods = $state<LTPeriod[]>([{ start: '', total: '', end: '' }]);
+export const ltPeriods = $state<LTPeriod[]>([{ start: '', total: 0, end: '' }]);
 
 let _ltMedRaw = $state('');
 let _ltDoseRaw = $state('');
@@ -401,12 +401,18 @@ export function getLtDoseRaw(): string { return _ltDoseRaw; }
 export function setLtDoseRaw(v: string): void { _ltDoseRaw = v; }
 
 export function setLtPeriodField(i: number, field: keyof LTPeriod, value: string): void {
-  if (ltPeriods[i]) ltPeriods[i][field] = value;
+  if (ltPeriods[i]) {
+    if (field === 'total') {
+      ltPeriods[i][field] = parseFloat(value) || 0;
+    } else {
+      ltPeriods[i][field] = value as any;
+    }
+  }
 }
 
 export function pushLtPeriod(): boolean {
   if (ltPeriods.length >= MAX_LT_PERIODS) return false;
-  ltPeriods.push({ start: '', total: '', end: '' });
+  ltPeriods.push({ start: '', total: 0, end: '' });
   return true;
 }
 
@@ -418,7 +424,7 @@ export function spliceLtPeriod(i: number): boolean {
 
 export function resetLtPeriods(): void {
   ltPeriods.length = 0;
-  ltPeriods.push({ start: '', total: '', end: '' });
+  ltPeriods.push({ start: '', total: 0, end: '' });
 }
 
 // =====================================================

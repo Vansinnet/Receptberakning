@@ -57,7 +57,7 @@ export function parseDateUTC(str: string): Date | null {
 // === DOSE UNIT EXTRACTION ===
 
 export function extractDoseUnit(medRaw: string): { amount: number; unit: string } | null {
-  const m = medRaw.match(/(\d+(?:[.,]\d+)?)\s*(mg|ml|µg|mikrogram|mikrog|microgram|mcg|nanogram|gram|ng|IU|IE|g|mmol)\b/i);
+  const m = medRaw.match(/(\d+(?:[.,]\d+)?)\s*(mg|ml|µg|μg|mikrogram|mikrog|microgram|mcg|nanogram|gram|ng|IU|IE|g|mmol)\b/i);
   if (!m) return null;
   const amount  = parseFloat(m[1].replace(',', '.'));
   const rawUnit = m[2].toLowerCase();
