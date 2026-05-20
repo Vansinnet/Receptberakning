@@ -1,7 +1,25 @@
-/* ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════════
    RECEPTBERÄKNING — app.css
    Widescreen-layout: topbar + tre-kolumnsvy
-   ═══════════════════════════════════════════════════════ */
+
+   INNEHÅLL
+   ──────────────────────────────────────────────────────────────────────────
+   l.1–78     CSS-variabler & teman (default + dark/klinisk/sakura)
+   l.80–101   Reset & noscript-fallback
+   l.103–115  App-shell — centrerad max-bredd
+   l.117–175  Topbar — sticky header med tabs & inställningar
+   l.177–190  Tab-paneler — .tab-panel aktiv/dold
+   l.184–300  Receptförnyelse — tre-kolumns widescreen-layout
+   l.302–     MedSidebar — läkemedelslista (kolumn 1)
+   l.346–     FormPanel — formulär (kolumn 2)
+   l.538–     ResultPanel — resultat (kolumn 4)
+   l.864–868  Progressbar-breddklasser (w0..w100, 5%-steg)
+   l.870–     Alerts, Copy-sektion, Early-decision
+   l.1062–    PrescribePanel — förskrivningspanel (kolumn 5)
+   l.1180–    NurseView — sjuksköterskebedömning (kolumn 3)
+   l.1312–    Print — @media print
+   l.1481–    Fas 6.4 — komponenttillägg (statusbadge, inactivity toast)
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ── CSS-variabel-bas ── */
 :root {

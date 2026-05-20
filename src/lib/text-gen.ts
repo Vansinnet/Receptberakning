@@ -2,103 +2,133 @@ import { getToday, parseDateUTC } from './utils';
 
 // === PATIENT TEXT ===
 
-const PATIENT_TEXT: Record<string, { greeting: string; closing: string }> = {
-  sv: { greeting: 'Hej,', closing: 'Vid frågor är du välkommen att kontakta oss via 1177.' },
-  en: { greeting: 'Hello,', closing: 'If you have questions, please contact us through 1177.' },
+type CardView = {
+  name: string;
+  prescribedEndDateStr?: string;
+  decision: 'yes' | 'no' | null;
+  daysToPrescribedEnd?: number;
+  contactDateStr?: string;
+  prescribeEnd?: string;
 };
 
-export function buildPatientText(
-  lang: string,
-  cards: Array<{ name: string; prescribedEndDateStr?: string; decision: 'yes' | 'no' | null; daysToPrescribedEnd?: number; contactDateStr?: string; prescribeEnd?: string }>
-): string {
-  const t = PATIENT_TEXT[lang] || PATIENT_TEXT.sv;
-  const en = lang === 'en';
-  const lines: string[] = [t.greeting, ''];
+const TPL = {
+  sv: {
+    greeting: 'Hej,',
+    closing: 'Vid frågor är du välkommen att kontakta oss via 1177.',
+    single_yes: (name: string, end: string) =>
+      `Vi har tagit emot din förfrågan om receptförnyelse för ${name}. Vi förnyar ditt recept${end}.`,
+    single_yes_footer: 'Du kan inom 2–3 arbetsdagar hämta ut det på valfritt apotek.',
+    single_no_header: 'Vi har tagit emot din förfrågan.',
+    single_no_body: (verb: string, date: string, contact: string) =>
+      `Nuvarande recept ${verb} räcka t.o.m. ${date}.${contact}`,
+    single_no_footer: 'Vi kan tyvärr inte förnya receptet vid detta tillfälle efter klinisk individuell bedömning av läkare.',
+    single_null: (name: string) =>
+      `Vi har tagit emot din förfrågan om receptförnyelse för ${name}. Din förfrågan är under bedömning.`,
+    multi_intro: (list: string) =>
+      `Vi har tagit emot din förfrågan om receptförnyelse för följande läkemedel: ${list}.`,
+    multi_item_yes: (name: string, end: string) =>
+      `  ${name}: Vi förnyar ditt recept${end}. Du kan inom 2–3 arbetsdagar hämta ut det på valfritt apotek.`,
+    multi_item_no: (name: string, verb: string, date: string, contact: string) =>
+      `  ${name}: Kan tyvärr inte förnyas. Nuvarande recept ${verb} räcka t.o.m. ${date}.${contact}`,
+    multi_item_no_nodate: (name: string) =>
+      `  ${name}: Kan tyvärr inte förnyas efter klinisk individuell bedömning av läkare.`,
+  },
+  en: {
+    greeting: 'Hello,',
+    closing: 'If you have questions, please contact us through 1177.',
+    single_yes: (name: string, end: string) =>
+      `We have received your prescription renewal request for ${name}. We will renew your prescription${end}.`,
+    single_yes_footer: 'You can collect your medication at any pharmacy within 2–3 working days.',
+    single_no_header: 'We have received your request.',
+    single_no_body: (verb: string, date: string, contact: string) =>
+      `The current prescription ${verb} to last until ${date}.${contact}`,
+    single_no_footer: 'We are unfortunately unable to renew the prescription at this time following an individual clinical assessment by a physician.',
+    single_null: (name: string) =>
+      `We have received your prescription renewal request for ${name}. Your request is currently being assessed.`,
+    multi_intro: (list: string) =>
+      `We have received your prescription renewal request for the following medications: ${list}.`,
+    multi_item_yes: (name: string, end: string) =>
+      `  ${name}: We will renew your prescription${end}. You can collect it within 2–3 working days.`,
+    multi_item_no: (name: string, verb: string, date: string, contact: string) =>
+      `  ${name}: Unable to renew. Prescription ${verb} to last until ${date}.${contact}`,
+    multi_item_no_nodate: (name: string) =>
+      `  ${name}: Unable to renew following clinical assessment.`,
+  },
+};
 
-  const list = cards.map(c => c.name).join(', ');
-  const first = cards[0];
+function _noBody(lang: typeof TPL.sv, days: number, date: string, contact?: string): string {
+  const verb = days < 0 ? 'beräknades' : 'beräknas';
+  const contactStr = days >= 14 && contact ? ` Hör av dig närmare ${contact}.` : '';
+  return lang.single_no_body(verb, date, contactStr);
+}
 
-  if (cards.length === 1 && first) {
-    if (first.decision === 'yes') {
-      const endText = first.prescribeEnd ? ` så att det räcker till ${first.prescribeEnd}` : '';
-      lines.push(en
-        ? `We have received your prescription renewal request for ${first.name}. We will renew your prescription${first.prescribeEnd ? ` to last until ${first.prescribeEnd}` : ''}.`
-        : `Vi har tagit emot din förfrågan om receptförnyelse för ${first.name}. Vi förnyar ditt recept${endText}.`);
-      lines.push(en
-        ? `You can collect your medication at any pharmacy within 2–3 working days.`
-        : `Du kan inom 2–3 arbetsdagar hämta ut det på valfritt apotek.`);
-    } else if (first.decision === 'no') {
-      const prescribedEnd = first.prescribedEndDateStr;
-      const days = first.daysToPrescribedEnd ?? 0;
-      const verb = days < 0 ? 'beräknades' : 'beräknas';
-      if (en) {
-        lines.push(`We have received your request.`);
-        if (prescribedEnd) {
-          const enPast = days < 0 ? 'was expected' : 'is expected';
-          if (days >= 14 && first.contactDateStr) {
-            lines.push(`The current prescription ${enPast} to last until ${prescribedEnd}. Please contact us again closer to ${first.contactDateStr}.`);
-          } else {
-            lines.push(`The current prescription ${enPast} to last until ${prescribedEnd}.`);
-          }
-        }
-        lines.push(`We are unfortunately unable to renew the prescription at this time following an individual clinical assessment by a physician.`);
-      } else {
-        lines.push(`Vi har tagit emot din förfrågan.`);
-        if (prescribedEnd) {
-          if (days >= 14 && first.contactDateStr) {
-            lines.push(`Nuvarande recept ${verb} räcka t.o.m. ${prescribedEnd}. Hör av dig närmare ${first.contactDateStr}.`);
-          } else {
-            lines.push(`Nuvarande recept ${verb} räcka t.o.m. ${prescribedEnd}.`);
-          }
-        }
-        lines.push(`Vi kan tyvärr inte förnya receptet vid detta tillfälle efter klinisk individuell bedömning av läkare.`);
-      }
-    } else {
-      lines.push(en
-        ? `We have received your prescription renewal request for ${first.name}. Your request is currently being assessed.`
-        : `Vi har tagit emot din förfrågan om receptförnyelse för ${first.name}. Din förfrågan är under bedömning.`);
+function _noBodyEn(lang: typeof TPL.en, days: number, date: string, contact?: string): string {
+  const verb = days < 0 ? 'was expected' : 'is expected';
+  const contactStr = days >= 14 && contact ? ` Please contact us again closer to ${contact}.` : '';
+  return lang.single_no_body(verb, date, contactStr);
+}
+
+function _itemNoBody(lang: typeof TPL.sv, name: string, days: number, date: string, contact?: string): string {
+  const verb = days < 0 ? 'beräknades' : 'beräknas';
+  const contactStr = days >= 14 && contact ? ` Hör av dig närmare ${contact}.` : '';
+  return lang.multi_item_no(name, verb, date, contactStr);
+}
+
+function _itemNoBodyEn(lang: typeof TPL.en, name: string, days: number, date: string, contact?: string): string {
+  const verb = days < 0 ? 'was expected' : 'is expected';
+  const contactStr = days >= 14 && contact ? ` Please contact us again closer to ${contact}.` : '';
+  return lang.multi_item_no(name, verb, date, contactStr);
+}
+
+function _buildSingle(lang: typeof TPL.sv, card: CardView, en: boolean): string[] {
+  if (card.decision === 'yes') {
+    const end = card.prescribeEnd ? (en ? ` to last until ${card.prescribeEnd}` : ` så att det räcker till ${card.prescribeEnd}`) : '';
+    return [lang.single_yes(card.name, end), lang.single_yes_footer];
+  }
+  if (card.decision === 'no') {
+    const lines = [lang.single_no_header];
+    const date = card.prescribedEndDateStr;
+    if (date) {
+      const days = card.daysToPrescribedEnd ?? 0;
+      lines.push(en ? _noBodyEn(TPL.en, days, date, card.contactDateStr) : _noBody(lang, days, date, card.contactDateStr));
     }
-  } else if (cards.length > 1) {
-    lines.push(en
-      ? `We have received your prescription renewal request for the following medications: ${list}.`
-      : `Vi har tagit emot din förfrågan om receptförnyelse för följande läkemedel: ${list}.`);
-    for (const c of cards) {
-      if (c.decision === 'yes') {
-        const endText = c.prescribeEnd ? ` så att det räcker till ${c.prescribeEnd}` : '';
-        lines.push(en
-          ? `  ${c.name}: We will renew your prescription${c.prescribeEnd ? ` to last until ${c.prescribeEnd}` : ''}. You can collect it within 2–3 working days.`
-          : `  ${c.name}: Vi förnyar ditt recept${endText}. Du kan inom 2–3 arbetsdagar hämta ut det på valfritt apotek.`);
-      } else if (c.decision === 'no') {
-        const prescribedEnd = c.prescribedEndDateStr;
+    lines.push(lang.single_no_footer);
+    return lines;
+  }
+  return [lang.single_null(card.name)];
+}
+
+function _buildMulti(lang: typeof TPL.sv, cards: CardView[], en: boolean): string[] {
+  const lines: string[] = [lang.multi_intro(cards.map(c => c.name).join(', '))];
+  for (const c of cards) {
+    if (c.decision === 'yes') {
+      const end = c.prescribeEnd ? (en ? ` to last until ${c.prescribeEnd}` : ` så att det räcker till ${c.prescribeEnd}`) : '';
+      lines.push(lang.multi_item_yes(c.name, end));
+    } else if (c.decision === 'no') {
+      const date = c.prescribedEndDateStr;
+      if (!date) {
+        lines.push(lang.multi_item_no_nodate(c.name));
+      } else {
         const days = c.daysToPrescribedEnd ?? 0;
-        const verb = days < 0 ? 'beräknades' : 'beräknas';
-        if (en) {
-          const enPast = days < 0 ? 'was expected' : 'is expected';
-          if (prescribedEnd) {
-            if (days >= 14 && c.contactDateStr) {
-              lines.push(`  ${c.name}: Unable to renew. Prescription ${enPast} to last until ${prescribedEnd}. Contact us closer to ${c.contactDateStr}.`);
-            } else {
-              lines.push(`  ${c.name}: Unable to renew. Prescription ${enPast} to last until ${prescribedEnd}.`);
-            }
-          } else {
-            lines.push(`  ${c.name}: Unable to renew following clinical assessment.`);
-          }
-        } else {
-          if (prescribedEnd) {
-            if (days >= 14 && c.contactDateStr) {
-              lines.push(`  ${c.name}: Kan tyvärr inte förnyas. Nuvarande recept ${verb} räcka t.o.m. ${prescribedEnd}. Hör av dig närmare ${c.contactDateStr}.`);
-            } else {
-              lines.push(`  ${c.name}: Kan tyvärr inte förnyas. Nuvarande recept ${verb} räcka t.o.m. ${prescribedEnd}.`);
-            }
-          } else {
-            lines.push(`  ${c.name}: Kan tyvärr inte förnyas efter klinisk individuell bedömning av läkare.`);
-          }
-        }
+        lines.push(en ? _itemNoBodyEn(TPL.en, c.name, days, date, c.contactDateStr) : _itemNoBody(lang, c.name, days, date, c.contactDateStr));
       }
     }
   }
+  return lines;
+}
 
-  lines.push('', t.closing);
+export function buildPatientText(lang: string, cards: CardView[]): string {
+  const en = lang === 'en';
+  const tpl = en ? TPL.en : TPL.sv;
+  const lines = [tpl.greeting, ''];
+
+  if (cards.length === 1) {
+    lines.push(..._buildSingle(tpl, cards[0], en));
+  } else if (cards.length > 1) {
+    lines.push(..._buildMulti(tpl, cards, en));
+  }
+
+  lines.push('', tpl.closing);
   return lines.join('\n');
 }
 

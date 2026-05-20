@@ -2,7 +2,7 @@
   import { medCards, getActiveMedIdx, getActiveValidated, clearCardPrescribeState } from '$lib/state.svelte';
   import { loadDrugs, searchDrugs, getDrugByName, type DrugEntry } from '$lib/drug-search';
   import { getFassUrl, applyDateMask } from '$lib/utils';
-  import { MIN_SEARCH_QUERY_LENGTH } from '$lib/constants';
+  import { createAutocomplete } from '$lib/autocomplete.svelte';
   import FieldError from './FieldError.svelte';
 
   let activeIdx = $derived(getActiveMedIdx());
@@ -12,11 +12,24 @@
   let drugEntry = $derived(getDrugByName(card?.form?.medRaw ?? ''));
   let fassUrl = $derived(getFassUrl(card?.form?.medRaw ?? '', card?.form?.nplId));
 
-  // Autocomplete state
-  let acResults = $state<DrugEntry[]>([]);
-  let acVisible = $state(false);
-  let acHighlight = $state(-1);
-  let acSearchSeq = 0;
+  const ac = createAutocomplete<DrugEntry>({
+    searchFn: async (q) => {
+      await loadDrugs();
+      return searchDrugs(q);
+    },
+    onSelect: (d) => {
+      if (!card) return;
+      card.form.medRaw = d.n;
+      card.form.atcCode = d.a || null;
+      card.form.nplId = d.i || null;
+      card.form.notCalculable = !!d.c;
+      if (d.p && d.p > 0) card.form.amtRaw = String(d.p); else card.form.amtRaw = '';
+      card.form.doseUnit = d.u === 'ml' ? 'ml' : d.u === 'dos' ? 'dos' : 'st';
+      card.form.doseRaw = '';
+      card.form.doseInterval = 1;
+      card.form.leftRaw = '';
+    },
+  });
 
   function handleClear() {
     const idx = getActiveMedIdx();
@@ -30,85 +43,18 @@
       medCards[idx].decision = null;
       clearCardPrescribeState(cardId);
     }
-    acVisible = false;
-    acResults = [];
+    ac.dismiss();
   }
 
-  async function handleMedInput(e: Event) {
+  function handleMedInput(e: Event) {
     const q = (e.target as HTMLInputElement).value.trim();
-    acSearchSeq++;
-    const seq = acSearchSeq;
-
     if (card) {
-    card.form.atcCode = null;
-    card.form.nplId = null;
-    card.form.notCalculable = false;
+      card.form.atcCode = null;
+      card.form.nplId = null;
+      card.form.notCalculable = false;
     }
-
-    if (q.length < MIN_SEARCH_QUERY_LENGTH) {
-      acResults = [];
-      acVisible = false;
-      acHighlight = -1;
-      return;
-    }
-    await loadDrugs();
-    if (seq !== acSearchSeq) return;
-    const results = searchDrugs(q);
-    if (seq !== acSearchSeq) return;
-    acResults = results;
-    acVisible = results.length > 0;
-    acHighlight = -1;
+    ac.search(q);
   }
-
-  function selectDrug(d: DrugEntry) {
-    if (!card) return;
-    card.form.medRaw = d.n;
-    card.form.atcCode = d.a || null;
-    card.form.nplId = d.i || null;
-    card.form.notCalculable = !!d.c;
-    if (d.p && d.p > 0) card.form.amtRaw = String(d.p); else card.form.amtRaw = '';
-    card.form.doseUnit = d.u === 'ml' ? 'ml' : d.u === 'dos' ? 'dos' : 'st';
-    card.form.doseRaw = '';
-    card.form.doseInterval = 1;
-    card.form.leftRaw = '';
-    acVisible = false;
-    acResults = [];
-  }
-
-  function handleAcKeydown(e: KeyboardEvent) {
-    if (!acVisible) return;
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      acHighlight = Math.min(acHighlight + 1, acResults.length - 1);
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      acHighlight = acHighlight >= 0 ? Math.max(acHighlight - 1, 0) : -1;
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      if (acHighlight >= 0 && acHighlight < acResults.length) {
-        selectDrug(acResults[acHighlight]);
-      }
-    } else if (e.key === 'Escape') {
-      acVisible = false;
-      acResults = [];
-    }
-  }
-
-  function handleBlur() {
-    if (blurTimeout) clearTimeout(blurTimeout);
-    blurTimeout = setTimeout(() => {
-      acVisible = false;
-      acResults = [];
-      blurTimeout = null;
-    }, 150);
-  }
-
-  let blurTimeout: ReturnType<typeof setTimeout> | null = null;
-  $effect(() => {
-    return () => {
-      if (blurTimeout) clearTimeout(blurTimeout);
-    };
-  });
 
   let dateDisplay = $derived(card?.form?.dateVal ?? '');
 
@@ -141,20 +87,20 @@
       <input
         id="medInput" type="text" placeholder="T.ex. Sertralin 50 mg" maxlength="100"
         autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-        bind:value={card.form.medRaw} oninput={handleMedInput} onkeydown={handleAcKeydown} onblur={handleBlur}
+        bind:value={card.form.medRaw} oninput={handleMedInput} onkeydown={ac.handleKeydown} onblur={ac.handleBlur}
         class:input-error={!!(fieldErrors?.medInput)}
         aria-invalid={!!(fieldErrors?.medInput)}
         role="combobox"
         aria-haspopup="listbox"
         aria-autocomplete="list"
         aria-controls="ac-dropdown"
-        aria-expanded={acVisible}
-        aria-activedescendant={acHighlight >= 0 ? `ac-option-${acHighlight}` : undefined}
+        aria-expanded={ac.visible}
+        aria-activedescendant={ac.highlight >= 0 ? `ac-option-${ac.highlight}` : undefined}
       />
-        {#if acVisible && acResults.length > 0}
+        {#if ac.visible && ac.results.length > 0}
           <div id="ac-dropdown" class="autocomplete-dropdown" role="listbox">
-            {#each acResults as d, i}
-              <div id="ac-option-{i}" class="autocomplete-item {i === acHighlight ? 'active' : ''}" role="option" tabindex="-1" aria-selected={i === acHighlight} onmousedown={(e) => { e.preventDefault(); selectDrug(d); }} onmouseenter={() => acHighlight = i}>
+            {#each ac.results as d, i}
+              <div id="ac-option-{i}" class="autocomplete-item {i === ac.highlight ? 'active' : ''}" role="option" tabindex="-1" aria-selected={i === ac.highlight} onmousedown={(e) => { e.preventDefault(); ac.select(d); }} onmouseenter={() => ac.highlightAt(i)}>
                 <span class="ac-drug-name">{d.n}</span>
                 <span class="ac-drug-meta">{d.p ?? ''} {d.u || 'st'} · {d.f || ''}</span>
               </div>

@@ -29,11 +29,23 @@ export function validateValues(
   doseUnitRaw?: string,
   notCalculable?: boolean
 ): CalcInput {
-  const fieldErrors = { medInput: '', dateInput: '', doseInput: '', amtInput: '', refInput: '', leftInput: '' };
-
+  // ── Steg 1: Sanitize ──
   const safeAmtRaw = (amtRaw == null || amtRaw === 'null') ? '' : String(amtRaw);
   const safeRefRaw = (refRaw == null || refRaw === 'null') ? '' : String(refRaw);
   const safeLeftRaw = (leftRaw == null || leftRaw === 'null') ? '' : String(leftRaw);
+
+  // ── Steg 2: Parse ──
+  const amt = parseInt(safeAmtRaw, 10);
+  const dose = parseFloat(doseRaw.replace(',', '.'));
+  const refNum = Number(safeRefRaw);
+  const pDate = dateVal ? parseDateUTC(dateVal) : null;
+  const today = getToday();
+  const doseUnit: DoseUnit = (doseUnitRaw === 'st' || doseUnitRaw === 'ml' || doseUnitRaw === 'dos') ? doseUnitRaw : 'st';
+  const isDiscreteUnit = (doseUnit === 'st');
+  const remaining = safeLeftRaw !== '' ? parseFloat(safeLeftRaw.replace(',', '.')) : null;
+
+  // ── Steg 3: Validate fields ──
+  const fieldErrors = { medInput: '', dateInput: '', doseInput: '', amtInput: '', refInput: '', leftInput: '' };
 
   if (medRaw.length > MAX_MED_NAME_LENGTH) {
     fieldErrors.medInput = `Läkemedelsnamnet får inte överstiga ${MAX_MED_NAME_LENGTH} tecken.`;
@@ -42,42 +54,32 @@ export function validateValues(
     fieldErrors.dateInput = 'Ogiltigt datum.';
   }
 
-  const amt = parseInt(safeAmtRaw, 10);
   const amtIsInvalid = safeAmtRaw !== '' && (isNaN(amt) || amt <= 0 || amt > MAX_AMT_VALUE || !Number.isInteger(Number(safeAmtRaw)));
   if (amtIsInvalid) fieldErrors.amtInput = `Ange ett heltal mellan 1 och ${MAX_AMT_VALUE}.`;
 
-  const dose = parseFloat(doseRaw.replace(',', '.'));
   const doseIsInvalid = doseRaw !== '' && (isNaN(dose) || dose < MIN_DOSE_VALUE || dose > MAX_DOSE_VALUE);
   if (doseIsInvalid) fieldErrors.doseInput = `Ange ett tal mellan ${MIN_DOSE_VALUE} och ${MAX_DOSE_VALUE}.`;
 
-  const refNum = Number(safeRefRaw);
   const refIsInvalid  = safeRefRaw !== '' && (!Number.isFinite(refNum) || !Number.isInteger(refNum) || refNum < MIN_REF_VALUE || refNum > MAX_REF_VALUE);
   const refOutOfRange = Number.isFinite(refNum) && Number.isInteger(refNum) && refNum > MAX_REF_VALUE;
   if (refOutOfRange)    fieldErrors.refInput = `Max ${MAX_REF_VALUE} uttag stöds.`;
   else if (refIsInvalid) fieldErrors.refInput = `Ange ett heltal mellan ${MIN_REF_VALUE} och ${MAX_REF_VALUE}.`;
 
-  const pDate = dateVal ? parseDateUTC(dateVal) : null;
   if (dateVal && !pDate) fieldErrors.dateInput = 'Ogiltigt datum.';
+  if (pDate && pDate > today) fieldErrors.dateInput = 'Datumet är satt i framtiden.';
 
-  const today = getToday();
-  if (pDate && pDate > today) {
-    fieldErrors.dateInput = 'Datumet är satt i framtiden.';
+  let leftIsInvalid = false;
+  if (remaining !== null) {
+    leftIsInvalid = isNaN(remaining) || remaining < 0 || remaining > MAX_AMT_VALUE
+      || (isDiscreteUnit && !Number.isInteger(remaining));
   }
-
-  const doseUnit: DoseUnit = (doseUnitRaw === 'st' || doseUnitRaw === 'ml' || doseUnitRaw === 'dos') ? doseUnitRaw : 'st';
-  const isDiscreteUnit = (doseUnit === 'st');
-  const remaining = safeLeftRaw !== '' ? parseFloat(safeLeftRaw.replace(',', '.')) : null;
-  const leftIsInvalid = safeLeftRaw !== '' && (
-    isNaN(remaining!) || remaining! < 0 ||
-    remaining! > MAX_AMT_VALUE ||
-    (isDiscreteUnit && !Number.isInteger(remaining!))
-  );
   if (leftIsInvalid) {
     fieldErrors.leftInput = isDiscreteUnit
       ? 'Ange ett heltal (0 eller fler), eller lämna tomt.'
       : 'Ange ett tal (0 eller fler), eller lämna tomt.';
   }
 
+  // ── Steg 4: Build result ──
   if (refOutOfRange) return { valid: false, reason: 'too_many_refs', fieldErrors };
 
   const otherMissing = !medRaw || !dateVal || isNaN(dose) || doseIsInvalid || isNaN(amt) || amtIsInvalid || refIsInvalid || !refNum || refNum < 1;
@@ -92,9 +94,7 @@ export function validateValues(
   const parsedInterval = parseInt(doseIntervalRaw || '', 10);
   const doseInterval = VALID_INTERVALS.includes(parsedInterval) ? parsedInterval : 1;
 
-  const ref = refNum;
-
-  return { valid: true, medRaw, dateVal, pDate, amt, dose, ref, remaining, doseRaw, amtRaw: safeAmtRaw, refRaw: safeRefRaw, leftRaw: safeLeftRaw, doseInterval: doseInterval as DoseInterval, doseUnit, notCalculable: !!notCalculable };
+  return { valid: true, medRaw, dateVal, pDate, amt, dose, ref: refNum, remaining, doseRaw, amtRaw: safeAmtRaw, refRaw: safeRefRaw, leftRaw: safeLeftRaw, doseInterval: doseInterval as DoseInterval, doseUnit, notCalculable: !!notCalculable };
 }
 
 // === CALCCORE ===
@@ -169,7 +169,8 @@ export function calcCore(inputData: CalcInput): CalcResult {
   let earlyPickup = false;
 
   if (hasRemaining) {
-    if (remaining! > total) {
+    const rem = remaining as number;
+    if (rem > total) {
       return {
         valid: true, calculable: false,
         metrics: [], alerts: [],
@@ -177,19 +178,19 @@ export function calcCore(inputData: CalcInput): CalcResult {
         consumptionPct: 0,
       };
     }
-    earlyPickup = remaining! > accessibleTotal;
+    earlyPickup = rem > accessibleTotal;
     if (earlyPickup) {
-      const minB = Math.ceil(remaining! / inputData.amt);
+      const minB = Math.ceil(rem / inputData.amt);
       calcBase = Math.min(minB, inputData.ref) * inputData.amt;
     } else {
       calcBase = total;
     }
-    const consumed = calcBase - remaining!;
+    const consumed = calcBase - rem;
     if (consumed < 0) {
       return { valid: false, statusText: 'Internt fel — kontrollera inmatningen.', consumptionPct: 0 };
     }
     avgNum        = consumed / daysSince;
-    daysRemaining = Math.floor(remaining! / effectiveDailyDose);
+    daysRemaining = Math.floor(rem / effectiveDailyDose);
     daysRemaining = Math.min(daysRemaining, MAX_TOTAL_DAYS);
     estimatedEndDate = new Date(today);
     estimatedEndDate.setUTCDate(today.getUTCDate() + daysRemaining);
@@ -211,7 +212,7 @@ export function calcCore(inputData: CalcInput): CalcResult {
   let displayAvg = `${avgPerInterval.toFixed(2)} ${doseUnitLabel}`;
   if (mgUnit) displayAvg += ` (${(avgPerInterval * mgUnit.amount).toFixed(1)} ${mgUnit.unit}/${intervalLabel})`;
   const avgNote = hasRemaining
-    ? `(beräknat på faktisk förbrukning: ${calcBase - remaining!} av ${calcBase} tillgängliga ${doseUnit}${earlyPickup ? ' – patienten kan ha hämtat ut uttag i förväg' : ''})`
+    ? `(beräknat på faktisk förbrukning: ${calcBase - remaining} av ${calcBase} tillgängliga ${doseUnit}${earlyPickup ? ' – patienten kan ha hämtat ut uttag i förväg' : ''})`
     : `(beräknat under antagandet att alla förskrivna ${doseUnit} är förbrukade)`;
 
   const consumptionPct = (avgNum / effectiveDailyDose) * 100;
