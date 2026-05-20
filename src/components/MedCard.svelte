@@ -163,6 +163,7 @@
         class:input-error={!!(fieldErrors?.medInput)}
         aria-invalid={!!(fieldErrors?.medInput)}
         role="combobox"
+        aria-haspopup="listbox"
         aria-autocomplete="list"
         aria-controls="ac-dropdown"
         aria-expanded={acVisible}

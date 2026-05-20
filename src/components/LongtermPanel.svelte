@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ltPeriods, pushLtPeriod, spliceLtPeriod, resetLtPeriods, getLtMedRaw, setLtMedRaw, getLtDoseRaw, setLtDoseRaw } from '$lib/state.svelte';
+  import { ltPeriods, pushLtPeriod, spliceLtPeriod, resetLtPeriods, getLtMedRaw, setLtMedRaw, getLtDoseRaw, setLtDoseRaw, setLtPeriodField } from '$lib/state.svelte';
   import { calcLongtermCore } from '$lib/calc-longterm';
   import { pctClass } from '$lib/utils';
   import { MAX_LT_PERIODS, LT_BAR_TEXT_THRESHOLD_PCT } from '$lib/constants';
@@ -133,7 +133,7 @@
                 </div>
                 <div class="field">
                   <label for="lt-total-{i}" data-tooltip="Totalt antal enheter uttagna under perioden.">Antal uttagna enheter</label>
-                  <input id="lt-total-{i}" type="number" placeholder="100" min="1" step="1" bind:value={period.total} class:input-error={!!pe?.totalError} aria-invalid={!!pe?.totalError} />
+                  <input id="lt-total-{i}" type="number" placeholder="100" min="1" step="1" value={period.total} oninput={(e) => setLtPeriodField(i, 'total', (e.target as HTMLInputElement).value)} class:input-error={!!pe?.totalError} aria-invalid={!!pe?.totalError} />
                   {#if pe?.totalError}
                     <span class="field-error-msg visible">Ange ett positivt heltal</span>
                   {:else}
@@ -243,7 +243,7 @@
           <!-- Copy section -->
           <div class="copy-section">
             <div class="copy-tabs-row">
-              <div class="copy-tab">Journalanteckning (förslag)</div>
+              <span class="copy-tab" role="heading" aria-level="3">Journalanteckning (förslag)</span>
             </div>
             <div class="copy-body" id="lt-copyBody">{result.journalText ?? ''}</div>
             <div class="copy-footer">

@@ -226,7 +226,7 @@
             <!-- KOLUMN 4: Resultat -->
             <section class="result-panel" id="resultPanel" aria-label="Beräkningsresultat">
               {#if interactionWarnings.length > 0}
-                <div id="interactionAlerts" aria-live="polite">
+                <div id="interactionAlerts" aria-live="polite" aria-atomic="true">
                   {#each interactionWarnings as w}
                     <div class="interaction-alert interaction-{w.s}">
                       <div class="interaction-header">

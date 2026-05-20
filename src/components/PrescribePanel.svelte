@@ -186,7 +186,7 @@
                 decision: c.decision,
               })}
                 {@const cached = getCachedResult(c._cardId)}
-                {@const pr = cached ? calcPrescribeResult({
+                {@const pr = cached?.calc?.dose != null ? calcPrescribeResult({
                   _cardId: c._cardId,
                   dose: cached.calc.dose,
                   doseInterval: cached.calc.doseInterval,

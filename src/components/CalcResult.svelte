@@ -115,12 +115,12 @@
           Vill du beräkna antalet förpackningar att förskriva utifrån dagens datum, eller då patienten borde ha slut på läkemedlet?
         </div>
         <div class="start-date-choice-actions">
-          <button onclick={() => handleStartChoice(true)}
-                  class:selected={psEntry?.startFromToday === true}>
+          <button type="button" onclick={() => handleStartChoice(true)}
+                   class:selected={psEntry?.startFromToday === true}>
             📅 Från dagens datum
           </button>
-          <button onclick={() => handleStartChoice(false)}
-                  class:selected={psEntry?.startFromToday === false}>
+          <button type="button" onclick={() => handleStartChoice(false)}
+                   class:selected={psEntry?.startFromToday === false}>
             🏁 Från beräknat slutdatum
           </button>
         </div>

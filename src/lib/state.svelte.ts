@@ -236,7 +236,7 @@ const _prescribeEnds = $derived.by((): Record<number, string> => {
   if (keys.length === lastKeys.length && keys.every(k => newEnds[Number(k)] === _lastPrescribeEnds[Number(k)])) {
     return _lastPrescribeEnds;
   }
-  _lastPrescribeEnds = newEnds;  // mutation i $derived.by — etablerat "stable reference"-mönster. Byt till $derived.cache vid Svelte ≥5.13.
+  _lastPrescribeEnds = newEnds;  // "stable reference"-mönster: mutation av icke-reaktiv closures-variabel för att undvika onödiga omräkningar i nedströms $derived. $derived.cache landade ej i Svelte 5.x trots planen.
   return newEnds;
 });
 

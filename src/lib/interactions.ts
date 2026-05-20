@@ -203,7 +203,7 @@ export function CHECK_INTERACTIONS(atcEntries: Array<{ a: string; i: string }>):
         const matchBA = ix.a.some(p => atcMatches(atcEntries[y].a, p))
                      && ix.b.some(p => atcMatches(atcEntries[x].a, p));
         if ((matchAB || matchBA) && atcEntries[x].a !== atcEntries[y].a) {
-          const key = `${ix.t}|${atcEntries[x].i}|${atcEntries[y].i}`;
+          const key = `${i}|${ix.t}|${atcEntries[x].i}|${atcEntries[y].i}`;
           if (!seen.has(key)) {
             seen.add(key);
             warnings.push({
