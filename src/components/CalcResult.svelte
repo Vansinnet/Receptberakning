@@ -110,25 +110,6 @@
     </div>
     {/if}
 
-    {#if card?.decision === 'yes' && result.daysToPrescribedEnd != null && result.daysToPrescribedEnd >= DAYS_REMAINING_WARN}
-      <div class="start-date-choice">
-        <div class="start-date-choice-label">
-          Patienten har recept för {result.daysToPrescribedEnd} dagar till (t.o.m. {result.prescribedEndDateStr}).
-          Vill du beräkna antalet förpackningar att förskriva utifrån dagens datum, eller då patienten borde ha slut på läkemedlet?
-        </div>
-        <div class="start-date-choice-actions">
-          <button onclick={() => handleStartChoice(true)}
-                  class:selected={psEntry?.startFromToday === true}>
-            📅 Från dagens datum
-          </button>
-          <button onclick={() => handleStartChoice(false)}
-                  class:selected={psEntry?.startFromToday === false}>
-            🏁 Från beräknat slutdatum
-          </button>
-        </div>
-      </div>
-    {/if}
-
     <!-- Copy Section -->
     <div class="copy-section">
       <div class="copy-tabs-row" role="tablist" aria-label="Texttyp att kopiera">
@@ -167,5 +148,23 @@
   <div class="result-empty-state">
     <div class="empty-icon">📋</div>
     <div>Fyll i formuläret för att se resultatet</div>
-  </div>
-{/if}
+    </div>
+    {#if card?.decision === 'yes' && result.daysToPrescribedEnd != null && result.daysToPrescribedEnd >= DAYS_REMAINING_WARN}
+      <div class="start-date-choice">
+        <div class="start-date-choice-label">
+          Patienten har recept för {result.daysToPrescribedEnd} dagar till (t.o.m. {result.prescribedEndDateStr}).
+          Vill du beräkna antalet förpackningar att förskriva utifrån dagens datum, eller då patienten borde ha slut på läkemedlet?
+        </div>
+        <div class="start-date-choice-actions">
+          <button onclick={() => handleStartChoice(true)}
+                  class:selected={psEntry?.startFromToday === true}>
+            📅 Från dagens datum
+          </button>
+          <button onclick={() => handleStartChoice(false)}
+                  class:selected={psEntry?.startFromToday === false}>
+            🏁 Från beräknat slutdatum
+          </button>
+        </div>
+      </div>
+    {/if}
+    {/if}
