@@ -11,7 +11,10 @@ export function initPrescribeState(cardId: number, initial: PrescribeEntry): voi
 }
 
 export function applyPrescribeStatePatch(cardId: number, patch: Partial<PrescribeEntry>): void {
-  if (!_prescribeState[cardId]) return;
+  if (!_prescribeState[cardId]) {
+    _prescribeState[cardId] = { packageSize: '', ...patch };
+    return;
+  }
   // Object.assign works correctly with Svelte 5 $state proxies — each property write triggers fine-grained reactivity
   Object.assign(_prescribeState[cardId], patch);
 }

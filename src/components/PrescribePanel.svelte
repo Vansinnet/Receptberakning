@@ -1,14 +1,12 @@
 <script lang="ts">
-  import { medCards, getPrescribeState, initPrescribeState, applyPrescribeStatePatch, appState, getCardStatus, getActiveResult, getHasSummary, getCachedResult, getPrescribeSummary } from '$lib/state.svelte';
-  import { calcPrescribeResult, canRenewMed, prescribeValidationHint } from '$lib/prescribe-calc';
+  import { medCards, getPrescribeState, applyPrescribeStatePatch, appState, getCardStatus, getActiveResult, getHasSummary, getCachedResult, getPrescribeSummary, getActivePrescribeResult } from '$lib/state.svelte';
+  import { canRenewMed, prescribeValidationHint } from '$lib/prescribe-calc';
   import { UNIT_DISPLAY, DEFAULT_PRESCRIBE_MODE, DEFAULT_PRESCRIBE_MONTHS } from '$lib/constants';
   import { applyDateMask } from '$lib/utils';
-  import type { PrescribeInput } from '$lib/types';
 
   let { visible = false } = $props();
 
-  let activeIdx = $derived(appState.activeMedIdx);
-  let card = $derived(medCards[activeIdx] ?? null);
+  let card = $derived(medCards[appState.activeMedIdx] ?? null);
   let result = $derived(getActiveResult());
 
   let psEntry = $derived(card ? getPrescribeState(card._cardId) : null);
@@ -22,26 +20,6 @@
     calculable: result.calculable ?? false,
     decision: card.decision,
   }) : false);
-
-  // AMT-spegling: kopiera amt till packageSize vid init eller ändring
-  $effect(() => {
-    if (!card) return;
-    const s = result;
-    if (!s?.valid || !s?.calculable) return;
-    if (s.amt == null || isNaN(s.amt) || s.amt <= 0) return;
-    const currentAmt = String(s.amt);
-    const ps = getPrescribeState(card._cardId);
-    if (ps && ps._lastAmt === currentAmt && ps.packageSize !== '') return;
-    if (!ps) {
-      initPrescribeState(card._cardId, { packageSize: currentAmt, _lastAmt: currentAmt });
-    } else {
-      if (ps._lastAmt !== currentAmt && currentAmt !== '') {
-        applyPrescribeStatePatch(card._cardId, { _lastAmt: currentAmt, packageSize: currentAmt });
-      } else if (ps.packageSize === '') {
-        applyPrescribeStatePatch(card._cardId, { packageSize: currentAmt });
-      }
-    }
-  });
 
   function handlePkgInput(e: Event) {
     if (!card) return;
@@ -67,18 +45,7 @@
     });
   }
 
-  let prescResult = $derived.by(() => {
-    if (!card || !result?.valid || !result?.calculable) return null;
-    const ps = getPrescribeState(card._cardId);
-    const s: PrescribeInput = {
-      _cardId: card._cardId,
-      dose: result.dose,
-      doseInterval: result.doseInterval,
-      doseUnit: result.doseUnit,
-      prescribedEndDateStr: result.prescribedEndDateStr,
-    };
-    return calcPrescribeResult(s, ps ?? null);
-  });
+  let prescResult = $derived(card ? getActivePrescribeResult() : null);
 
   let hasSummary = $derived(getHasSummary());
   let prescribeSummaries = $derived(getPrescribeSummary());
@@ -111,7 +78,7 @@
     <!-- Inner (per medication) -->
     {#if eligible && card && result}
       <div id="prescribeInner">
-        <div class="prescribe-med-name">{result.medRaw || `Läkemedel ${activeIdx + 1}`}</div>
+        <div class="prescribe-med-name">{result.medRaw || `Läkemedel ${appState.activeMedIdx + 1}`}</div>
 
         <div class="field prescribe-pkg-field">
           <label for="ps-pkg" data-tooltip="Antal enheter per förpackning.">Förpackningsstorlek ({UNIT_DISPLAY[(result.doseUnit ?? 'st') as keyof typeof UNIT_DISPLAY]?.long ?? 'tabletter'})</label>
@@ -171,7 +138,7 @@
                 decision: c.decision,
               })}
                 {@const pr = prescribeSummaries[c._cardId]}
-                <button type="button" class="prescribe-summary-row {i === activeIdx ? 'active' : ''}" onclick={() => appState.activeMedIdx = i}>
+                <button type="button" class="prescribe-summary-row {i === appState.activeMedIdx ? 'active' : ''}" onclick={() => appState.activeMedIdx = i}>
                   <span class="prescribe-summary-name">{c.form.medRaw || `Läkemedel ${i + 1}`}</span>
                   <span class="prescribe-summary-right">
                     <span class="prescribe-summary-pkg">{pr?.packages ?? '—'} förp.</span>

@@ -36,12 +36,15 @@
     return CHECK_INTERACTIONS(entries);
   });
 
-  let prescribeVisible = $derived(card && getActiveResult() ? canRenewMed({
-    _cardId: card._cardId,
-    valid: getActiveResult().valid ?? false,
-    calculable: getActiveResult().calculable ?? false,
-    decision: card.decision,
-  }) : false);
+  let prescribeVisible = $derived.by(() => {
+    const r = getActiveResult();
+    return card && r ? canRenewMed({
+      _cardId: card._cardId,
+      valid: r.valid ?? false,
+      calculable: r.calculable ?? false,
+      decision: card.decision,
+    }) : false;
+  });
 
   let showPrescribe = $derived(prescribeVisible || getHasSummary());
 

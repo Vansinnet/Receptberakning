@@ -3,7 +3,7 @@ import { validateValues, calcCore } from './calc';
 import { MAX_MED_CARDS } from './constants';
 import { getNow } from './clock';
 
-function createEmptyCard(cardId: number): MedCard {
+export function createEmptyCard(cardId: number): MedCard {
   return {
     _cardId: cardId,
     form: {

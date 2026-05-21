@@ -4,7 +4,7 @@ import { validateValues, calcCore } from './calc';
 import { stripManufacturer, parseDateUTC, fmtDate } from './utils';
 import { calcPrescribeResult, canRenewMed } from './prescribe-calc';
 import { buildPatientText, buildJournalText, buildNurseJournalText } from './text-gen';
-import { appState, medCards, resetNurseState } from './form-state.svelte';
+import { appState, medCards, resetNurseState, createEmptyCard, getActiveResult } from './form-state.svelte';
 import { getPrescribeState, clearPrescribeState, clearCardPrescribeState } from './prescribe-state.svelte';
 import { ltState, resetLtPeriods } from './longterm-state.svelte';
 import { _cardResultsCache, _cardStatus, getCardStatus, getCachedResult, _resetCaches } from './cache-state.svelte';
@@ -45,23 +45,18 @@ const _prescribeCombined = $derived.by((): Record<number, { endDateStr?: string;
   return r;
 });
 
-const _prescribeEnds = $derived.by((): Record<number, string> => {
-  const r: Record<number, string> = {};
+const _prescribeExtracted = $derived.by(() => {
+  const ends: Record<number, string> = {};
+  const summary: Record<number, PrescribeResult | null> = {};
   for (const [cardId, val] of Object.entries(_prescribeCombined)) {
-    if (val.endDateStr) r[Number(cardId)] = val.endDateStr;
+    const id = Number(cardId);
+    if (val.endDateStr) ends[id] = val.endDateStr;
+    summary[id] = val.result ?? null;
   }
-  return r;
+  return { ends, summary };
 });
 
-const _prescribeSummary = $derived.by((): Record<number, PrescribeResult | null> => {
-  const r: Record<number, PrescribeResult | null> = {};
-  for (const [cardId, val] of Object.entries(_prescribeCombined)) {
-    r[Number(cardId)] = val.result ?? null;
-  }
-  return r;
-});
-
-export function getPrescribeSummary() { return _prescribeSummary; }
+export function getPrescribeSummary() { return _prescribeExtracted.summary; }
 
 interface CardsForTextEntry {
   name: string; i: number; dose: number; doseUnitLabel: string; doseUnit: string;
@@ -221,7 +216,7 @@ const _texts = $derived.by((): TextResult => {
       return { patientText: '', patientTextEn: '', journalText: '', cardStatuses: computed.cardStatuses, cacheUpdates: computed.cacheUpdates };
     }
     const cardsForText = _buildCardsForText(computed.cardResults, computed.medCardMap);
-    return _buildTextResult(computed.cardResults, cardsForText, computed.cardStatuses, computed.cacheUpdates, _prescribeEnds);
+    return _buildTextResult(computed.cardResults, cardsForText, computed.cardStatuses, computed.cacheUpdates, _prescribeExtracted.ends);
   } catch (e) {
     console.error('[v3 _texts] KRASCH:', e instanceof Error ? e.stack : String(e));
     return { patientText: '', patientTextEn: '', journalText: 'Textgenerering misslyckades', cardStatuses: {} as Record<number, CardStatusCache>, cacheUpdates: [] };
@@ -231,6 +226,22 @@ const _texts = $derived.by((): TextResult => {
 export function getActiveTexts(): ActiveTexts {
   const { patientText, patientTextEn, journalText } = _texts;
   return { patientText, patientTextEn, journalText };
+}
+
+export function getActivePrescribeResult(): PrescribeResult | null {
+  const result = getActiveResult();
+  if (!result.valid || result.calculable === false) return null;
+  const card = medCards[appState.activeMedIdx];
+  if (!card) return null;
+  const ps = getPrescribeState(card._cardId);
+  const s: PrescribeInput = {
+    _cardId: card._cardId,
+    dose: result.dose,
+    doseInterval: result.doseInterval,
+    doseUnit: result.doseUnit,
+    prescribedEndDateStr: result.prescribedEndDateStr,
+  };
+  return calcPrescribeResult(s, ps ?? null);
 }
 
 export function _syncCardStatus(): void {
@@ -292,7 +303,7 @@ export function spliceMedCard(i: number): void {
 
 export function clearAllMedState(): void {
   medCards.length = 0;
-  medCards.push({ _cardId: 1, form: { medRaw: '', dateVal: '', doseRaw: '', amtRaw: '', refRaw: '', leftRaw: '', doseUnit: 'st', doseInterval: 1, notCalculable: false, atcCode: null, nplId: null }, decision: null, patientLang: 'sv' });
+  medCards.push(createEmptyCard(1));
   appState.activeMedIdx = 0;
   appState.nextCardId = 2;
   clearPrescribeState();

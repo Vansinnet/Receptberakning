@@ -21,9 +21,3 @@ export function copyable(node: HTMLElement, getText: () => string) {
   };
 }
 
-export function ariaTooltip(node: HTMLElement) {
-  const tip = node.getAttribute('data-tooltip');
-  if (tip && !node.hasAttribute('aria-label')) {
-    node.setAttribute('aria-label', tip);
-  }
-}

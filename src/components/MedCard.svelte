@@ -1,12 +1,11 @@
 <script lang="ts">
-  import { medCards, appState, getActiveValidated, clearCardPrescribeState, clearCardForm } from '$lib/state.svelte';
+  import { medCards, appState, getActiveValidated, clearCardPrescribeState, clearCardForm, applyPrescribeStatePatch } from '$lib/state.svelte';
   import { loadDrugs, searchDrugs, getDrugByName, type DrugEntry } from '$lib/drug-search';
   import { getFassUrl, applyDateMask } from '$lib/utils';
   import { createAutocomplete } from '$lib/autocomplete.svelte';
   import FieldError from './FieldError.svelte';
 
-  let activeIdx = $derived(appState.activeMedIdx);
-  let card = $derived(medCards[activeIdx] ?? null);
+  let card = $derived(medCards[appState.activeMedIdx] ?? null);
   let validated = $derived(getActiveValidated());
   let fieldErrors = $derived(!validated.valid && validated.fieldErrors ? validated.fieldErrors : null);
   let drugEntry = $derived(getDrugByName(card?.form?.medRaw ?? ''));
@@ -28,6 +27,7 @@
       card.form.doseRaw = '';
       card.form.doseInterval = 1;
       card.form.leftRaw = '';
+      applyPrescribeStatePatch(card._cardId, { packageSize: card.form.amtRaw, _lastAmt: card.form.amtRaw });
     },
   });
 

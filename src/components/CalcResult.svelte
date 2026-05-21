@@ -31,14 +31,10 @@
   }
 
   let activeTab = $state<'patient' | 'journal'>('patient');
+  let effectiveTab = $derived(nurseViewActive ? 'journal' : activeTab);
   let texts = $derived(getActiveTexts());
 
   let tlWidthClass = $derived(pctClass(result?.tlPct ?? 0, 'w'));
-
-  // Tvinga journal-flik i sjuksköterskeläge
-  $effect(() => {
-    activeTab = nurseViewActive ? 'journal' : 'patient';
-  });
 </script>
 
 {#if result && result.valid && result.calculable !== false}
@@ -113,17 +109,17 @@
     <div class="copy-section">
       <div class="copy-tabs-row" role="tablist" aria-label="Texttyp att kopiera">
         {#if !nurseViewActive}
-          <button class="copy-tab {activeTab === 'patient' ? 'active' : ''}" role="tab" aria-selected={activeTab === 'patient'} data-tooltip="Förslag på formulering att skicka till patienten via 1177." onclick={() => activeTab = 'patient'}>Svar till patient (förslag)</button>
+          <button class="copy-tab {effectiveTab === 'patient' ? 'active' : ''}" role="tab" aria-selected={effectiveTab === 'patient'} data-tooltip="Förslag på formulering att skicka till patienten via 1177." onclick={() => activeTab = 'patient'}>Svar till patient (förslag)</button>
         {/if}
-        <button class="copy-tab {activeTab === 'journal' ? 'active' : ''}" role="tab" aria-selected={activeTab === 'journal'} data-tooltip="Förslag på formulering för dokumentation i journalen." onclick={() => activeTab = 'journal'}>Journalanteckning (förslag)</button>
+        <button class="copy-tab {effectiveTab === 'journal' ? 'active' : ''}" role="tab" aria-selected={effectiveTab === 'journal'} data-tooltip="Förslag på formulering för dokumentation i journalen." onclick={() => activeTab = 'journal'}>Journalanteckning (förslag)</button>
       </div>
       <div class="copy-body">
-        {activeTab === 'patient'
+        {effectiveTab === 'patient'
           ? (patientLang === 'en' ? texts.patientTextEn : texts.patientText)
           : texts.journalText}
       </div>
       <div class="copy-footer">
-        {#if !nurseViewActive && activeTab === 'patient'}
+        {#if !nurseViewActive && effectiveTab === 'patient'}
           <button class="btn btn-ghost" id="langBtnResult" data-tooltip="Växla språk på patientmeddelandet" onclick={toggleLang}>
             {#if patientLang === 'sv'}
               <FlagIcon lang="en" />
@@ -134,7 +130,7 @@
             {/if}
           </button>
         {/if}
-        <button class="btn btn-ghost" data-tooltip="Kopiera texten till urklipp." use:copyable={() => activeTab === 'patient' ? (patientLang === 'en' ? texts.patientTextEn : texts.patientText) : texts.journalText}>📋 Kopiera text</button>
+        <button class="btn btn-ghost" data-tooltip="Kopiera texten till urklipp." use:copyable={() => effectiveTab === 'patient' ? (patientLang === 'en' ? texts.patientTextEn : texts.patientText) : texts.journalText}>📋 Kopiera text</button>
       </div>
     </div>
   </div>
