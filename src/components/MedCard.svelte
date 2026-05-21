@@ -1,7 +1,7 @@
 <script lang="ts">
   import { medCards, appState, getActiveValidated, clearCardPrescribeState, clearCardForm, applyPrescribeStatePatch } from '$lib/state.svelte';
   import { loadDrugs, searchDrugs, getDrugByName, type DrugEntry } from '$lib/drug-search';
-  import { getFassUrl, applyDateMask } from '$lib/utils';
+  import { getFassUrl, applyDateMask, stripManufacturer } from '$lib/utils';
   import { createAutocomplete } from '$lib/autocomplete.svelte';
   import FieldError from './FieldError.svelte';
 
@@ -96,7 +96,7 @@
           <div id="ac-dropdown" class="autocomplete-dropdown" role="listbox">
             {#each ac.results as d, i}
               <div id="ac-option-{i}" class="autocomplete-item {i === ac.highlight ? 'active' : ''}" role="option" tabindex="-1" aria-selected={i === ac.highlight} onmousedown={(e) => { e.preventDefault(); ac.select(d); }} onmouseenter={() => ac.highlightAt(i)}>
-                <span class="ac-drug-name">{d.name}</span>
+                <span class="ac-drug-name">{stripManufacturer(d.name)}</span>
                 <span class="ac-drug-meta">{d.packageSize ?? ''} {d.unit || 'st'} · {d.form || ''}</span>
               </div>
             {/each}
