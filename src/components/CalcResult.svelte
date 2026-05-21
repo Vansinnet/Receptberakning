@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { CalcResult } from '$lib/types';
   import { getActiveTexts, medCards, appState, getPrescribeState, applyPrescribeStatePatch } from '$lib/state.svelte';
-  import { pctClass, copyToClipboard } from '$lib/utils';
+  import { pctClass } from '$lib/utils';
+  import { copyable } from '$lib/actions.svelte';
   import { DAYS_REMAINING_WARN } from '$lib/constants';
   import Alert from './Alert.svelte';
 
@@ -30,14 +31,6 @@
 
   let activeTab = $state<'patient' | 'journal'>('patient');
   let texts = $derived(getActiveTexts());
-  let copied = $state(false);
-  let copiedTimeout: ReturnType<typeof setTimeout> | null = null;
-
-  $effect(() => {
-    return () => {
-      if (copiedTimeout) clearTimeout(copiedTimeout);
-    };
-  });
 
   let tlWidthClass = $derived(pctClass(result?.tlPct ?? 0, 'w'));
 
@@ -45,18 +38,6 @@
   $effect(() => {
     activeTab = nurseViewActive ? 'journal' : 'patient';
   });
-
-  async function copyText() {
-    const body = activeTab === 'patient'
-      ? (patientLang === 'en' ? texts.patientTextEn : texts.patientText)
-      : texts.journalText;
-    const ok = await copyToClipboard(body);
-    if (ok) {
-      copied = true;
-      if (copiedTimeout) clearTimeout(copiedTimeout);
-      copiedTimeout = setTimeout(() => { copied = false; }, 2000);
-    }
-  }
 </script>
 
 {#if result && result.valid && result.calculable !== false}
@@ -152,7 +133,7 @@
             {/if}
           </button>
         {/if}
-        <button class="btn btn-ghost" data-tooltip="Kopiera texten till urklipp." onclick={copyText}>{copied ? '✅ Text kopierad till urklipp.' : '📋 Kopiera text'}</button>
+        <button class="btn btn-ghost" data-tooltip="Kopiera texten till urklipp." use:copyable={() => activeTab === 'patient' ? (patientLang === 'en' ? texts.patientTextEn : texts.patientText) : texts.journalText}>📋 Kopiera text</button>
       </div>
     </div>
   </div>

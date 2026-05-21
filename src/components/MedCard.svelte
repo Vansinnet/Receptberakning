@@ -19,12 +19,12 @@
     },
     onSelect: (d) => {
       if (!card) return;
-      card.form.medRaw = d.n;
-      card.form.atcCode = d.a || null;
-      card.form.nplId = d.i || null;
-      card.form.notCalculable = !!d.c;
-      if (d.p && d.p > 0) card.form.amtRaw = String(d.p); else card.form.amtRaw = '';
-      card.form.doseUnit = d.u === 'ml' ? 'ml' : d.u === 'dos' ? 'dos' : 'st';
+      card.form.medRaw = d.name;
+      card.form.atcCode = d.atcCode || null;
+      card.form.nplId = d.nplId || null;
+      card.form.notCalculable = !!d.notCalculable;
+      if (d.packageSize && d.packageSize > 0) card.form.amtRaw = String(d.packageSize); else card.form.amtRaw = '';
+      card.form.doseUnit = d.unit === 'ml' ? 'ml' : d.unit === 'dos' ? 'dos' : 'st';
       card.form.doseRaw = '';
       card.form.doseInterval = 1;
       card.form.leftRaw = '';
@@ -74,8 +74,8 @@
       <div class="form-panel-actions">
         {#if card.form.medRaw}
           <a class="btn btn-ghost fass-link" href={fassUrl} target="_blank" rel="noopener noreferrer" data-tooltip="Öppnar FASS produktresumé för detta läkemedel i ny flik.">FASS</a>
-          {#if drugEntry?.r}
-            <button type="button" class="btn btn-ghost narc-btn" disabled data-tooltip="Narkotikaklassificering enligt Läkemedelsverket.">Narkotika klass {drugEntry.r}</button>
+          {#if drugEntry?.regulation}
+            <button type="button" class="btn btn-ghost narc-btn" disabled data-tooltip="Narkotikaklassificering enligt Läkemedelsverket.">Narkotika klass {drugEntry.regulation}</button>
           {/if}
         {/if}
         <button class="btn btn-ghost" data-tooltip="Rensa formuläret för detta läkemedel." onclick={handleClear}>Rensa</button>
@@ -101,8 +101,8 @@
           <div id="ac-dropdown" class="autocomplete-dropdown" role="listbox">
             {#each ac.results as d, i}
               <div id="ac-option-{i}" class="autocomplete-item {i === ac.highlight ? 'active' : ''}" role="option" tabindex="-1" aria-selected={i === ac.highlight} onmousedown={(e) => { e.preventDefault(); ac.select(d); }} onmouseenter={() => ac.highlightAt(i)}>
-                <span class="ac-drug-name">{d.n}</span>
-                <span class="ac-drug-meta">{d.p ?? ''} {d.u || 'st'} · {d.f || ''}</span>
+                <span class="ac-drug-name">{d.name}</span>
+                <span class="ac-drug-meta">{d.packageSize ?? ''} {d.unit || 'st'} · {d.form || ''}</span>
               </div>
             {/each}
           </div>

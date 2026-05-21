@@ -3,7 +3,7 @@
   import { calcPrescribeResult, canRenewMed, prescribeValidationHint } from '$lib/prescribe-calc';
   import { UNIT_DISPLAY, DEFAULT_PRESCRIBE_MODE, DEFAULT_PRESCRIBE_MONTHS } from '$lib/constants';
   import { applyDateMask } from '$lib/utils';
-  import type { MedState } from '$lib/types';
+  import type { PrescribeInput } from '$lib/types';
 
   let { visible = false } = $props();
 
@@ -49,7 +49,7 @@
     applyPrescribeStatePatch(card._cardId, { packageSize: val });
   }
 
-  function handleModeChange(m: string) {
+  function handleModeChange(m: 'months' | 'date') {
     if (!card) return;
     applyPrescribeStatePatch(card._cardId, { mode: m });
   }
@@ -70,7 +70,7 @@
   let prescResult = $derived.by(() => {
     if (!card || !result?.valid || !result?.calculable) return null;
     const ps = getPrescribeState(card._cardId);
-    const s: MedState = {
+    const s: PrescribeInput = {
       _cardId: card._cardId,
       dose: result.dose,
       doseInterval: result.doseInterval,

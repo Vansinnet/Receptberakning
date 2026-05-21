@@ -6,6 +6,8 @@
   import NurseView from './NurseView.svelte';
   import PrescribePanel from './PrescribePanel.svelte';
   import LongtermPanel from './LongtermPanel.svelte';
+  import InteractionAlerts from './InteractionAlerts.svelte';
+  import InactivityTimer from './InactivityTimer.svelte';
   import { medCards, appState, tickCurrentDate, clearAllMedState, getActiveResult, getPrescribeState, getCardStatus, _syncCardStatus, _textsVersion, getHasSummary } from '$lib/state.svelte';
   import { CHECK_INTERACTIONS } from '$lib/interactions';
   import { canRenewMed } from '$lib/prescribe-calc';
@@ -91,17 +93,6 @@
   });
 
   $effect(() => {
-    if (typeof document === 'undefined') return;
-    void medCards.length;
-    for (const el of document.querySelectorAll('[data-tooltip]')) {
-      const tip = el.getAttribute('data-tooltip');
-      if (tip && !el.hasAttribute('aria-label')) {
-        el.setAttribute('aria-label', tip);
-      }
-    }
-  });
-
-  $effect(() => {
     void _textsVersion();
     void hasSummaryDerived;
     _syncCardStatus();
@@ -163,21 +154,7 @@
 
             <!-- KOLUMN 4: Resultat -->
             <section class="result-panel" id="resultPanel" aria-label="Beräkningsresultat">
-              {#if interactionWarnings.length > 0}
-                <div id="interactionAlerts" aria-live="polite" aria-atomic="true">
-                  {#each interactionWarnings as w}
-                    <div class="interaction-alert interaction-{w.s}">
-                      <div class="interaction-header">
-                        <span class="interaction-icon" aria-hidden="true">{w.s === 'danger' ? '⚠' : '⚡'}</span>
-                        <strong>{w.t}</strong>
-                        <span class="interaction-drugs">{w.drugs.join(', ')}</span>
-                      </div>
-                      <div class="interaction-desc">{w.d}</div>
-                      <div class="interaction-rec">{w.r}</div>
-                    </div>
-                  {/each}
-                </div>
-              {/if}
+              <InteractionAlerts warnings={interactionWarnings} />
               {#if result?.valid && result?.calculable !== false}
                 <CalcResult
                   result={result}
@@ -230,11 +207,5 @@
     </footer>
   </div>
 
-  {#if showInactivityToast}
-    <div class="inactivity-toast" role="alert" aria-live="assertive">
-      <span class="toast-icon" aria-hidden="true">⏰</span>
-      <span>Inaktivitet — sessionen rensas om <strong>{inactivityCountdown}s</strong></span>
-      <button class="btn btn-ghost" onclick={() => inactivityTimer.dismiss()}>Fortsätt</button>
-    </div>
-  {/if}
+  <InactivityTimer showToast={showInactivityToast} countdown={inactivityCountdown} onDismiss={() => inactivityTimer.dismiss()} />
 <!-- /BOUNDARY -->

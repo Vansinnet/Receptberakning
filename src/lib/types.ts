@@ -88,6 +88,68 @@ export interface CalcResult {
 
 // === State ===
 
+export interface FormValues {
+  medRaw: string;
+  dateVal: string;
+  doseRaw: string;
+  amtRaw: string;
+  refRaw: string;
+  leftRaw: string;
+  doseUnit: DoseUnit;
+  doseInterval: DoseInterval;
+  notCalculable: boolean;
+  atcCode: string | null;
+  nplId: string | null;
+}
+
+export interface MedCard {
+  _cardId: number;
+  form: FormValues;
+  decision: 'yes' | 'no' | null;
+  activeTab: 'patient' | 'journal';
+  patientLang: 'sv' | 'en';
+}
+
+export type CardStatusCache = {
+  valid: boolean;
+  calculable: boolean;
+  statusText: string;
+  consumptionPct: number;
+  daysToPrescribedEnd: number;
+  prescribedEndDateStr: string;
+};
+
+export interface CardResult {
+  cardId: number;
+  calc: CalcResult;
+  medNameStripped: string;
+}
+
+export interface PrescribeEntry {
+  packageSize: string;
+  _lastAmt?: string;
+  mode?: string;
+  months?: number;
+  endDate?: string;
+  startFromToday?: boolean;
+}
+
+export interface PrescribeInput {
+  _cardId: number;
+  dose?: number;
+  doseInterval?: DoseInterval;
+  doseUnit?: DoseUnit;
+  prescribedEndDateStr?: string;
+}
+
+export interface RenewableCard {
+  _cardId: number;
+  valid: boolean;
+  calculable: boolean;
+  decision: 'yes' | 'no' | null;
+}
+
+/** @deprecated Använd PrescribeInput eller RenewableCard istället */
 export interface MedState {
   _cardId: number;
   // Form fields (saved from DOM / inputs)

@@ -65,7 +65,7 @@ describe('CHECK_INTERACTIONS — kända interaktioner', () => {
       { i: '1', a: 'N06AF05' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('danger');
+    expect(result[0].severity).toBe('danger');
     expect(result[0].drugs[0]).toBe('0');
     expect(result[0].drugs[1]).toBe('1');
   });
@@ -76,7 +76,7 @@ describe('CHECK_INTERACTIONS — kända interaktioner', () => {
       { i: '1', a: 'M01AE01' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('danger');
+    expect(result[0].severity).toBe('danger');
   });
 
   it('ACE-hämmare + kaliumsparande diuretika → danger', () => {
@@ -85,7 +85,7 @@ describe('CHECK_INTERACTIONS — kända interaktioner', () => {
       { i: '1', a: 'C03DA01' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('danger');
+    expect(result[0].severity).toBe('danger');
   });
 
   it('paracetamol + kalcium → ingen varning', () => {
@@ -107,7 +107,7 @@ describe('CHECK_INTERACTIONS — kända interaktioner', () => {
     ]);
     expect(r1.length).toBeGreaterThanOrEqual(1);
     expect(r2.length).toBeGreaterThanOrEqual(1);
-    expect(r1[0].t).toBe(r2[0].t);
+    expect(r1[0].title).toBe(r2[0].title);
   });
 
   it('prefix-matchning (ATC-kod startswith mönster)', () => {
@@ -129,7 +129,7 @@ describe('Tier 1 — nya interaktioner', () => {
       { i: '0', a: 'M01AE01' },
       { i: '1', a: 'N06AB04' },
     ]);
-    const found = result.some(w => w.t === 'Ökad blödningsrisk' && w.s === 'warn');
+    const found = result.some(w => w.title === 'Ökad blödningsrisk' && w.severity === 'warn');
     expect(found).toBe(true);
   });
 
@@ -139,7 +139,7 @@ describe('Tier 1 — nya interaktioner', () => {
       { i: '1', a: 'J01XD01' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('danger');
+    expect(result[0].severity).toBe('danger');
   });
 
   it('warfarin + flukonazol → danger', () => {
@@ -148,7 +148,7 @@ describe('Tier 1 — nya interaktioner', () => {
       { i: '1', a: 'J02AC01' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('danger');
+    expect(result[0].severity).toBe('danger');
   });
 
   it('warfarin + ciprofloxacin → danger', () => {
@@ -157,7 +157,7 @@ describe('Tier 1 — nya interaktioner', () => {
       { i: '1', a: 'J01MA02' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('danger');
+    expect(result[0].severity).toBe('danger');
   });
 
   it('metotrexat + penicillin → danger', () => {
@@ -166,8 +166,8 @@ describe('Tier 1 — nya interaktioner', () => {
       { i: '1', a: 'J01CE02' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('danger');
-    expect(result[0].t).toBe('Ökad metotrexattoxicitet');
+    expect(result[0].severity).toBe('danger');
+    expect(result[0].title).toBe('Ökad metotrexattoxicitet');
   });
 
   it('simvastatin + amlodipin → warn', () => {
@@ -176,8 +176,8 @@ describe('Tier 1 — nya interaktioner', () => {
       { i: '1', a: 'C08CA01' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('warn');
-    expect(result[0].t.indexOf('statinkoncentration')).toBeGreaterThanOrEqual(0);
+    expect(result[0].severity).toBe('warn');
+    expect(result[0].title.indexOf('statinkoncentration')).toBeGreaterThanOrEqual(0);
   });
 
   it('NSAID + ACE-hämmare → warn', () => {
@@ -185,7 +185,7 @@ describe('Tier 1 — nya interaktioner', () => {
       { i: '0', a: 'M01AE01' },
       { i: '1', a: 'C09AA02' },
     ]);
-    const found = result.some(w => w.t === 'Minskad antihypertensiv effekt och njurpåverkan' && w.drugs[0] === '0' && w.drugs[1] === '1');
+    const found = result.some(w => w.title === 'Minskad antihypertensiv effekt och njurpåverkan' && w.drugs[0] === '0' && w.drugs[1] === '1');
     expect(found).toBe(true);
   });
 
@@ -195,7 +195,7 @@ describe('Tier 1 — nya interaktioner', () => {
       { i: '1', a: 'C09CA01' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('warn');
+    expect(result[0].severity).toBe('warn');
   });
 
   it('NSAID + tiazid → warn', () => {
@@ -204,7 +204,7 @@ describe('Tier 1 — nya interaktioner', () => {
       { i: '1', a: 'C03AA03' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('warn');
+    expect(result[0].severity).toBe('warn');
   });
 
   it('NSAID + loopdiuretika → warn', () => {
@@ -213,7 +213,7 @@ describe('Tier 1 — nya interaktioner', () => {
       { i: '1', a: 'C03CA01' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('warn');
+    expect(result[0].severity).toBe('warn');
   });
 
   it('fluorokinoloner + NSAID → warn (kramptröskel)', () => {
@@ -222,8 +222,8 @@ describe('Tier 1 — nya interaktioner', () => {
       { i: '1', a: 'M01AE01' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('warn');
-    expect(result[0].t.indexOf('kramptröskel')).toBeGreaterThanOrEqual(0);
+    expect(result[0].severity).toBe('warn');
+    expect(result[0].title.indexOf('kramptröskel')).toBeGreaterThanOrEqual(0);
   });
 });
 
@@ -238,8 +238,8 @@ describe('FAS 1–3 — kliniskt viktiga interaktioner', () => {
       { i: '1', a: 'B01AA03' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('danger');
-    expect(result[0].t.indexOf('warfarin')).toBeGreaterThanOrEqual(0);
+    expect(result[0].severity).toBe('danger');
+    expect(result[0].title.indexOf('warfarin')).toBeGreaterThanOrEqual(0);
   });
 
   it('karbamazepin + DOAC (rivaroxaban) → danger', () => {
@@ -248,8 +248,8 @@ describe('FAS 1–3 — kliniskt viktiga interaktioner', () => {
       { i: '1', a: 'B01AF01' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('danger');
-    expect(result[0].t.indexOf('DOAC')).toBeGreaterThanOrEqual(0);
+    expect(result[0].severity).toBe('danger');
+    expect(result[0].title.indexOf('DOAC')).toBeGreaterThanOrEqual(0);
   });
 
   it('amiodaron + betablockerare → danger (bradykardi/AV-block)', () => {
@@ -258,7 +258,7 @@ describe('FAS 1–3 — kliniskt viktiga interaktioner', () => {
       { i: '1', a: 'C07AA05' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('danger');
+    expect(result[0].severity).toBe('danger');
   });
 
   it('amiodaron + simvastatin → danger (rabdomyolysrisk)', () => {
@@ -267,8 +267,8 @@ describe('FAS 1–3 — kliniskt viktiga interaktioner', () => {
       { i: '1', a: 'C10AA01' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('danger');
-    expect(result[0].t.indexOf('rabdomyolys')).toBeGreaterThanOrEqual(0);
+    expect(result[0].severity).toBe('danger');
+    expect(result[0].title.indexOf('rabdomyolys')).toBeGreaterThanOrEqual(0);
   });
 
   it('metformin + jodkontrast → danger (laktatacidos)', () => {
@@ -277,8 +277,8 @@ describe('FAS 1–3 — kliniskt viktiga interaktioner', () => {
       { i: '1', a: 'V08AB02' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('danger');
-    expect(result[0].t.indexOf('laktatacidos')).toBeGreaterThanOrEqual(0);
+    expect(result[0].severity).toBe('danger');
+    expect(result[0].title.indexOf('laktatacidos')).toBeGreaterThanOrEqual(0);
   });
 
   it('valproat + karbapenem (meropenem) → danger (recidivrisk)', () => {
@@ -287,8 +287,8 @@ describe('FAS 1–3 — kliniskt viktiga interaktioner', () => {
       { i: '1', a: 'J01DH02' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('danger');
-    expect(result[0].t.indexOf('recidiv')).toBeGreaterThanOrEqual(0);
+    expect(result[0].severity).toBe('danger');
+    expect(result[0].title.indexOf('recidiv')).toBeGreaterThanOrEqual(0);
   });
 
   it('makrolider (klaritromycin) + warfarin → danger (INR-stegring)', () => {
@@ -297,8 +297,8 @@ describe('FAS 1–3 — kliniskt viktiga interaktioner', () => {
       { i: '1', a: 'B01AA03' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('danger');
-    expect(result[0].t.indexOf('INR')).toBeGreaterThanOrEqual(0);
+    expect(result[0].severity).toBe('danger');
+    expect(result[0].title.indexOf('INR')).toBeGreaterThanOrEqual(0);
   });
 
   it('klopidogrel + omeprazol → warn (minskad effekt)', () => {
@@ -307,8 +307,8 @@ describe('FAS 1–3 — kliniskt viktiga interaktioner', () => {
       { i: '1', a: 'A02BC01' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('warn');
-    expect(result[0].t.indexOf('klopidogrel')).toBeGreaterThanOrEqual(0);
+    expect(result[0].severity).toBe('warn');
+    expect(result[0].title.indexOf('klopidogrel')).toBeGreaterThanOrEqual(0);
   });
 
   it('litium + NSAID → danger (intoxikationsrisk)', () => {
@@ -317,8 +317,8 @@ describe('FAS 1–3 — kliniskt viktiga interaktioner', () => {
       { i: '1', a: 'M01AE01' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('danger');
-    expect(result[0].t.indexOf('litium')).toBeGreaterThanOrEqual(0);
+    expect(result[0].severity).toBe('danger');
+    expect(result[0].title.indexOf('litium')).toBeGreaterThanOrEqual(0);
   });
 
   it('tamoxifen + paroxetin → danger (recidivrisk bröstcancer)', () => {
@@ -327,8 +327,8 @@ describe('FAS 1–3 — kliniskt viktiga interaktioner', () => {
       { i: '1', a: 'N06AB05' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0].s).toBe('danger');
-    expect(result[0].t.indexOf('tamoxifen')).toBeGreaterThanOrEqual(0);
+    expect(result[0].severity).toBe('danger');
+    expect(result[0].title.indexOf('tamoxifen')).toBeGreaterThanOrEqual(0);
   });
 });
 
@@ -368,16 +368,16 @@ describe('Deduplicering', () => {
 // =====================================================
 
 describe('Output-struktur', () => {
-  it('varningsobjekt innehåller alla fält (s, t, d, r, drugs)', () => {
+  it('varningsobjekt innehåller alla fält (severity, title, description, recommendation, drugs)', () => {
     const result = CHECK_INTERACTIONS([
       { i: '0', a: 'N06AB04' },
       { i: '1', a: 'N06AF05' },
     ]);
     const w = result[0];
-    expect(typeof w.s).toBe('string');
-    expect(typeof w.t).toBe('string');
-    expect(typeof w.d).toBe('string');
-    expect(typeof w.r).toBe('string');
+    expect(typeof w.severity).toBe('string');
+    expect(typeof w.title).toBe('string');
+    expect(typeof w.description).toBe('string');
+    expect(typeof w.recommendation).toBe('string');
     expect(Array.isArray(w.drugs)).toBe(true);
     expect(w.drugs.length).toBe(2);
     expect(typeof w.drugs[0]).toBe('string');

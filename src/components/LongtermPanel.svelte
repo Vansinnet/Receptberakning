@@ -1,15 +1,16 @@
 <script lang="ts">
   import { ltPeriods, pushLtPeriod, spliceLtPeriod, resetLtPeriods, ltState, setLtPeriodField } from '$lib/state.svelte';
   import { calcLongtermCore } from '$lib/calc-longterm';
-  import { pctClass, applyDateMask, copyToClipboard } from '$lib/utils';
+  import { pctClass, applyDateMask } from '$lib/utils';
+  import { copyable } from '$lib/actions.svelte';
   import { getDrugByName } from '$lib/drug-search';
   import { MAX_LT_PERIODS, LT_BAR_TEXT_THRESHOLD_PCT } from '$lib/constants';
   import FieldError from './FieldError.svelte';
-  import type { LTResult, LTCardPeriod } from '$lib/types';
+  import type { LTResult } from '$lib/types';
 
   let medRaw = $derived(ltState.medRaw);
   let doseRaw = $derived(ltState.doseRaw);
-  let nplId = $derived(getDrugByName(medRaw)?.i ?? null);
+  let nplId = $derived(getDrugByName(medRaw)?.nplId ?? null);
 
   function handleAddPeriod() {
     pushLtPeriod();
@@ -27,9 +28,7 @@
 
   function handleDateInput(field: 'start' | 'end', idx: number, e: Event) {
     applyDateMask(e.target as HTMLInputElement, (val) => {
-      if (ltPeriods[idx]) {
-        ltPeriods[idx][field] = val;
-      }
+      setLtPeriodField(idx, field, val);
     });
   }
 
@@ -46,26 +45,7 @@
     return calcLongtermCore(medRaw, ordDose, periods, nplId);
   });
 
-  let ltCopied = $state(false);
-  let ltCopiedTimeout: ReturnType<typeof setTimeout> | null = null;
-
-  async function copyLtText() {
-    const text = result.journalText ?? '';
-    const ok = await copyToClipboard(text);
-    if (ok) {
-      ltCopied = true;
-      if (ltCopiedTimeout) clearTimeout(ltCopiedTimeout);
-      ltCopiedTimeout = setTimeout(() => { ltCopied = false; }, 2000);
-    }
-  }
-
   let barWidthClass = $derived(pctClass((result.barPct ?? 0) / 150 * 100, 'w'));
-
-  $effect(() => {
-    return () => {
-      if (ltCopiedTimeout) clearTimeout(ltCopiedTimeout);
-    };
-  });
 </script>
 
 <div class="longterm-layout">
@@ -216,7 +196,7 @@
             </div>
             <div class="copy-body" id="lt-copyBody">{result.journalText ?? ''}</div>
             <div class="copy-footer">
-              <button id="ltCopyBtn" class="btn btn-ghost" onclick={copyLtText}>{ltCopied ? '✅ Text kopierad till urklipp.' : '📋 Kopiera text'}</button>
+              <button id="ltCopyBtn" class="btn btn-ghost" use:copyable={() => result.journalText ?? ''}>📋 Kopiera text</button>
             </div>
           </div>
         {/if}

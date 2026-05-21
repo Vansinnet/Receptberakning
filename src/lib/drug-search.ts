@@ -10,10 +10,10 @@ const STORE_NAME = 'drugs';
 
 interface CacheData {
   version: number;
-  entries: DrugEntry[];
+  entries: RawDrugEntry[];
 }
 
-export interface DrugEntry {
+interface RawDrugEntry {
   n: string;
   i: string;
   a: string;
@@ -22,6 +22,17 @@ export interface DrugEntry {
   f?: string;
   r?: string;
   c?: boolean;
+}
+
+export interface DrugEntry {
+  name: string;
+  nplId: string;
+  atcCode: string;
+  packageSize?: number;
+  unit?: string;
+  form?: string;
+  regulation?: string;
+  notCalculable?: boolean;
 }
 
 let _drugList: DrugEntry[] | null = null;
@@ -65,7 +76,7 @@ async function loadFromCache(): Promise<CacheData | null> {
   }
 }
 
-async function fetchAndCache(serverVersion: number): Promise<DrugEntry[]> {
+async function fetchAndCache(serverVersion: number): Promise<RawDrugEntry[]> {
   const resp = await fetch('/data/drugs.json');
   if (!resp.ok) throw new Error(`drugs.json: ${resp.status}`);
   const entries = await resp.json();
@@ -99,9 +110,16 @@ export async function loadDrugs(): Promise<void> {
       const cached = await loadFromCache();
 
       if (cached && cached.version === serverVersion) {
-        _drugList = cached.entries;
+        _drugList = cached.entries.map(e => ({
+          name: e.n, nplId: e.i, atcCode: e.a, packageSize: e.p,
+          unit: e.u, form: e.f, regulation: e.r, notCalculable: e.c,
+        }));
       } else {
-        _drugList = await fetchAndCache(serverVersion);
+        const raw = await fetchAndCache(serverVersion);
+        _drugList = raw.map(e => ({
+          name: e.n, nplId: e.i, atcCode: e.a, packageSize: e.p,
+          unit: e.u, form: e.f, regulation: e.r, notCalculable: e.c,
+        }));
       }
     } catch (err) {
       console.error('[drug-search] kunde inte ladda läkemedelsdata:', err);
@@ -112,7 +130,7 @@ export async function loadDrugs(): Promise<void> {
     _drugMap = new Map();
     _drugListLower = [];
     for (let i = 0; i < _drugList.length; i++) {
-      const key = _drugList[i].n.toLowerCase().trim();
+      const key = _drugList[i].name.toLowerCase().trim();
       if (!_drugMap.has(key)) _drugMap.set(key, _drugList[i]);
       _drugListLower.push(key);
     }
@@ -137,10 +155,10 @@ export function searchDrugs(query: string): DrugEntry[] {
     const aStarts = aName.startsWith(q) ? 0 : 1;
     const bStarts = bName.startsWith(q) ? 0 : 1;
     if (aStarts !== bStarts) return aStarts - bStarts;
-    const aCombi = a.entry.n.includes('/') ? 1 : 0;
-    const bCombi = b.entry.n.includes('/') ? 1 : 0;
+    const aCombi = a.entry.name.includes('/') ? 1 : 0;
+    const bCombi = b.entry.name.includes('/') ? 1 : 0;
     if (aCombi !== bCombi) return aCombi - bCombi;
-    return a.entry.n.length - b.entry.n.length;
+    return a.entry.name.length - b.entry.name.length;
   });
   return results.slice(0, MAX_AUTOCOMPLETE_RESULTS).map(r => r.entry);
 }

@@ -1,4 +1,4 @@
-import type { MedState } from './types';
+import type { PrescribeInput, RenewableCard } from './types';
 import { getToday, getDaysDiff, fmtDate, parseDateUTC } from './utils';
 import {
   DEFAULT_PRESCRIBE_MODE,
@@ -10,7 +10,7 @@ import {
 
 // === CAN RENEW ===
 
-export function canRenewMed(s: MedState): boolean {
+export function canRenewMed(s: RenewableCard): boolean {
   return !!(s.valid && s.calculable !== false && s.decision !== 'no');
 }
 
@@ -33,7 +33,7 @@ export interface PrescribeResult {
 }
 
 export function calcPrescribeResult(
-  s: MedState,
+  s: PrescribeInput,
   ps: { packageSize: string; mode?: string; months?: number; endDate?: string; startFromToday?: boolean } | null
 ): PrescribeResult | null {
   if (!ps) return null;
@@ -114,7 +114,7 @@ export interface PrescribeHint {
 }
 
 export function prescribeValidationHint(
-  s: MedState,
+  s: PrescribeInput,
   ps: { packageSize: string; mode?: string; months?: number; endDate?: string } | null
 ): PrescribeHint[] {
   if (!ps) return [];
