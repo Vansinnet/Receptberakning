@@ -1,28 +1,5 @@
-// drug-search.ts — lazy-loadar läkemedelsdatabasen via IndexedDB-cache eller fetch.
-// Portad från Kod/drug-loader.js. Enligt B3-beslutet: IndexedDB → fetch('drugs.json').
-// __DRUG_DATA__-globalen existerar inte i 4.0.
-
 import { MIN_SEARCH_QUERY_LENGTH, MAX_AUTOCOMPLETE_RESULTS } from './constants';
-
-const CACHE_NAME = 'drug-data';
-const DB_NAME = 'ReceptCache';
-const STORE_NAME = 'drugs';
-
-interface CacheData {
-  version: number;
-  entries: RawDrugEntry[];
-}
-
-interface RawDrugEntry {
-  n: string;
-  i: string;
-  a: string;
-  p?: number;
-  u?: string;
-  f?: string;
-  r?: string;
-  c?: boolean;
-}
+import { loadFromCache, fetchAndCache, type RawDrugEntry } from './drug-cache';
 
 export interface DrugEntry {
   name: string;
@@ -39,59 +16,11 @@ let _drugList: DrugEntry[] | null = null;
 let _drugMap: Map<string, DrugEntry> | null = null;
 let _drugListLower: string[] | null = null;
 let _loadPromise: Promise<void> | null = null;
-let _dbPromise: Promise<IDBDatabase> | null = null;
 
-function getDB(): Promise<IDBDatabase> {
-  if (!_dbPromise) {
-    _dbPromise = new Promise((resolve, reject) => {
-      const req = indexedDB.open(DB_NAME, 1);
-      req.onupgradeneeded = () => { req.result.createObjectStore(STORE_NAME); };
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-    });
-  }
-  return _dbPromise;
-}
-
-async function loadFromCache(): Promise<CacheData | null> {
-  try {
-    const db = await getDB();
-    return new Promise((resolve) => {
-      const tx = db.transaction(STORE_NAME, 'readonly');
-      const req = tx.objectStore(STORE_NAME).get(CACHE_NAME);
-      req.onsuccess = () => {
-        const data = req.result;
-        if (data && data.entries && data.version) {
-          resolve({ version: data.version, entries: data.entries });
-        } else {
-          resolve(null);
-        }
-        db.close();
-      };
-      req.onerror = () => { resolve(null); db.close(); };
-      tx.onerror = () => { resolve(null); try { db.close(); } catch {} };
-    });
-  } catch {
-    return null;
-  }
-}
-
-async function fetchAndCache(serverVersion: number): Promise<RawDrugEntry[]> {
-  const resp = await fetch('/data/drugs.json');
-  if (!resp.ok) throw new Error(`drugs.json: ${resp.status}`);
-  const entries = await resp.json();
-  if (!Array.isArray(entries)) throw new Error('drugs.json: unexpected format');
-  getDB().then(db => {
-      try {
-        const tx = db.transaction(STORE_NAME, 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
-        const req = store.put({ id: CACHE_NAME, version: serverVersion, entries, ts: Date.now() }, CACHE_NAME);
-        req.onsuccess = () => db.close();
-        req.onerror = () => { console.warn('[drug-search] IndexedDB cache write failed:', req.error); db.close(); };
-      } catch (e) { console.warn('[drug-search] IndexedDB transaction failed:', e); }
-    }).catch(e => { console.warn('[drug-search] IndexedDB open failed:', e); });
-  return entries;
-}
+const _mapRaw = (entries: RawDrugEntry[]): DrugEntry[] => entries.map(e => ({
+  name: e.n, nplId: e.i, atcCode: e.a, packageSize: e.p,
+  unit: e.u, form: e.f, regulation: e.r, notCalculable: e.c,
+}));
 
 export async function loadDrugs(): Promise<void> {
   if (_drugList) return;
@@ -110,16 +39,9 @@ export async function loadDrugs(): Promise<void> {
       const cached = await loadFromCache();
 
       if (cached && cached.version === serverVersion) {
-        _drugList = cached.entries.map(e => ({
-          name: e.n, nplId: e.i, atcCode: e.a, packageSize: e.p,
-          unit: e.u, form: e.f, regulation: e.r, notCalculable: e.c,
-        }));
+        _drugList = _mapRaw(cached.entries);
       } else {
-        const raw = await fetchAndCache(serverVersion);
-        _drugList = raw.map(e => ({
-          name: e.n, nplId: e.i, atcCode: e.a, packageSize: e.p,
-          unit: e.u, form: e.f, regulation: e.r, notCalculable: e.c,
-        }));
+        _drugList = _mapRaw(await fetchAndCache(serverVersion));
       }
     } catch (err) {
       console.error('[drug-search] kunde inte ladda läkemedelsdata:', err);

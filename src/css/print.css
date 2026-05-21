@@ -1,0 +1,170 @@
+﻿   och genererad text. DÃ¶ljer all UI-chrome.
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 15mm 20mm 20mm;
+  }
+
+  *, *::before, *::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  body {
+    background: white;
+    color: #0f172a;
+    font-size: 10pt;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* SÃ¤kerstÃ¤ll kontrast fÃ¶r fÃ¤rgade element pÃ¥ vitt papper */
+  :root {
+    --bg: white; --surface: white; --surface2: #f8fafc;
+    --text: #0f172a; --text-muted: #475569;
+    --border: #cbd5e1; --border-strong: #94a3b8;
+    --green: #15803d; --green-bg: #f0fdf4; --green-border: #86efac;
+    --amber: #92400e; --amber-bg: #fffbeb; --amber-border: #fcd34d;
+    --red:   #991b1b; --red-bg:   #fef2f2; --red-border:   #fca5a5;
+    --blue:  #1e40af; --blue-bg:  #eff6ff; --blue-border:  #bfdbfe;
+    --primary: #1d4ed8; --primary-light: #dbeafe;
+    --code-bg: #f8fafc;
+  }
+
+  /* â”€â”€ App-shell: ta bort hÃ¶jdbegrÃ¤nsning och overflow â”€â”€ */
+  .app-shell {
+    display: block;
+    max-width: 100%;
+    min-height: 0;
+    background: white;
+  }
+
+  /* â”€â”€ Topbar: fÃ¶renklas till tryckt sidhuvud â”€â”€ */
+  .topbar {
+    position: static;
+    display: block;
+    border-bottom: 1.5pt solid #0f172a;
+    box-shadow: none;
+    padding: 0 0 5pt;
+    margin-bottom: 10pt;
+  }
+  .topbar-nav-row,
+  .topbar-right { display: none !important; }
+  .topbar-brand-row {
+    justify-content: flex-start;
+    border-bottom: none;
+    padding: 0;
+    gap: 8pt;
+  }
+  .app-brand-icon { display: none; }
+  .app-brand-name { font-size: 13pt; font-weight: 700; color: #0f172a; }
+  .app-brand-date { font-size: 8pt; }
+
+  /* â”€â”€ Flikpanel: bryt ur scroll-containern â”€â”€ */
+  .tab-panel.active {
+    display: block;
+    height: auto;
+    overflow: visible;
+    flex: none;
+  }
+
+  /* â”€â”€ ReceptfÃ¶rnyelse: dÃ¶lj allt utom resultatkolumnen â”€â”€ */
+  .renew-layout {
+    display: block;
+    height: auto;
+    overflow: visible;
+  }
+  .med-sidebar,
+  .form-panel,
+  .prescribe-panel { display: none !important; }
+
+  .result-panel {
+    display: block;
+    width: 100%;
+    overflow: visible;
+    background: white;
+  }
+  #resultEmptyState { display: none !important; }
+  .result-content {
+    max-width: 100%;
+    padding: 0;
+    gap: 8pt;
+  }
+
+  /* â”€â”€ Tidslinje: dÃ¶lj (informationen finns i mÃ¤tvÃ¤rden) â”€â”€ */
+  .tl-wrap { display: none !important; }
+
+  /* â”€â”€ Alerter â”€â”€ */
+  .alert {
+    border-inline-start-width: 3pt;
+    padding: 5pt 8pt;
+    font-size: 9pt;
+    page-break-inside: avoid;
+  }
+
+  /* â”€â”€ BeslutsfrÃ¥ga: visa bedÃ¶mningstext, dÃ¶lj knappar â”€â”€ */
+  .early-decision-actions { display: none !important; }
+  .early-decision-box { page-break-inside: avoid; }
+
+  /* â”€â”€ Kopieringssektionen: visa enbart textkroppen â”€â”€ */
+  .copy-tabs-row,
+  .copy-footer { display: none !important; }
+  .copy-section {
+    border: 1pt solid var(--border);
+    border-radius: 3pt;
+    overflow: visible;
+    page-break-inside: avoid;
+  }
+  .copy-body {
+    font-size: 9pt;
+    line-height: 1.65;
+    background: white;
+    overflow: visible;
+    min-height: 0;
+    padding: 7pt 10pt;
+    white-space: pre-wrap;
+  }
+
+  /* â”€â”€ LÃ¥ngvarig fÃ¶rbrukning â”€â”€ */
+  .longterm-layout {
+    display: block;
+    padding: 0;
+  }
+  .longterm-layout > .card {
+    max-width: 100%;
+    border: none;
+    overflow: visible;
+  }
+  .card { overflow: visible; }
+  .longterm-body {
+    display: block;
+    min-height: 0;
+    overflow: visible;
+  }
+  .longterm-form-col { display: none !important; }
+  .longterm-result-col {
+    display: block !important; /* override inline display:flex frÃ¥n showEl */
+    overflow: visible;
+    padding: 0;
+    background: white;
+    gap: 0;
+  }
+  /* Ge gap tillbaka med margin istÃ¤llet (gap fungerar ej pÃ¥ block) */
+  .longterm-result-col > * { margin-bottom: 8pt; }
+
+  .consumption-bar-wrap {
+    overflow: visible;
+    height: 16pt;
+  }
+
+  .period-table {
+    overflow: visible;
+    page-break-inside: avoid;
+  }
+
+  /* â”€â”€ DÃ¶lj resterande chrome â”€â”€ */
+  .site-footer { display: none !important; }
+}

@@ -1,27 +1,27 @@
-/* ═══════════════════════════════════════════════════════════════════════════
-   RECEPTBERÄKNING — app.css
+﻿/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   RECEPTBERÃ„KNING â€” app.css
    Widescreen-layout: topbar + tre-kolumnsvy
 
-   INNEHÅLL
-   ──────────────────────────────────────────────────────────────────────────
-   l.1–78     CSS-variabler & teman (default + dark/klinisk/sakura)
-   l.80–101   Reset & noscript-fallback
-   l.103–115  App-shell — centrerad max-bredd
-   l.117–175  Topbar — sticky header med tabs & inställningar
-   l.177–190  Tab-paneler — .tab-panel aktiv/dold
-   l.184–300  Receptförnyelse — tre-kolumns widescreen-layout
-   l.302–     MedSidebar — läkemedelslista (kolumn 1)
-   l.346–     FormPanel — formulär (kolumn 2)
-   l.538–     ResultPanel — resultat (kolumn 4)
-   l.864–868  Progressbar-breddklasser (w0..w100, 5%-steg)
-   l.870–     Alerts, Copy-sektion, Early-decision
-   l.1062–    PrescribePanel — förskrivningspanel (kolumn 5)
-   l.1180–    NurseView — sjuksköterskebedömning (kolumn 3)
-   l.1312–    Print — @media print
-   l.1481–    Fas 6.4 — komponenttillägg (statusbadge, inactivity toast)
-   ═══════════════════════════════════════════════════════════════════════════ */
+   INNEHÃ…LL
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   l.1â€“78     CSS-variabler & teman (default + dark/klinisk/sakura)
+   l.80â€“101   Reset & noscript-fallback
+   l.103â€“115  App-shell â€” centrerad max-bredd
+   l.117â€“175  Topbar â€” sticky header med tabs & instÃ¤llningar
+   l.177â€“190  Tab-paneler â€” .tab-panel aktiv/dold
+   l.184â€“300  ReceptfÃ¶rnyelse â€” tre-kolumns widescreen-layout
+   l.302â€“     MedSidebar â€” lÃ¤kemedelslista (kolumn 1)
+   l.346â€“     FormPanel â€” formulÃ¤r (kolumn 2)
+   l.538â€“     ResultPanel â€” resultat (kolumn 4)
+   l.864â€“868  Progressbar-breddklasser (w0..w100, 5%-steg)
+   l.870â€“     Alerts, Copy-sektion, Early-decision
+   l.1062â€“    PrescribePanel â€” fÃ¶rskrivningspanel (kolumn 5)
+   l.1180â€“    NurseView â€” sjukskÃ¶terskebedÃ¶mning (kolumn 3)
+   l.1312â€“    Print â€” @media print
+   l.1481â€“    Fas 6.4 â€” komponenttillÃ¤gg (statusbadge, inactivity toast)
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
-/* ── CSS-variabel-bas ── */
+/* â”€â”€ CSS-variabel-bas â”€â”€ */
 :root {
   --primary: #1d4ed8;
   --primary-light: #dbeafe;
@@ -95,7 +95,7 @@
   --clear-btn: #fce7f3; --clear-btn-hover: #fbcfe8; --clear-btn-text: #831843;
 }
 
-/* ── Reset ── */
+/* â”€â”€ Reset â”€â”€ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
@@ -108,7 +108,7 @@ html, body {
   transition: background 0.3s, color 0.3s;
 }
 
-/* ── Noscript-fallback ── */
+/* â”€â”€ Noscript-fallback â”€â”€ */
 .noscript-msg {
   padding: 20px 24px;
   background: var(--amber-bg);
@@ -118,21 +118,21 @@ html, body {
   text-align: center;
 }
 
-/* ════════════════════════════════════════════
-   APP SHELL — centrerad max-bredd
-   ════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   APP SHELL â€” centrerad max-bredd
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .app-shell {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   max-width: 1400px;
   margin: 0 auto;
-  /* Skugga på sidorna för att markera bredden mot bakgrunden */
+  /* Skugga pÃ¥ sidorna fÃ¶r att markera bredden mot bakgrunden */
   box-shadow: 0 0 0 1px var(--border), 0 4px 32px rgba(0,0,0,0.08);
   background: var(--bg);
 }
 
-/* ── TOPBAR ── */
+/* â”€â”€ TOPBAR â”€â”€ */
 .topbar {
   position: sticky;
   top: 0;
@@ -146,7 +146,7 @@ html, body {
   border-radius: 0;
 }
 
-/* Varumärkesrad — centrerad */
+/* VarumÃ¤rkesrad â€” centrerad */
 .topbar-brand-row {
   display: flex;
   align-items: center;
@@ -156,7 +156,7 @@ html, body {
   border-bottom: 1px solid var(--border);
 }
 
-/* Navigeringsrad — tabs till vänster, inställningar till höger */
+/* Navigeringsrad â€” tabs till vÃ¤nster, instÃ¤llningar till hÃ¶ger */
 .topbar-nav-row {
   display: flex;
   align-items: center;
@@ -192,22 +192,22 @@ html, body {
 .topbar-setting-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
 
-/* ── TAB PANELS ── */
+/* â”€â”€ TAB PANELS â”€â”€ */
 .tab-panel { display: none; flex: 1; min-height: 0; }
 .tab-panel.active { display: flex; flex-direction: column; flex: 1; }
 
-/* ════════════════════════════════════════════
-   RECEPTFÖRNYELSE — tre-kolumns widescreen
-   ════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   RECEPTFÃ–RNYELSE â€” tre-kolumns widescreen
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .renew-layout {
   display: flex;
   flex: 1;
   min-height: 0;
-  /* Fyller hela höjden minus topbar+banner */
+  /* Fyller hela hÃ¶jden minus topbar+banner */
   height: calc(100vh - var(--topbar-h) - var(--banner-h) - 32px);
 }
 
-/* ── Vänster: Läkemedelslista ── */
+/* â”€â”€ VÃ¤nster: LÃ¤kemedelslista â”€â”€ */
 .med-sidebar {
   width: var(--sidebar-w);
   flex-shrink: 0;
@@ -289,7 +289,7 @@ html, body {
   width: calc(100% - 16px);
 }
 
-/* ── Mitten: Formulär ── */
+/* â”€â”€ Mitten: FormulÃ¤r â”€â”€ */
 .form-panel {
   width: var(--form-w);
   flex-shrink: 0;
@@ -330,7 +330,7 @@ html, body {
 }
 .form-panel-actions { display: flex; gap: 6px; align-items: center; }
 
-/* ── Höger: Resultat ── */
+/* â”€â”€ HÃ¶ger: Resultat â”€â”€ */
 .result-panel {
   flex: 1;
   background: var(--surface2);
@@ -342,7 +342,7 @@ html, body {
 }
 
 #interactionAlerts {
-  order: -1;                  /* alltid överst i kolumnen även före beräkning */
+  order: -1;                  /* alltid Ã¶verst i kolumnen Ã¤ven fÃ¶re berÃ¤kning */
   width: 100%;
   max-width: 860px;
   padding: 14px 16px 0;      /* samma sidopadding som result-content, topp separat */
@@ -353,7 +353,7 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-width: 860px;       /* hindrar texten att bli för bred på stora skärmar */
+  max-width: 860px;       /* hindrar texten att bli fÃ¶r bred pÃ¥ stora skÃ¤rmar */
   width: 100%;
 }
 
@@ -441,13 +441,13 @@ html, body {
   margin: 0;
 }
 
-/* Statusprick för interagerande läkemedel */
+/* Statusprick fÃ¶r interagerande lÃ¤kemedel */
 .status-dot.interaction {
   background: var(--red);
   box-shadow: 0 0 6px rgba(220, 38, 38, 0.5);
 }
 
-/* Beslutsfråga – för tidig förnyelse */
+/* BeslutsfrÃ¥ga â€“ fÃ¶r tidig fÃ¶rnyelse */
 .early-decision-box {
   border: 2px solid var(--amber);
   border-inline-start: 5px solid var(--amber);
@@ -482,7 +482,7 @@ html, body {
 .early-btn-no:hover   { background: var(--red-border); }
 .early-btn-no.selected  { background: var(--red);   color: var(--btn-selected-text); border-color: var(--red); }
 
-/* Val av startdatum för förskrivning */
+/* Val av startdatum fÃ¶r fÃ¶rskrivning */
 .start-date-choice {
   background: var(--amber-bg); border: 1px solid var(--amber-border);
   border-radius: var(--radius-md); padding: 12px 14px; margin-top: 10px;
@@ -499,7 +499,7 @@ html, body {
   background: var(--amber); color: var(--btn-selected-text); border-color: var(--amber);
 }
 
-/* Knapp för vy-växling läkare/sjuksköterska */
+/* Knapp fÃ¶r vy-vÃ¤xling lÃ¤kare/sjukskÃ¶terska */
 .btn-nurse-toggle {
   padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
   cursor: pointer; border: 1px solid var(--border); background: var(--surface2);
@@ -513,7 +513,7 @@ html, body {
 .btn-nurse-toggle:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .btn-nurse-toggle:hover { background: var(--clear-btn); color: var(--text); }
 
-/* Nurse-kolumn — mellan formulär och resultat */
+/* Nurse-kolumn â€” mellan formulÃ¤r och resultat */
 .nurse-col {
   width: 240px;
   flex-shrink: 0;
@@ -525,7 +525,7 @@ html, body {
   flex-direction: column;
 }
 
-/* Sjuksköterskebedömning */
+/* SjukskÃ¶terskebedÃ¶mning */
 .nurse-assessment {
   background: var(--primary-light);
   border-radius: var(--radius-md);
@@ -596,9 +596,9 @@ html, body {
   flex-shrink: 0;
 }
 
-/* ════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    GEMENSAMMA FORM-ELEMENT
-   ════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .field { margin-bottom: 10px; display: flex; flex-direction: column; position: relative; }
 .field label {
   display: block; font-size: 10px; font-weight: 700; color: var(--text-muted);
@@ -631,7 +631,7 @@ html, body {
 .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: end; }
 .form-row-2-uneven { grid-template-columns: 1.5fr 1fr; }
 .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; align-items: end; }
-/* Dos-fältet: input + period-dropdown sida vid sida */
+/* Dos-fÃ¤ltet: input + period-dropdown sida vid sida */
 .dose-input-row { display: flex; gap: 6px; align-items: stretch; }
 .dose-input-row input { flex: 1 1 0; min-width: 0; }
 .dose-input-row select {
@@ -647,7 +647,7 @@ html, body {
   outline: none;
 }
 
-/* Se till att labels i sidoordnade fält tar samma höjd så input-fälten linjerar */
+/* Se till att labels i sidoordnade fÃ¤lt tar samma hÃ¶jd sÃ¥ input-fÃ¤lten linjerar */
 .form-row-2 .field label,
 .form-row-3 .field label {
   min-height: 2.6em;
@@ -655,7 +655,7 @@ html, body {
   align-items: flex-start;
 }
 
-/* ── Knappar ── */
+/* â”€â”€ Knappar â”€â”€ */
 .btn {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 6px 12px; border-radius: var(--radius-md);
@@ -704,15 +704,15 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 .badge-over  { background: var(--red-bg);   color: var(--red);   border-color: var(--red-border); }
 .badge-under { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
 
-/* Förhindra layoutförskjutning när FASS-länk dyker upp:
-   reservera alltid plats men dölj med visibility istället för display:none */
+/* FÃ¶rhindra layoutfÃ¶rskjutning nÃ¤r FASS-lÃ¤nk dyker upp:
+   reservera alltid plats men dÃ¶lj med visibility istÃ¤llet fÃ¶r display:none */
 .fass-link.is-hidden {
   display: inline-flex !important;
   visibility: hidden;
   pointer-events: none;
 }
 
-/* Resultat-grid (nyckel/värde-tabell) */
+/* Resultat-grid (nyckel/vÃ¤rde-tabell) */
 .result-grid {
   display: grid; grid-template-columns: auto 1fr;
   gap: 4px 12px; font-size: 12px; margin-bottom: 8px;
@@ -721,9 +721,9 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 .result-grid .rv { font-weight: 600;   text-align: end; }
 .result-grid .divider { grid-column: 1 / -1; border: none; border-top: 1px solid var(--border); margin: 4px 0; }
 
-/* ════════════════════════════════════════════
-   LÅNGVARIG FÖRBRUKNING
-   ════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   LÃ…NGVARIG FÃ–RBRUKNING
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .longterm-layout {
   padding: 16px;
   flex: 1;
@@ -753,7 +753,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 .card-num-lt { background: var(--violet-bg); color: var(--violet); }
 .card-title { font-size: 14px; font-weight: 700; }
 
-/* Tvåkolumns layout för Långvarig */
+/* TvÃ¥kolumns layout fÃ¶r LÃ¥ngvarig */
 .longterm-body {
   display: flex;
   min-height: 400px;
@@ -791,7 +791,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   border-top: 1px solid var(--border); flex-wrap: wrap;
 }
 
-/* Förbrukningsgraf */
+/* FÃ¶rbrukningsgraf */
 .consumption-bar-wrap {
   margin: 8px 0 3px; background: var(--surface2);
   border: 1px solid var(--border); border-radius: var(--radius-md);
@@ -839,13 +839,13 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 
 .btn-add-period { margin-top: 8px; }
 
-/* ════════════════════════════════════════════
-   HJÄLPKLASSER
-   ════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   HJÃ„LPKLASSER
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .is-hidden   { display: none !important; }
 .ml-auto     { margin-inline-start: auto; }
 
-/* ── Tooltip (CSS-only — CSP-kompatibel) ── */
+/* â”€â”€ Tooltip (CSS-only â€” CSP-kompatibel) â”€â”€ */
 [data-tooltip] {
   cursor: help;
   position: relative;
@@ -878,7 +878,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 [data-tooltip]:focus-visible::after {
   opacity: 1;
 }
-/* ── CSP-säkra breddklasser (progressbars, 5%-steg) ── */
+/* â”€â”€ CSP-sÃ¤kra breddklasser (progressbars, 5%-steg) â”€â”€ */
 .w0 { width: 0%; } .w5 { width: 5%; } .w10 { width: 10%; } .w15 { width: 15%; }
 .w20 { width: 20%; } .w25 { width: 25%; } .w30 { width: 30%; } .w35 { width: 35%; }
 .w40 { width: 40%; } .w45 { width: 45%; } .w50 { width: 50%; } .w55 { width: 55%; }
@@ -920,9 +920,9 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 }
 .footer-links a:hover { color: var(--text); background: var(--border); }
 
-/* ════════════════════════════════════════════
-   NY FÖRSKRIVNING — fjärde kolumnen
-   ════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   NY FÃ–RSKRIVNING â€” fjÃ¤rde kolumnen
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .prescribe-panel {
   width: 236px;
   flex-shrink: 0;
@@ -981,7 +981,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   margin-top: 2px;
 }
 
-/* ── Sammanställning: alla läkemedel ── */
+/* â”€â”€ SammanstÃ¤llning: alla lÃ¤kemedel â”€â”€ */
 .prescribe-summary-wrap {
   margin-bottom: 12px;
   padding-bottom: 12px;
@@ -1161,13 +1161,13 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   color: var(--text-muted);
 }
 
-/* ════════════════════════════════════════════
-   RESPONSIV — faller tillbaka till staplat på smal skärm
-   ════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   RESPONSIV â€” faller tillbaka till staplat pÃ¥ smal skÃ¤rm
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 @media (max-width: 900px) {
   .renew-layout { flex-direction: column; height: auto; overflow-y: auto; }
-  /* result-panel får inte äta upp all höjd i kolumnriktning — prescribe-panel
-     måste få plats nedanför. overflow-y: visible förhindrar dubbel scroll-container. */
+  /* result-panel fÃ¥r inte Ã¤ta upp all hÃ¶jd i kolumnriktning â€” prescribe-panel
+     mÃ¥ste fÃ¥ plats nedanfÃ¶r. overflow-y: visible fÃ¶rhindrar dubbel scroll-container. */
   .result-panel { flex: none; overflow-y: visible; }
   .med-sidebar { width: 100%;   border-inline-end: none; border-bottom: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; }
   .med-list { flex-direction: row; flex-wrap: wrap; padding: 6px 8px; }
@@ -1196,7 +1196,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   .metrics { grid-template-columns: 1fr 1fr; }
 }
 
-/* ── Skip-to-content ── */
+/* â”€â”€ Skip-to-content â”€â”€ */
 .skip-link {
   position: absolute;
   top: -100%;
@@ -1215,7 +1215,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   top: 8px;
 }
 
-/* ── Autocomplete-dropdown ── */
+/* â”€â”€ Autocomplete-dropdown â”€â”€ */
 .autocomplete-dropdown {
   position: absolute;
   z-index: 200;
@@ -1228,7 +1228,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   overflow-y: auto;
   width: 100%;
   margin-top: -1px;
-  /* Placera i förhållande till .field (position:relative krävs på föräldern) */
+  /* Placera i fÃ¶rhÃ¥llande till .field (position:relative krÃ¤vs pÃ¥ fÃ¶rÃ¤ldern) */
 }
 .autocomplete-item {
   display: flex;
@@ -1260,7 +1260,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   flex-shrink: 0;
 }
 
-/* ── Screen-reader-only ── */
+/* â”€â”€ Screen-reader-only â”€â”€ */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -1273,7 +1273,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   border: 0;
 }
 
-/* ── Reduced motion ── */
+/* â”€â”€ Reduced motion â”€â”€ */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -1283,7 +1283,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   html, body { transition: none; }
 }
 
-/* ── Windows High Contrast Mode ── */
+/* â”€â”€ Windows High Contrast Mode â”€â”€ */
 @media (forced-colors: active) {
   .btn:focus-visible,
   .main-tab:focus-visible,
@@ -1322,192 +1322,22 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   }
 }
 
-/* ════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    UTSKRIFT
-   Visar utlåtande, mätvärden, kliniska alerter
-   och genererad text. Döljer all UI-chrome.
-   ════════════════════════════════════════════ */
-@media print {
-  @page {
-    size: A4 portrait;
-    margin: 15mm 20mm 20mm;
-  }
-
-  *, *::before, *::after {
-    box-shadow: none !important;
-    text-shadow: none !important;
-    animation: none !important;
-    transition: none !important;
-  }
-
-  body {
-    background: white;
-    color: #0f172a;
-    font-size: 10pt;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  /* Säkerställ kontrast för färgade element på vitt papper */
-  :root {
-    --bg: white; --surface: white; --surface2: #f8fafc;
-    --text: #0f172a; --text-muted: #475569;
-    --border: #cbd5e1; --border-strong: #94a3b8;
-    --green: #15803d; --green-bg: #f0fdf4; --green-border: #86efac;
-    --amber: #92400e; --amber-bg: #fffbeb; --amber-border: #fcd34d;
-    --red:   #991b1b; --red-bg:   #fef2f2; --red-border:   #fca5a5;
-    --blue:  #1e40af; --blue-bg:  #eff6ff; --blue-border:  #bfdbfe;
-    --primary: #1d4ed8; --primary-light: #dbeafe;
-    --code-bg: #f8fafc;
-  }
-
-  /* ── App-shell: ta bort höjdbegränsning och overflow ── */
-  .app-shell {
-    display: block;
-    max-width: 100%;
-    min-height: 0;
-    background: white;
-  }
-
-  /* ── Topbar: förenklas till tryckt sidhuvud ── */
-  .topbar {
-    position: static;
-    display: block;
-    border-bottom: 1.5pt solid #0f172a;
-    box-shadow: none;
-    padding: 0 0 5pt;
-    margin-bottom: 10pt;
-  }
-  .topbar-nav-row,
-  .topbar-right { display: none !important; }
-  .topbar-brand-row {
-    justify-content: flex-start;
-    border-bottom: none;
-    padding: 0;
-    gap: 8pt;
-  }
-  .app-brand-icon { display: none; }
-  .app-brand-name { font-size: 13pt; font-weight: 700; color: #0f172a; }
-  .app-brand-date { font-size: 8pt; }
-
-  /* ── Flikpanel: bryt ur scroll-containern ── */
-  .tab-panel.active {
-    display: block;
-    height: auto;
-    overflow: visible;
-    flex: none;
-  }
-
-  /* ── Receptförnyelse: dölj allt utom resultatkolumnen ── */
-  .renew-layout {
-    display: block;
-    height: auto;
-    overflow: visible;
-  }
-  .med-sidebar,
-  .form-panel,
-  .prescribe-panel { display: none !important; }
-
-  .result-panel {
-    display: block;
-    width: 100%;
-    overflow: visible;
-    background: white;
-  }
-  #resultEmptyState { display: none !important; }
-  .result-content {
-    max-width: 100%;
-    padding: 0;
-    gap: 8pt;
-  }
-
-  /* ── Tidslinje: dölj (informationen finns i mätvärden) ── */
-  .tl-wrap { display: none !important; }
-
-  /* ── Alerter ── */
-  .alert {
-    border-inline-start-width: 3pt;
-    padding: 5pt 8pt;
-    font-size: 9pt;
-    page-break-inside: avoid;
-  }
-
-  /* ── Beslutsfråga: visa bedömningstext, dölj knappar ── */
-  .early-decision-actions { display: none !important; }
-  .early-decision-box { page-break-inside: avoid; }
-
-  /* ── Kopieringssektionen: visa enbart textkroppen ── */
-  .copy-tabs-row,
-  .copy-footer { display: none !important; }
-  .copy-section {
-    border: 1pt solid var(--border);
-    border-radius: 3pt;
-    overflow: visible;
-    page-break-inside: avoid;
-  }
-  .copy-body {
-    font-size: 9pt;
-    line-height: 1.65;
-    background: white;
-    overflow: visible;
-    min-height: 0;
-    padding: 7pt 10pt;
-    white-space: pre-wrap;
-  }
-
-  /* ── Långvarig förbrukning ── */
-  .longterm-layout {
-    display: block;
-    padding: 0;
-  }
-  .longterm-layout > .card {
-    max-width: 100%;
-    border: none;
-    overflow: visible;
-  }
-  .card { overflow: visible; }
-  .longterm-body {
-    display: block;
-    min-height: 0;
-    overflow: visible;
-  }
-  .longterm-form-col { display: none !important; }
-  .longterm-result-col {
-    display: block !important; /* override inline display:flex från showEl */
-    overflow: visible;
-    padding: 0;
-    background: white;
-    gap: 0;
-  }
-  /* Ge gap tillbaka med margin istället (gap fungerar ej på block) */
-  .longterm-result-col > * { margin-bottom: 8pt; }
-
-  .consumption-bar-wrap {
-    overflow: visible;
-    height: 16pt;
-  }
-
-  .period-table {
-    overflow: visible;
-    page-break-inside: avoid;
-  }
-
-  /* ── Dölj resterande chrome ── */
-  .site-footer { display: none !important; }
-}
+   Visar utlÃ¥tande, mÃ¤tvÃ¤rden, kliniska alerter
 
 /* ============================================================
-   FAS 6.4: KOMPONENT-TILLÄGG (4.0)
-   Nya CSS-klasser för funktionalitet som saknas i 3.0.
+   FAS 6.4: KOMPONENT-TILLÃ„GG (4.0)
+   Nya CSS-klasser fÃ¶r funktionalitet som saknas i 3.0.
    ============================================================ */
 
-/* Statusbadge i läkemedelslistan */
+/* Statusbadge i lÃ¤kemedelslistan */
 .med-list-badge {
   font-size: 10px; padding: 1px 6px; border-radius: 3px;
   flex-shrink: 0; margin-left: auto;
 }
 
-/* Prescribe-panel i gömt läge — behåll bredd, dölj visuellt (Flexbox) */
+/* Prescribe-panel i gÃ¶mt lÃ¤ge â€” behÃ¥ll bredd, dÃ¶lj visuellt (Flexbox) */
 .prescribe-panel.is-hidden { display: flex !important; visibility: hidden; pointer-events: none; }
 
 /* Inaktivitetstoast */

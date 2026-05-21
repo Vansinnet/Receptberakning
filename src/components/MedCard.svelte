@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { medCards, appState, getActiveValidated, clearCardPrescribeState } from '$lib/state.svelte';
+  import { medCards, appState, getActiveValidated, clearCardPrescribeState, clearCardForm } from '$lib/state.svelte';
   import { loadDrugs, searchDrugs, getDrugByName, type DrugEntry } from '$lib/drug-search';
   import { getFassUrl, applyDateMask } from '$lib/utils';
   import { createAutocomplete } from '$lib/autocomplete.svelte';
@@ -35,12 +35,7 @@
     const idx = appState.activeMedIdx;
     if (idx >= 0 && idx < medCards.length) {
       const cardId = medCards[idx]._cardId;
-      medCards[idx].form = {
-        medRaw: '', dateVal: '', doseRaw: '', amtRaw: '', refRaw: '', leftRaw: '',
-        doseUnit: 'st', doseInterval: 1, notCalculable: false,
-        atcCode: null, nplId: null,
-      };
-      medCards[idx].decision = null;
+      clearCardForm(cardId);
       clearCardPrescribeState(cardId);
     }
     ac.dismiss();

@@ -87,7 +87,7 @@ export function calcPrescribeResult(
   const packageSize     = parseFloat(ps.packageSize) || 0;
 
   if (!totalDays || !dose || packageSize <= 0) {
-    return { startDate, startDateStr, daysAlreadyCovered, endDate: null, endDateStr: null, totalDays: 0, totalTablets: 0, packages: 0, packageSize: 0, dose: 0, doseUnit: 'st', unitLabelLong: 'tabletter', unitLabelShort: 'st' };
+    return null;
   }
 
   const totalTablets = Math.ceil(totalDays * effectiveDose);

@@ -30,7 +30,18 @@
   let activeIdx = $derived(appState.activeMedIdx);
   let card = $derived(medCards[activeIdx] ?? null);
 
+  let activeAtcSignature = $derived.by((): string => {
+    const codes: string[] = [];
+    for (const c of medCards) {
+      if (c?.form?.atcCode && c.form.medRaw) {
+        codes.push(`${c.form.atcCode}|${c.form.medRaw}`);
+      }
+    }
+    return codes.join(',');
+  });
+
   let interactionWarnings = $derived.by(() => {
+    void activeAtcSignature;
     const entries: Array<{ a: string; i: string }> = [];
     for (let i = 0; i < medCards.length; i++) {
       const c = medCards[i];
