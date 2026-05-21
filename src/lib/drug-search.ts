@@ -1,5 +1,6 @@
-import { MIN_SEARCH_QUERY_LENGTH, MAX_AUTOCOMPLETE_RESULTS } from './constants';
+import { MIN_SEARCH_QUERY_LENGTH, MAX_AUTOCOMPLETE_RESULTS, DEDUP_THRESHOLD } from './constants';
 import { loadFromCache, fetchAndCache, type RawDrugEntry } from './drug-cache';
+import { stripManufacturer } from './utils';
 
 export interface DrugEntry {
   name: string;
@@ -60,29 +61,78 @@ export async function loadDrugs(): Promise<void> {
   return _loadPromise;
 }
 
+function _strengthVal(name: string): number {
+  const matches = [...name.matchAll(/(\d+(?:[.,]\d+)?)\s*(?:mg|µg|μg|g|IE|mmol|ml|mikrogram|mikrog|mcg|ng|gram|nanogram|IU)\b/gi)];
+  if (matches.length === 0) return Infinity;
+  return parseFloat(matches[matches.length - 1][1].replace(',', '.'));
+}
+
+function _stripStrength(name: string): string {
+  return name.replace(/\d+(?:[.,]\d+)?\s*(?:mg|µg|μg|g|IE|mmol|ml|mikrogram|mikrog|mcg|ng|gram|nanogram|IU)\b/gi, '')
+    .replace(/[/\s]+/g, ' ').trim();
+}
+
+function _dedupKey(entry: DrugEntry): string {
+  const stripped = stripManufacturer(entry.name);
+  const baseName = _stripStrength(stripped);
+  const strength = _strengthVal(entry.name);
+  return `${baseName.toLowerCase()}|${strength}|${entry.form ?? ''}|${entry.packageSize ?? ''}|${entry.unit ?? 'st'}`;
+}
+
+function _entryScore(entry: DrugEntry): number {
+  let score = 0;
+  if (entry.packageSize) score++;
+  if (entry.form) score++;
+  if (entry.atcCode) score++;
+  return score;
+}
+
+function _sortEntries(entries: DrugEntry[], q: string): DrugEntry[] {
+  return entries.sort((a, b) => {
+    const sa = _strengthVal(a.name);
+    const sb = _strengthVal(b.name);
+    const aStarts = a.name.toLowerCase().startsWith(q) ? 0 : 1;
+    const bStarts = b.name.toLowerCase().startsWith(q) ? 0 : 1;
+    if (aStarts !== bStarts) return aStarts - bStarts;
+    const aName = _stripStrength(stripManufacturer(a.name)).toLowerCase();
+    const bName = _stripStrength(stripManufacturer(b.name)).toLowerCase();
+    if (aName !== bName) return aName.localeCompare(bName);
+    if (sa !== sb) return sa - sb;
+    const pa = a.packageSize ?? Infinity;
+    const pb = b.packageSize ?? Infinity;
+    return pa - pb;
+  });
+}
+
 export function searchDrugs(query: string): DrugEntry[] {
   if (!_drugList || !_drugListLower) return [];
   if (!query || query.length < MIN_SEARCH_QUERY_LENGTH) return [];
   const q = query.toLowerCase().trim();
   const results: Array<{ entry: DrugEntry; idx: number }> = [];
   const lower = _drugListLower;
+  const rawLimit = MAX_AUTOCOMPLETE_RESULTS * 3;
   for (let i = 0; i < _drugList.length; i++) {
     if (lower[i].includes(q)) {
       results.push({ entry: _drugList[i], idx: i });
+      if (results.length >= rawLimit) break;
     }
   }
-  results.sort((a, b) => {
-    const aName = lower[a.idx];
-    const bName = lower[b.idx];
-    const aStarts = aName.startsWith(q) ? 0 : 1;
-    const bStarts = bName.startsWith(q) ? 0 : 1;
-    if (aStarts !== bStarts) return aStarts - bStarts;
-    const aCombi = a.entry.name.includes('/') ? 1 : 0;
-    const bCombi = b.entry.name.includes('/') ? 1 : 0;
-    if (aCombi !== bCombi) return aCombi - bCombi;
-    return a.entry.name.length - b.entry.name.length;
-  });
-  return results.slice(0, MAX_AUTOCOMPLETE_RESULTS).map(r => r.entry);
+
+  const entries = results.map(r => r.entry);
+
+  if (entries.length > DEDUP_THRESHOLD) {
+    const seen = new Map<string, DrugEntry>();
+    for (const entry of entries) {
+      const key = _dedupKey(entry);
+      const existing = seen.get(key);
+      if (!existing || _entryScore(entry) > _entryScore(existing)) {
+        seen.set(key, entry);
+      }
+    }
+    return _sortEntries([...seen.values()], q).slice(0, MAX_AUTOCOMPLETE_RESULTS);
+  }
+
+  return _sortEntries(entries, q).slice(0, MAX_AUTOCOMPLETE_RESULTS);
 }
 
 export function getDrugByName(name: string): DrugEntry | undefined {
