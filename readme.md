@@ -48,7 +48,7 @@ Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder
 
 ### ✅ Receptförnyelse
 - Stöd för upp till **8 läkemedel**.
-- **Autocomplete** för läkemedelsnamn – sök bland ~8 300 preparat ur FASS.
+- **Autocomplete** för läkemedelsnamn – sök bland ~8 300 preparat ur FASS. Deduplicerar tillverkarvariationer — visar ett rent läkemedelsnamn per styrka/form/förpackningsstorlek, sorterat efter styrka (lägst först).
 - **Automatisk datumformatering** (ÅÅÅÅ-MM-DD).
 - **Dosintervall** – per dag, per vecka (t.ex. plåster, veckodepåer) eller per månad (t.ex. månadsdepåer, implantat).
 - **Dosenheter** – st (tabletter, kapslar, plåster), ml (orala lösningar, injektioner), doser (inhalatorer, nässprayer, ögondroppar, injektionspennor).
@@ -110,23 +110,36 @@ Tre inbyggda teman som växlas direkt:
 
 - **Svelte 5 + TypeScript** — reaktiva komponenter med `$state`/`$derived`, strict type-checking
 - **Vite** — byggsystem med HMR i dev, tree-shaking och code-splitting i production
-- **Vitest** — 139 enhetstester (83 calc + 43 interactions + 5 properties + 8 card-status)
-- **Playwright** — 32 E2E-tester + 200 fuzz-simuleringar
+- **Vitest** — 254 enhetstester (123 calc + 43 interactions + 5 properties + 8 card-status + 75 utils)
+- **Playwright** — 34 E2E-tester + 200 fuzz-simuleringar
 - **PWA** — offline-first via `vite-plugin-pwa` + Workbox, precache av alla assets
 
 ### Projektstruktur
 ```
 src/
-  lib/           — 10 pure-function filer (TypeScript)
+  lib/           — 11 TypeScript-filer + 9 .svelte.ts-moduler
     constants.ts, types.ts, clock.ts, utils.ts,
     calc.ts, calc-longterm.ts, text-gen.ts,
     prescribe-calc.ts, interactions.ts, drug-search.ts,
-    state.svelte.ts  — Svelte 5 reaktivt tillståndslager
-  components/    — 9 Svelte-komponenter
+    drug-cache.ts,
+    state.svelte.ts           — Barrel-export (5 statemoduler)
+    form-state.svelte.ts      — Formulär, validering, aktiv beräkning
+    prescribe-state.svelte.ts — Förskrivar-state (per cardId)
+    longterm-state.svelte.ts  — Långvarig förbrukning
+    cache-state.svelte.ts     — Resultatcache + statuscache
+    text-state.svelte.ts      — Textorkestrering + prescribe-derivations
+    autocomplete.svelte.ts    — Autocomplete-modul (generisk)
+    inactivity.svelte.ts      — Inaktivitetstimer
+    actions.svelte.ts         — Svelte actions (copyable)
+  components/    — 15 Svelte-komponenter
     App.svelte, TopBar.svelte, MedList.svelte,
     MedCard.svelte, CalcResult.svelte, NurseView.svelte,
-    PrescribePanel.svelte, LongtermPanel.svelte, Alert.svelte
+    PrescribePanel.svelte, LongtermPanel.svelte, Alert.svelte,
+    GitHubIcon.svelte, FieldError.svelte, FlagIcon.svelte,
+    InteractionAlerts.svelte, InactivityTimer.svelte,
+    AlertDialog.svelte
   app.css        — CSS (global, inga scoped styles)
+  app.d.ts       — TypeScript-deklarationer
   main.ts        — Entrypoint
 public/
   _headers       — CSP för Cloudflare Pages
@@ -148,8 +161,8 @@ public/
 npm install               # Installera beroenden
 npm run dev               # Starta Vite dev-server (HMR)
 npm run build             # Production build → dist/
-npm test                  # Kör 139 vitest-tester
-npm run test:e2e          # Kör 33 Playwright E2E-tester
+npm test                  # Kör 254 vitest-tester
+npm run test:e2e          # Kör 34 Playwright E2E-tester
 npm run check             # TypeScript-kontroll (svelte-check)
 npm run build:db          # Crawla FASS och bygg product-db.json (~45 min)
 npm run generate:drugs    # Generera drugs.json → public/data/drugs.json (~1 min)

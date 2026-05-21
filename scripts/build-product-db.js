@@ -3,8 +3,8 @@ const path = require("path");
 const https = require("node:https");
 const dns = require("node:dns");
 
-const CONCURRENCY = 30;
-const DELAY_MS = 50;
+const CONCURRENCY = 50;
+const DELAY_MS = 0;
 dns.setDefaultResultOrder("ipv4first");
 
 const KEEP_ALIVE_AGENT = new https.Agent({
@@ -97,27 +97,19 @@ async function fetchSitemapNplIds(sitemapUrl) {
 }
 
 function extractProductData(html) {
-  const all = [];
   const re = /self\.__next_f\.push\(\[1,"([\s\S]*?)"\]\)/g;
   let m;
   while ((m = re.exec(html)) !== null) {
-    all.push(JSON.parse('"' + m[1] + '"'));
-  }
-
-  if (all.length === 0) return null;
-
-  const payload = all.join("\n");
-  const lines = payload.split("\n");
-
-  for (const line of lines) {
-    const colonIdx = line.indexOf(":");
-    if (colonIdx < 0) continue;
-    const jsonStr = line.substring(colonIdx + 1);
-    try {
-      const obj = JSON.parse(jsonStr);
-      const data = findProductHeader(obj);
-      if (data) return data;
-    } catch (e) {}
+    const rscChunk = JSON.parse('"' + m[1] + '"');
+    for (const line of rscChunk.split('\n')) {
+      const colonIdx = line.indexOf(':');
+      if (colonIdx < 0) continue;
+      try {
+        const obj = JSON.parse(line.substring(colonIdx + 1));
+        const data = findProductHeader(obj);
+        if (data) return data;
+      } catch {}
+    }
   }
   return null;
 }
@@ -172,12 +164,13 @@ function normalizeProduct(raw) {
   if (!tradeName) return null;
 
   const seen = new Set();
+  const pkgMap = new Map();
   const packages = [];
   for (const p of raw.packages) {
     const isParallel = p.parallelDistributingOrganizationName != null;
     const key = `${p.quantity}-${p.container}`;
-    const existing = packages.find(x => x.quantity === p.quantity && x.container === p.container);
-    if (existing) {
+    if (seen.has(key) && pkgMap.has(key)) {
+      const existing = pkgMap.get(key);
       if (!isParallel && existing.isParallel) {
         existing.isParallel = false;
         existing.nplPackId = p.nplPackId;
@@ -187,13 +180,15 @@ function normalizeProduct(raw) {
     }
     if (seen.has(key)) continue;
     seen.add(key);
-    packages.push({
+    const pkg = {
       nplPackId: p.nplPackId,
       quantity: p.quantity,
       container: p.container,
       itemNumber: p.itemNumber,
       isParallel: isParallel
-    });
+    };
+    pkgMap.set(key, pkg);
+    packages.push(pkg);
   }
 
   if (packages.length === 0) return null;
