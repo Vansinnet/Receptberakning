@@ -278,6 +278,13 @@ export function calcCore(inputData: CalcInput): CalcResult {
   };
 }
 
+function _formatValueWithNote(prescribedEndDateStr: string, daysToPrescribedEnd: number): string {
+  const note = daysToPrescribedEnd > 0 ? ` (${daysToPrescribedEnd} dagar kvar)`
+    : daysToPrescribedEnd === 0 ? ' (tar slut idag)'
+    : ` (slut sedan ${Math.abs(daysToPrescribedEnd)} dagar)`;
+  return prescribedEndDateStr + note;
+}
+
 function _buildMetrics(
   total: number,
   doseUnit: string,
@@ -290,12 +297,7 @@ function _buildMetrics(
 ): CalcMetric[] {
   return [
     { label: 'Totalt förskrivet', value: `${total} ${doseUnit}`, cls: '', tooltip: `Mängd per uttag × antal uttag.` },
-    { label: 'Räcker t.o.m.', value: (function() {
-        const note = daysToPrescribedEnd > 0 ? ` (${daysToPrescribedEnd} dagar kvar)`
-          : daysToPrescribedEnd === 0 ? ' (tar slut idag)'
-          : ` (slut sedan ${Math.abs(daysToPrescribedEnd)} dagar)`;
-        return prescribedEndDateStr + note;
-      })(), cls: racktillCls, tooltip: `Beräknat slutdatum. Gul markering om ≥${DAYS_REMAINING_WARN} dagar återstår.` },
+    { label: 'Räcker t.o.m.', value: _formatValueWithNote(prescribedEndDateStr, daysToPrescribedEnd), cls: racktillCls, tooltip: `Beräknat slutdatum. Gul markering om ≥${DAYS_REMAINING_WARN} dagar återstår.` },
     { label: 'Snittförbrukning', value: displayAvg, cls: snittCls, tooltip: `Genomsnittlig förbrukning per ${intervalLabel}. Grön om 80–110% av ordination, gul annars.` },
   ];
 }

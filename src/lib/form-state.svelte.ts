@@ -1,6 +1,7 @@
 import type { FormValues, MedCard } from './types';
 import { validateValues, calcCore } from './calc';
 import { MAX_MED_CARDS } from './constants';
+import { getNow } from './clock';
 
 function createEmptyCard(cardId: number): MedCard {
   return {
@@ -22,7 +23,7 @@ export const appState = $state({
   nurseViewActive: false,
   nurseVitalNormal: false,
   nurseFollowUpAdequate: false,
-  currentDate: new Date().toDateString(),
+  currentDate: getNow().toDateString(),
 });
 
 export const medCards = $state<MedCard[]>([createEmptyCard(1)]);
@@ -41,7 +42,7 @@ export function resetNurseState(): void {
 }
 
 export function tickCurrentDate(): void {
-  const newKey = new Date().toDateString();
+  const newKey = getNow().toDateString();
   if (appState.currentDate !== newKey) {
     appState.currentDate = newKey;
   }

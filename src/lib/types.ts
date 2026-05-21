@@ -149,53 +149,6 @@ export interface RenewableCard {
   decision: 'yes' | 'no' | null;
 }
 
-/** @deprecated Använd PrescribeInput eller RenewableCard istället */
-export interface MedState {
-  _cardId: number;
-  // Form fields (saved from DOM / inputs)
-  medRaw?: string;
-  medNameStripped?: string;
-  dateVal?: string;
-  doseRaw?: string;
-  amtRaw?: string;
-  refRaw?: string;
-  leftRaw?: string;
-  doseUnit?: DoseUnit;
-  doseInterval?: DoseInterval;
-  notCalculable?: boolean;
-  // calcCore output fields (cached in state)
-  valid?: boolean;
-  calculable?: boolean;
-  decision?: 'yes' | 'no' | null;
-  statusText?: string;
-  metrics?: CalcMetric[];
-  alerts?: CalcAlert[];
-  tlPct?: number;
-  tlStart?: string;
-  tlEnd?: string;
-  dose?: number;
-  doseUnitLabel?: string;
-  pDateStr?: string;
-  total?: number;
-  remainingDoses?: number | null;
-  endDateStr?: string;
-  prescribedEndDateStr?: string;
-  daysRemaining?: number;
-  daysToPrescribedEnd?: number;
-  displayAvgStr?: string;
-  avgNote?: string;
-  consumptionPct?: number;
-  patientText?: string;
-  patientTextEn?: string;
-  journalText?: string;
-  // UI preferences
-  activeTab?: 'patient' | 'journal';
-  patientLang?: 'sv' | 'en';
-  // Prescribe calculated
-  amt?: number;
-  ref?: number;
-}
-
 // === Textgenerering ===
 
 export type CardView = {

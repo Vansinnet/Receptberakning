@@ -138,14 +138,6 @@
       </div>
     </div>
   </div>
-{:else if result && !result.valid}
-  <div class="result-empty-state">
-    <div class="empty-icon" aria-hidden="true">📋</div>
-    <div>{result.statusText || 'Resultatet visas här'}</div>
-  </div>
 {:else}
-  <div class="result-empty-state">
-    <div class="empty-icon" aria-hidden="true">📋</div>
-    <div>Fyll i formuläret för att se resultatet</div>
-  </div>
+  <!-- App.svelte garanterar att result.valid && result.calculable !== false -->
 {/if}

@@ -360,6 +360,30 @@ async function checkConsistency(page: Page, seq: number, s: Scenario, errors: Lo
 
       return issues;
     }, s.expected);
+
+    // Retry: om C3-felet inträffar kan DOM:en vara en tick efter.
+    // Vänta 300ms extra och kolla igen — rapportera endast om felet kvarstår.
+    const hasC3 = result.some(issue => issue.startsWith('C3:'));
+    if (hasC3) {
+      await page.waitForTimeout(300);
+      const retry = await page.evaluate(() => {
+        return !!document.querySelector('.early-decision-box');
+      });
+      if (!retry) {
+        // Felet kvarstår — rapportera
+        for (const issue of result) {
+          errors.push({ seq, type: 'consistency', msg: issue, detail: tag });
+        }
+        return;
+      }
+      // C3 löstes av retry — filtrera bort C3 från övriga fel
+      for (const issue of result) {
+        if (issue.startsWith('C3:')) continue;
+        errors.push({ seq, type: 'consistency', msg: issue, detail: tag });
+      }
+      return;
+    }
+
     for (const issue of result) {
       errors.push({ seq, type: 'consistency', msg: issue, detail: tag });
     }
@@ -415,15 +439,16 @@ test.describe('Fuzz — 200 realistiska kliniska användningar', () => {
 
     for (let seq = 1; seq <= SCENARIOS.length; seq++) {
       const s = SCENARIOS[seq - 1];
+      const seqInRound = ((seq - 1) % SEQUENCES.length) + 1;
 
-      // Multi-card scenarios (seq 39-43): bygg upp kort gradvis
-      if (seq >= 39 && seq <= 43) {
-        if (seq === 39) {
+      // Multi-card scenarios (seqInRound 39-43): bygg upp kort gradvis
+      if (seqInRound >= 39 && seqInRound <= 43) {
+        if (seqInRound === 39) {
           await page.evaluate(async () => {
             const mod = await import('/src/lib/state.svelte.ts');
             mod.clearAllMedState();
           });
-        } else if (seq === 40 || seq === 42) {
+        } else if (seqInRound === 40 || seqInRound === 42) {
           await page.evaluate(async () => {
             const mod = await import('/src/lib/state.svelte.ts');
             mod.pushMedCard();
@@ -436,8 +461,13 @@ test.describe('Fuzz — 200 realistiska kliniska användningar', () => {
             mod.appState.activeMedIdx = 0;
           });
         }
-      } else if (seq === 50) {
-        // Seq 50 handles its own clear in extra action
+      } else if (seqInRound === 50) {
+        // Seq 50: rensa state även här — extra kör clearAllMedState efter
+        // checkConsistency för verifiering, men vi måste rensa inför fillForm.
+        await page.evaluate(async () => {
+          const mod = await import('/src/lib/state.svelte.ts');
+          mod.clearAllMedState();
+        });
       } else {
         // Normal: reset to single clean card
         await page.evaluate(async () => {

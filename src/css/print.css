@@ -1,5 +1,6 @@
-﻿   och genererad text. DÃ¶ljer all UI-chrome.
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* === Print ===
+   och genererad text. Döljer all UI-chrome.
+   ════════════════════════════════════════════ */
 @media print {
   @page {
     size: A4 portrait;
@@ -21,7 +22,7 @@
     print-color-adjust: exact;
   }
 
-  /* SÃ¤kerstÃ¤ll kontrast fÃ¶r fÃ¤rgade element pÃ¥ vitt papper */
+  /* Säkerställ kontrast för färgade element på vitt papper */
   :root {
     --bg: white; --surface: white; --surface2: #f8fafc;
     --text: #0f172a; --text-muted: #475569;
@@ -34,7 +35,7 @@
     --code-bg: #f8fafc;
   }
 
-  /* â”€â”€ App-shell: ta bort hÃ¶jdbegrÃ¤nsning och overflow â”€â”€ */
+  /* ── App-shell: ta bort höjdbegränsning och overflow ── */
   .app-shell {
     display: block;
     max-width: 100%;
@@ -42,7 +43,7 @@
     background: white;
   }
 
-  /* â”€â”€ Topbar: fÃ¶renklas till tryckt sidhuvud â”€â”€ */
+  /* ── Topbar: förenklas till tryckt sidhuvud ── */
   .topbar {
     position: static;
     display: block;
@@ -63,7 +64,7 @@
   .app-brand-name { font-size: 13pt; font-weight: 700; color: #0f172a; }
   .app-brand-date { font-size: 8pt; }
 
-  /* â”€â”€ Flikpanel: bryt ur scroll-containern â”€â”€ */
+  /* ── Flikpanel: bryt ur scroll-containern ── */
   .tab-panel.active {
     display: block;
     height: auto;
@@ -71,7 +72,7 @@
     flex: none;
   }
 
-  /* â”€â”€ ReceptfÃ¶rnyelse: dÃ¶lj allt utom resultatkolumnen â”€â”€ */
+  /* ── Receptförnyelse: dölj allt utom resultatkolumnen ── */
   .renew-layout {
     display: block;
     height: auto;
@@ -94,10 +95,10 @@
     gap: 8pt;
   }
 
-  /* â”€â”€ Tidslinje: dÃ¶lj (informationen finns i mÃ¤tvÃ¤rden) â”€â”€ */
+  /* ── Tidslinje: dölj (informationen finns i mätvärden) ── */
   .tl-wrap { display: none !important; }
 
-  /* â”€â”€ Alerter â”€â”€ */
+  /* ── Alerter ── */
   .alert {
     border-inline-start-width: 3pt;
     padding: 5pt 8pt;
@@ -105,11 +106,11 @@
     page-break-inside: avoid;
   }
 
-  /* â”€â”€ BeslutsfrÃ¥ga: visa bedÃ¶mningstext, dÃ¶lj knappar â”€â”€ */
+  /* ── Beslutsfråga: visa bedömningstext, dölj knappar ── */
   .early-decision-actions { display: none !important; }
   .early-decision-box { page-break-inside: avoid; }
 
-  /* â”€â”€ Kopieringssektionen: visa enbart textkroppen â”€â”€ */
+  /* ── Kopieringssektionen: visa enbart textkroppen ── */
   .copy-tabs-row,
   .copy-footer { display: none !important; }
   .copy-section {
@@ -128,7 +129,7 @@
     white-space: pre-wrap;
   }
 
-  /* â”€â”€ LÃ¥ngvarig fÃ¶rbrukning â”€â”€ */
+  /* ── Långvarig förbrukning ── */
   .longterm-layout {
     display: block;
     padding: 0;
@@ -146,13 +147,13 @@
   }
   .longterm-form-col { display: none !important; }
   .longterm-result-col {
-    display: block !important; /* override inline display:flex frÃ¥n showEl */
+    display: block !important; /* override inline display:flex från showEl */
     overflow: visible;
     padding: 0;
     background: white;
     gap: 0;
   }
-  /* Ge gap tillbaka med margin istÃ¤llet (gap fungerar ej pÃ¥ block) */
+  /* Ge gap tillbaka med margin istället (gap fungerar ej på block) */
   .longterm-result-col > * { margin-bottom: 8pt; }
 
   .consumption-bar-wrap {
@@ -165,6 +166,6 @@
     page-break-inside: avoid;
   }
 
-  /* â”€â”€ DÃ¶lj resterande chrome â”€â”€ */
+  /* ── Dölj resterande chrome ── */
   .site-footer { display: none !important; }
 }

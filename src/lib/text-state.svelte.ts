@@ -1,4 +1,4 @@
-import type { MedState, CalcResult, MedCard, CardStatusCache, CardResult, PrescribeEntry, PrescribeInput } from './types';
+import type { CalcResult, MedCard, CardStatusCache, CardResult, PrescribeEntry, PrescribeInput } from './types';
 import type { PrescribeResult } from './prescribe-calc';
 import { validateValues, calcCore } from './calc';
 import { stripManufacturer, parseDateUTC, fmtDate } from './utils';
@@ -7,6 +7,7 @@ import { buildPatientText, buildJournalText, buildNurseJournalText } from './tex
 import { appState, medCards, resetNurseState } from './form-state.svelte';
 import { getPrescribeState, clearPrescribeState, clearCardPrescribeState } from './prescribe-state.svelte';
 import { ltState, resetLtPeriods } from './longterm-state.svelte';
+import { _cardResultsCache, _cardStatus, getCardStatus, getCachedResult, _resetCaches } from './cache-state.svelte';
 
 export { type CardStatusCache, type CardResult } from './types';
 
@@ -18,25 +19,12 @@ interface TextResult {
   cacheUpdates: Array<{ cardId: number; entry: { fp: string; cr: CardResult | null; status: CardStatusCache } }>;
 }
 
-let _cardResultsCache = $state<Record<number, { fp: string; cr: CardResult | null; status: CardStatusCache }>>({});
-
-let _cardStatus = $state<Record<number, CardStatusCache>>({});
-
-export function getCardStatus(cardId: number): CardStatusCache | undefined {
-  return _cardStatus[cardId];
-}
-
-export function getCachedResult(cardId: number): CardResult | null {
-  return _cardResultsCache[cardId]?.cr ?? null;
-}
-
-const _prescribeEnds = $derived.by((): Record<number, string> => {
-  const result: Record<number, string> = {};
+const _prescribeCombined = $derived.by((): Record<number, { endDateStr?: string; result: PrescribeResult | null }> => {
+  const r: Record<number, { endDateStr?: string; result: PrescribeResult | null }> = {};
   for (const card of medCards) {
     const ps = getPrescribeState(card._cardId);
-    if (!ps?.packageSize) continue;
     const cached = _cardResultsCache[card._cardId];
-    if (!cached?.cr) continue;
+    if (!ps || !cached?.cr) { r[card._cardId] = { result: null }; continue; }
     const s: PrescribeInput = {
       _cardId: card._cardId,
       dose: cached.cr.calc.dose,
@@ -44,27 +32,27 @@ const _prescribeEnds = $derived.by((): Record<number, string> => {
       doseUnit: cached.cr.calc.doseUnit,
       prescribedEndDateStr: cached.cr.calc.prescribedEndDateStr,
     };
+    if (!ps.packageSize) { r[card._cardId] = { result: calcPrescribeResult(s, ps) }; continue; }
     const pr = calcPrescribeResult(s, ps);
-    if (pr?.endDateStr) result[card._cardId] = pr.endDateStr;
+    r[card._cardId] = { endDateStr: pr?.endDateStr ?? undefined, result: pr };
   }
-  return result;
+  return r;
+});
+
+const _prescribeEnds = $derived.by((): Record<number, string> => {
+  const r: Record<number, string> = {};
+  for (const [cardId, val] of Object.entries(_prescribeCombined)) {
+    if (val.endDateStr) r[Number(cardId)] = val.endDateStr;
+  }
+  return r;
 });
 
 const _prescribeSummary = $derived.by((): Record<number, PrescribeResult | null> => {
-  const result: Record<number, PrescribeResult | null> = {};
-  for (const card of medCards) {
-    const ps = getPrescribeState(card._cardId);
-    const cached = _cardResultsCache[card._cardId];
-    if (!ps || !cached?.cr) { result[card._cardId] = null; continue; }
-    result[card._cardId] = calcPrescribeResult({
-      _cardId: card._cardId,
-      dose: cached.cr.calc.dose,
-      doseInterval: cached.cr.calc.doseInterval,
-      doseUnit: cached.cr.calc.doseUnit,
-      prescribedEndDateStr: cached.cr.calc.prescribedEndDateStr,
-    }, ps);
+  const r: Record<number, PrescribeResult | null> = {};
+  for (const [cardId, val] of Object.entries(_prescribeCombined)) {
+    r[Number(cardId)] = val.result ?? null;
   }
-  return result;
+  return r;
 });
 
 export function getPrescribeSummary() { return _prescribeSummary; }
@@ -300,6 +288,5 @@ export function clearAllMedState(): void {
   ltState.medRaw = '';
   ltState.doseRaw = '';
   resetNurseState();
-  _cardResultsCache = {};
-  _cardStatus = {};
+  _resetCaches();
 }

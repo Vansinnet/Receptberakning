@@ -1,7 +1,3 @@
-<script module lang="ts">
-  declare const __APP_VERSION__: string;
-</script>
-
 <script lang="ts">
   let {
     activeTab = 'renew' as 'renew' | 'longterm',

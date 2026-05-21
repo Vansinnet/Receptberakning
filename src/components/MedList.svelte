@@ -32,6 +32,7 @@
       const warn = cs.consumptionPct < CONSUMPTION_NORMAL_LOW || cs.consumptionPct > CONSUMPTION_NORMAL_HIGH || cs.daysToPrescribedEnd >= DAYS_REMAINING_WARN;
       return { cls: warn ? 'warn' : 'ok', text: cs.statusText };
     }
+    // getActiveResult() är $derived — alltid aktuell. getCardStatus() uppdateras via $effect och kan vara en tick efter.
     if (!result) return { cls: '', text: '—' };
     if (!result.valid) return { cls: '', text: 'Ej ifyllt' };
     if (!result.calculable) return { cls: '', text: result.statusText || '—' };
