@@ -1,7 +1,7 @@
 {
   "name": "recept-4.0",
   "private": true,
-  "version": "3.0.20",
+  "version": "3.0.21",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,8 +12,8 @@
     "test:properties": "vitest run tests/unit/calc.properties.test.ts",
     "test:e2e": "playwright test tests/e2e",
     "test:visual": "playwright test tests/visual-baseline/regression.spec.ts",
-    "build:db": "node scripts/build-product-db.js",
-    "generate:drugs": "node scripts/generate-drugs.js",
+    "build:db": "node scripts/build-product-db.cjs",
+    "generate:drugs": "node scripts/generate-drugs.cjs",
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "devDependencies": {

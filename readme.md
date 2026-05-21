@@ -164,7 +164,7 @@ npm run build             # Production build → dist/
 npm test                  # Kör 254 vitest-tester
 npm run test:e2e          # Kör 34 Playwright E2E-tester
 npm run check             # TypeScript-kontroll (svelte-check)
-npm run build:db          # Crawla FASS och bygg product-db.json (~45 min)
+npm run build:db          # Crawla FASS och bygg product-db.json (~20–25 min)
 npm run generate:drugs    # Generera drugs.json → public/data/drugs.json (~1 min)
 ```
 
