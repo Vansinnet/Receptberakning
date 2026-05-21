@@ -12,7 +12,6 @@ function createEmptyCard(cardId: number): MedCard {
       atcCode: null, nplId: null,
     },
     decision: null,
-    activeTab: 'patient',
     patientLang: 'sv',
   };
 }
@@ -50,16 +49,18 @@ export function tickCurrentDate(): void {
 
 const _activeValidated = $derived.by(() => {
   void appState.currentDate;
+  const c = medCards[appState.activeMedIdx];
+  const f = c?.form;
   return validateValues(
-    medCards[appState.activeMedIdx]?.form?.medRaw ?? '',
-    medCards[appState.activeMedIdx]?.form?.dateVal ?? '',
-    medCards[appState.activeMedIdx]?.form?.doseRaw ?? '',
-    medCards[appState.activeMedIdx]?.form?.amtRaw ?? '',
-    medCards[appState.activeMedIdx]?.form?.refRaw ?? '',
-    medCards[appState.activeMedIdx]?.form?.leftRaw ?? '',
-    String(medCards[appState.activeMedIdx]?.form?.doseInterval ?? 1),
-    medCards[appState.activeMedIdx]?.form?.doseUnit ?? 'st',
-    medCards[appState.activeMedIdx]?.form?.notCalculable ?? false,
+    f?.medRaw ?? '',
+    f?.dateVal ?? '',
+    f?.doseRaw ?? '',
+    f?.amtRaw ?? '',
+    f?.refRaw ?? '',
+    f?.leftRaw ?? '',
+    String(f?.doseInterval ?? 1),
+    f?.doseUnit ?? 'st',
+    f?.notCalculable ?? false,
   );
 });
 

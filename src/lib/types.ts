@@ -106,7 +106,6 @@ export interface MedCard {
   _cardId: number;
   form: FormValues;
   decision: 'yes' | 'no' | null;
-  activeTab: 'patient' | 'journal';
   patientLang: 'sv' | 'en';
 }
 

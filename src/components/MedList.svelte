@@ -1,6 +1,9 @@
 <script lang="ts">
   import { medCards, appState, pushMedCard, getActiveResult, clearAllMedState, getCardStatus } from '$lib/state.svelte';
   import { MAX_MED_CARDS, CONSUMPTION_NORMAL_LOW, CONSUMPTION_NORMAL_HIGH, DAYS_REMAINING_WARN } from '$lib/constants';
+  import AlertDialog from './AlertDialog.svelte';
+
+  let confirmOpen = $state(false);
 
   function handleSelectMed(idx: number) {
     appState.activeMedIdx = idx;
@@ -13,9 +16,16 @@
   }
 
   function handleNewPatient() {
-    if (confirm('Är du säker på att du vill rensa all inmatad data? Detta kan inte ångras.')) {
-      clearAllMedState();
-    }
+    confirmOpen = true;
+  }
+
+  function onConfirmClear() {
+    confirmOpen = false;
+    clearAllMedState();
+  }
+
+  function onCancelClear() {
+    confirmOpen = false;
   }
 
   let activeIdx = $derived(appState.activeMedIdx);
@@ -65,3 +75,11 @@
   </button>
   <button class="btn btn-ghost" data-tooltip="Rensa all data och börja om med en ny patient." onclick={handleNewPatient}>Ny patient</button>
 </aside>
+
+<AlertDialog
+  open={confirmOpen}
+  title="Rensa all data?"
+  message="Är du säker på att du vill rensa all inmatad data? Detta kan inte ångras."
+  onConfirm={onConfirmClear}
+  onCancel={onCancelClear}
+/>

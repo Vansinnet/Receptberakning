@@ -8,7 +8,7 @@
   import LongtermPanel from './LongtermPanel.svelte';
   import InteractionAlerts from './InteractionAlerts.svelte';
   import InactivityTimer from './InactivityTimer.svelte';
-  import { medCards, appState, tickCurrentDate, clearAllMedState, getActiveResult, getPrescribeState, getCardStatus, _syncCardStatus, _textsVersion, getHasSummary } from '$lib/state.svelte';
+  import { medCards, appState, tickCurrentDate, clearAllMedState, getActiveResult, _syncCardStatus, getHasSummary } from '$lib/state.svelte';
   import { CHECK_INTERACTIONS } from '$lib/interactions';
   import { canRenewMed } from '$lib/prescribe-calc';
   import { VALID_THEMES } from '$lib/constants';
@@ -22,26 +22,9 @@
     () => clearAllMedState(),
     () => medCards.some(c => c.form.medRaw !== ''),
   );
-  let showInactivityToast = $derived(inactivityTimer.showToast);
-  let inactivityCountdown = $derived(inactivityTimer.countdown);
-
-  let nurseActive = $derived(appState.nurseViewActive);
-  let result = $derived(getActiveResult());
-  let activeIdx = $derived(appState.activeMedIdx);
-  let card = $derived(medCards[activeIdx] ?? null);
-
-  let activeAtcSignature = $derived.by((): string => {
-    const codes: string[] = [];
-    for (const c of medCards) {
-      if (c?.form?.atcCode && c.form.medRaw) {
-        codes.push(`${c.form.atcCode}|${c.form.medRaw}`);
-      }
-    }
-    return codes.join(',');
-  });
+  let card = $derived(medCards[appState.activeMedIdx] ?? null);
 
   let interactionWarnings = $derived.by(() => {
-    void activeAtcSignature;
     const entries: Array<{ a: string; i: string }> = [];
     for (let i = 0; i < medCards.length; i++) {
       const c = medCards[i];
@@ -53,23 +36,21 @@
     return CHECK_INTERACTIONS(entries);
   });
 
-  let prescribeVisible = $derived(card && result ? canRenewMed({
+  let prescribeVisible = $derived(card && getActiveResult() ? canRenewMed({
     _cardId: card._cardId,
-    valid: result.valid ?? false,
-    calculable: result.calculable ?? false,
+    valid: getActiveResult().valid ?? false,
+    calculable: getActiveResult().calculable ?? false,
     decision: card.decision,
   }) : false);
 
-  let hasSummaryDerived = $derived(getHasSummary());
-
-  let showPrescribe = $derived(prescribeVisible || hasSummaryDerived);
+  let showPrescribe = $derived(prescribeVisible || getHasSummary());
 
   function handleTabChange(tab: 'renew' | 'longterm') {
     activeTab = tab;
   }
 
   function handleNurseToggle() {
-    appState.nurseViewActive = !nurseActive;
+    appState.nurseViewActive = !appState.nurseViewActive;
   }
 
   function handleThemeChange(t: string) {
@@ -101,8 +82,6 @@
   });
 
   $effect(() => {
-    void _textsVersion();
-    void hasSummaryDerived;
     _syncCardStatus();
   });
 
@@ -110,20 +89,10 @@
     void medCards.length;
     inactivityTimer.reset();
   });
-
-  $effect(() => {
-    for (let i = 0; i < medCards.length; i++) {
-      const status = getCardStatus(medCards[i]._cardId);
-      if (status?.valid === false && medCards[i].decision !== null) {
-        medCards[i].decision = null;
-      }
-    }
-  });
 </script>
 
 <svelte:window onvisibilitychange={onVisibilityChange} onpagehide={onPageHide} />
 
-<!-- BOUNDARY temporärt bort för felsökning -->
   <a href="#main-content" class="skip-link">Hoppa till innehåll</a>
 
   <noscript>
@@ -137,7 +106,7 @@
   <div class="app-shell">
     <h1 class="sr-only">Receptberäkning – kliniskt beslutsstöd</h1>
 
-    <TopBar {activeTab} {theme} nurseViewActive={nurseActive}
+    <TopBar {activeTab} {theme} nurseViewActive={appState.nurseViewActive}
       onTabChange={handleTabChange}
       onNurseToggle={handleNurseToggle}
       onThemeChange={handleThemeChange}
@@ -156,39 +125,29 @@
             </section>
 
             <!-- KOLUMN 3: Sjuksköterskebedömning (villkorad) -->
-            {#if nurseActive}
+            {#if appState.nurseViewActive}
               <NurseView />
             {/if}
 
             <!-- KOLUMN 4: Resultat -->
             <section class="result-panel" id="resultPanel" aria-label="Beräkningsresultat">
               <InteractionAlerts warnings={interactionWarnings} />
-              {#if result?.valid && result?.calculable !== false}
+              {#if getActiveResult()?.valid && getActiveResult()?.calculable !== false}
                 <CalcResult
-                  result={result}
-                  nurseViewActive={nurseActive}
+                  result={getActiveResult()}
+                  nurseViewActive={appState.nurseViewActive}
                   onDecision={handleEarlyDecision}
                 />
-              {:else if result && !result.valid}
-                <div class="result-empty-state">
-                  <div class="empty-icon" aria-hidden="true">📋</div>
-                  <div>{result.statusText || 'Fyll i formuläret för att se resultatet'}</div>
-                </div>
-              {:else if result?.valid && result?.calculable === false}
-                <div class="result-empty-state">
-                  <div class="empty-icon" aria-hidden="true">📋</div>
-                  <div>{result.statusText || 'Kan ej beräknas'}</div>
-                </div>
               {:else}
                 <div class="result-empty-state">
                   <div class="empty-icon" aria-hidden="true">📋</div>
-                  <div>Fyll i formuläret för att se resultatet</div>
+                  <div>{getActiveResult()?.statusText || 'Fyll i formuläret för att se resultatet'}</div>
                 </div>
               {/if}
             </section>
 
             <!-- KOLUMN 5: Förskrivningspanel (alltid i DOM, reserverar plats) -->
-            <PrescribePanel visible={showPrescribe && !nurseActive} />
+            <PrescribePanel visible={showPrescribe && !appState.nurseViewActive} />
           </div>
         </div>
 
@@ -215,5 +174,4 @@
     </footer>
   </div>
 
-  <InactivityTimer showToast={showInactivityToast} countdown={inactivityCountdown} onDismiss={() => inactivityTimer.dismiss()} />
-<!-- /BOUNDARY -->
+  <InactivityTimer showToast={inactivityTimer.showToast} countdown={inactivityTimer.countdown} onDismiss={() => inactivityTimer.dismiss()} />

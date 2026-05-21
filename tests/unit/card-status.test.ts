@@ -9,7 +9,7 @@ import {
   clearAllMedState,
   getActiveResult,
   _syncCardStatus,
-  _textsVersion,
+  getTextsState,
 } from '../../src/lib/state.svelte';
 import { setMockNow } from '../../src/lib/clock';
 
@@ -30,7 +30,7 @@ function fillCard(idx: number, overrides: Partial<{
 }
 
 function syncAndGetStatus(cardId: number) {
-  void _textsVersion();
+  void getTextsState();
   _syncCardStatus();
   return getCardStatus(cardId);
 }

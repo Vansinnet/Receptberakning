@@ -1,8 +1,8 @@
 import type { CardStatusCache, CardResult } from './types';
 
-export let _cardResultsCache = $state<Record<number, { fp: string; cr: CardResult | null; status: CardStatusCache }>>({});
+export const _cardResultsCache = $state<Record<number, { fp: string; cr: CardResult | null; status: CardStatusCache }>>({});
 
-export let _cardStatus = $state<Record<number, CardStatusCache>>({});
+export const _cardStatus = $state<Record<number, CardStatusCache>>({});
 
 export function getCardStatus(cardId: number): CardStatusCache | undefined {
   return _cardStatus[cardId];

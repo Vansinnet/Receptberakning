@@ -1371,3 +1371,40 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   from { opacity: 0; transform: translateX(-50%) translateY(20px); }
   to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
+
+/* === AlertDialog === */
+
+.alert-dialog {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface1);
+  color: var(--text);
+  padding: 0;
+  max-width: 420px;
+  width: 90vw;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+}
+.alert-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+.alert-dialog-content {
+  padding: 24px;
+}
+.alert-dialog-title {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+.alert-dialog-msg {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.alert-dialog-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}

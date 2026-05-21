@@ -19,6 +19,12 @@ interface TextResult {
   cacheUpdates: Array<{ cardId: number; entry: { fp: string; cr: CardResult | null; status: CardStatusCache } }>;
 }
 
+export interface ActiveTexts {
+  patientText: string;
+  patientTextEn: string;
+  journalText: string;
+}
+
 const _prescribeCombined = $derived.by((): Record<number, { endDateStr?: string; result: PrescribeResult | null }> => {
   const r: Record<number, { endDateStr?: string; result: PrescribeResult | null }> = {};
   for (const card of medCards) {
@@ -88,7 +94,7 @@ function _computeAllCards(): {
     }
 
     const fp = [f.medRaw, f.dateVal, f.doseRaw, f.amtRaw, f.refRaw, f.leftRaw,
-      f.doseUnit, f.doseInterval, f.notCalculable, card.decision, appState.currentDate].join('\x00');
+      f.doseUnit, f.doseInterval, f.notCalculable, appState.currentDate].join('\x00');
 
     const cached = _cardResultsCache[card._cardId];
     if (cached && cached.fp === fp) {
@@ -222,9 +228,9 @@ const _texts = $derived.by((): TextResult => {
   }
 });
 
-export function getActiveTexts(): TextResult {
+export function getActiveTexts(): ActiveTexts {
   const { patientText, patientTextEn, journalText } = _texts;
-  return { patientText, patientTextEn, journalText, cardStatuses: {}, cacheUpdates: [] };
+  return { patientText, patientTextEn, journalText };
 }
 
 export function _syncCardStatus(): void {
@@ -236,12 +242,18 @@ export function _syncCardStatus(): void {
   for (const c of caches) {
     _cardResultsCache[c.cardId] = c.entry;
   }
+  for (const [cardIdStr, status] of Object.entries(statuses)) {
+    if (!status.valid) {
+      const cardId = Number(cardIdStr);
+      const card = medCards.find(c => c._cardId === cardId);
+      if (card && card.decision !== null) {
+        card.decision = null;
+      }
+    }
+  }
 }
 
-export function _textsVersion(): number {
-  void _texts.patientText;
-  return Object.keys(_texts.cardStatuses).length;
-}
+export function getTextsState() { return _texts; }
 
 const _hasSummary = $derived.by(() => {
   let count = 0;
@@ -280,7 +292,7 @@ export function spliceMedCard(i: number): void {
 
 export function clearAllMedState(): void {
   medCards.length = 0;
-  medCards.push({ _cardId: 1, form: { medRaw: '', dateVal: '', doseRaw: '', amtRaw: '', refRaw: '', leftRaw: '', doseUnit: 'st', doseInterval: 1, notCalculable: false, atcCode: null, nplId: null }, decision: null, activeTab: 'patient', patientLang: 'sv' });
+  medCards.push({ _cardId: 1, form: { medRaw: '', dateVal: '', doseRaw: '', amtRaw: '', refRaw: '', leftRaw: '', doseUnit: 'st', doseInterval: 1, notCalculable: false, atcCode: null, nplId: null }, decision: null, patientLang: 'sv' });
   appState.activeMedIdx = 0;
   appState.nextCardId = 2;
   clearPrescribeState();

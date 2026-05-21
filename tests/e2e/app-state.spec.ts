@@ -37,7 +37,7 @@ test.describe('Lägg till / ta bort kort', () => {
     await page.fill('#medInput', 'Metformin 500 mg');
     await page.fill('#dateInput', '2025-01-01');
     await page.waitForTimeout(200);
-    await page.click('button:has-text("Rensa")');
+    await page.click('button[data-tooltip="Rensa formuläret för detta läkemedel."]');
     await page.waitForTimeout(200);
     await expect(page.locator('#medInput')).toHaveValue('');
     await expect(page.locator('#dateInput')).toHaveValue('');
@@ -53,11 +53,10 @@ test.describe('Ny patient (rensning)', () => {
     await page.fill('#amtInput', '100');
     await page.fill('#refInput', '3');
     await page.waitForTimeout(400);
-    // Klicka Ny patient
-    page.on('dialog', dialog => dialog.accept());
     await page.click('button:has-text("Ny patient")');
+    await page.waitForSelector('.alert-dialog[open]');
+    await page.click('.alert-dialog .btn-danger');
     await page.waitForTimeout(300);
-    // Efter rensning: ett tomt kort
     await expect(page.locator('#medInput')).toHaveValue('');
     await expect(page.locator('.med-item')).toHaveCount(1);
   });
