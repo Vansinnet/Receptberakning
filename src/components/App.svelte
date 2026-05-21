@@ -75,9 +75,6 @@
   function handleThemeChange(t: string) {
     if (!VALID_THEMES.has(t)) return;
     theme = t as 'dark' | 'klinisk' | 'sakura';
-    if (typeof document !== 'undefined') {
-      document.documentElement.setAttribute('data-theme', t);
-    }
   }
 
   function handleEarlyDecision(decision: 'yes' | 'no') {
