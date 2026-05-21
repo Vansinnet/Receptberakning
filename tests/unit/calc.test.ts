@@ -257,6 +257,34 @@ describe('buildPatientText — 3+ läkemedel', () => {
     expect(t).toContain('Metformin');
     expect(t).toContain('Atorvastatin');
     expect(t).toContain('Losartan');
+    expect(t).toContain('klinisk individuell bedömning av läkare');
+  });
+  it('multi no med datum → klinisk motivering syns', () => {
+    const t = buildPatientText('sv', [
+      { name: 'Sertralin', decision: 'no', prescribedEndDateStr: '2026-01-30', daysToPrescribedEnd: -50 },
+      { name: 'Concerta', decision: 'no', prescribedEndDateStr: '2026-01-30', daysToPrescribedEnd: -50 },
+    ]);
+    expect(t).toContain('klinisk individuell bedömning av läkare');
+  });
+  it('multi no en → clinical assessment syns', () => {
+    const t = buildPatientText('en', [
+      { name: 'Sertralin', decision: 'no', prescribedEndDateStr: '2026-01-30', daysToPrescribedEnd: -50 },
+      { name: 'Concerta', decision: 'no', prescribedEndDateStr: '2026-01-30', daysToPrescribedEnd: -50 },
+    ]);
+    expect(t).toContain('clinical assessment');
+  });
+  it('multi no med 14+ dagar → klinisk motivering + kontakt syns', () => {
+    const t = buildPatientText('sv', [
+      { name: 'Sertralin', decision: 'no', prescribedEndDateStr: '2026-12-31', daysToPrescribedEnd: 200, contactDateStr: '2026-12-24' },
+    ]);
+    expect(t).toContain('klinisk individuell bedömning av läkare');
+    expect(t).toContain('Hör av dig');
+  });
+  it('single no → klinisk motivering syns (redan befintligt)', () => {
+    const t = buildPatientText('sv', [
+      { name: 'Sertralin', decision: 'no', prescribedEndDateStr: '2026-01-30', daysToPrescribedEnd: -50 },
+    ]);
+    expect(t).toContain('klinisk individuell bedömning av läkare');
   });
 });
 

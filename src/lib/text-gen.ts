@@ -22,7 +22,7 @@ const TPL = {
     multi_item_yes: (name: string, end: string) =>
       `  ${name}: Vi förnyar ditt recept${end}. Du kan inom 2–3 arbetsdagar hämta ut det på valfritt apotek.`,
     multi_item_no: (name: string, verb: string, date: string, contact: string) =>
-      `  ${name}: Kan tyvärr inte förnyas. Nuvarande recept ${verb} räcka t.o.m. ${date}.${contact}`,
+      `  ${name}: Kan tyvärr inte förnyas. Nuvarande recept ${verb} räcka t.o.m. ${date}.${contact} Vi kan tyvärr inte förnya receptet vid detta tillfälle efter klinisk individuell bedömning av läkare.`,
     multi_item_no_nodate: (name: string) =>
       `  ${name}: Kan tyvärr inte förnyas efter klinisk individuell bedömning av läkare.`,
   },
@@ -43,7 +43,7 @@ const TPL = {
     multi_item_yes: (name: string, end: string) =>
       `  ${name}: We will renew your prescription${end}. You can collect it within 2–3 working days.`,
     multi_item_no: (name: string, verb: string, date: string, contact: string) =>
-      `  ${name}: Unable to renew. Prescription ${verb} to last until ${date}.${contact}`,
+      `  ${name}: Unable to renew. Prescription ${verb} to last until ${date}.${contact} We are unfortunately unable to renew the prescription at this time following an individual clinical assessment by a physician.`,
     multi_item_no_nodate: (name: string) =>
       `  ${name}: Unable to renew following clinical assessment.`,
   },
