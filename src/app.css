@@ -50,7 +50,7 @@
   --danger-bg: var(--red-bg); --danger-color: var(--red); --danger-border: var(--red-border); --danger-hover: var(--red-border);
   --btn-selected-text: #fff;
   --sidebar-w: 178px;
-  --form-w: 441px;
+  --form-w: 440px;
 }
 
 [data-theme="dark"] {
@@ -341,104 +341,41 @@ html, body {
   align-items: center;       /* centrerar barnen horisontellt */
 }
 
+/* Interaktionsvarningar — uniform stil */
 #interactionAlerts {
-  order: -1;                  /* alltid Ã¶verst i kolumnen Ã¤ven fÃ¶re berÃ¤kning */
+  order: -1;
   width: 100%;
   max-width: 860px;
-  padding: 14px 16px 0;      /* samma sidopadding som result-content, topp separat */
+  padding: 14px 16px 0;
+  gap: 6px;
 }
-
-.result-content {
-  padding: 14px 16px;
+.interaction-alerts {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-width: 860px;       /* hindrar texten att bli fÃ¶r bred pÃ¥ stora skÃ¤rmar */
-  width: 100%;
-}
-
-/* Tidslinje */
-.tl-label {
-  font-size: 10px; font-weight: 700; color: var(--text-muted);
-  text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px;
-}
-.tl-bar-bg {
-  height: 6px; background: var(--border); border-radius: 3px; position: relative;
-}
-.tl-fill {
-  height: 6px; border-radius: 3px; position: relative; transition: width 0.4s ease; width: 0%;
-}
-.tl-fill-ok    { background: var(--green); }
-.tl-fill-warn  { background: var(--amber); }
-.tl-fill-danger{ background: var(--red); }
-.tl-today-marker {
-  position: absolute; right: 0; top: -5px;
-  width: 2px; height: 16px; background: var(--text-muted); border-radius: 1px;
-}
-.tl-labels {
-  display: flex; justify-content: space-between; margin-top: 4px;
-  font-size: 10px; color: var(--text-muted);
-  font-family: "SF Mono", Consolas, monospace;
-}
-.tl-today-label { font-weight: 600; color: var(--text-muted); }
-
-/* Alerts */
-.alert {
-  padding: 10px 12px; border-inline-start: 3px solid; border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  font-size: 12px; line-height: 1.6;
-}
-.alert strong { font-weight: 700; display: block; margin-bottom: 2px; }
-.alert-danger { background: var(--red-bg);   border-color: var(--red);   color: var(--red); }
-.alert-warn   { background: var(--amber-bg); border-color: var(--amber); color: var(--amber); }
-.alert-info   { background: var(--blue-bg);  border-color: var(--blue);  color: var(--blue); }
-.alert-ok     { background: var(--green-bg); border-color: var(--green); color: var(--green); }
-
-/* Interaktionsvarningar */
-.interaction-alert {
-  padding: 12px 14px;
-  border-inline-start: 4px solid;
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  margin-bottom: 12px;
-  font-size: 12px;
-  line-height: 1.6;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-}
-.interaction-danger {
-  background: var(--red-bg);
-  border-color: var(--red);
-  color: var(--red);
-}
-.interaction-warn {
-  background: var(--amber-bg);
-  border-color: var(--amber);
-  color: var(--amber);
-}
-.interaction-header {
-  display: flex;
-  align-items: baseline;
   gap: 6px;
-  margin-bottom: 4px;
 }
-.interaction-icon {
-  font-size: 14px;
-  flex-shrink: 0;
+.interaction-row {
+  padding: 8px 12px;
+  border-inline-start: 3px solid var(--primary);
+  background: var(--surface);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-size: 12px;
+  line-height: 1.5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
 }
-.interaction-header strong {
-  font-size: 13px;
-  font-weight: 700;
+.interaction-text {
+  color: var(--text);
 }
-.interaction-drugs {
-  font-size: 11px;
-  opacity: 0.75;
-  margin-inline-start: auto;
+.interaction-janus-link {
+  display: inline;
 }
-.interaction-desc {
-  margin-bottom: 4px;
-}
-.interaction-rec {
-  font-style: italic;
-  opacity: 0.85;
-  margin: 0;
+.interaction-janus-link a {
+  color: var(--primary);
+  text-decoration: underline;
+  white-space: nowrap;
 }
 
 /* Statusprick fÃ¶r interagerande lÃ¤kemedel */

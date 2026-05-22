@@ -5,6 +5,7 @@ test-results/
 *.tsbuildinfo
 data/product-db.json
 data/_crawl-progress.json
+data/_interactions-progress.json
 .DS_Store
 Thumbs.db
 AGENTS.md

@@ -1,4 +1,5 @@
-import interactionsRaw from './data/interactions.json';
+import interactionsManual from './data/interactions.json';
+import interactionsScraped from './data/interactions-scraped.json';
 
 export interface InteractionRule {
   atcGroupA: string[];
@@ -18,7 +19,10 @@ export interface InteractionWarning {
   nplIds: [string | null, string | null];
 }
 
-export const INTERACTIONS: InteractionRule[] = interactionsRaw as InteractionRule[];
+export const INTERACTIONS: InteractionRule[] = [
+  ...(Array.isArray(interactionsScraped) ? interactionsScraped : []) as InteractionRule[],
+  ...(Array.isArray(interactionsManual) ? interactionsManual : []) as InteractionRule[],
+];
 
 const _idxA = new Map<string, number[]>();
 const _idxB = new Map<string, number[]>();
