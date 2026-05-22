@@ -1,4 +1,3 @@
-import interactionsManual from './data/interactions.json';
 import interactionsScraped from './data/interactions-scraped.json';
 import type { AtcEntry } from './types';
 
@@ -22,7 +21,6 @@ export interface InteractionWarning {
 
 export const INTERACTIONS: InteractionRule[] = [
   ...(Array.isArray(interactionsScraped) ? interactionsScraped : []) as InteractionRule[],
-  ...(Array.isArray(interactionsManual) ? interactionsManual : []) as InteractionRule[],
 ];
 
 const _idxA = new Map<string, number[]>();
