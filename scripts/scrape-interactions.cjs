@@ -11,9 +11,11 @@
  */
 
 const fs = require('fs');
+const fsp = require('fs/promises');
 const path = require('path');
 const https = require('node:https');
 const dns = require('node:dns');
+const dnsPromises = require('node:dns').promises;
 
 const isIncremental = process.argv.includes('--incremental');
 dns.setDefaultResultOrder('ipv4first');
@@ -82,7 +84,7 @@ async function fetchWithRetry(url, retries = RETRY_COUNT) {
       return await res.text();
     } catch (e) {
       if (i === retries) throw e;
-      await sleep(1000 * (i + 1));
+      await sleep(300 * (i + 1));
     }
   }
 }
@@ -124,10 +126,13 @@ function loadAndGroup() {
  * Generera alla unika par från ATC5-keys.
  */
 function generatePairs(keys) {
-  const pairs = [];
-  for (let i = 0; i < keys.length; i++) {
-    for (let j = i + 1; j < keys.length; j++) {
-      pairs.push([keys[i], keys[j]]);
+  const n = keys.length;
+  const total = (n * (n - 1)) / 2;
+  const pairs = new Array(total);
+  let idx = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      pairs[idx++] = [keys[i], keys[j]];
     }
   }
   console.log(`  ${pairs.length} unika ATC5-par att kontrollera`);
@@ -205,6 +210,16 @@ function saveProgress(progress) {
   fs.writeFileSync(PROGRESS_FILE, JSON.stringify(progress, null, 2));
 }
 
+let _savePending = false;
+function saveProgressAsync(progress) {
+  if (_savePending) return;
+  _savePending = true;
+  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+  fsp.writeFile(PROGRESS_FILE, JSON.stringify(progress, null, 2)).finally(() => {
+    _savePending = false;
+  });
+}
+
 async function main() {
   console.log('=== scrape-interactions.cjs ===\n');
 
@@ -252,7 +267,14 @@ async function main() {
 
   console.log(`\nSteg 3: Skrapa Janusmed...`);
   console.log(`  Redan kontrollerade: ${totalPairs - remaining.length}`);
-  console.log(`  Kvar att kontrollera: ${remaining.length}\n`);
+  console.log(`  Kvar att kontrollera: ${remaining.length}`);
+
+  // DNS+TLS pre-warm: lös upp janusmed.se och etablera TLS-session
+  try {
+    await dnsPromises.resolve4('janusmed.se');
+    await fetch('https://janusmed.se/', { agent: KEEP_ALIVE_AGENT, signal: AbortSignal.timeout(5000) });
+  } catch { /* non-critical, first real request handles it */ }
+  console.log('');
 
   if (remaining.length === 0) {
     console.log('  Alla par redan kontrollerade!');
@@ -315,7 +337,7 @@ async function main() {
         const doneCount = completed - (totalPairs - remaining.length);
         if (doneCount - lastSaved >= PROGRESS_SAVE_INTERVAL) {
           lastSaved = doneCount;
-          saveProgress(progress);
+          saveProgressAsync(progress);
         }
 
         showProgress();
@@ -365,7 +387,7 @@ async function main() {
   fs.writeFileSync(OUTPUT_FILE, JSON.stringify(progress.rules, null, 2));
   console.log('  Klart!\n');
 
-  saveProgress(progress);
+  await fsp.writeFile(PROGRESS_FILE, JSON.stringify(progress, null, 2));
 
   console.log(`=== scrape-interactions.cjs slutförd ===`);
   console.log(`  Totalt: ${totalPairs} par kontrollerade`);
