@@ -25,11 +25,11 @@
   let card = $derived(medCards[appState.activeMedIdx] ?? null);
 
   let interactionWarnings = $derived.by(() => {
-    const entries: Array<{ a: string; i: string }> = [];
+    const entries: Array<{ a: string; i: string; p: string | null }> = [];
     for (let i = 0; i < medCards.length; i++) {
       const c = medCards[i];
       if (c?.form?.atcCode && c.form.medRaw) {
-        entries.push({ a: c.form.atcCode, i: c.form.medRaw });
+        entries.push({ a: c.form.atcCode, i: c.form.medRaw, p: c.form.nplId });
       }
     }
     if (entries.length < 2) return [];

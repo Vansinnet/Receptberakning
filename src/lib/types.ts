@@ -127,6 +127,7 @@ export interface CardResult {
 export interface PrescribeEntry {
   packageSize: string;
   _lastAmt?: string;
+  _pkgUserEdited?: boolean;
   mode?: string;
   months?: number;
   endDate?: string;

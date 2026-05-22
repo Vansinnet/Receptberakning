@@ -27,7 +27,7 @@
       card.form.doseRaw = '';
       card.form.doseInterval = 1;
       card.form.leftRaw = '';
-      applyPrescribeStatePatch(card._cardId, { packageSize: card.form.amtRaw, _lastAmt: card.form.amtRaw });
+      applyPrescribeStatePatch(card._cardId, { packageSize: card.form.amtRaw, _lastAmt: card.form.amtRaw, _pkgUserEdited: false });
     },
   });
 

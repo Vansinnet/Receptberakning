@@ -21,10 +21,17 @@
     decision: card.decision,
   }) : false);
 
+  let displayPkgSize = $derived.by(() => {
+    if (!card || !result?.valid || !result?.calculable) return '';
+    const ps = getPrescribeState(card._cardId);
+    if (ps?._pkgUserEdited) return ps.packageSize;
+    return result.amt != null ? String(result.amt) : '';
+  });
+
   function handlePkgInput(e: Event) {
     if (!card) return;
     const val = (e.target as HTMLInputElement).value;
-    applyPrescribeStatePatch(card._cardId, { packageSize: val });
+    applyPrescribeStatePatch(card._cardId, { packageSize: val, _pkgUserEdited: val !== '' });
   }
 
   function handleModeChange(m: 'months' | 'date') {
@@ -82,7 +89,7 @@
 
         <div class="field prescribe-pkg-field">
           <label for="ps-pkg" data-tooltip="Antal enheter per förpackning.">Förpackningsstorlek ({UNIT_DISPLAY[(result.doseUnit ?? 'st') as keyof typeof UNIT_DISPLAY]?.long ?? 'tabletter'})</label>
-          <input id="ps-pkg" type="number" min="1" step="1" placeholder="T.ex. 30" value={psEntry?.packageSize ?? ''} oninput={handlePkgInput} />
+          <input id="ps-pkg" type="number" min="1" step="1" placeholder="T.ex. 30" value={displayPkgSize} oninput={handlePkgInput} />
         </div>
 
         <div class="prescribe-info-row">

@@ -15,6 +15,7 @@ export interface InteractionWarning {
   description: string;
   recommendation: string;
   drugs: [string, string];
+  nplIds: [string | null, string | null];
 }
 
 export const INTERACTIONS: InteractionRule[] = interactionsRaw as InteractionRule[];
@@ -54,7 +55,7 @@ export function atcMatches(atcCode: string | null | undefined, pattern: string):
   return atcCode ? atcCode.startsWith(pattern) : false;
 }
 
-export function CHECK_INTERACTIONS(atcEntries: Array<{ a: string; i: string }>): InteractionWarning[] {
+export function CHECK_INTERACTIONS(atcEntries: Array<{ a: string; i: string; p?: string | null }>): InteractionWarning[] {
   if (atcEntries.length < 2) return [];
 
   const warnings: InteractionWarning[] = [];
@@ -83,6 +84,7 @@ export function CHECK_INTERACTIONS(atcEntries: Array<{ a: string; i: string }>):
         warnings.push({
           severity: ix.severity, title: ix.title, description: ix.description, recommendation: ix.recommendation,
           drugs: [atcEntries[x].i, atcEntries[y].i],
+          nplIds: [atcEntries[x].p ?? null, atcEntries[y].p ?? null],
         });
       }
     }
