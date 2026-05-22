@@ -25,12 +25,13 @@ export interface ActiveTexts {
   journalText: string;
 }
 
-const _prescribeCombined = $derived.by((): Record<number, { endDateStr?: string; result: PrescribeResult | null }> => {
-  const r: Record<number, { endDateStr?: string; result: PrescribeResult | null }> = {};
+const _prescribeData = $derived.by(() => {
+  const ends: Record<number, string> = {};
+  const summary: Record<number, PrescribeResult | null> = {};
   for (const card of medCards) {
     const ps = getPrescribeState(card._cardId);
     const cached = _cardResultsCache[card._cardId];
-    if (!ps || !cached?.cr) { r[card._cardId] = { result: null }; continue; }
+    if (!ps || !cached?.cr) { summary[card._cardId] = null; continue; }
     const s: PrescribeInput = {
       _cardId: card._cardId,
       dose: cached.cr.calc.dose,
@@ -38,25 +39,14 @@ const _prescribeCombined = $derived.by((): Record<number, { endDateStr?: string;
       doseUnit: cached.cr.calc.doseUnit,
       prescribedEndDateStr: cached.cr.calc.prescribedEndDateStr,
     };
-    if (!ps.packageSize) { r[card._cardId] = { result: calcPrescribeResult(s, ps) }; continue; }
     const pr = calcPrescribeResult(s, ps);
-    r[card._cardId] = { endDateStr: pr?.endDateStr ?? undefined, result: pr };
-  }
-  return r;
-});
-
-const _prescribeExtracted = $derived.by(() => {
-  const ends: Record<number, string> = {};
-  const summary: Record<number, PrescribeResult | null> = {};
-  for (const [cardId, val] of Object.entries(_prescribeCombined)) {
-    const id = Number(cardId);
-    if (val.endDateStr) ends[id] = val.endDateStr;
-    summary[id] = val.result ?? null;
+    summary[card._cardId] = pr ?? null;
+    if (pr?.endDateStr) ends[card._cardId] = pr.endDateStr;
   }
   return { ends, summary };
 });
 
-export function getPrescribeSummary() { return _prescribeExtracted.summary; }
+export function getPrescribeSummary() { return _prescribeData.summary; }
 
 function _computeAllCards(): {
   cardResults: CardResult[];
@@ -209,7 +199,7 @@ const _texts = $derived.by((): TextResult => {
       return { patientText: '', patientTextEn: '', journalText: '', cardStatuses: computed.cardStatuses, cacheUpdates: computed.cacheUpdates };
     }
     const cardsForText = _buildCardsForText(computed.cardResults, computed.medCardMap);
-    return _buildTextResult(computed.cardResults, cardsForText, computed.cardStatuses, computed.cacheUpdates, _prescribeExtracted.ends);
+    return _buildTextResult(computed.cardResults, cardsForText, computed.cardStatuses, computed.cacheUpdates, _prescribeData.ends);
   } catch (e) {
     console.error('[v3 _texts] KRASCH:', e instanceof Error ? e.stack : String(e));
     return { patientText: '', patientTextEn: '', journalText: 'Textgenerering misslyckades', cardStatuses: {} as Record<number, CardStatusCache>, cacheUpdates: [] };

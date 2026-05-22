@@ -33,7 +33,7 @@ export function createInactivityTimer(onClear: () => void, getHasData: () => boo
   }
 
   $effect(() => {
-    document.addEventListener('mousemove', onActivity);
+    document.addEventListener('mousemove', onActivity, { passive: true });
     document.addEventListener('keydown', onActivity);
     document.addEventListener('pointerdown', onActivity);
     return () => {

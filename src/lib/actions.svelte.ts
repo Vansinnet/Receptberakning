@@ -2,9 +2,9 @@ import { copyToClipboard } from './utils';
 
 export function copyable(node: HTMLElement, getText: () => string) {
   let timeout: ReturnType<typeof setTimeout> | null = null;
-  const originalText = node.textContent ?? '';
 
   async function handleClick() {
+    const originalText = node.textContent ?? '';
     const ok = await copyToClipboard(getText());
     if (!ok) return;
     node.textContent = 'Kopierat!';

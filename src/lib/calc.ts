@@ -97,11 +97,11 @@ export function validateValues(
     leftInput: _validateLeft(safeLeftRaw, remaining, isDiscreteUnit),
   };
 
-  const { outOfRange } = _validateRef(safeRefRaw, refNum);
-  fieldErrors.refInput = _validateRef(safeRefRaw, refNum).error;
+  const refValidation = _validateRef(safeRefRaw, refNum);
+  fieldErrors.refInput = refValidation.error;
 
   // ── Steg 4: Build result ──
-  if (outOfRange) return { valid: false, reason: 'too_many_refs', fieldErrors };
+  if (refValidation.outOfRange) return { valid: false, reason: 'too_many_refs', fieldErrors };
 
   const amtIsInvalid = fieldErrors.amtInput !== '';
   const doseIsInvalid = fieldErrors.doseInput !== '';

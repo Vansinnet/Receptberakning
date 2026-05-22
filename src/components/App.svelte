@@ -38,11 +38,10 @@
   });
 
   let prescribeVisible = $derived.by(() => {
-    const r = getActiveResult();
-    return card && r ? canRenewMed({
+    return card && result ? canRenewMed({
       _cardId: card._cardId,
-      valid: r.valid ?? false,
-      calculable: r.calculable ?? false,
+      valid: result.valid ?? false,
+      calculable: result.calculable ?? false,
       decision: card.decision,
     }) : false;
   });

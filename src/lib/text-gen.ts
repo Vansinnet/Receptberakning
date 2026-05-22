@@ -49,22 +49,24 @@ const TPL = {
   },
 };
 
-function _noBody(tpl: typeof TPL.sv | typeof TPL.en, days: number, date: string, contact?: string): string {
+function _nounVerb(tpl: typeof TPL.sv | typeof TPL.en, days: number) {
   const isSv = tpl === TPL.sv;
-  const verb = days < 0 ? (isSv ? 'beräknades' : 'was expected') : (isSv ? 'beräknas' : 'is expected');
-  const contactStr = days >= 14 && contact
+  return days < 0 ? (isSv ? 'beräknades' : 'was expected') : (isSv ? 'beräknas' : 'is expected');
+}
+
+function _contactStr(tpl: typeof TPL.sv | typeof TPL.en, days: number, contact?: string) {
+  const isSv = tpl === TPL.sv;
+  return days >= 14 && contact
     ? (isSv ? ` Hör av dig närmare ${contact}.` : ` Please contact us again closer to ${contact}.`)
     : '';
-  return tpl.single_no_body(verb, date, contactStr);
+}
+
+function _noBody(tpl: typeof TPL.sv | typeof TPL.en, days: number, date: string, contact?: string): string {
+  return tpl.single_no_body(_nounVerb(tpl, days), date, _contactStr(tpl, days, contact));
 }
 
 function _itemNoBody(tpl: typeof TPL.sv | typeof TPL.en, name: string, days: number, date: string, contact?: string): string {
-  const isSv = tpl === TPL.sv;
-  const verb = days < 0 ? (isSv ? 'beräknades' : 'was expected') : (isSv ? 'beräknas' : 'is expected');
-  const contactStr = days >= 14 && contact
-    ? (isSv ? ` Hör av dig närmare ${contact}.` : ` Please contact us again closer to ${contact}.`)
-    : '';
-  return tpl.multi_item_no(name, verb, date, contactStr);
+  return tpl.multi_item_no(name, _nounVerb(tpl, days), date, _contactStr(tpl, days, contact));
 }
 
 function _buildSingle(lang: typeof TPL.sv, card: CardView): string[] {

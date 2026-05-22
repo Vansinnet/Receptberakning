@@ -1,6 +1,7 @@
 <script lang="ts">
   import { medCards, appState, pushMedCard, getActiveResult, clearAllMedState, getCardStatus } from '$lib/state.svelte';
-  import { MAX_MED_CARDS, CONSUMPTION_NORMAL_LOW, CONSUMPTION_NORMAL_HIGH, DAYS_REMAINING_WARN } from '$lib/constants';
+  import { MAX_MED_CARDS } from '$lib/constants';
+  import { needsRenewalWarning } from '$lib/utils';
   import AlertDialog from './AlertDialog.svelte';
 
   let confirmOpen = $state(false);
@@ -39,14 +40,14 @@
       if (!cs) return { cls: '', text: '—' };
       if (!cs.valid) return { cls: '', text: 'Ej ifyllt' };
       if (!cs.calculable) return { cls: '', text: cs.statusText || '—' };
-      const warn = cs.consumptionPct < CONSUMPTION_NORMAL_LOW || cs.consumptionPct > CONSUMPTION_NORMAL_HIGH || cs.daysToPrescribedEnd >= DAYS_REMAINING_WARN;
+      const warn = needsRenewalWarning(cs.consumptionPct, cs.daysToPrescribedEnd);
       return { cls: warn ? 'warn' : 'ok', text: cs.statusText };
     }
     // getActiveResult() är $derived — alltid aktuell. getCardStatus() uppdateras via $effect och kan vara en tick efter.
     if (!result) return { cls: '', text: '—' };
     if (!result.valid) return { cls: '', text: 'Ej ifyllt' };
     if (!result.calculable) return { cls: '', text: result.statusText || '—' };
-    const warn = result.consumptionPct < CONSUMPTION_NORMAL_LOW || result.consumptionPct > CONSUMPTION_NORMAL_HIGH || (result.daysToPrescribedEnd ?? 0) >= DAYS_REMAINING_WARN;
+    const warn = needsRenewalWarning(result.consumptionPct, result.daysToPrescribedEnd ?? 0);
     return { cls: warn ? 'warn' : 'ok', text: result.statusText || '' };
   }
 </script>
