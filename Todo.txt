@@ -1,1 +1,5 @@
+Interaktioner ska inte tolkas, bara detekteras med uppmaning att gå in på janusinfo:s interaktionssite
 
+Förpackningsstorlek i prescribe-panelen ska spegla renew-kolumnen, men inte tvärtom
+
+Bredda lämedelsfältet i renew-kolumnen för att få plats med långa läkemedelsnamn?
