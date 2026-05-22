@@ -152,6 +152,17 @@ export interface RenewableCard {
   decision: 'yes' | 'no' | null;
 }
 
+export interface NurseViewCardState {
+  _cardId: number;
+  medRaw?: string;
+  valid?: boolean;
+  calculable?: boolean;
+  prescribedEndDateStr?: string;
+  daysToPrescribedEnd?: number;
+  consumptionPct?: number;
+  decision?: 'yes' | 'no' | null;
+}
+
 // === Textgenerering ===
 
 export interface CardsForTextEntry {

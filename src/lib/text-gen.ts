@@ -3,7 +3,7 @@ import { CONTACT_REMINDER_DAYS } from './constants';
 
 // === PATIENT TEXT ===
 
-import type { CardView, CardsForTextEntry } from './types';
+import type { CardView, CardsForTextEntry, NurseViewCardState } from './types';
 
 const TPL = {
   sv: {
@@ -149,7 +149,7 @@ export function buildJournalText(
 }
 
 export function buildNurseJournalText(
-  states: Array<{ _cardId: number; medRaw?: string; valid?: boolean; calculable?: boolean; prescribedEndDateStr?: string; daysToPrescribedEnd?: number; consumptionPct?: number; decision?: 'yes' | 'no' | null }>,
+  states: NurseViewCardState[],
   nurseVitalNormal?: boolean,
   nurseFollowUpAdequate?: boolean
 ): string {

@@ -10,12 +10,15 @@ import { getPrescribeState, clearPrescribeState, clearCardPrescribeState } from 
 import { ltState, resetLtPeriods } from './longterm-state.svelte';
 import { _cardResultsCache, _cardStatus, _resetCaches } from './cache-state.svelte';
 
+const _prescribeSummaryState = $state<Record<number, PrescribeResult | null>>({});
+
 interface TextResult {
   patientText: string;
   patientTextEn: string;
   journalText: string;
   cardStatuses: Record<number, CardStatusCache>;
   cacheUpdates: Array<{ cardId: number; entry: { fp: string; cr: CardResult | null; status: CardStatusCache } }>;
+  prescribeSummary: Record<number, PrescribeResult | null>;
 }
 
 export interface ActiveTexts {
@@ -24,39 +27,41 @@ export interface ActiveTexts {
   journalText: string;
 }
 
-const _prescribeData = $derived.by(() => {
-  const ends: Record<number, string> = {};
-  const summary: Record<number, PrescribeResult | null> = {};
-  for (const card of medCards) {
-    const ps = getPrescribeState(card._cardId);
-    const cached = _cardResultsCache[card._cardId];
-    if (!ps || !cached?.cr) { summary[card._cardId] = null; continue; }
-    const s: PrescribeInput = {
-      _cardId: card._cardId,
-      dose: cached.cr.calc.dose,
-      doseInterval: cached.cr.calc.doseInterval,
-      doseUnit: cached.cr.calc.doseUnit,
-      prescribedEndDateStr: cached.cr.calc.prescribedEndDateStr,
-    };
-    const pr = calcPrescribeResult(s, ps);
-    summary[card._cardId] = pr ?? null;
-    if (pr?.endDateStr) ends[card._cardId] = pr.endDateStr;
-  }
-  return { ends, summary };
-});
-
-export function getPrescribeSummary() { return _prescribeData.summary; }
+export function getPrescribeSummary() { return _prescribeSummaryState; }
 
 function _computeAllCards(): {
   cardResults: CardResult[];
   cardStatuses: Record<number, CardStatusCache>;
   cacheUpdates: Array<{ cardId: number; entry: { fp: string; cr: CardResult | null; status: CardStatusCache } }>;
   medCardMap: Map<number, MedCard>;
+  prescribeEnds: Record<number, string>;
+  prescribeSummary: Record<number, PrescribeResult | null>;
 } {
   const cardResults: CardResult[] = [];
   const cardStatuses: Record<number, CardStatusCache> = {};
   const cacheUpdates: Array<{ cardId: number; entry: { fp: string; cr: CardResult | null; status: CardStatusCache } }> = [];
   const medCardMap = new Map(medCards.map(m => [m._cardId, m]));
+  const prescribeEnds: Record<number, string> = {};
+  const prescribeSummary: Record<number, PrescribeResult | null> = {};
+
+  function _tryPrescribe(cardId: number, calc: CalcResult): void {
+    const ps = getPrescribeState(cardId);
+    if (!ps) { prescribeSummary[cardId] = null; return; }
+    const s: PrescribeInput = {
+      _cardId: cardId,
+      dose: calc.dose,
+      doseInterval: calc.doseInterval,
+      doseUnit: calc.doseUnit,
+      prescribedEndDateStr: calc.prescribedEndDateStr,
+    };
+    const pr = calcPrescribeResult(s, ps);
+    if (pr) {
+      prescribeSummary[cardId] = pr;
+      if (pr.endDateStr) prescribeEnds[cardId] = pr.endDateStr;
+    } else {
+      prescribeSummary[cardId] = null;
+    }
+  }
   for (let i = 0; i < medCards.length; i++) {
     const card = medCards[i];
     if (!card) continue;
@@ -67,6 +72,7 @@ function _computeAllCards(): {
         statusText: 'Ej ifyllt', consumptionPct: 0, daysToPrescribedEnd: 0,
         prescribedEndDateStr: '',
       };
+      prescribeSummary[card._cardId] = null;
       continue;
     }
 
@@ -76,7 +82,12 @@ function _computeAllCards(): {
     const cached = _cardResultsCache[card._cardId];
     if (cached && cached.fp === fp) {
       cardStatuses[card._cardId] = cached.status;
-      if (cached.cr) cardResults.push(cached.cr);
+      if (cached.cr) {
+        cardResults.push(cached.cr);
+        _tryPrescribe(card._cardId, cached.cr.calc);
+      } else {
+        prescribeSummary[card._cardId] = null;
+      }
       continue;
     }
 
@@ -97,6 +108,7 @@ function _computeAllCards(): {
       };
       cardStatuses[card._cardId] = status;
       cacheUpdates.push({ cardId: card._cardId, entry: { fp, cr: null, status } });
+      prescribeSummary[card._cardId] = null;
       continue;
     }
 
@@ -113,8 +125,9 @@ function _computeAllCards(): {
     cardResults.push(cr);
     cardStatuses[card._cardId] = status;
     cacheUpdates.push({ cardId: card._cardId, entry: { fp, cr, status } });
+    _tryPrescribe(card._cardId, calc);
   }
-  return { cardResults, cardStatuses, cacheUpdates, medCardMap };
+  return { cardResults, cardStatuses, cacheUpdates, medCardMap, prescribeEnds, prescribeSummary };
 }
 
 function _buildCardsForText(cardResults: CardResult[], medCardMap: Map<number, MedCard>): CardsForTextEntry[] {
@@ -141,6 +154,7 @@ function _buildTextResult(
   cardStatuses: Record<number, CardStatusCache>,
   cacheUpdates: Array<{ cardId: number; entry: { fp: string; cr: CardResult | null; status: CardStatusCache } }>,
   prescribeEnds: Record<number, string>,
+  prescribeSummary: Record<number, PrescribeResult | null>,
 ): TextResult {
   const validCount = cardResults.length;
 
@@ -184,10 +198,10 @@ function _buildTextResult(
       appState.nurseVitalNormal,
       appState.nurseFollowUpAdequate,
     );
-    return { patientText: '', patientTextEn: '', journalText: nurseJournalText, cardStatuses, cacheUpdates };
+    return { patientText: '', patientTextEn: '', journalText: nurseJournalText, cardStatuses, cacheUpdates, prescribeSummary };
   }
 
-  return { patientText, patientTextEn, journalText, cardStatuses, cacheUpdates };
+  return { patientText, patientTextEn, journalText, cardStatuses, cacheUpdates, prescribeSummary };
 }
 
 const _texts = $derived.by((): TextResult => {
@@ -195,13 +209,13 @@ const _texts = $derived.by((): TextResult => {
     void appState.currentDate;
     const computed = _computeAllCards();
     if (computed.cardResults.length === 0) {
-      return { patientText: '', patientTextEn: '', journalText: '', cardStatuses: computed.cardStatuses, cacheUpdates: computed.cacheUpdates };
+      return { patientText: '', patientTextEn: '', journalText: '', cardStatuses: computed.cardStatuses, cacheUpdates: computed.cacheUpdates, prescribeSummary: computed.prescribeSummary };
     }
     const cardsForText = _buildCardsForText(computed.cardResults, computed.medCardMap);
-    return _buildTextResult(computed.cardResults, cardsForText, computed.cardStatuses, computed.cacheUpdates, _prescribeData.ends);
+    return _buildTextResult(computed.cardResults, cardsForText, computed.cardStatuses, computed.cacheUpdates, computed.prescribeEnds, computed.prescribeSummary);
   } catch (e) {
     console.error('[v3 _texts] KRASCH:', e instanceof Error ? e.stack : String(e));
-    return { patientText: '', patientTextEn: '', journalText: 'Textgenerering misslyckades', cardStatuses: {} as Record<number, CardStatusCache>, cacheUpdates: [] };
+    return { patientText: '', patientTextEn: '', journalText: 'Textgenerering misslyckades', cardStatuses: {} as Record<number, CardStatusCache>, cacheUpdates: [], prescribeSummary: {} };
   }
 });
 
@@ -242,13 +256,17 @@ export function _syncCardStatus(): void {
   for (const c of caches) {
     _cardResultsCache[c.cardId] = c.entry;
   }
+  const summary = _texts.prescribeSummary;
+  for (const [cardIdStr, pr] of Object.entries(summary)) {
+    _prescribeSummaryState[Number(cardIdStr)] = pr;
+  }
 }
 
 export function getTextsState() { return _texts; }
 
 const _hasSummary = $derived.by(() => {
   let count = 0;
-  const summary = _prescribeData.summary;
+  const summary = _prescribeSummaryState;
   for (let i = 0; i < medCards.length; i++) {
     if (!summary[medCards[i]._cardId]) continue;
     if (medCards[i].decision === 'no') continue;
@@ -267,6 +285,7 @@ export function spliceMedCard(i: number): void {
   medCards.splice(i, 1);
   delete _cardResultsCache[removedCardId];
   delete _cardStatus[removedCardId];
+  delete _prescribeSummaryState[removedCardId];
   clearCardPrescribeState(removedCardId);
   if (appState.activeMedIdx > i) {
     appState.activeMedIdx -= 1;
@@ -286,4 +305,5 @@ export function clearAllMedState(): void {
   ltState.doseRaw = '';
   resetNurseState();
   _resetCaches();
+  for (const key of Object.keys(_prescribeSummaryState)) { delete _prescribeSummaryState[Number(key)]; }
 }
