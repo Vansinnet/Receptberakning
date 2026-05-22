@@ -341,39 +341,42 @@ html, body {
   align-items: center;       /* centrerar barnen horisontellt */
 }
 
-/* Interaktionsvarningar — uniform stil */
+/* Interaktionsvarningar */
 #interactionAlerts {
   order: -1;
   width: 100%;
   max-width: 860px;
   padding: 14px 16px 0;
-  gap: 6px;
 }
-.interaction-alerts {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.interaction-row {
+.interaction-alert {
   padding: 8px 12px;
-  border-inline-start: 3px solid var(--primary);
-  background: var(--surface);
+  border-inline-start: 4px solid;
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  margin-bottom: 8px;
   font-size: 12px;
   line-height: 1.5;
+}
+.interaction-danger {
+  background: var(--red-bg);
+  border-color: var(--red);
+  color: var(--red);
+}
+.interaction-warn {
+  background: var(--amber-bg);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+.interaction-header {
   display: flex;
-  flex-wrap: wrap;
   align-items: baseline;
-  gap: 4px;
+  gap: 6px;
+  margin-bottom: 2px;
 }
-.interaction-text {
-  color: var(--text);
-}
-.interaction-janus-link {
-  display: inline;
-}
-.interaction-janus-link a {
-  color: var(--primary);
+.interaction-icon { font-size: 14px; flex-shrink: 0; }
+.interaction-header strong { font-size: 13px; font-weight: 700; }
+.interaction-inline { font-size: 12px; }
+.interaction-link {
+  color: inherit;
   text-decoration: underline;
   white-space: nowrap;
 }

@@ -5,16 +5,20 @@
 </script>
 
 {#if warnings.length > 0}
-  <div id="interactionAlerts" class="interaction-alerts" aria-live="polite" aria-atomic="true">
+  <div id="interactionAlerts" aria-live="polite" aria-atomic="true">
     {#each warnings as w}
-      <div class="interaction-row">
-        <span class="interaction-text">{w.drugs[0]} + {w.drugs[1]} — {w.title} har möjlig interaktion.</span>
-        <span class="interaction-janus-link">
+      <div class="interaction-alert interaction-{w.severity}">
+        <div class="interaction-header">
+          <span class="interaction-icon" aria-hidden="true">{w.severity === 'danger' ? '⚠' : '⚡'}</span>
+          <strong>{w.drugs[0]} + {w.drugs[1]}</strong>
+        </div>
+        <div class="interaction-inline">
+          Möjlig interaktion.
           {#if w.nplIds[0] && w.nplIds[1]}
-            <span>Se </span>
-            <a href={`https://janusmed.se/interaktioner?nplIds=${w.nplIds[0]}&nplIds=${w.nplIds[1]}`} target="_blank" rel="noopener noreferrer">kombinationen på Janusmed →</a>
+            <span> Var god se </span>
+            <a class="interaction-link" href={`https://janusmed.se/interaktioner?nplIds=${w.nplIds[0]}&nplIds=${w.nplIds[1]}`} target="_blank" rel="noopener noreferrer">kombinationen på Janusmed →</a>
           {/if}
-        </span>
+        </div>
       </div>
     {/each}
   </div>

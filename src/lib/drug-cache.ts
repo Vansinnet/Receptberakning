@@ -45,10 +45,9 @@ export async function loadFromCache(): Promise<CacheData | null> {
         } else {
           resolve(null);
         }
-        db.close();
       };
-      req.onerror = () => { resolve(null); db.close(); };
-      tx.onerror = () => { resolve(null); try { db.close(); } catch {} };
+      req.onerror = () => { resolve(null); };
+      tx.onerror = () => { resolve(null); };
     });
   } catch {
     return null;
@@ -69,8 +68,7 @@ export async function fetchAndCache(serverVersion: number): Promise<RawDrugEntry
         const tx = db.transaction(STORE_NAME, 'readwrite');
         const store = tx.objectStore(STORE_NAME);
         const req = store.put({ id: CACHE_NAME, version: serverVersion, entries, ts: Date.now() }, CACHE_NAME);
-        req.onsuccess = () => db.close();
-        req.onerror = () => { console.warn('[drug-search] IndexedDB cache write failed:', req.error); db.close(); };
+        req.onerror = () => { console.warn('[drug-search] IndexedDB cache write failed:', req.error); };
       } catch (e) { console.warn('[drug-search] IndexedDB transaction failed:', e); }
     }).catch(e => { console.warn('[drug-search] IndexedDB open failed:', e); });
   return entries;
