@@ -30,7 +30,7 @@ För varje läkemedel genereras direkt:
 
 Stöd för upp till **8 läkemedel** i samma session — en sammanhållen patienttext och journalanteckning skapas för alla.
 
-Vid flera läkemedel analyseras automatiskt **läkemedelsinteraktioner** — 89 regler baserade på ATC-koder som varnar för bland annat serotonergt syndrom, blödningsrisk, QT-förlängning och dubbelbehandling. Varningarna graderas som danger (röd) eller warn (gul) och visas ovanför beräkningsresultatet.
+Vid flera läkemedel detekteras automatiskt **läkemedelsinteraktioner** — 89 regler baserade på ATC-koder som identifierar potentiella interaktioner. En genväg till Janusmed visas med läkemedlen redan ifyllda för klinisk bedömning.
 
 När förnyelse beviljas visas en **nyförskrivningspanel** — läkaren anger förskrivningsperiod (1–12 månader eller slutdatum) och verktyget beräknar exakt antal förpackningar med hänsyn till kvarvarande dagar på befintligt recept.
 
@@ -62,7 +62,7 @@ Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder
 - **Kliniskt beslut** – läkaren väljer Förnya eller Avslå för varje läkemedel. Vid Förnya med ≥14 dagar kvar: följdfråga om förskrivning ska räknas från dagens datum eller receptets slutdatum.
 - **Svar till patient på svenska och engelska** – växla med SVG-flaggor, ingen översättningstjänst krävs.
 - **Journalanteckning** – anpassas efter förnyelsebeslut och klinisk bedömning.
-- **Interaktionsvarningar** – 89 regler fördelade på kategorier: serotonergt syndrom, blödningsrisk, hyperkalemi, bradykardi/AV-block, smal terapeutisk bredd, CYP-interaktioner, QT-förlängning, triple whammy, psykofarmaka och övriga. Varningarna graderas danger/warn med beskrivning och åtgärdsrekommendation.
+- **Interaktionsdetektion** – 89 ATC-regler detekterar potentiella interaktioner. Visar vilka läkemedel som berörs med direktlänk till Janusmed för klinisk bedömning (ingen medicinsk vägledning i verktyget).
 - **Kopieringsknappar** – för snabb inklistring i journalsystem/1177. Tillfällig bekräftelsetext ("✅ Text kopierad till urklipp.") visas i 2 sekunder.
 
 ### 📦 Nyförskrivning
