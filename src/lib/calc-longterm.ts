@@ -1,4 +1,4 @@
-import type { LTCardPeriod, LTResult } from './types';
+import type { LTCardPeriod, LTResult, LongtermPeriodInternal } from './types';
 import { getToday, getDaysDiff, fmtDate, parseDateUTC, extractDoseUnit, getFassUrl, stripManufacturer } from './utils';
 import {
   MAX_PERIOD_SPAN_DAYS,
@@ -15,14 +15,7 @@ export function calcLongtermCore(
 ): LTResult {
   const today = getToday();
   const periodErrors: LTResult['periodErrors'] = [];
-  const periods: Array<{
-    startDate: Date;
-    endDate: Date;
-    total: number;
-    days: number;
-    avgPerDay: number;
-    classification?: string;
-  }> = [];
+  const periods: LongtermPeriodInternal[] = [];
 
   for (let i = 0; i < rawPeriods.length; i++) {
     const p         = rawPeriods[i];

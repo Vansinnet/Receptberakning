@@ -23,6 +23,7 @@
     () => medCards.some(c => c.form.medRaw !== ''),
   );
   let card = $derived(medCards[appState.activeMedIdx] ?? null);
+  let result = $derived(getActiveResult());
 
   let interactionWarnings = $derived.by(() => {
     const entries: Array<{ a: string; i: string; p: string | null }> = [];
@@ -116,7 +117,7 @@
     />
 
     <main id="main-content">
-        <div id="panel-renew" class="tab-panel" class:active={activeTab === 'renew'} class:is-hidden={activeTab !== 'renew'} role="tabpanel" aria-labelledby="heading-renew">
+        <div id="panel-renew" class="tab-panel" class:active={activeTab === 'renew'} role="tabpanel" aria-labelledby="heading-renew">
           <h2 class="sr-only" id="heading-renew">Receptförnyelse</h2>
           <div class="renew-layout">
             <!-- KOLUMN 1: Läkemedelslista -->
@@ -135,16 +136,16 @@
             <!-- KOLUMN 4: Resultat -->
             <section class="result-panel" id="resultPanel" aria-label="Beräkningsresultat">
               <InteractionAlerts warnings={interactionWarnings} />
-              {#if getActiveResult()?.valid && getActiveResult()?.calculable !== false}
+              {#if result?.valid && result?.calculable !== false}
                 <CalcResult
-                  result={getActiveResult()}
+                  result={result}
                   nurseViewActive={appState.nurseViewActive}
                   onDecision={handleEarlyDecision}
                 />
               {:else}
                 <div class="result-empty-state">
                   <div class="empty-icon" aria-hidden="true">📋</div>
-                  <div>{getActiveResult()?.statusText || 'Fyll i formuläret för att se resultatet'}</div>
+                  <div>{result?.statusText || 'Fyll i formuläret för att se resultatet'}</div>
                 </div>
               {/if}
             </section>
@@ -154,7 +155,7 @@
           </div>
         </div>
 
-        <div id="panel-longterm" class="tab-panel" class:active={activeTab === 'longterm'} class:is-hidden={activeTab !== 'longterm'} role="tabpanel" aria-labelledby="heading-longterm">
+        <div id="panel-longterm" class="tab-panel" class:active={activeTab === 'longterm'} role="tabpanel" aria-labelledby="heading-longterm">
           <h2 class="sr-only" id="heading-longterm">Långvarig förbrukningsanalys</h2>
           <LongtermPanel />
         </div>

@@ -1,4 +1,4 @@
-import type { CalcResult, MedCard, CardStatusCache, CardResult, PrescribeEntry, PrescribeInput } from './types';
+import type { CalcResult, MedCard, CardStatusCache, CardResult, CardsForTextEntry, PrescribeEntry, PrescribeInput } from './types';
 import type { PrescribeResult } from './prescribe-calc';
 import { validateValues, calcCore } from './calc';
 import { stripManufacturer, parseDateUTC, fmtDate } from './utils';
@@ -57,13 +57,6 @@ const _prescribeExtracted = $derived.by(() => {
 });
 
 export function getPrescribeSummary() { return _prescribeExtracted.summary; }
-
-interface CardsForTextEntry {
-  name: string; i: number; dose: number; doseUnitLabel: string; doseUnit: string;
-  total: number; pDateStr: string; prescribedEndDateStr: string; displayAvgStr: string;
-  avgNote: string; daysToPrescribedEnd: number; consumptionPct: number;
-  decision: 'yes' | 'no' | null;
-}
 
 function _computeAllCards(): {
   cardResults: CardResult[];
@@ -246,21 +239,19 @@ export function getActivePrescribeResult(): PrescribeResult | null {
 
 export function _syncCardStatus(): void {
   const statuses = _texts.cardStatuses;
-  for (const cardId of Object.keys(statuses)) {
-    _cardStatus[Number(cardId)] = statuses[Number(cardId)];
-  }
-  const caches = _texts.cacheUpdates;
-  for (const c of caches) {
-    _cardResultsCache[c.cardId] = c.entry;
-  }
   for (const [cardIdStr, status] of Object.entries(statuses)) {
+    const cardId = Number(cardIdStr);
+    _cardStatus[cardId] = status;
     if (!status.valid) {
-      const cardId = Number(cardIdStr);
       const card = medCards.find(c => c._cardId === cardId);
       if (card && card.decision !== null) {
         card.decision = null;
       }
     }
+  }
+  const caches = _texts.cacheUpdates;
+  for (const c of caches) {
+    _cardResultsCache[c.cardId] = c.entry;
   }
 }
 

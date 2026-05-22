@@ -136,7 +136,7 @@
         <div class="prescribe-summary-wrap">
           <div class="prescribe-summary-header">Sammanställning av läkemedel att förskriva</div>
           <div class="prescribe-summary-list">
-            {#each medCards as c, i}
+            {#each medCards as c, i (c._cardId)}
               {@const status = getCardStatus(c._cardId)}
               {#if getPrescribeState(c._cardId) && canRenewMed({
                 _cardId: c._cardId,

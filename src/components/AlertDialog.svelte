@@ -19,10 +19,10 @@
   });
 </script>
 
-<dialog bind:this={dialogEl} class="alert-dialog" onclose={() => onCancel()} onclick={(e) => { if (e.target === dialogEl) onCancel(); }}>
+<dialog bind:this={dialogEl} class="alert-dialog" aria-describedby="dialog-msg" onclose={() => onCancel()} onclick={(e) => { if (e.target === dialogEl) onCancel(); }}>
   <div class="alert-dialog-content">
     <h3 class="alert-dialog-title">{title}</h3>
-    <p class="alert-dialog-msg">{message}</p>
+    <p id="dialog-msg" class="alert-dialog-msg">{message}</p>
     <div class="alert-dialog-actions">
       <button class="btn btn-ghost" onclick={() => onCancel()}>Avbryt</button>
       <button class="btn btn-danger" onclick={() => onConfirm()}>Ja, rensa</button>

@@ -2,7 +2,7 @@ import { getToday, parseDateUTC } from './utils';
 
 // === PATIENT TEXT ===
 
-import type { CardView } from './types';
+import type { CardView, CardsForTextEntry } from './types';
 
 const TPL = {
   sv: {
@@ -121,7 +121,7 @@ export function buildPatientText(lang: string, cards: CardView[]): string {
 }
 
 export function buildJournalText(
-  cards: Array<{ name: string; i: number; dose: number; doseUnitLabel: string; doseUnit: string; total: number; pDateStr: string; prescribedEndDateStr: string; displayAvgStr: string; avgNote: string; daysToPrescribedEnd: number; consumptionPct: number; decision: 'yes' | 'no' | null }>,
+  cards: CardsForTextEntry[],
   validCount: number,
   prescribeEnds?: Record<number, string>
 ): string {

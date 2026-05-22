@@ -8,9 +8,7 @@
   import FieldError from './FieldError.svelte';
   import type { LTResult } from '$lib/types';
 
-  let medRaw = $derived(ltState.medRaw);
-  let doseRaw = $derived(ltState.doseRaw);
-  let nplId = $derived(getDrugByName(medRaw)?.nplId ?? null);
+  let nplId = $derived(getDrugByName(ltState.medRaw)?.nplId ?? null);
 
   function handleAddPeriod() {
     pushLtPeriod();
@@ -33,16 +31,16 @@
   }
 
   let ordDose = $derived.by(() => {
-    const v = parseFloat(doseRaw.replace(',', '.'));
+    const v = parseFloat(ltState.doseRaw.replace(',', '.'));
     return isNaN(v) ? 0 : v;
   });
 
-  let doseInvalid = $derived(doseRaw !== '' && ordDose <= 0);
+  let doseInvalid = $derived(ltState.doseRaw !== '' && ordDose <= 0);
 
   let result = $derived.by((): LTResult => {
     // Läs ltPeriods för att registrera beroende
     const periods = ltPeriods.map(p => ({ start: p.start, end: p.end, total: p.total }));
-    return calcLongtermCore(medRaw, ordDose, periods, nplId);
+    return calcLongtermCore(ltState.medRaw, ordDose, periods, nplId);
   });
 
   let barWidthClass = $derived(pctClass((result.barPct ?? 0) / 150 * 100, 'w'));
@@ -67,18 +65,18 @@
         <div class="form-row-2">
           <div class="field">
             <label for="lt-med" data-tooltip="Ange läkemedelsnamn och styrka.">Läkemedel och styrka</label>
-            <input id="lt-med" type="text" placeholder="T.ex. Tramadol 100 mg" maxlength="100" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value={medRaw} oninput={(e) => ltState.medRaw = (e.target as HTMLInputElement).value} />
+            <input id="lt-med" type="text" placeholder="T.ex. Tramadol 100 mg" maxlength="100" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value={ltState.medRaw} oninput={(e) => ltState.medRaw = (e.target as HTMLInputElement).value} />
           </div>
           <div class="field">
             <label for="lt-dose" data-tooltip="Patientens ordinerade dygnsdos i enheter per dag.">Ordinerad dos (enheter/dag)</label>
-            <input id="lt-dose" type="text" inputmode="decimal" placeholder="T.ex. 1" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value={doseRaw} oninput={(e) => ltState.doseRaw = (e.target as HTMLInputElement).value} class:input-error={doseInvalid} aria-invalid={doseInvalid} />
+            <input id="lt-dose" type="text" inputmode="decimal" placeholder="T.ex. 1" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value={ltState.doseRaw} oninput={(e) => ltState.doseRaw = (e.target as HTMLInputElement).value} class:input-error={doseInvalid} aria-invalid={doseInvalid} />
             <FieldError error={doseInvalid ? 'Ange ett positivt tal' : ''} />
           </div>
         </div>
 
         <div class="section-label">Receptperioder</div>
         <div id="lt-periods-container">
-          {#each ltPeriods as period, i}
+          {#each ltPeriods as period, i (i)}
             {@const pe = result.periodErrors[i]}
             <div id="lt-period-wrap-{i}">
               <div class="section-label">Period {i + 1}</div>
@@ -176,7 +174,7 @@
                   </tr>
                 </thead>
                 <tbody id="lt-period-rows">
-                  {#each result.periods as p}
+                  {#each result.periods as p (p.start + '|' + p.end)}
                     <tr>
                       <td class="period-cell">{p.start} – {p.end} ({p.days}d)</td>
                       <td class="period-cell mono ph-avg">{p.avg.toFixed(2)}/dag</td>

@@ -69,7 +69,7 @@
     <!-- Alerts -->
     {#if result.alerts?.length}
       <div aria-live="polite" aria-atomic="true">
-        {#each result.alerts as a}
+        {#each result.alerts as a (a.title)}
           <Alert type={a.type} title={a.title} message={a.message} />
         {/each}
       </div>

@@ -151,6 +151,13 @@ export interface RenewableCard {
 
 // === Textgenerering ===
 
+export interface CardsForTextEntry {
+  name: string; i: number; dose: number; doseUnitLabel: string; doseUnit: string;
+  total: number; pDateStr: string; prescribedEndDateStr: string; displayAvgStr: string;
+  avgNote: string; daysToPrescribedEnd: number; consumptionPct: number;
+  decision: 'yes' | 'no' | null;
+}
+
 export type CardView = {
   name: string;
   prescribedEndDateStr?: string;
@@ -166,6 +173,15 @@ export interface LTCardInput {
   medRaw: string;
   dose: number;
   periods: LTCardPeriod[];
+}
+
+export interface LongtermPeriodInternal {
+  startDate: Date;
+  endDate: Date;
+  total: number;
+  days: number;
+  avgPerDay: number;
+  classification?: string;
 }
 
 export interface LTCardPeriod {

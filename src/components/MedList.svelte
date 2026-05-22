@@ -56,7 +56,7 @@
     <span class="sidebar-label">Läkemedel</span>
   </div>
   <div class="med-list">
-    {#each medCards as card, idx}
+    {#each medCards as card, idx (card._cardId)}
       {@const dot = getStatusDot(idx)}
       <button
         class="med-item {idx === activeIdx ? 'active' : ''}"

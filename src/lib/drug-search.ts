@@ -1,4 +1,4 @@
-import { MIN_SEARCH_QUERY_LENGTH, MAX_AUTOCOMPLETE_RESULTS, DEDUP_THRESHOLD, MAX_SEARCH_QUERY_LENGTH } from './constants';
+import { MIN_SEARCH_QUERY_LENGTH, MAX_AUTOCOMPLETE_RESULTS, DEDUP_THRESHOLD, MAX_SEARCH_QUERY_LENGTH, STRENGTH_UNIT_PATTERN } from './constants';
 import { loadFromCache, fetchAndCache, type RawDrugEntry } from './drug-cache';
 import { stripManufacturer } from './utils';
 
@@ -62,13 +62,13 @@ export async function loadDrugs(): Promise<void> {
 }
 
 function _strengthVal(name: string): number {
-  const matches = [...name.matchAll(/(\d+(?:[.,]\d+)?)\s*(?:mg|µg|μg|g|IE|mmol|ml|mikrogram|mikrog|mcg|ng|gram|nanogram|IU)\b/gi)];
+  const matches = [...name.matchAll(new RegExp('(\\d+(?:[.,]\\d+)?)\\s*(?:' + STRENGTH_UNIT_PATTERN + ')\\b', 'gi'))];
   if (matches.length === 0) return Infinity;
   return parseFloat(matches[matches.length - 1][1].replace(',', '.'));
 }
 
 function _stripStrength(name: string): string {
-  return name.replace(/\d+(?:[.,]\d+)?\s*(?:mg|µg|μg|g|IE|mmol|ml|mikrogram|mikrog|mcg|ng|gram|nanogram|IU)\b/gi, '')
+  return name.replace(new RegExp('\\d+(?:[.,]\\d+)?\\s*(?:' + STRENGTH_UNIT_PATTERN + ')\\b', 'gi'), '')
     .replace(/[/\s]+/g, ' ').trim();
 }
 

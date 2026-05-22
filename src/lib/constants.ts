@@ -147,7 +147,7 @@ export const SINGLE_MFR_NAMES: string[] = [
   "STADA", "Sandoz", "Accord(?:pharma)?", "Teva", "Krka", "Ebb",
   "Viatris", "Orion", "Actavis", "Zentiva", "Orifarm", "Bluefish",
   "Glenmark", "Evolan", "APL", "ABECE", "Avansor", "Apofri",
-  "SUN", "Amarox", "Aurobindo", "Hexal", "HEXAL", "Alternova",
+  "SUN", "Amarox", "Aurobindo", "Hexal", "Alternova",
   "Mylan", "Bijon", "Grindeks", "Newbury", "Jubilant", "Strides",
   "Holsten", "Vitabalans", "Medartuum", "Abcur", "2care4",
   "Amdipharm", "Brown", "Pfizer", "Xiromed", "Pilum",
@@ -162,3 +162,5 @@ export const MIN_SEARCH_QUERY_LENGTH = 2;
 export const MAX_AUTOCOMPLETE_RESULTS = 20;
 export const DEDUP_THRESHOLD = 8;
 export const MAX_SEARCH_QUERY_LENGTH = 100;
+
+export const STRENGTH_UNIT_PATTERN = 'mg|ml|µg|μg|g|IE|mmol|mikrogram|mikrog|microgram|mcg|ng|gram|nanogram|IU';
