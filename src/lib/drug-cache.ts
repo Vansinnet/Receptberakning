@@ -58,7 +58,11 @@ export async function loadFromCache(): Promise<CacheData | null> {
 export async function fetchAndCache(serverVersion: number): Promise<RawDrugEntry[]> {
   const resp = await fetch('/data/drugs.json');
   if (!resp.ok) throw new Error(`drugs.json: ${resp.status}`);
-  const entries = await resp.json();
+  const text = await resp.text();
+  const entries = JSON.parse(text, (key, val) => {
+    if (key === '__proto__' || key === 'constructor') return undefined;
+    return val;
+  });
   if (!Array.isArray(entries)) throw new Error('drugs.json: unexpected format');
   getDB().then(db => {
       try {

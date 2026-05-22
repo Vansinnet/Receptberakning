@@ -1,4 +1,4 @@
-import { MIN_SEARCH_QUERY_LENGTH, MAX_AUTOCOMPLETE_RESULTS, DEDUP_THRESHOLD } from './constants';
+import { MIN_SEARCH_QUERY_LENGTH, MAX_AUTOCOMPLETE_RESULTS, DEDUP_THRESHOLD, MAX_SEARCH_QUERY_LENGTH } from './constants';
 import { loadFromCache, fetchAndCache, type RawDrugEntry } from './drug-cache';
 import { stripManufacturer } from './utils';
 
@@ -106,7 +106,7 @@ function _sortEntries(entries: DrugEntry[], q: string): DrugEntry[] {
 
 export function searchDrugs(query: string): DrugEntry[] {
   if (!_drugList || !_drugListLower) return [];
-  if (!query || query.length < MIN_SEARCH_QUERY_LENGTH) return [];
+  if (!query || query.length < MIN_SEARCH_QUERY_LENGTH || query.length > MAX_SEARCH_QUERY_LENGTH) return [];
   const q = query.toLowerCase().trim();
   const results: Array<{ entry: DrugEntry; idx: number }> = [];
   const lower = _drugListLower;

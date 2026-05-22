@@ -161,3 +161,4 @@ export const SINGLE_MFR_NAMES: string[] = [
 export const MIN_SEARCH_QUERY_LENGTH = 2;
 export const MAX_AUTOCOMPLETE_RESULTS = 20;
 export const DEDUP_THRESHOLD = 8;
+export const MAX_SEARCH_QUERY_LENGTH = 100;
