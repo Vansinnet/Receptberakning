@@ -50,7 +50,7 @@
   --danger-bg: var(--red-bg); --danger-color: var(--red); --danger-border: var(--red-border); --danger-hover: var(--red-border);
   --btn-selected-text: #fff;
   --sidebar-w: 178px;
-  --form-w: 440px;
+  --form-w: 441px;
 }
 
 [data-theme="dark"] {
