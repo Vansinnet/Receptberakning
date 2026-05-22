@@ -2,7 +2,7 @@
   import { medCards, getPrescribeState, applyPrescribeStatePatch, appState, getCardStatus, getActiveResult, getHasSummary, getPrescribeSummary, getActivePrescribeResult } from '$lib/state.svelte';
   import { canRenewMed, prescribeValidationHint } from '$lib/prescribe-calc';
   import { UNIT_DISPLAY, DEFAULT_PRESCRIBE_MODE, DEFAULT_PRESCRIBE_MONTHS, MAX_PRESCRIBE_MONTHS } from '$lib/constants';
-  import { applyDateMask } from '$lib/utils';
+  import { applyDateMask, stripManufacturer } from '$lib/utils';
 
   let { visible = false, eligible = false } = $props();
 
@@ -88,7 +88,7 @@
     <!-- Inner (per medication) -->
     {#if eligible && card && result}
       <div id="prescribeInner">
-        <div class="prescribe-med-name">{result.medRaw || `Läkemedel ${appState.activeMedIdx + 1}`}</div>
+        <div class="prescribe-med-name">{stripManufacturer(result.medRaw || '') || `Läkemedel ${appState.activeMedIdx + 1}`}</div>
 
         <div class="field prescribe-pkg-field">
           <label for="ps-pkg" data-tooltip="Antal enheter per förpackning.">Förpackningsstorlek ({UNIT_DISPLAY[(result.doseUnit ?? 'st') as keyof typeof UNIT_DISPLAY]?.long ?? 'tabletter'})</label>
@@ -146,7 +146,7 @@
               })}
                 {@const pr = prescribeSummaries[c._cardId]}
                 <button type="button" class="prescribe-summary-row {i === appState.activeMedIdx ? 'active' : ''}" onclick={() => appState.activeMedIdx = i}>
-                  <span class="prescribe-summary-name">{c.form.medRaw || `Läkemedel ${i + 1}`}</span>
+                  <span class="prescribe-summary-name">{stripManufacturer(c.form.medRaw) || `Läkemedel ${i + 1}`}</span>
                   <span class="prescribe-summary-right">
                     <span class="prescribe-summary-pkg">{pr?.packages ?? '—'} förp.</span>
                   </span>

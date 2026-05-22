@@ -1,6 +1,6 @@
 <script lang="ts">
   import { medCards, appState, getActiveValidated, clearCardPrescribeState, clearCardForm, applyPrescribeStatePatch } from '$lib/state.svelte';
-  import { loadDrugs, searchDrugs, getDrugByName, type DrugEntry } from '$lib/drug-search';
+  import { loadDrugs, searchDrugs, getDrugByName, getDrugByNplId, type DrugEntry } from '$lib/drug-search';
   import { getFassUrl, applyDateMask, stripManufacturer } from '$lib/utils';
   import { createAutocomplete } from '$lib/autocomplete.svelte';
   import FieldError from './FieldError.svelte';
@@ -8,7 +8,7 @@
   let card = $derived(medCards[appState.activeMedIdx] ?? null);
   let validated = $derived(getActiveValidated());
   let fieldErrors = $derived(!validated.valid && validated.fieldErrors ? validated.fieldErrors : null);
-  let drugEntry = $derived(getDrugByName(card?.form?.medRaw ?? ''));
+  let drugEntry = $derived(card?.form?.nplId ? getDrugByNplId(card.form.nplId) : getDrugByName(card?.form?.medRaw ?? ''));
   let fassUrl = $derived(getFassUrl(card?.form?.medRaw ?? '', card?.form?.nplId));
 
   const ac = createAutocomplete<DrugEntry>({
@@ -18,7 +18,7 @@
     },
     onSelect: (d) => {
       if (!card) return;
-      card.form.medRaw = d.name;
+      card.form.medRaw = stripManufacturer(d.name);
       card.form.atcCode = d.atcCode || null;
       card.form.nplId = d.nplId || null;
       card.form.notCalculable = !!d.notCalculable;
@@ -64,7 +64,7 @@
 {#if card}
     <div class="form-panel-header">
       <div>
-        <div class="form-med-name">{card.form.medRaw || '—'}</div>
+        <div class="form-med-name">{stripManufacturer(card.form.medRaw) || '—'}</div>
       </div>
       <div class="form-panel-actions">
         {#if card.form.medRaw}

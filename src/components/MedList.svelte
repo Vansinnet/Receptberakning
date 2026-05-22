@@ -1,7 +1,7 @@
 <script lang="ts">
   import { medCards, appState, pushMedCard, getActiveResult, clearAllMedState, getCardStatus } from '$lib/state.svelte';
   import { MAX_MED_CARDS } from '$lib/constants';
-  import { needsRenewalWarning } from '$lib/utils';
+  import { needsRenewalWarning, stripManufacturer } from '$lib/utils';
   import AlertDialog from './AlertDialog.svelte';
 
   let confirmOpen = $state(false);
@@ -64,7 +64,7 @@
         onclick={() => handleSelectMed(idx)}
       >
         <div class="med-item-info">
-          <div class="med-item-name">{card.form.medRaw || `Läkemedel ${idx + 1}`}</div>
+          <div class="med-item-name">{stripManufacturer(card.form.medRaw) || `Läkemedel ${idx + 1}`}</div>
           <div class="med-item-status">{dot.text}</div>
         </div>
         <div class="status-dot {dot.cls}"></div>

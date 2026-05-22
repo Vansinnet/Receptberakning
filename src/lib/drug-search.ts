@@ -143,3 +143,11 @@ export function getDrugByName(name: string): DrugEntry | undefined {
   if (!_drugMap) return undefined;
   return _drugMap.get((name || '').toLowerCase().trim());
 }
+
+export function getDrugByNplId(nplId: string | null): DrugEntry | undefined {
+  if (!nplId || !_drugList) return undefined;
+  for (let i = 0; i < _drugList.length; i++) {
+    if (_drugList[i].nplId === nplId) return _drugList[i];
+  }
+  return undefined;
+}
