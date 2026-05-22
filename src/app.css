@@ -341,6 +341,51 @@ html, body {
   align-items: center;       /* centrerar barnen horisontellt */
 }
 
+.result-content {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 860px;       /* hindrar texten att bli för bred på stora skärmar */
+  width: 100%;
+}
+
+/* Tidslinje */
+.tl-label {
+  font-size: 10px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px;
+}
+.tl-bar-bg {
+  height: 6px; background: var(--border); border-radius: 3px; position: relative;
+}
+.tl-fill {
+  height: 6px; border-radius: 3px; position: relative; transition: width 0.4s ease; width: 0%;
+}
+.tl-fill-ok    { background: var(--green); }
+.tl-fill-warn  { background: var(--amber); }
+.tl-fill-danger{ background: var(--red); }
+.tl-today-marker {
+  position: absolute; right: 0; top: -5px;
+  width: 2px; height: 16px; background: var(--text-muted); border-radius: 1px;
+}
+.tl-labels {
+  display: flex; justify-content: space-between; margin-top: 4px;
+  font-size: 10px; color: var(--text-muted);
+  font-family: "SF Mono", Consolas, monospace;
+}
+.tl-today-label { font-weight: 600; color: var(--text-muted); }
+
+/* Alerts */
+.alert {
+  padding: 10px 12px; border-inline-start: 3px solid; border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-size: 12px; line-height: 1.6;
+}
+.alert strong { font-weight: 700; display: block; margin-bottom: 2px; }
+.alert-danger { background: var(--red-bg);   border-color: var(--red);   color: var(--red); }
+.alert-warn   { background: var(--amber-bg); border-color: var(--amber); color: var(--amber); }
+.alert-info   { background: var(--blue-bg);  border-color: var(--blue);  color: var(--blue); }
+.alert-ok     { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+
 /* Interaktionsvarningar */
 #interactionAlerts {
   order: -1;
