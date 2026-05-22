@@ -50,7 +50,7 @@
   --danger-bg: var(--red-bg); --danger-color: var(--red); --danger-border: var(--red-border); --danger-hover: var(--red-border);
   --btn-selected-text: #fff;
   --sidebar-w: 178px;
-  --form-w: 441px;
+  --form-w: 440px;
 }
 
 [data-theme="dark"] {
@@ -341,19 +341,12 @@ html, body {
   align-items: center;       /* centrerar barnen horisontellt */
 }
 
-#interactionAlerts {
-  order: -1;                  /* alltid Ã¶verst i kolumnen Ã¤ven fÃ¶re berÃ¤kning */
-  width: 100%;
-  max-width: 860px;
-  padding: 14px 16px 0;      /* samma sidopadding som result-content, topp separat */
-}
-
 .result-content {
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-width: 860px;       /* hindrar texten att bli fÃ¶r bred pÃ¥ stora skÃ¤rmar */
+  max-width: 860px;       /* hindrar texten att bli för bred på stora skärmar */
   width: 100%;
 }
 
@@ -394,14 +387,19 @@ html, body {
 .alert-ok     { background: var(--green-bg); border-color: var(--green); color: var(--green); }
 
 /* Interaktionsvarningar */
+#interactionAlerts {
+  order: -1;
+  width: 100%;
+  max-width: 860px;
+  padding: 14px 16px 0;
+}
 .interaction-alert {
-  padding: 12px 14px;
+  padding: 8px 12px;
   border-inline-start: 4px solid;
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   font-size: 12px;
-  line-height: 1.6;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  line-height: 1.5;
 }
 .interaction-danger {
   background: var(--red-bg);
@@ -417,28 +415,15 @@ html, body {
   display: flex;
   align-items: baseline;
   gap: 6px;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
-.interaction-icon {
-  font-size: 14px;
-  flex-shrink: 0;
-}
-.interaction-header strong {
-  font-size: 13px;
-  font-weight: 700;
-}
-.interaction-drugs {
-  font-size: 11px;
-  opacity: 0.75;
-  margin-inline-start: auto;
-}
-.interaction-desc {
-  margin-bottom: 4px;
-}
-.interaction-rec {
-  font-style: italic;
-  opacity: 0.85;
-  margin: 0;
+.interaction-icon { font-size: 14px; flex-shrink: 0; }
+.interaction-header strong { font-size: 13px; font-weight: 700; }
+.interaction-inline { font-size: 12px; }
+.interaction-link {
+  color: inherit;
+  text-decoration: underline;
+  white-space: nowrap;
 }
 
 /* Statusprick fÃ¶r interagerande lÃ¤kemedel */

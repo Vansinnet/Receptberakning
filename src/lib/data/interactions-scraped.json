@@ -1,0 +1,4022 @@
+[
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "B03A"
+    ],
+    "severity": "warn",
+    "title": "kalcium - järn\n          <!---->",
+    "description": "kalcium - järn\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "B03A"
+    ],
+    "severity": "warn",
+    "title": "magnesium - järn\n          <!---->",
+    "description": "magnesium - järn\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "A12C"
+    ],
+    "severity": "warn",
+    "title": "fosforsyra - magnesium\n          <!---->",
+    "description": "fosforsyra - magnesium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "A12C"
+    ],
+    "severity": "warn",
+    "title": "fosforsyra - kalcium\n          <!---->",
+    "description": "fosforsyra - kalcium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "C01A"
+    ],
+    "severity": "warn",
+    "title": "digoxin - magnesium\n          <!---->",
+    "description": "digoxin - magnesium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "C02K"
+    ],
+    "severity": "warn",
+    "title": "riociguat - magnesium\n          <!---->",
+    "description": "riociguat - magnesium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "C02K"
+    ],
+    "severity": "warn",
+    "title": "riociguat - kalcium\n          <!---->",
+    "description": "riociguat - kalcium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "C07A"
+    ],
+    "severity": "warn",
+    "title": "atenolol - magnesium\n          <!---->",
+    "description": "atenolol - magnesium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "C07A"
+    ],
+    "severity": "warn",
+    "title": "atenolol - kalcium\n          <!---->",
+    "description": "atenolol - kalcium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "C07F"
+    ],
+    "severity": "warn",
+    "title": "metoprolol - magnesium\n          <!---->",
+    "description": "metoprolol - magnesium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "H03A"
+    ],
+    "severity": "warn",
+    "title": "levotyroxin - kalcium\n          <!---->",
+    "description": "levotyroxin - kalcium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "H03A"
+    ],
+    "severity": "warn",
+    "title": "levotyroxin - magnesium\n          <!---->",
+    "description": "levotyroxin - magnesium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "J01A"
+    ],
+    "severity": "warn",
+    "title": "kalcium - doxycyklin\n          <!---->",
+    "description": "kalcium - doxycyklin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "J01A"
+    ],
+    "severity": "warn",
+    "title": "magnesium - doxycyklin\n          <!---->",
+    "description": "magnesium - doxycyklin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "L01A"
+    ],
+    "severity": "danger",
+    "title": "melfalan - magnesium\n          <!---->",
+    "description": "melfalan - magnesium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "J01M"
+    ],
+    "severity": "danger",
+    "title": "magnesium - moxifloxacin\n          <!---->",
+    "description": "magnesium - moxifloxacin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "J01M"
+    ],
+    "severity": "warn",
+    "title": "moxifloxacin - kalcium\n          <!---->",
+    "description": "moxifloxacin - kalcium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "M04A"
+    ],
+    "severity": "warn",
+    "title": "febuxostat - magnesium\n          <!---->",
+    "description": "febuxostat - magnesium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "M05B"
+    ],
+    "severity": "warn",
+    "title": "kalcium - alendronsyra\n          <!---->",
+    "description": "kalcium - alendronsyra\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02A"
+    ],
+    "atcGroupB": [
+      "M05B"
+    ],
+    "severity": "warn",
+    "title": "magnesium - alendronsyra\n          <!---->",
+    "description": "magnesium - alendronsyra\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02B"
+    ],
+    "atcGroupB": [
+      "B03A"
+    ],
+    "severity": "warn",
+    "title": "sukralfat - järn\n          <!---->",
+    "description": "sukralfat - järn\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02B"
+    ],
+    "atcGroupB": [
+      "C07A"
+    ],
+    "severity": "warn",
+    "title": "sukralfat - atenolol\n          <!---->",
+    "description": "sukralfat - atenolol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02B"
+    ],
+    "atcGroupB": [
+      "C07F"
+    ],
+    "severity": "warn",
+    "title": "sukralfat - metoprolol\n          <!---->",
+    "description": "sukralfat - metoprolol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02B"
+    ],
+    "atcGroupB": [
+      "J01A"
+    ],
+    "severity": "warn",
+    "title": "doxycyklin - sukralfat\n          <!---->",
+    "description": "doxycyklin - sukralfat\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02B"
+    ],
+    "atcGroupB": [
+      "H03A"
+    ],
+    "severity": "warn",
+    "title": "levotyroxin - sukralfat\n          <!---->",
+    "description": "levotyroxin - sukralfat\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02B"
+    ],
+    "atcGroupB": [
+      "J01M"
+    ],
+    "severity": "danger",
+    "title": "sukralfat - moxifloxacin\n          <!---->",
+    "description": "sukralfat - moxifloxacin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02B"
+    ],
+    "atcGroupB": [
+      "L01A"
+    ],
+    "severity": "danger",
+    "title": "melfalan - sukralfat\n          <!---->",
+    "description": "melfalan - sukralfat\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A02B"
+    ],
+    "atcGroupB": [
+      "M05B"
+    ],
+    "severity": "warn",
+    "title": "sukralfat - alendronsyra\n          <!---->",
+    "description": "sukralfat - alendronsyra\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A03A"
+    ],
+    "atcGroupB": [
+      "H03A"
+    ],
+    "severity": "warn",
+    "title": "levotyroxin - simetikon\n          <!---->",
+    "description": "levotyroxin - simetikon\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A03F"
+    ],
+    "atcGroupB": [
+      "C01A"
+    ],
+    "severity": "warn",
+    "title": "metoklopramid - digoxin\n          <!---->",
+    "description": "metoklopramid - digoxin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A03F"
+    ],
+    "atcGroupB": [
+      "D01B"
+    ],
+    "severity": "warn",
+    "title": "metoklopramid - terbinafin\n          <!---->",
+    "description": "metoklopramid - terbinafin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A03F"
+    ],
+    "atcGroupB": [
+      "G02C"
+    ],
+    "severity": "danger",
+    "title": "metoklopramid - kabergolin\n          <!---->",
+    "description": "metoklopramid - kabergolin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A03F"
+    ],
+    "atcGroupB": [
+      "H05B"
+    ],
+    "severity": "warn",
+    "title": "metoklopramid - cinakalcet\n          <!---->",
+    "description": "metoklopramid - cinakalcet\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A03F"
+    ],
+    "atcGroupB": [
+      "L04A"
+    ],
+    "severity": "warn",
+    "title": "takrolimus - metoklopramid\n          <!---->",
+    "description": "takrolimus - metoklopramid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A03F"
+    ],
+    "atcGroupB": [
+      "N04B"
+    ],
+    "severity": "danger",
+    "title": "metoklopramid - ropinirol\n          <!---->",
+    "description": "metoklopramid - ropinirol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A03F"
+    ],
+    "atcGroupB": [
+      "P01A"
+    ],
+    "severity": "danger",
+    "title": "atovakvon - metoklopramid\n          <!---->",
+    "description": "atovakvon - metoklopramid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A04A"
+    ],
+    "atcGroupB": [
+      "C03D"
+    ],
+    "severity": "warn",
+    "title": "eplerenon - aprepitant\n          <!---->",
+    "description": "eplerenon - aprepitant\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A04A"
+    ],
+    "atcGroupB": [
+      "C02A"
+    ],
+    "severity": "warn",
+    "title": "guanfacin - aprepitant\n          <!---->",
+    "description": "guanfacin - aprepitant\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A04A"
+    ],
+    "atcGroupB": [
+      "C03X"
+    ],
+    "severity": "danger",
+    "title": "tolvaptan - aprepitant\n          <!---->",
+    "description": "tolvaptan - aprepitant\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A04A"
+    ],
+    "atcGroupB": [
+      "C09X"
+    ],
+    "severity": "warn",
+    "title": "sparsentan - aprepitant\n          <!---->",
+    "description": "sparsentan - aprepitant\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A04A"
+    ],
+    "atcGroupB": [
+      "C08D"
+    ],
+    "severity": "danger",
+    "title": "verapamil - aprepitant\n          <!---->",
+    "description": "verapamil - aprepitant\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A04A"
+    ],
+    "atcGroupB": [
+      "C09D"
+    ],
+    "severity": "warn",
+    "title": "aprepitant - amlodipin\n          <!---->",
+    "description": "aprepitant - amlodipin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A04A"
+    ],
+    "atcGroupB": [
+      "G03A"
+    ],
+    "severity": "danger",
+    "title": "aprepitant - etinylestradiol\n          <!---->",
+    "description": "aprepitant - etinylestradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A04A"
+    ],
+    "atcGroupB": [
+      "G03F"
+    ],
+    "severity": "danger",
+    "title": "aprepitant - noretisteron\n          <!---->",
+    "description": "aprepitant - noretisteron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A04A"
+    ],
+    "atcGroupB": [
+      "J04A"
+    ],
+    "severity": "warn",
+    "title": "rifabutin - aprepitant\n          <!---->",
+    "description": "rifabutin - aprepitant\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A04A"
+    ],
+    "atcGroupB": [
+      "J02A"
+    ],
+    "severity": "warn",
+    "title": "isavukonazol - aprepitant\n          <!---->",
+    "description": "isavukonazol - aprepitant\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A04A"
+    ],
+    "atcGroupB": [
+      "L01C"
+    ],
+    "severity": "warn",
+    "title": "aprepitant - paklitaxel\n          <!---->",
+    "description": "aprepitant - paklitaxel\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A04A"
+    ],
+    "atcGroupB": [
+      "L01E"
+    ],
+    "severity": "warn",
+    "title": "aprepitant - everolimus\n          <!---->",
+    "description": "aprepitant - everolimus\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A04A"
+    ],
+    "atcGroupB": [
+      "L04A"
+    ],
+    "severity": "warn",
+    "title": "aprepitant - takrolimus\n          <!---->",
+    "description": "aprepitant - takrolimus\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A04A"
+    ],
+    "atcGroupB": [
+      "N05A"
+    ],
+    "severity": "warn",
+    "title": "aripiprazol - aprepitant\n          <!---->",
+    "description": "aripiprazol - aprepitant\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A04A"
+    ],
+    "atcGroupB": [
+      "N02A"
+    ],
+    "severity": "warn",
+    "title": "fentanyl - aprepitant\n          <!---->",
+    "description": "fentanyl - aprepitant\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A04A"
+    ],
+    "atcGroupB": [
+      "N01A"
+    ],
+    "severity": "warn",
+    "title": "alfentanil - aprepitant\n          <!---->",
+    "description": "alfentanil - aprepitant\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A04A"
+    ],
+    "atcGroupB": [
+      "N05B"
+    ],
+    "severity": "warn",
+    "title": "alprazolam - aprepitant\n          <!---->",
+    "description": "alprazolam - aprepitant\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A04A"
+    ],
+    "atcGroupB": [
+      "R07A"
+    ],
+    "severity": "warn",
+    "title": "deutivakaftor - aprepitant\n          <!---->",
+    "description": "deutivakaftor - aprepitant\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A04A"
+    ],
+    "atcGroupB": [
+      "R07A"
+    ],
+    "severity": "warn",
+    "title": "vanzakaftor - aprepitant\n          <!---->",
+    "description": "vanzakaftor - aprepitant\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A06A"
+    ],
+    "atcGroupB": [
+      "B03A"
+    ],
+    "severity": "warn",
+    "title": "järn - natriumvätekarbonat\n          <!---->",
+    "description": "järn - natriumvätekarbonat\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A06A"
+    ],
+    "atcGroupB": [
+      "C03D"
+    ],
+    "severity": "warn",
+    "title": "eplerenon - kalium\n          <!---->",
+    "description": "eplerenon - kalium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A06A"
+    ],
+    "atcGroupB": [
+      "C03E"
+    ],
+    "severity": "warn",
+    "title": "kalium - amilorid\n          <!---->",
+    "description": "kalium - amilorid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A06A"
+    ],
+    "atcGroupB": [
+      "J01E"
+    ],
+    "severity": "warn",
+    "title": "kalium - trimetoprim\n          <!---->",
+    "description": "kalium - trimetoprim\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A06A"
+    ],
+    "atcGroupB": [
+      "L04A"
+    ],
+    "severity": "warn",
+    "title": "kalium - takrolimus\n          <!---->",
+    "description": "kalium - takrolimus\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A07A"
+    ],
+    "atcGroupB": [
+      "C01A"
+    ],
+    "severity": "warn",
+    "title": "fidaxomicin - digoxin\n          <!---->",
+    "description": "fidaxomicin - digoxin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A07A"
+    ],
+    "atcGroupB": [
+      "C01B"
+    ],
+    "severity": "warn",
+    "title": "fidaxomicin - amiodaron\n          <!---->",
+    "description": "fidaxomicin - amiodaron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A07A"
+    ],
+    "atcGroupB": [
+      "C08D"
+    ],
+    "severity": "warn",
+    "title": "fidaxomicin - verapamil\n          <!---->",
+    "description": "fidaxomicin - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A07D"
+    ],
+    "atcGroupB": [
+      "H01B"
+    ],
+    "severity": "warn",
+    "title": "loperamid - desmopressin\n          <!---->",
+    "description": "loperamid - desmopressin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A07X"
+    ],
+    "atcGroupB": [
+      "C09A"
+    ],
+    "severity": "warn",
+    "title": "racekadotril - enalapril\n          <!---->",
+    "description": "racekadotril - enalapril\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A07X"
+    ],
+    "atcGroupB": [
+      "C09B"
+    ],
+    "severity": "warn",
+    "title": "racekadotril - enalapril\n          <!---->",
+    "description": "racekadotril - enalapril\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A08A"
+    ],
+    "atcGroupB": [
+      "A12A"
+    ],
+    "severity": "warn",
+    "title": "orlistat - kolekalciferol\n          <!---->",
+    "description": "orlistat - kolekalciferol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A08A"
+    ],
+    "atcGroupB": [
+      "C01B"
+    ],
+    "severity": "danger",
+    "title": "orlistat - amiodaron\n          <!---->",
+    "description": "orlistat - amiodaron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A08A"
+    ],
+    "atcGroupB": [
+      "H03A"
+    ],
+    "severity": "warn",
+    "title": "levotyroxin - orlistat\n          <!---->",
+    "description": "levotyroxin - orlistat\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A08A"
+    ],
+    "atcGroupB": [
+      "L04A"
+    ],
+    "severity": "warn",
+    "title": "orlistat - takrolimus\n          <!---->",
+    "description": "orlistat - takrolimus\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A10A"
+    ],
+    "atcGroupB": [
+      "A10B"
+    ],
+    "severity": "warn",
+    "title": "pioglitazon - insulin\n          <!---->",
+    "description": "pioglitazon - insulin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A10A"
+    ],
+    "atcGroupB": [
+      "J01M"
+    ],
+    "severity": "warn",
+    "title": "moxifloxacin - insulin\n          <!---->",
+    "description": "moxifloxacin - insulin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A10B"
+    ],
+    "atcGroupB": [
+      "J01E"
+    ],
+    "severity": "warn",
+    "title": "pioglitazon - trimetoprim\n          <!---->",
+    "description": "pioglitazon - trimetoprim\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A11E"
+    ],
+    "atcGroupB": [
+      "L01B"
+    ],
+    "severity": "warn",
+    "title": "folsyra - fluorouracil\n          <!---->",
+    "description": "folsyra - fluorouracil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A11H"
+    ],
+    "atcGroupB": [
+      "C01A"
+    ],
+    "severity": "warn",
+    "title": "tokofersolan - digoxin\n          <!---->",
+    "description": "tokofersolan - digoxin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A11H"
+    ],
+    "atcGroupB": [
+      "L04A"
+    ],
+    "severity": "warn",
+    "title": "tokofersolan - takrolimus\n          <!---->",
+    "description": "tokofersolan - takrolimus\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A12A"
+    ],
+    "atcGroupB": [
+      "A12C"
+    ],
+    "severity": "warn",
+    "title": "fosforsyra - kalcium\n          <!---->",
+    "description": "fosforsyra - kalcium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A12A"
+    ],
+    "atcGroupB": [
+      "B03A"
+    ],
+    "severity": "warn",
+    "title": "kalcium - järn\n          <!---->",
+    "description": "kalcium - järn\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A12A"
+    ],
+    "atcGroupB": [
+      "C03A"
+    ],
+    "severity": "warn",
+    "title": "kolekalciferol - bendroflumetiazid\n          <!---->",
+    "description": "kolekalciferol - bendroflumetiazid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A12A"
+    ],
+    "atcGroupB": [
+      "C03B"
+    ],
+    "severity": "warn",
+    "title": "metolazon - kolekalciferol\n          <!---->",
+    "description": "metolazon - kolekalciferol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A12A"
+    ],
+    "atcGroupB": [
+      "C02K"
+    ],
+    "severity": "warn",
+    "title": "riociguat - kalcium\n          <!---->",
+    "description": "riociguat - kalcium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A12A"
+    ],
+    "atcGroupB": [
+      "C03E"
+    ],
+    "severity": "warn",
+    "title": "kolekalciferol - hydroklortiazid\n          <!---->",
+    "description": "kolekalciferol - hydroklortiazid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A12A"
+    ],
+    "atcGroupB": [
+      "C07A"
+    ],
+    "severity": "warn",
+    "title": "atenolol - kalcium\n          <!---->",
+    "description": "atenolol - kalcium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A12A"
+    ],
+    "atcGroupB": [
+      "C09B"
+    ],
+    "severity": "warn",
+    "title": "kolekalciferol - hydroklortiazid\n          <!---->",
+    "description": "kolekalciferol - hydroklortiazid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A12A"
+    ],
+    "atcGroupB": [
+      "H03A"
+    ],
+    "severity": "warn",
+    "title": "levotyroxin - kalcium\n          <!---->",
+    "description": "levotyroxin - kalcium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A12A"
+    ],
+    "atcGroupB": [
+      "J01A"
+    ],
+    "severity": "warn",
+    "title": "kalcium - doxycyklin\n          <!---->",
+    "description": "kalcium - doxycyklin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A12A"
+    ],
+    "atcGroupB": [
+      "J01M"
+    ],
+    "severity": "warn",
+    "title": "moxifloxacin - kalcium\n          <!---->",
+    "description": "moxifloxacin - kalcium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A12A"
+    ],
+    "atcGroupB": [
+      "M05B"
+    ],
+    "severity": "warn",
+    "title": "kalcium - alendronsyra\n          <!---->",
+    "description": "kalcium - alendronsyra\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A12B"
+    ],
+    "atcGroupB": [
+      "C03D"
+    ],
+    "severity": "warn",
+    "title": "eplerenon - kalium\n          <!---->",
+    "description": "eplerenon - kalium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A12B"
+    ],
+    "atcGroupB": [
+      "C03E"
+    ],
+    "severity": "warn",
+    "title": "kalium - amilorid\n          <!---->",
+    "description": "kalium - amilorid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A12B"
+    ],
+    "atcGroupB": [
+      "J01E"
+    ],
+    "severity": "warn",
+    "title": "kalium - trimetoprim\n          <!---->",
+    "description": "kalium - trimetoprim\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A12B"
+    ],
+    "atcGroupB": [
+      "L04A"
+    ],
+    "severity": "warn",
+    "title": "kalium - takrolimus\n          <!---->",
+    "description": "kalium - takrolimus\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A12C"
+    ],
+    "atcGroupB": [
+      "B03A"
+    ],
+    "severity": "warn",
+    "title": "fosforsyra - järn\n          <!---->",
+    "description": "fosforsyra - järn\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "A12C"
+    ],
+    "atcGroupB": [
+      "C03C"
+    ],
+    "severity": "warn",
+    "title": "bumetanid - fosforsyra\n          <!---->",
+    "description": "bumetanid - fosforsyra\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B03A"
+    ],
+    "atcGroupB": [
+      "J01A"
+    ],
+    "severity": "danger",
+    "title": "järn - doxycyklin\n          <!---->",
+    "description": "järn - doxycyklin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B03A"
+    ],
+    "atcGroupB": [
+      "H03A"
+    ],
+    "severity": "warn",
+    "title": "levotyroxin - järn\n          <!---->",
+    "description": "levotyroxin - järn\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B03A"
+    ],
+    "atcGroupB": [
+      "J01M"
+    ],
+    "severity": "danger",
+    "title": "järn - moxifloxacin\n          <!---->",
+    "description": "järn - moxifloxacin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B03A"
+    ],
+    "atcGroupB": [
+      "M05B"
+    ],
+    "severity": "warn",
+    "title": "alendronsyra - järn\n          <!---->",
+    "description": "alendronsyra - järn\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B03X"
+    ],
+    "atcGroupB": [
+      "C09A"
+    ],
+    "severity": "warn",
+    "title": "darbepoetin alfa - enalapril\n          <!---->",
+    "description": "darbepoetin alfa - enalapril\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B03X"
+    ],
+    "atcGroupB": [
+      "C09B"
+    ],
+    "severity": "warn",
+    "title": "darbepoetin alfa - enalapril\n          <!---->",
+    "description": "darbepoetin alfa - enalapril\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B05B"
+    ],
+    "atcGroupB": [
+      "C01A"
+    ],
+    "severity": "warn",
+    "title": "digoxin - kalcium\n          <!---->",
+    "description": "digoxin - kalcium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B05B"
+    ],
+    "atcGroupB": [
+      "C03E"
+    ],
+    "severity": "warn",
+    "title": "kalium - amilorid\n          <!---->",
+    "description": "kalium - amilorid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B05B"
+    ],
+    "atcGroupB": [
+      "C03D"
+    ],
+    "severity": "warn",
+    "title": "eplerenon - kalium\n          <!---->",
+    "description": "eplerenon - kalium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B05B"
+    ],
+    "atcGroupB": [
+      "C08D"
+    ],
+    "severity": "warn",
+    "title": "verapamil - kalcium\n          <!---->",
+    "description": "verapamil - kalcium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B05B"
+    ],
+    "atcGroupB": [
+      "J01E"
+    ],
+    "severity": "warn",
+    "title": "kalium - trimetoprim\n          <!---->",
+    "description": "kalium - trimetoprim\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B05B"
+    ],
+    "atcGroupB": [
+      "L01B"
+    ],
+    "severity": "warn",
+    "title": "kalcium - fluorouracil\n          <!---->",
+    "description": "kalcium - fluorouracil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B05B"
+    ],
+    "atcGroupB": [
+      "L01B"
+    ],
+    "severity": "warn",
+    "title": "magnesium - fluorouracil\n          <!---->",
+    "description": "magnesium - fluorouracil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B05B"
+    ],
+    "atcGroupB": [
+      "L01F"
+    ],
+    "severity": "warn",
+    "title": "magnesium - bevacizumab\n          <!---->",
+    "description": "magnesium - bevacizumab\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B05B"
+    ],
+    "atcGroupB": [
+      "L01F"
+    ],
+    "severity": "warn",
+    "title": "kalcium - bevacizumab\n          <!---->",
+    "description": "kalcium - bevacizumab\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B05B"
+    ],
+    "atcGroupB": [
+      "L04A"
+    ],
+    "severity": "warn",
+    "title": "kalium - takrolimus\n          <!---->",
+    "description": "kalium - takrolimus\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B05D"
+    ],
+    "atcGroupB": [
+      "C01A"
+    ],
+    "severity": "warn",
+    "title": "digoxin - kalcium\n          <!---->",
+    "description": "digoxin - kalcium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B05D"
+    ],
+    "atcGroupB": [
+      "C08D"
+    ],
+    "severity": "warn",
+    "title": "verapamil - kalcium\n          <!---->",
+    "description": "verapamil - kalcium\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B05D"
+    ],
+    "atcGroupB": [
+      "L01B"
+    ],
+    "severity": "warn",
+    "title": "kalcium - fluorouracil\n          <!---->",
+    "description": "kalcium - fluorouracil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B05D"
+    ],
+    "atcGroupB": [
+      "L01B"
+    ],
+    "severity": "warn",
+    "title": "magnesium - fluorouracil\n          <!---->",
+    "description": "magnesium - fluorouracil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B05D"
+    ],
+    "atcGroupB": [
+      "L01F"
+    ],
+    "severity": "warn",
+    "title": "magnesium - bevacizumab\n          <!---->",
+    "description": "magnesium - bevacizumab\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B05D"
+    ],
+    "atcGroupB": [
+      "L01F"
+    ],
+    "severity": "warn",
+    "title": "kalcium - bevacizumab\n          <!---->",
+    "description": "kalcium - bevacizumab\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B05Z"
+    ],
+    "atcGroupB": [
+      "C03C"
+    ],
+    "severity": "warn",
+    "title": "bumetanid - fosforsyra\n          <!---->",
+    "description": "bumetanid - fosforsyra\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B05Z"
+    ],
+    "atcGroupB": [
+      "L01B"
+    ],
+    "severity": "warn",
+    "title": "magnesium - fluorouracil\n          <!---->",
+    "description": "magnesium - fluorouracil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "B05Z"
+    ],
+    "atcGroupB": [
+      "L01F"
+    ],
+    "severity": "warn",
+    "title": "magnesium - bevacizumab\n          <!---->",
+    "description": "magnesium - bevacizumab\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "C03B"
+    ],
+    "severity": "warn",
+    "title": "metolazon - digoxin\n          <!---->",
+    "description": "metolazon - digoxin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "C03A"
+    ],
+    "severity": "warn",
+    "title": "digoxin - bendroflumetiazid\n          <!---->",
+    "description": "digoxin - bendroflumetiazid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "C01B"
+    ],
+    "severity": "warn",
+    "title": "digoxin - amiodaron\n          <!---->",
+    "description": "digoxin - amiodaron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "C03E"
+    ],
+    "severity": "warn",
+    "title": "digoxin - hydroklortiazid\n          <!---->",
+    "description": "digoxin - hydroklortiazid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "C03D"
+    ],
+    "severity": "warn",
+    "title": "eplerenon - digoxin\n          <!---->",
+    "description": "eplerenon - digoxin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "C03X"
+    ],
+    "severity": "warn",
+    "title": "tolvaptan - digoxin\n          <!---->",
+    "description": "tolvaptan - digoxin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "C08C"
+    ],
+    "severity": "warn",
+    "title": "nifedipin - digoxin\n          <!---->",
+    "description": "nifedipin - digoxin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "C07F"
+    ],
+    "severity": "warn",
+    "title": "digoxin - felodipin\n          <!---->",
+    "description": "digoxin - felodipin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "C10A"
+    ],
+    "severity": "warn",
+    "title": "atorvastatin - digoxin\n          <!---->",
+    "description": "atorvastatin - digoxin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "C08D"
+    ],
+    "severity": "danger",
+    "title": "digoxin - verapamil\n          <!---->",
+    "description": "digoxin - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "C09B"
+    ],
+    "severity": "warn",
+    "title": "digoxin - hydroklortiazid\n          <!---->",
+    "description": "digoxin - hydroklortiazid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "C10B"
+    ],
+    "severity": "warn",
+    "title": "atorvastatin - digoxin\n          <!---->",
+    "description": "atorvastatin - digoxin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "J02A"
+    ],
+    "severity": "warn",
+    "title": "isavukonazol - digoxin\n          <!---->",
+    "description": "isavukonazol - digoxin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "H03A"
+    ],
+    "severity": "warn",
+    "title": "levotyroxin - digoxin\n          <!---->",
+    "description": "levotyroxin - digoxin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "J01E"
+    ],
+    "severity": "warn",
+    "title": "trimetoprim - digoxin\n          <!---->",
+    "description": "trimetoprim - digoxin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "L01A"
+    ],
+    "severity": "warn",
+    "title": "digoxin - melfalan\n          <!---->",
+    "description": "digoxin - melfalan\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "J01F"
+    ],
+    "severity": "warn",
+    "title": "azitromycin - digoxin\n          <!---->",
+    "description": "azitromycin - digoxin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "L01D"
+    ],
+    "severity": "warn",
+    "title": "digoxin - bleomycin\n          <!---->",
+    "description": "digoxin - bleomycin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "N05B"
+    ],
+    "severity": "warn",
+    "title": "alprazolam - digoxin\n          <!---->",
+    "description": "alprazolam - digoxin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01A"
+    ],
+    "atcGroupB": [
+      "R07A"
+    ],
+    "severity": "warn",
+    "title": "deutivakaftor - digoxin\n          <!---->",
+    "description": "deutivakaftor - digoxin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "C02A"
+    ],
+    "severity": "warn",
+    "title": "guanfacin - amiodaron\n          <!---->",
+    "description": "guanfacin - amiodaron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "C02K"
+    ],
+    "severity": "warn",
+    "title": "riociguat - amiodaron\n          <!---->",
+    "description": "riociguat - amiodaron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "C03D"
+    ],
+    "severity": "warn",
+    "title": "eplerenon - amiodaron\n          <!---->",
+    "description": "eplerenon - amiodaron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "C01E"
+    ],
+    "severity": "danger",
+    "title": "adenosin - amiodaron\n          <!---->",
+    "description": "adenosin - amiodaron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "C08D"
+    ],
+    "severity": "danger",
+    "title": "amiodaron - verapamil\n          <!---->",
+    "description": "amiodaron - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "C07F"
+    ],
+    "severity": "warn",
+    "title": "amiodaron - metoprolol\n          <!---->",
+    "description": "amiodaron - metoprolol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "C07F"
+    ],
+    "severity": "warn",
+    "title": "felodipin - amiodaron\n          <!---->",
+    "description": "felodipin - amiodaron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "C10A"
+    ],
+    "severity": "warn",
+    "title": "amiodaron - atorvastatin\n          <!---->",
+    "description": "amiodaron - atorvastatin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "C10B"
+    ],
+    "severity": "warn",
+    "title": "amiodaron - atorvastatin\n          <!---->",
+    "description": "amiodaron - atorvastatin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "D04A"
+    ],
+    "severity": "warn",
+    "title": "lidokain - amiodaron\n          <!---->",
+    "description": "lidokain - amiodaron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "G04C"
+    ],
+    "severity": "warn",
+    "title": "amiodaron - alfuzosin\n          <!---->",
+    "description": "amiodaron - alfuzosin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "H02C"
+    ],
+    "severity": "warn",
+    "title": "osilodrostat - amiodaron\n          <!---->",
+    "description": "osilodrostat - amiodaron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "J01M"
+    ],
+    "severity": "danger",
+    "title": "moxifloxacin - amiodaron\n          <!---->",
+    "description": "moxifloxacin - amiodaron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "J01F"
+    ],
+    "severity": "danger",
+    "title": "azitromycin - amiodaron\n          <!---->",
+    "description": "azitromycin - amiodaron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "L04A"
+    ],
+    "severity": "warn",
+    "title": "amiodaron - takrolimus\n          <!---->",
+    "description": "amiodaron - takrolimus\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "L01C"
+    ],
+    "severity": "warn",
+    "title": "amiodaron - paklitaxel\n          <!---->",
+    "description": "amiodaron - paklitaxel\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "L01E"
+    ],
+    "severity": "warn",
+    "title": "amiodaron - everolimus\n          <!---->",
+    "description": "amiodaron - everolimus\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "L01X"
+    ],
+    "severity": "danger",
+    "title": "abirateron - amiodaron\n          <!---->",
+    "description": "abirateron - amiodaron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "L02B"
+    ],
+    "severity": "danger",
+    "title": "abirateron - amiodaron\n          <!---->",
+    "description": "abirateron - amiodaron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "N01A"
+    ],
+    "severity": "warn",
+    "title": "alfentanil - amiodaron\n          <!---->",
+    "description": "alfentanil - amiodaron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "N06D"
+    ],
+    "severity": "danger",
+    "title": "donepezil - amiodaron\n          <!---->",
+    "description": "donepezil - amiodaron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "R02A"
+    ],
+    "severity": "warn",
+    "title": "lidokain - amiodaron\n          <!---->",
+    "description": "lidokain - amiodaron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01B"
+    ],
+    "atcGroupB": [
+      "S01H"
+    ],
+    "severity": "warn",
+    "title": "lidokain - amiodaron\n          <!---->",
+    "description": "lidokain - amiodaron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01D"
+    ],
+    "atcGroupB": [
+      "C02K"
+    ],
+    "severity": "danger",
+    "title": "riociguat - glyceryltrinitrat\n          <!---->",
+    "description": "riociguat - glyceryltrinitrat\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01E"
+    ],
+    "atcGroupB": [
+      "J01M"
+    ],
+    "severity": "danger",
+    "title": "adenosin - moxifloxacin\n          <!---->",
+    "description": "adenosin - moxifloxacin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01E"
+    ],
+    "atcGroupB": [
+      "L02B"
+    ],
+    "severity": "warn",
+    "title": "adenosin - abirateron\n          <!---->",
+    "description": "adenosin - abirateron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C01E"
+    ],
+    "atcGroupB": [
+      "L01X"
+    ],
+    "severity": "warn",
+    "title": "adenosin - abirateron\n          <!---->",
+    "description": "adenosin - abirateron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C02A"
+    ],
+    "atcGroupB": [
+      "C08D"
+    ],
+    "severity": "warn",
+    "title": "verapamil - guanfacin\n          <!---->",
+    "description": "verapamil - guanfacin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C02A"
+    ],
+    "atcGroupB": [
+      "J02A"
+    ],
+    "severity": "warn",
+    "title": "guanfacin - isavukonazol\n          <!---->",
+    "description": "guanfacin - isavukonazol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C02A"
+    ],
+    "atcGroupB": [
+      "J01M"
+    ],
+    "severity": "warn",
+    "title": "guanfacin - moxifloxacin\n          <!---->",
+    "description": "guanfacin - moxifloxacin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C02A"
+    ],
+    "atcGroupB": [
+      "J04A"
+    ],
+    "severity": "warn",
+    "title": "rifabutin - guanfacin\n          <!---->",
+    "description": "rifabutin - guanfacin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C02A"
+    ],
+    "atcGroupB": [
+      "L01X"
+    ],
+    "severity": "warn",
+    "title": "guanfacin - abirateron\n          <!---->",
+    "description": "guanfacin - abirateron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C02A"
+    ],
+    "atcGroupB": [
+      "L02B"
+    ],
+    "severity": "warn",
+    "title": "guanfacin - abirateron\n          <!---->",
+    "description": "guanfacin - abirateron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C02A"
+    ],
+    "atcGroupB": [
+      "N03A"
+    ],
+    "severity": "warn",
+    "title": "valproinsyra - guanfacin\n          <!---->",
+    "description": "valproinsyra - guanfacin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C02D"
+    ],
+    "atcGroupB": [
+      "C07F"
+    ],
+    "severity": "warn",
+    "title": "metoprolol - hydralazin\n          <!---->",
+    "description": "metoprolol - hydralazin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C02K"
+    ],
+    "atcGroupB": [
+      "C08D"
+    ],
+    "severity": "danger",
+    "title": "riociguat - verapamil\n          <!---->",
+    "description": "riociguat - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C02K"
+    ],
+    "atcGroupB": [
+      "J05A"
+    ],
+    "severity": "warn",
+    "title": "abakavir - riociguat\n          <!---->",
+    "description": "abakavir - riociguat\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03A"
+    ],
+    "atcGroupB": [
+      "J01E"
+    ],
+    "severity": "warn",
+    "title": "trimetoprim - bendroflumetiazid\n          <!---->",
+    "description": "trimetoprim - bendroflumetiazid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03A"
+    ],
+    "atcGroupB": [
+      "J01A"
+    ],
+    "severity": "warn",
+    "title": "bendroflumetiazid - doxycyklin\n          <!---->",
+    "description": "bendroflumetiazid - doxycyklin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03A"
+    ],
+    "atcGroupB": [
+      "M01A"
+    ],
+    "severity": "warn",
+    "title": "tenoxikam - bendroflumetiazid\n          <!---->",
+    "description": "tenoxikam - bendroflumetiazid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03A"
+    ],
+    "atcGroupB": [
+      "N02B"
+    ],
+    "severity": "warn",
+    "title": "acetylsalicylsyra - bendroflumetiazid\n          <!---->",
+    "description": "acetylsalicylsyra - bendroflumetiazid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03B"
+    ],
+    "atcGroupB": [
+      "J01E"
+    ],
+    "severity": "warn",
+    "title": "metolazon - trimetoprim\n          <!---->",
+    "description": "metolazon - trimetoprim\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03B"
+    ],
+    "atcGroupB": [
+      "J01A"
+    ],
+    "severity": "warn",
+    "title": "doxycyklin - metolazon\n          <!---->",
+    "description": "doxycyklin - metolazon\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03B"
+    ],
+    "atcGroupB": [
+      "M01A"
+    ],
+    "severity": "warn",
+    "title": "metolazon - tenoxikam\n          <!---->",
+    "description": "metolazon - tenoxikam\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03B"
+    ],
+    "atcGroupB": [
+      "N02B"
+    ],
+    "severity": "warn",
+    "title": "acetylsalicylsyra - metolazon\n          <!---->",
+    "description": "acetylsalicylsyra - metolazon\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03C"
+    ],
+    "atcGroupB": [
+      "J01A"
+    ],
+    "severity": "warn",
+    "title": "bumetanid - doxycyklin\n          <!---->",
+    "description": "bumetanid - doxycyklin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03C"
+    ],
+    "atcGroupB": [
+      "J01E"
+    ],
+    "severity": "warn",
+    "title": "bumetanid - trimetoprim\n          <!---->",
+    "description": "bumetanid - trimetoprim\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03C"
+    ],
+    "atcGroupB": [
+      "M01A"
+    ],
+    "severity": "warn",
+    "title": "bumetanid - tenoxikam\n          <!---->",
+    "description": "bumetanid - tenoxikam\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03C"
+    ],
+    "atcGroupB": [
+      "N02B"
+    ],
+    "severity": "warn",
+    "title": "bumetanid - acetylsalicylsyra\n          <!---->",
+    "description": "bumetanid - acetylsalicylsyra\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03D"
+    ],
+    "atcGroupB": [
+      "C09C"
+    ],
+    "severity": "warn",
+    "title": "eplerenon - kandesartan\n          <!---->",
+    "description": "eplerenon - kandesartan\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03D"
+    ],
+    "atcGroupB": [
+      "C09B"
+    ],
+    "severity": "warn",
+    "title": "eplerenon - enalapril\n          <!---->",
+    "description": "eplerenon - enalapril\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03D"
+    ],
+    "atcGroupB": [
+      "C09A"
+    ],
+    "severity": "warn",
+    "title": "eplerenon - enalapril\n          <!---->",
+    "description": "eplerenon - enalapril\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03D"
+    ],
+    "atcGroupB": [
+      "C08D"
+    ],
+    "severity": "warn",
+    "title": "eplerenon - verapamil\n          <!---->",
+    "description": "eplerenon - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03D"
+    ],
+    "atcGroupB": [
+      "C09D"
+    ],
+    "severity": "warn",
+    "title": "eplerenon - valsartan\n          <!---->",
+    "description": "eplerenon - valsartan\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03D"
+    ],
+    "atcGroupB": [
+      "H02C"
+    ],
+    "severity": "warn",
+    "title": "eplerenon - osilodrostat\n          <!---->",
+    "description": "eplerenon - osilodrostat\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03D"
+    ],
+    "atcGroupB": [
+      "J04A"
+    ],
+    "severity": "warn",
+    "title": "eplerenon - rifabutin\n          <!---->",
+    "description": "eplerenon - rifabutin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03D"
+    ],
+    "atcGroupB": [
+      "J01E"
+    ],
+    "severity": "warn",
+    "title": "eplerenon - trimetoprim\n          <!---->",
+    "description": "eplerenon - trimetoprim\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03D"
+    ],
+    "atcGroupB": [
+      "J01E"
+    ],
+    "severity": "warn",
+    "title": "sulfametoxazol - eplerenon\n          <!---->",
+    "description": "sulfametoxazol - eplerenon\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03D"
+    ],
+    "atcGroupB": [
+      "J02A"
+    ],
+    "severity": "warn",
+    "title": "eplerenon - isavukonazol\n          <!---->",
+    "description": "eplerenon - isavukonazol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03D"
+    ],
+    "atcGroupB": [
+      "L01E"
+    ],
+    "severity": "warn",
+    "title": "eplerenon - everolimus\n          <!---->",
+    "description": "eplerenon - everolimus\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03D"
+    ],
+    "atcGroupB": [
+      "M01A"
+    ],
+    "severity": "warn",
+    "title": "eplerenon - tenoxikam\n          <!---->",
+    "description": "eplerenon - tenoxikam\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03D"
+    ],
+    "atcGroupB": [
+      "M03B"
+    ],
+    "severity": "warn",
+    "title": "baklofen - eplerenon\n          <!---->",
+    "description": "baklofen - eplerenon\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03D"
+    ],
+    "atcGroupB": [
+      "N02B"
+    ],
+    "severity": "warn",
+    "title": "eplerenon - acetylsalicylsyra\n          <!---->",
+    "description": "eplerenon - acetylsalicylsyra\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03E"
+    ],
+    "atcGroupB": [
+      "C09C"
+    ],
+    "severity": "warn",
+    "title": "amilorid - kandesartan\n          <!---->",
+    "description": "amilorid - kandesartan\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03E"
+    ],
+    "atcGroupB": [
+      "C09A"
+    ],
+    "severity": "warn",
+    "title": "amilorid - enalapril\n          <!---->",
+    "description": "amilorid - enalapril\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03E"
+    ],
+    "atcGroupB": [
+      "C09B"
+    ],
+    "severity": "warn",
+    "title": "amilorid - enalapril\n          <!---->",
+    "description": "amilorid - enalapril\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03E"
+    ],
+    "atcGroupB": [
+      "C09D"
+    ],
+    "severity": "warn",
+    "title": "amilorid - valsartan\n          <!---->",
+    "description": "amilorid - valsartan\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03E"
+    ],
+    "atcGroupB": [
+      "J01A"
+    ],
+    "severity": "warn",
+    "title": "hydroklortiazid - doxycyklin\n          <!---->",
+    "description": "hydroklortiazid - doxycyklin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03E"
+    ],
+    "atcGroupB": [
+      "J01C"
+    ],
+    "severity": "warn",
+    "title": "amilorid - amoxicillin\n          <!---->",
+    "description": "amilorid - amoxicillin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03E"
+    ],
+    "atcGroupB": [
+      "J01E"
+    ],
+    "severity": "warn",
+    "title": "trimetoprim - hydroklortiazid\n          <!---->",
+    "description": "trimetoprim - hydroklortiazid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03E"
+    ],
+    "atcGroupB": [
+      "J01E"
+    ],
+    "severity": "warn",
+    "title": "amilorid - trimetoprim\n          <!---->",
+    "description": "amilorid - trimetoprim\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03E"
+    ],
+    "atcGroupB": [
+      "J01E"
+    ],
+    "severity": "warn",
+    "title": "sulfametoxazol - amilorid\n          <!---->",
+    "description": "sulfametoxazol - amilorid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03E"
+    ],
+    "atcGroupB": [
+      "M01A"
+    ],
+    "severity": "warn",
+    "title": "amilorid - tenoxikam\n          <!---->",
+    "description": "amilorid - tenoxikam\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03E"
+    ],
+    "atcGroupB": [
+      "M01A"
+    ],
+    "severity": "warn",
+    "title": "tenoxikam - hydroklortiazid\n          <!---->",
+    "description": "tenoxikam - hydroklortiazid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03E"
+    ],
+    "atcGroupB": [
+      "L04A"
+    ],
+    "severity": "warn",
+    "title": "takrolimus - amilorid\n          <!---->",
+    "description": "takrolimus - amilorid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03E"
+    ],
+    "atcGroupB": [
+      "N02B"
+    ],
+    "severity": "warn",
+    "title": "acetylsalicylsyra - hydroklortiazid\n          <!---->",
+    "description": "acetylsalicylsyra - hydroklortiazid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03E"
+    ],
+    "atcGroupB": [
+      "N02B"
+    ],
+    "severity": "warn",
+    "title": "acetylsalicylsyra - amilorid\n          <!---->",
+    "description": "acetylsalicylsyra - amilorid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03X"
+    ],
+    "atcGroupB": [
+      "C08D"
+    ],
+    "severity": "danger",
+    "title": "tolvaptan - verapamil\n          <!---->",
+    "description": "tolvaptan - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03X"
+    ],
+    "atcGroupB": [
+      "J04A"
+    ],
+    "severity": "warn",
+    "title": "rifabutin - tolvaptan\n          <!---->",
+    "description": "rifabutin - tolvaptan\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C03X"
+    ],
+    "atcGroupB": [
+      "J02A"
+    ],
+    "severity": "danger",
+    "title": "tolvaptan - isavukonazol\n          <!---->",
+    "description": "tolvaptan - isavukonazol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07A"
+    ],
+    "atcGroupB": [
+      "C08C"
+    ],
+    "severity": "warn",
+    "title": "nifedipin - atenolol\n          <!---->",
+    "description": "nifedipin - atenolol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07A"
+    ],
+    "atcGroupB": [
+      "C08D"
+    ],
+    "severity": "danger",
+    "title": "verapamil - atenolol\n          <!---->",
+    "description": "verapamil - atenolol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07A"
+    ],
+    "atcGroupB": [
+      "M01A"
+    ],
+    "severity": "warn",
+    "title": "tenoxikam - atenolol\n          <!---->",
+    "description": "tenoxikam - atenolol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07A"
+    ],
+    "atcGroupB": [
+      "N02B"
+    ],
+    "severity": "warn",
+    "title": "acetylsalicylsyra - atenolol\n          <!---->",
+    "description": "acetylsalicylsyra - atenolol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07A"
+    ],
+    "atcGroupB": [
+      "N06D"
+    ],
+    "severity": "warn",
+    "title": "donepezil - atenolol\n          <!---->",
+    "description": "donepezil - atenolol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07A"
+    ],
+    "atcGroupB": [
+      "R02A"
+    ],
+    "severity": "warn",
+    "title": "lidokain - atenolol\n          <!---->",
+    "description": "lidokain - atenolol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07F"
+    ],
+    "atcGroupB": [
+      "C08D"
+    ],
+    "severity": "danger",
+    "title": "verapamil - metoprolol\n          <!---->",
+    "description": "verapamil - metoprolol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07F"
+    ],
+    "atcGroupB": [
+      "D01B"
+    ],
+    "severity": "warn",
+    "title": "terbinafin - metoprolol\n          <!---->",
+    "description": "terbinafin - metoprolol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07F"
+    ],
+    "atcGroupB": [
+      "C08C"
+    ],
+    "severity": "warn",
+    "title": "nifedipin - metoprolol\n          <!---->",
+    "description": "nifedipin - metoprolol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07F"
+    ],
+    "atcGroupB": [
+      "H02C"
+    ],
+    "severity": "warn",
+    "title": "metoprolol - osilodrostat\n          <!---->",
+    "description": "metoprolol - osilodrostat\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07F"
+    ],
+    "atcGroupB": [
+      "H02C"
+    ],
+    "severity": "warn",
+    "title": "osilodrostat - felodipin\n          <!---->",
+    "description": "osilodrostat - felodipin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07F"
+    ],
+    "atcGroupB": [
+      "H05B"
+    ],
+    "severity": "warn",
+    "title": "cinakalcet - metoprolol\n          <!---->",
+    "description": "cinakalcet - metoprolol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07F"
+    ],
+    "atcGroupB": [
+      "J04A"
+    ],
+    "severity": "warn",
+    "title": "rifabutin - felodipin\n          <!---->",
+    "description": "rifabutin - felodipin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07F"
+    ],
+    "atcGroupB": [
+      "L01E"
+    ],
+    "severity": "warn",
+    "title": "felodipin - everolimus\n          <!---->",
+    "description": "felodipin - everolimus\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07F"
+    ],
+    "atcGroupB": [
+      "L01X"
+    ],
+    "severity": "warn",
+    "title": "metoprolol - abirateron\n          <!---->",
+    "description": "metoprolol - abirateron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07F"
+    ],
+    "atcGroupB": [
+      "M01A"
+    ],
+    "severity": "warn",
+    "title": "tenoxikam - metoprolol\n          <!---->",
+    "description": "tenoxikam - metoprolol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07F"
+    ],
+    "atcGroupB": [
+      "L02B"
+    ],
+    "severity": "warn",
+    "title": "metoprolol - abirateron\n          <!---->",
+    "description": "metoprolol - abirateron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07F"
+    ],
+    "atcGroupB": [
+      "N02B"
+    ],
+    "severity": "warn",
+    "title": "acetylsalicylsyra - metoprolol\n          <!---->",
+    "description": "acetylsalicylsyra - metoprolol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07F"
+    ],
+    "atcGroupB": [
+      "L04A"
+    ],
+    "severity": "warn",
+    "title": "felodipin - takrolimus\n          <!---->",
+    "description": "felodipin - takrolimus\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07F"
+    ],
+    "atcGroupB": [
+      "N06D"
+    ],
+    "severity": "warn",
+    "title": "donepezil - metoprolol\n          <!---->",
+    "description": "donepezil - metoprolol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C07F"
+    ],
+    "atcGroupB": [
+      "R02A"
+    ],
+    "severity": "warn",
+    "title": "lidokain - metoprolol\n          <!---->",
+    "description": "lidokain - metoprolol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08C"
+    ],
+    "atcGroupB": [
+      "J04A"
+    ],
+    "severity": "warn",
+    "title": "rifabutin - nifedipin\n          <!---->",
+    "description": "rifabutin - nifedipin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08C"
+    ],
+    "atcGroupB": [
+      "L04A"
+    ],
+    "severity": "warn",
+    "title": "nifedipin - takrolimus\n          <!---->",
+    "description": "nifedipin - takrolimus\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08C"
+    ],
+    "atcGroupB": [
+      "N05C"
+    ],
+    "severity": "warn",
+    "title": "melatonin - nifedipin\n          <!---->",
+    "description": "melatonin - nifedipin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "C10A"
+    ],
+    "severity": "warn",
+    "title": "atorvastatin - verapamil\n          <!---->",
+    "description": "atorvastatin - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "C09X"
+    ],
+    "severity": "warn",
+    "title": "sparsentan - verapamil\n          <!---->",
+    "description": "sparsentan - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "C10B"
+    ],
+    "severity": "warn",
+    "title": "atorvastatin - verapamil\n          <!---->",
+    "description": "atorvastatin - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "G03C"
+    ],
+    "severity": "warn",
+    "title": "estradiol - verapamil\n          <!---->",
+    "description": "estradiol - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "G02C"
+    ],
+    "severity": "warn",
+    "title": "kabergolin - verapamil\n          <!---->",
+    "description": "kabergolin - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "G03F"
+    ],
+    "severity": "warn",
+    "title": "estradiol - verapamil\n          <!---->",
+    "description": "estradiol - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "J04A"
+    ],
+    "severity": "warn",
+    "title": "rifabutin - verapamil\n          <!---->",
+    "description": "rifabutin - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "L04A"
+    ],
+    "severity": "warn",
+    "title": "takrolimus - verapamil\n          <!---->",
+    "description": "takrolimus - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "J02A"
+    ],
+    "severity": "warn",
+    "title": "isavukonazol - verapamil\n          <!---->",
+    "description": "isavukonazol - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "L01C"
+    ],
+    "severity": "warn",
+    "title": "verapamil - paklitaxel\n          <!---->",
+    "description": "verapamil - paklitaxel\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "L01E"
+    ],
+    "severity": "warn",
+    "title": "everolimus - verapamil\n          <!---->",
+    "description": "everolimus - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "M03C"
+    ],
+    "severity": "danger",
+    "title": "dantrolen - verapamil\n          <!---->",
+    "description": "dantrolen - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "N02A"
+    ],
+    "severity": "warn",
+    "title": "fentanyl - verapamil\n          <!---->",
+    "description": "fentanyl - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "N01B"
+    ],
+    "severity": "warn",
+    "title": "bupivakain - verapamil\n          <!---->",
+    "description": "bupivakain - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "N05A"
+    ],
+    "severity": "warn",
+    "title": "aripiprazol - verapamil\n          <!---->",
+    "description": "aripiprazol - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "R01A"
+    ],
+    "severity": "warn",
+    "title": "mometason - verapamil\n          <!---->",
+    "description": "mometason - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "R07A"
+    ],
+    "severity": "warn",
+    "title": "vanzakaftor - verapamil\n          <!---->",
+    "description": "vanzakaftor - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "R07A"
+    ],
+    "severity": "warn",
+    "title": "deutivakaftor - verapamil\n          <!---->",
+    "description": "deutivakaftor - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "R07A"
+    ],
+    "severity": "warn",
+    "title": "tezakaftor - verapamil\n          <!---->",
+    "description": "tezakaftor - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "S01B"
+    ],
+    "severity": "warn",
+    "title": "dexametason - verapamil\n          <!---->",
+    "description": "dexametason - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "S01C"
+    ],
+    "severity": "warn",
+    "title": "dexametason - verapamil\n          <!---->",
+    "description": "dexametason - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C08D"
+    ],
+    "atcGroupB": [
+      "R06A"
+    ],
+    "severity": "warn",
+    "title": "ebastin - verapamil\n          <!---->",
+    "description": "ebastin - verapamil\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C09A"
+    ],
+    "atcGroupB": [
+      "J01E"
+    ],
+    "severity": "warn",
+    "title": "enalapril - trimetoprim\n          <!---->",
+    "description": "enalapril - trimetoprim\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C09A"
+    ],
+    "atcGroupB": [
+      "M01A"
+    ],
+    "severity": "warn",
+    "title": "enalapril - tenoxikam\n          <!---->",
+    "description": "enalapril - tenoxikam\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C09A"
+    ],
+    "atcGroupB": [
+      "L01E"
+    ],
+    "severity": "warn",
+    "title": "everolimus - enalapril\n          <!---->",
+    "description": "everolimus - enalapril\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C09A"
+    ],
+    "atcGroupB": [
+      "N02B"
+    ],
+    "severity": "warn",
+    "title": "acetylsalicylsyra - enalapril\n          <!---->",
+    "description": "acetylsalicylsyra - enalapril\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C09B"
+    ],
+    "atcGroupB": [
+      "J01A"
+    ],
+    "severity": "warn",
+    "title": "hydroklortiazid - doxycyklin\n          <!---->",
+    "description": "hydroklortiazid - doxycyklin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C09B"
+    ],
+    "atcGroupB": [
+      "J01E"
+    ],
+    "severity": "warn",
+    "title": "trimetoprim - hydroklortiazid\n          <!---->",
+    "description": "trimetoprim - hydroklortiazid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C09B"
+    ],
+    "atcGroupB": [
+      "J01E"
+    ],
+    "severity": "warn",
+    "title": "enalapril - trimetoprim\n          <!---->",
+    "description": "enalapril - trimetoprim\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C09B"
+    ],
+    "atcGroupB": [
+      "L01E"
+    ],
+    "severity": "warn",
+    "title": "everolimus - enalapril\n          <!---->",
+    "description": "everolimus - enalapril\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C09B"
+    ],
+    "atcGroupB": [
+      "M01A"
+    ],
+    "severity": "warn",
+    "title": "tenoxikam - hydroklortiazid\n          <!---->",
+    "description": "tenoxikam - hydroklortiazid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C09B"
+    ],
+    "atcGroupB": [
+      "M01A"
+    ],
+    "severity": "warn",
+    "title": "enalapril - tenoxikam\n          <!---->",
+    "description": "enalapril - tenoxikam\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C09B"
+    ],
+    "atcGroupB": [
+      "N02B"
+    ],
+    "severity": "warn",
+    "title": "acetylsalicylsyra - enalapril\n          <!---->",
+    "description": "acetylsalicylsyra - enalapril\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C09B"
+    ],
+    "atcGroupB": [
+      "N02B"
+    ],
+    "severity": "warn",
+    "title": "acetylsalicylsyra - hydroklortiazid\n          <!---->",
+    "description": "acetylsalicylsyra - hydroklortiazid\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C09C"
+    ],
+    "atcGroupB": [
+      "M01A"
+    ],
+    "severity": "warn",
+    "title": "kandesartan - tenoxikam\n          <!---->",
+    "description": "kandesartan - tenoxikam\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C09C"
+    ],
+    "atcGroupB": [
+      "N02B"
+    ],
+    "severity": "warn",
+    "title": "kandesartan - acetylsalicylsyra\n          <!---->",
+    "description": "kandesartan - acetylsalicylsyra\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C09D"
+    ],
+    "atcGroupB": [
+      "J02A"
+    ],
+    "severity": "warn",
+    "title": "amlodipin - isavukonazol\n          <!---->",
+    "description": "amlodipin - isavukonazol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C09D"
+    ],
+    "atcGroupB": [
+      "L04A"
+    ],
+    "severity": "warn",
+    "title": "takrolimus - amlodipin\n          <!---->",
+    "description": "takrolimus - amlodipin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C09D"
+    ],
+    "atcGroupB": [
+      "M01A"
+    ],
+    "severity": "warn",
+    "title": "valsartan - tenoxikam\n          <!---->",
+    "description": "valsartan - tenoxikam\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C09D"
+    ],
+    "atcGroupB": [
+      "N02B"
+    ],
+    "severity": "warn",
+    "title": "valsartan - acetylsalicylsyra\n          <!---->",
+    "description": "valsartan - acetylsalicylsyra\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C09X"
+    ],
+    "atcGroupB": [
+      "J02A"
+    ],
+    "severity": "warn",
+    "title": "sparsentan - isavukonazol\n          <!---->",
+    "description": "sparsentan - isavukonazol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C10A"
+    ],
+    "atcGroupB": [
+      "G03A"
+    ],
+    "severity": "warn",
+    "title": "atorvastatin - etinylestradiol\n          <!---->",
+    "description": "atorvastatin - etinylestradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C10A"
+    ],
+    "atcGroupB": [
+      "G03F"
+    ],
+    "severity": "warn",
+    "title": "atorvastatin - noretisteron\n          <!---->",
+    "description": "atorvastatin - noretisteron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C10A"
+    ],
+    "atcGroupB": [
+      "H02C"
+    ],
+    "severity": "warn",
+    "title": "osilodrostat - atorvastatin\n          <!---->",
+    "description": "osilodrostat - atorvastatin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C10A"
+    ],
+    "atcGroupB": [
+      "J01F"
+    ],
+    "severity": "warn",
+    "title": "atorvastatin - azitromycin\n          <!---->",
+    "description": "atorvastatin - azitromycin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C10A"
+    ],
+    "atcGroupB": [
+      "J02A"
+    ],
+    "severity": "warn",
+    "title": "isavukonazol - atorvastatin\n          <!---->",
+    "description": "isavukonazol - atorvastatin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C10A"
+    ],
+    "atcGroupB": [
+      "J04A"
+    ],
+    "severity": "warn",
+    "title": "rifabutin - atorvastatin\n          <!---->",
+    "description": "rifabutin - atorvastatin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C10A"
+    ],
+    "atcGroupB": [
+      "L01C"
+    ],
+    "severity": "warn",
+    "title": "paklitaxel - atorvastatin\n          <!---->",
+    "description": "paklitaxel - atorvastatin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C10A"
+    ],
+    "atcGroupB": [
+      "L01X"
+    ],
+    "severity": "warn",
+    "title": "niraparib - atorvastatin\n          <!---->",
+    "description": "niraparib - atorvastatin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C10B"
+    ],
+    "atcGroupB": [
+      "G03A"
+    ],
+    "severity": "warn",
+    "title": "atorvastatin - etinylestradiol\n          <!---->",
+    "description": "atorvastatin - etinylestradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C10B"
+    ],
+    "atcGroupB": [
+      "G03F"
+    ],
+    "severity": "warn",
+    "title": "atorvastatin - noretisteron\n          <!---->",
+    "description": "atorvastatin - noretisteron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C10B"
+    ],
+    "atcGroupB": [
+      "H02C"
+    ],
+    "severity": "warn",
+    "title": "osilodrostat - atorvastatin\n          <!---->",
+    "description": "osilodrostat - atorvastatin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C10B"
+    ],
+    "atcGroupB": [
+      "J01F"
+    ],
+    "severity": "warn",
+    "title": "atorvastatin - azitromycin\n          <!---->",
+    "description": "atorvastatin - azitromycin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C10B"
+    ],
+    "atcGroupB": [
+      "J02A"
+    ],
+    "severity": "warn",
+    "title": "isavukonazol - atorvastatin\n          <!---->",
+    "description": "isavukonazol - atorvastatin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C10B"
+    ],
+    "atcGroupB": [
+      "L01C"
+    ],
+    "severity": "warn",
+    "title": "paklitaxel - atorvastatin\n          <!---->",
+    "description": "paklitaxel - atorvastatin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C10B"
+    ],
+    "atcGroupB": [
+      "J04A"
+    ],
+    "severity": "warn",
+    "title": "rifabutin - atorvastatin\n          <!---->",
+    "description": "rifabutin - atorvastatin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C10B"
+    ],
+    "atcGroupB": [
+      "L01X"
+    ],
+    "severity": "warn",
+    "title": "niraparib - atorvastatin\n          <!---->",
+    "description": "niraparib - atorvastatin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "C10B"
+    ],
+    "atcGroupB": [
+      "L04A"
+    ],
+    "severity": "warn",
+    "title": "takrolimus - ezetimib\n          <!---->",
+    "description": "takrolimus - ezetimib\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "D01B"
+    ],
+    "atcGroupB": [
+      "N05A"
+    ],
+    "severity": "warn",
+    "title": "terbinafin - aripiprazol\n          <!---->",
+    "description": "terbinafin - aripiprazol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "D01B"
+    ],
+    "atcGroupB": [
+      "N06D"
+    ],
+    "severity": "warn",
+    "title": "donepezil - terbinafin\n          <!---->",
+    "description": "donepezil - terbinafin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "D01B"
+    ],
+    "atcGroupB": [
+      "R05F"
+    ],
+    "severity": "danger",
+    "title": "etylmorfin - terbinafin\n          <!---->",
+    "description": "etylmorfin - terbinafin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "D05B"
+    ],
+    "atcGroupB": [
+      "G03F"
+    ],
+    "severity": "warn",
+    "title": "acitretin - noretisteron\n          <!---->",
+    "description": "acitretin - noretisteron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "D05B"
+    ],
+    "atcGroupB": [
+      "J01A"
+    ],
+    "severity": "danger",
+    "title": "acitretin - doxycyklin\n          <!---->",
+    "description": "acitretin - doxycyklin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "D05B"
+    ],
+    "atcGroupB": [
+      "L02A"
+    ],
+    "severity": "warn",
+    "title": "acitretin - megestrol\n          <!---->",
+    "description": "acitretin - megestrol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "D10B"
+    ],
+    "atcGroupB": [
+      "J01A"
+    ],
+    "severity": "danger",
+    "title": "isotretinoin - doxycyklin\n          <!---->",
+    "description": "isotretinoin - doxycyklin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G02C"
+    ],
+    "atcGroupB": [
+      "N05A"
+    ],
+    "severity": "warn",
+    "title": "kabergolin - aripiprazol\n          <!---->",
+    "description": "kabergolin - aripiprazol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03A"
+    ],
+    "atcGroupB": [
+      "J01D"
+    ],
+    "severity": "warn",
+    "title": "aztreonam - etinylestradiol\n          <!---->",
+    "description": "aztreonam - etinylestradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03A"
+    ],
+    "atcGroupB": [
+      "H03A"
+    ],
+    "severity": "warn",
+    "title": "levotyroxin - etinylestradiol\n          <!---->",
+    "description": "levotyroxin - etinylestradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03A"
+    ],
+    "atcGroupB": [
+      "J01E"
+    ],
+    "severity": "warn",
+    "title": "etinylestradiol - sulfametoxazol\n          <!---->",
+    "description": "etinylestradiol - sulfametoxazol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03A"
+    ],
+    "atcGroupB": [
+      "J01E"
+    ],
+    "severity": "warn",
+    "title": "etinylestradiol - trimetoprim\n          <!---->",
+    "description": "etinylestradiol - trimetoprim\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03A"
+    ],
+    "atcGroupB": [
+      "J01C"
+    ],
+    "severity": "warn",
+    "title": "etinylestradiol - amoxicillin\n          <!---->",
+    "description": "etinylestradiol - amoxicillin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03A"
+    ],
+    "atcGroupB": [
+      "J04A"
+    ],
+    "severity": "danger",
+    "title": "rifabutin - etinylestradiol\n          <!---->",
+    "description": "rifabutin - etinylestradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03A"
+    ],
+    "atcGroupB": [
+      "J01F"
+    ],
+    "severity": "warn",
+    "title": "azitromycin - etinylestradiol\n          <!---->",
+    "description": "azitromycin - etinylestradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03A"
+    ],
+    "atcGroupB": [
+      "J01A"
+    ],
+    "severity": "warn",
+    "title": "etinylestradiol - doxycyklin\n          <!---->",
+    "description": "etinylestradiol - doxycyklin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03A"
+    ],
+    "atcGroupB": [
+      "J01G"
+    ],
+    "severity": "warn",
+    "title": "amikacin - etinylestradiol\n          <!---->",
+    "description": "amikacin - etinylestradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03A"
+    ],
+    "atcGroupB": [
+      "J01M"
+    ],
+    "severity": "warn",
+    "title": "moxifloxacin - etinylestradiol\n          <!---->",
+    "description": "moxifloxacin - etinylestradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03A"
+    ],
+    "atcGroupB": [
+      "N06A"
+    ],
+    "severity": "warn",
+    "title": "agomelatin - etinylestradiol\n          <!---->",
+    "description": "agomelatin - etinylestradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03A"
+    ],
+    "atcGroupB": [
+      "N05C"
+    ],
+    "severity": "warn",
+    "title": "melatonin - etinylestradiol\n          <!---->",
+    "description": "melatonin - etinylestradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03A"
+    ],
+    "atcGroupB": [
+      "N03A"
+    ],
+    "severity": "warn",
+    "title": "etinylestradiol - valproinsyra\n          <!---->",
+    "description": "etinylestradiol - valproinsyra\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03A"
+    ],
+    "atcGroupB": [
+      "N05B"
+    ],
+    "severity": "warn",
+    "title": "etinylestradiol - alprazolam\n          <!---->",
+    "description": "etinylestradiol - alprazolam\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03A"
+    ],
+    "atcGroupB": [
+      "N04B"
+    ],
+    "severity": "warn",
+    "title": "ropinirol - etinylestradiol\n          <!---->",
+    "description": "ropinirol - etinylestradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03C"
+    ],
+    "atcGroupB": [
+      "H03A"
+    ],
+    "severity": "warn",
+    "title": "levotyroxin - estradiol\n          <!---->",
+    "description": "levotyroxin - estradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03C"
+    ],
+    "atcGroupB": [
+      "J04A"
+    ],
+    "severity": "warn",
+    "title": "rifabutin - estradiol\n          <!---->",
+    "description": "rifabutin - estradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03C"
+    ],
+    "atcGroupB": [
+      "N05C"
+    ],
+    "severity": "warn",
+    "title": "melatonin - estradiol\n          <!---->",
+    "description": "melatonin - estradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03C"
+    ],
+    "atcGroupB": [
+      "N06A"
+    ],
+    "severity": "warn",
+    "title": "agomelatin - estradiol\n          <!---->",
+    "description": "agomelatin - estradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03F"
+    ],
+    "atcGroupB": [
+      "H03A"
+    ],
+    "severity": "warn",
+    "title": "levotyroxin - estradiol\n          <!---->",
+    "description": "levotyroxin - estradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03F"
+    ],
+    "atcGroupB": [
+      "J01A"
+    ],
+    "severity": "warn",
+    "title": "noretisteron - doxycyklin\n          <!---->",
+    "description": "noretisteron - doxycyklin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03F"
+    ],
+    "atcGroupB": [
+      "J04A"
+    ],
+    "severity": "danger",
+    "title": "rifabutin - noretisteron\n          <!---->",
+    "description": "rifabutin - noretisteron\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03F"
+    ],
+    "atcGroupB": [
+      "J04A"
+    ],
+    "severity": "warn",
+    "title": "rifabutin - estradiol\n          <!---->",
+    "description": "rifabutin - estradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03F"
+    ],
+    "atcGroupB": [
+      "N05C"
+    ],
+    "severity": "warn",
+    "title": "melatonin - estradiol\n          <!---->",
+    "description": "melatonin - estradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G03F"
+    ],
+    "atcGroupB": [
+      "N06A"
+    ],
+    "severity": "warn",
+    "title": "agomelatin - estradiol\n          <!---->",
+    "description": "agomelatin - estradiol\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  },
+  {
+    "atcGroupA": [
+      "G04C"
+    ],
+    "atcGroupB": [
+      "J01M"
+    ],
+    "severity": "warn",
+    "title": "alfuzosin - moxifloxacin\n          <!---->",
+    "description": "alfuzosin - moxifloxacin\n          <!---->",
+    "recommendation": "Kontrollera på Janusmed för detaljerad information."
+  }
+]
