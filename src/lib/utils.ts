@@ -68,7 +68,7 @@ export function extractDoseUnit(medRaw: string): { amount: number; unit: string 
 // === FASS URL ===
 
 export function getFassUrl(medRaw: string, nplId?: string | null): string {
-  if (nplId) return `https://www.fass.se/LIF/product?nplId=${nplId}&userType=0`;
+  if (nplId && /^\d+$/.test(nplId)) return `https://www.fass.se/LIF/product?nplId=${nplId}&userType=0`;
   return `https://www.fass.se/LIF/result?query=${encodeURIComponent(medRaw.trim())}&userType=0`;
 }
 
