@@ -94,7 +94,7 @@
       />
         {#if ac.visible && ac.results.length > 0}
           <div id="ac-dropdown" class="autocomplete-dropdown" role="listbox">
-            {#each ac.results as d, i}
+            {#each ac.results as d, i (d.nplId ?? d.name)}
               <div id="ac-option-{i}" class="autocomplete-item {i === ac.highlight ? 'active' : ''}" role="option" tabindex="-1" aria-selected={i === ac.highlight} onmousedown={(e) => { e.preventDefault(); ac.select(d); }} onmouseenter={() => ac.highlightAt(i)}>
                 <span class="ac-drug-name">{stripManufacturer(d.name)}</span>
                 <span class="ac-drug-meta">{d.packageSize ?? ''} {d.unit || 'st'} · {d.form || ''}</span>

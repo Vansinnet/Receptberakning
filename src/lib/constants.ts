@@ -21,6 +21,10 @@ export const CONSUMPTION_NORMAL_HIGH = 110;
 // Under 14 dagar kvar visas raden grön.
 export const DAYS_REMAINING_WARN = 14;
 
+// AKTIVT VAL: 14 dagar — tröskel för påminnelse om att kontakta
+// patienten för receptförnyelse (används i textgenerering).
+export const CONTACT_REMINDER_DAYS = 14;
+
 // AKTIVT VAL: 2.5x — vid denna multiplikator av ordinerad dos triggas en
 // datakontrollsvarning. Fångar orimlig inmatning (t.ex. fel enhet) utan att
 // blockera legitima fall (t.ex. titrering).

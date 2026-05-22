@@ -4,7 +4,6 @@ import {
   DEFAULT_PRESCRIBE_MODE,
   DEFAULT_PRESCRIBE_MONTHS,
   DEFAULT_PRESCRIBE_END_DATE,
-  MAX_PRESCRIBE_MONTHS,
   UNIT_DISPLAY,
 } from './constants';
 
@@ -12,6 +11,17 @@ import {
 
 export function canRenewMed(s: RenewableCard): boolean {
   return !!(s.valid && s.calculable !== false && s.decision !== 'no');
+}
+
+function _effectiveStartDate(prescribedEndDateStr: string | undefined, today: Date, startFromToday: boolean): { startDate: Date; startDateStr: string; daysAlreadyCovered: number } {
+  const prescribedEnd = parseDateUTC(prescribedEndDateStr || '');
+  let startDate = (prescribedEnd && prescribedEnd > today) ? prescribedEnd : today;
+  let daysAlreadyCovered = (prescribedEnd && prescribedEnd > today) ? getDaysDiff(prescribedEnd, today) : 0;
+  if (startFromToday) {
+    startDate = today;
+    daysAlreadyCovered = 0;
+  }
+  return { startDate, startDateStr: fmtDate(startDate), daysAlreadyCovered };
 }
 
 // === CALC PRESCRIBE RESULT ===
@@ -38,18 +48,8 @@ export function calcPrescribeResult(
 ): PrescribeResult | null {
   if (!ps) return null;
 
-  const today         = getToday();
-  const prescribedEnd = parseDateUTC(s.prescribedEndDateStr || '');
-
-  let startDate          = (prescribedEnd && prescribedEnd > today) ? prescribedEnd : today;
-  let startDateStr       = fmtDate(startDate);
-  let daysAlreadyCovered = (prescribedEnd && prescribedEnd > today) ? getDaysDiff(prescribedEnd, today) : 0;
-
-  if (ps.startFromToday) {
-    startDate = today;
-    daysAlreadyCovered = 0;
-    startDateStr = fmtDate(startDate);
-  }
+  const today = getToday();
+  const { startDate, startDateStr, daysAlreadyCovered } = _effectiveStartDate(s.prescribedEndDateStr, today, !!ps.startFromToday);
 
   let endDate: Date | null = null;
   let totalDays = 0;
@@ -115,7 +115,7 @@ export interface PrescribeHint {
 
 export function prescribeValidationHint(
   s: PrescribeInput,
-  ps: { packageSize: string; mode?: string; months?: number; endDate?: string } | null
+  ps: { packageSize: string; mode?: string; months?: number; endDate?: string; startFromToday?: boolean } | null
 ): PrescribeHint[] {
   if (!ps) return [];
 
@@ -140,8 +140,7 @@ export function prescribeValidationHint(
       dateHint = { type: 'info', field: 'date', msg: 'Ange ett slutdatum för att beräkna antal förpackningar.' };
     } else {
       const today    = getToday();
-      const prescEnd = parseDateUTC(s.prescribedEndDateStr || '');
-      const start    = (prescEnd && prescEnd > today) ? prescEnd : today;
+      const { startDate: start } = _effectiveStartDate(s.prescribedEndDateStr, today, !!ps.startFromToday);
       const ed       = parseDateUTC(endDateRaw);
       if (!ed)          dateHint = { type: 'warn', field: 'date', msg: 'Ange ett giltigt datum (ÅÅÅÅ-MM-DD).' };
       else if (ed <= start) dateHint = { type: 'warn', field: 'date', msg: `Slutdatumet måste vara efter ${fmtDate(start)}.` };

@@ -28,8 +28,8 @@
   </div>
   <div class="topbar-nav-row">
     <div class="main-tabs" role="tablist">
-      <button class="main-tab {activeTab === 'renew' ? 'active' : ''}" role="tab" aria-selected={activeTab === 'renew'} aria-controls="panel-renew" data-tab="renew" data-tooltip="Beräkna förbrukning och avgör om receptet kan förnyas." onclick={() => onTabChange('renew')}>💊 Receptförnyelse</button>
-      <button class="main-tab {activeTab === 'longterm' ? 'active' : ''}" role="tab" aria-selected={activeTab === 'longterm'} aria-controls="panel-longterm" data-tab="longterm" data-tooltip="Analysera förbrukningsmönster över flera receptperioder." onclick={() => onTabChange('longterm')}>📊 Långvarig förbrukning</button>
+      <button class="main-tab" class:active={activeTab === 'renew'} role="tab" aria-selected={activeTab === 'renew'} aria-controls="panel-renew" data-tab="renew" data-tooltip="Beräkna förbrukning och avgör om receptet kan förnyas." onclick={() => onTabChange('renew')}>💊 Receptförnyelse</button>
+      <button class="main-tab" class:active={activeTab === 'longterm'} role="tab" aria-selected={activeTab === 'longterm'} aria-controls="panel-longterm" data-tab="longterm" data-tooltip="Analysera förbrukningsmönster över flera receptperioder." onclick={() => onTabChange('longterm')}>📊 Långvarig förbrukning</button>
     </div>
     <button class="btn-nurse-toggle" aria-pressed={nurseViewActive} data-tooltip="Växla till sjuksköterskans dokumentationsvy" onclick={() => onNurseToggle()}>🩺 Sjuksköterskevy</button>
     <div class="topbar-right">

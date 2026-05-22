@@ -9,6 +9,10 @@
 
   let dialogEl = $state<HTMLDialogElement | null>(null);
 
+  function handleBackdropClick(e: MouseEvent) {
+    if (e.target === dialogEl) onCancel();
+  }
+
   $effect(() => {
     if (!dialogEl) return;
     if (open && !dialogEl.open) {
@@ -19,7 +23,7 @@
   });
 </script>
 
-<dialog bind:this={dialogEl} class="alert-dialog" aria-describedby="dialog-msg" onclose={() => onCancel()} onclick={(e) => { if (e.target === dialogEl) onCancel(); }}>
+<dialog bind:this={dialogEl} class="alert-dialog" aria-describedby="dialog-msg" onclose={() => onCancel()} onclick={handleBackdropClick}>
   <div class="alert-dialog-content">
     <h3 class="alert-dialog-title">{title}</h3>
     <p id="dialog-msg" class="alert-dialog-msg">{message}</p>

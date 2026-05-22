@@ -1,5 +1,6 @@
 import interactionsManual from './data/interactions.json';
 import interactionsScraped from './data/interactions-scraped.json';
+import type { AtcEntry } from './types';
 
 export interface InteractionRule {
   atcGroupA: string[];
@@ -59,7 +60,7 @@ export function atcMatches(atcCode: string | null | undefined, pattern: string):
   return atcCode ? atcCode.startsWith(pattern) : false;
 }
 
-export function CHECK_INTERACTIONS(atcEntries: Array<{ a: string; i: string; p?: string | null }>): InteractionWarning[] {
+export function CHECK_INTERACTIONS(atcEntries: AtcEntry[]): InteractionWarning[] {
   if (atcEntries.length < 2) return [];
 
   const warnings: InteractionWarning[] = [];

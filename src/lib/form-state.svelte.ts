@@ -74,10 +74,6 @@ export function getActiveResult() { return _activeResult; }
 export function clearCardForm(cardId: number): void {
   const card = medCards.find(c => c._cardId === cardId);
   if (!card) return;
-  card.form = {
-    medRaw: '', dateVal: '', doseRaw: '', amtRaw: '', refRaw: '', leftRaw: '',
-    doseUnit: 'st', doseInterval: 1, notCalculable: false,
-    atcCode: null, nplId: null,
-  };
+  card.form = createEmptyCard(0).form;
   card.decision = null;
 }

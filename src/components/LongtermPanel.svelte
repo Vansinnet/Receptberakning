@@ -10,6 +10,8 @@
 
   let nplId = $derived(getDrugByName(ltState.medRaw)?.nplId ?? null);
 
+  const CLASS_LABELS: Record<string, string> = { over: 'Över', under: 'Under', ok: 'OK' };
+
   function handleAddPeriod() {
     pushLtPeriod();
   }
@@ -38,7 +40,6 @@
   let doseInvalid = $derived(ltState.doseRaw !== '' && ordDose <= 0);
 
   let result = $derived.by((): LTResult => {
-    // Läs ltPeriods för att registrera beroende
     const periods = ltPeriods.map(p => ({ start: p.start, end: p.end, total: p.total }));
     return calcLongtermCore(ltState.medRaw, ordDose, periods, nplId);
   });
@@ -110,7 +111,7 @@
         <button id="addPeriodBtn" class="btn btn-ghost btn-add-period" class:is-hidden={ltPeriods.length >= MAX_LT_PERIODS} data-tooltip="Lägg till ytterligare en period." onclick={handleAddPeriod}>＋ Lägg till period</button>
 
         <div class="lt-form-actions">
-          <a class="btn fass-link btn-ghost {result.valid ? '' : 'is-hidden'}" id="lt-fassBtn" href={result.fassUrl ?? '#'} target="_blank" rel="noopener noreferrer" data-tooltip="Öppnar FASS produktresumé.">FASS</a>
+          <a class="btn fass-link btn-ghost" class:is-hidden={!result.valid} id="lt-fassBtn" href={result.fassUrl ?? '#'} target="_blank" rel="noopener noreferrer" data-tooltip="Öppnar FASS produktresumé.">FASS</a>
           <button id="clearLongtermBtn" class="btn btn-ghost ml-auto" data-tooltip="Rensa alla fält." onclick={handleClear}>Rensa</button>
         </div>
       </div>
@@ -179,7 +180,7 @@
                       <td class="period-cell">{p.start} – {p.end} ({p.days}d)</td>
                       <td class="period-cell mono ph-avg">{p.avg.toFixed(2)}/dag</td>
                       <td class="period-cell mono">{p.consumptionPct >= 100 ? '+' : ''}{(p.consumptionPct - 100).toFixed(1)}%</td>
-                      <td class="period-cell"><span class="badge badge-{p.classification}">{p.classification === 'over' ? 'Över' : p.classification === 'under' ? 'Under' : 'OK'}</span></td>
+                      <td class="period-cell"><span class="badge badge-{p.classification}">{CLASS_LABELS[p.classification] ?? p.classification}</span></td>
                     </tr>
                   {/each}
                 </tbody>

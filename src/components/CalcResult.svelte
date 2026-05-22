@@ -35,6 +35,7 @@
   let texts = $derived(getActiveTexts());
 
   let tlWidthClass = $derived(pctClass(result?.tlPct ?? 0, 'w'));
+  let displayText = $derived(effectiveTab === 'patient' ? (patientLang === 'en' ? texts.patientTextEn : texts.patientText) : texts.journalText);
 </script>
 
 {#if result && result.valid && result.calculable !== false}
@@ -42,7 +43,7 @@
     <!-- Metrics -->
     {#if result.metrics?.length}
       <div class="result-grid">
-        {#each result.metrics as m}
+        {#each result.metrics as m (m.label)}
           <span class="rk" data-tooltip={m.tooltip}>{m.label}</span>
           <span class="rv {m.cls}">{m.value}</span>
         {/each}
@@ -113,11 +114,7 @@
         {/if}
         <button class="copy-tab {effectiveTab === 'journal' ? 'active' : ''}" role="tab" aria-selected={effectiveTab === 'journal'} data-tooltip="Förslag på formulering för dokumentation i journalen." onclick={() => activeTab = 'journal'}>Journalanteckning (förslag)</button>
       </div>
-      <div class="copy-body">
-        {effectiveTab === 'patient'
-          ? (patientLang === 'en' ? texts.patientTextEn : texts.patientText)
-          : texts.journalText}
-      </div>
+      <div class="copy-body">{displayText}</div>
       <div class="copy-footer">
         {#if !nurseViewActive && effectiveTab === 'patient'}
           <button class="btn btn-ghost" id="langBtnResult" data-tooltip="Växla språk på patientmeddelandet" onclick={toggleLang}>
@@ -130,7 +127,7 @@
             {/if}
           </button>
         {/if}
-        <button class="btn btn-ghost" data-tooltip="Kopiera texten till urklipp." use:copyable={() => effectiveTab === 'patient' ? (patientLang === 'en' ? texts.patientTextEn : texts.patientText) : texts.journalText}>📋 Kopiera text</button>
+        <button class="btn btn-ghost" data-tooltip="Kopiera texten till urklipp." use:copyable={() => displayText}>📋 Kopiera text</button>
       </div>
     </div>
   </div>

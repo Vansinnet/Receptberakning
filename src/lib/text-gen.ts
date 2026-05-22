@@ -1,4 +1,5 @@
 import { getToday, parseDateUTC } from './utils';
+import { CONTACT_REMINDER_DAYS } from './constants';
 
 // === PATIENT TEXT ===
 
@@ -56,7 +57,7 @@ function _nounVerb(tpl: typeof TPL.sv | typeof TPL.en, days: number) {
 
 function _contactStr(tpl: typeof TPL.sv | typeof TPL.en, days: number, contact?: string) {
   const isSv = tpl === TPL.sv;
-  return days >= 14 && contact
+  return days >= CONTACT_REMINDER_DAYS && contact
     ? (isSv ? ` Hör av dig närmare ${contact}.` : ` Please contact us again closer to ${contact}.`)
     : '';
 }

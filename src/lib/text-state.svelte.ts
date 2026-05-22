@@ -2,14 +2,13 @@ import type { CalcResult, MedCard, CardStatusCache, CardResult, CardsForTextEntr
 import type { PrescribeResult } from './prescribe-calc';
 import { validateValues, calcCore } from './calc';
 import { stripManufacturer, parseDateUTC, fmtDate } from './utils';
-import { calcPrescribeResult, canRenewMed } from './prescribe-calc';
+import { CONTACT_REMINDER_DAYS } from './constants';
+import { calcPrescribeResult } from './prescribe-calc';
 import { buildPatientText, buildJournalText, buildNurseJournalText } from './text-gen';
 import { appState, medCards, resetNurseState, createEmptyCard, getActiveResult } from './form-state.svelte';
 import { getPrescribeState, clearPrescribeState, clearCardPrescribeState } from './prescribe-state.svelte';
 import { ltState, resetLtPeriods } from './longterm-state.svelte';
-import { _cardResultsCache, _cardStatus, getCardStatus, getCachedResult, _resetCaches } from './cache-state.svelte';
-
-export { type CardStatusCache, type CardResult } from './types';
+import { _cardResultsCache, _cardStatus, _resetCaches } from './cache-state.svelte';
 
 interface TextResult {
   patientText: string;
@@ -147,7 +146,7 @@ function _buildTextResult(
 
   const ptCards = cardsForText.map(c => {
     let contactDateStr = '';
-    if (c.daysToPrescribedEnd >= 14 && c.prescribedEndDateStr) {
+      if (c.daysToPrescribedEnd >= CONTACT_REMINDER_DAYS && c.prescribedEndDateStr) {
       const parsed = parseDateUTC(c.prescribedEndDateStr);
       if (parsed) {
         parsed.setUTCDate(parsed.getUTCDate() - 7);
@@ -249,16 +248,10 @@ export function getTextsState() { return _texts; }
 
 const _hasSummary = $derived.by(() => {
   let count = 0;
+  const summary = _prescribeData.summary;
   for (let i = 0; i < medCards.length; i++) {
-    const ps = getPrescribeState(medCards[i]._cardId);
-    if (!ps || !ps.packageSize) continue;
-    const status = _cardStatus[medCards[i]._cardId];
-    if (!canRenewMed({
-      _cardId: medCards[i]._cardId,
-      valid: status?.valid ?? false,
-      calculable: status?.calculable ?? false,
-      decision: medCards[i].decision,
-    })) continue;
+    if (!summary[medCards[i]._cardId]) continue;
+    if (medCards[i].decision === 'no') continue;
     count++;
   }
   return count >= 2;

@@ -164,7 +164,7 @@ export function calcCore(inputData: CalcInput): CalcResult {
 
   const doseInterval     = inputData.doseInterval || 1;
   const doseUnit: DoseUnit = inputData.doseUnit     || 'st';
-  const intervalLabel    = INTERVAL_LABELS[doseInterval] || 'dag';
+  const intervalLabel    = INTERVAL_LABELS[doseInterval];
   const doseUnitLabel    = `${doseUnit}/${intervalLabel}`;
   const effectiveDailyDose = inputData.dose / doseInterval;
 

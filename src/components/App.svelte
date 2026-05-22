@@ -13,6 +13,7 @@
   import { canRenewMed } from '$lib/prescribe-calc';
   import { VALID_THEMES } from '$lib/constants';
   import { createInactivityTimer } from '$lib/inactivity.svelte';
+  import type { AtcEntry } from '$lib/types';
   import GitHubIcon from './GitHubIcon.svelte';
 
   let activeTab = $state<'renew' | 'longterm'>('renew');
@@ -26,7 +27,7 @@
   let result = $derived(getActiveResult());
 
   let interactionWarnings = $derived.by(() => {
-    const entries: Array<{ a: string; i: string; p: string | null }> = [];
+    const entries: AtcEntry[] = [];
     for (let i = 0; i < medCards.length; i++) {
       const c = medCards[i];
       if (c?.form?.atcCode && c.form.medRaw) {
@@ -150,7 +151,7 @@
             </section>
 
             <!-- KOLUMN 5: Förskrivningspanel (alltid i DOM, reserverar plats) -->
-            <PrescribePanel visible={showPrescribe && !appState.nurseViewActive} />
+            <PrescribePanel visible={showPrescribe && !appState.nurseViewActive} eligible={prescribeVisible} />
           </div>
         </div>
 

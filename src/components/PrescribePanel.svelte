@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { medCards, getPrescribeState, applyPrescribeStatePatch, appState, getCardStatus, getActiveResult, getHasSummary, getCachedResult, getPrescribeSummary, getActivePrescribeResult } from '$lib/state.svelte';
+  import { medCards, getPrescribeState, applyPrescribeStatePatch, appState, getCardStatus, getActiveResult, getHasSummary, getPrescribeSummary, getActivePrescribeResult } from '$lib/state.svelte';
   import { canRenewMed, prescribeValidationHint } from '$lib/prescribe-calc';
-  import { UNIT_DISPLAY, DEFAULT_PRESCRIBE_MODE, DEFAULT_PRESCRIBE_MONTHS } from '$lib/constants';
+  import { UNIT_DISPLAY, DEFAULT_PRESCRIBE_MODE, DEFAULT_PRESCRIBE_MONTHS, MAX_PRESCRIBE_MONTHS } from '$lib/constants';
   import { applyDateMask } from '$lib/utils';
 
-  let { visible = false } = $props();
+  let { visible = false, eligible = false } = $props();
 
   let card = $derived(medCards[appState.activeMedIdx] ?? null);
   let result = $derived(getActiveResult());
@@ -13,13 +13,6 @@
   let entryMode = $derived(psEntry?.mode ?? DEFAULT_PRESCRIBE_MODE);
   let entryMonths = $derived(psEntry?.months ?? DEFAULT_PRESCRIBE_MONTHS);
   let entryEndDate = $derived(psEntry?.endDate ?? '');
-
-  let eligible = $derived(card && result ? canRenewMed({
-    _cardId: card._cardId,
-    valid: result.valid ?? false,
-    calculable: result.calculable ?? false,
-    decision: card.decision,
-  }) : false);
 
   let displayPkgSize = $derived.by(() => {
     if (!card || !result?.valid || !result?.calculable) return '';
@@ -56,6 +49,16 @@
 
   let hasSummary = $derived(getHasSummary());
   let prescribeSummaries = $derived(getPrescribeSummary());
+
+  const MONTH_OPTIONS = Array.from({ length: MAX_PRESCRIBE_MONTHS }, (_, i) => i + 1);
+
+  let validationHints = $derived.by(() => {
+    if (!card || !psEntry) return [];
+    return prescribeValidationHint(
+      { _cardId: card._cardId, prescribedEndDateStr: result?.prescribedEndDateStr },
+      psEntry,
+    );
+  });
 </script>
 
 <section class="prescribe-panel" class:is-hidden={!visible} aria-label="Ny förskrivning">
@@ -69,7 +72,7 @@
         <div class="field">
           <label for="ps-global-months" data-tooltip="Antal månader som den nya förskrivningen ska täcka.">Förskriva i antal månader</label>
           <select id="ps-global-months" class="prescribe-select" value={entryMonths} onchange={handleMonthsChange}>
-            {#each Array.from({ length: 12 }, (_, i) => i + 1) as m}
+            {#each MONTH_OPTIONS as m}
               <option value={m}>{m === 1 ? '1 månad' : `${m} månader`}</option>
             {/each}
           </select>
@@ -119,10 +122,7 @@
           {:else if prescResult && prescResult.packages === 0 && prescResult.totalDays === 0 && prescResult.daysAlreadyCovered > 0}
             <div class="prescribe-result-covered">Nuvarande recept täcker redan hela perioden.</div>
           {:else if psEntry}
-            {#each prescribeValidationHint(
-              { _cardId: card._cardId, prescribedEndDateStr: result.prescribedEndDateStr },
-              psEntry
-            ) as hint}
+            {#each validationHints as hint}
               <div class="alert alert-{hint.type}" role="alert">{hint.msg}</div>
             {/each}
           {/if}

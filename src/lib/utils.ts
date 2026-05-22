@@ -80,18 +80,11 @@ export function getFassUrl(medRaw: string, nplId?: string | null): string {
 
 // === TILLVERKARSTRIPPNING ===
 
-let _mfrRe: RegExp | null = null;
-
-function buildMfrRe(): RegExp {
-  if (_mfrRe) return _mfrRe;
-  const all = COMPOUND_MFR_NAMES.concat(SINGLE_MFR_NAMES);
-  _mfrRe = new RegExp("\\b(?:" + all.join("|") + ")\\b", "gi");
-  return _mfrRe;
-}
+const _mfrRe = new RegExp("\\b(?:" + COMPOUND_MFR_NAMES.concat(SINGLE_MFR_NAMES).join("|") + ")\\b", "gi");
 
 export function stripManufacturer(name: string): string {
   if (!name) return name;
-  return name.replace(buildMfrRe(), "").replace(/\s+/g, " ").trim();
+  return name.replace(_mfrRe, "").replace(/\s+/g, " ").trim();
 }
 
 export function pctClass(pct: number, prefix: string): string {
