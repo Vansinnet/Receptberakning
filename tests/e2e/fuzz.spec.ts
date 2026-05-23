@@ -1,6 +1,7 @@
 /**
- * Fuzz-test: 200 realistiska kliniska användningar av Receptberäkning 4.0.
+ * Fuzz-test: 2000 realistiska kliniska användningar av Receptberäkning 4.0.
  * Simulerar en läkares arbetsdag med receptförnyelser.
+ * Inkluderar interaktions-stress och memory tracking.
  *
  * Kräver: npm run dev (Vite dev-server på port 5173)
  * Körning: npx playwright test tests/e2e/fuzz.spec.ts
@@ -22,6 +23,8 @@ interface Scenario {
   amt: string;
   ref: string;
   left: string;
+  atc?: string;
+  nplId?: string;
   expected: 'valid' | 'empty' | 'notCalc' | 'calcFail';
   extra?: (p: Page) => Promise<void>;
 }
@@ -279,6 +282,127 @@ const SEQUENCES: Scenario[] = [
       await expect(p.locator('.med-item')).toHaveCount(1);
     },
   },
+
+  // ==================== 10× INTERAKTIONS-STRESS ====================
+
+  // 51 warfarin (B01AA) + NSAID (M01AE) → danger
+  {
+    med: 'Waran 2.5 mg', date: '2025-01-01', dose: '1', amt: '100', ref: '3', left: '',
+    atc: 'B01AA03', nplId: '20000101000016', expected: 'valid',
+    extra: async (p) => {
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.pushMedCard(); m.appState.activeMedIdx = m.medCards.length - 1; });
+      const mod = await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); const f = m.medCards[m.appState.activeMedIdx].form; f.medRaw = 'Ipren 400 mg'; f.dateVal = '2025-01-01'; f.doseRaw = '1'; f.amtRaw = '100'; f.refRaw = '3'; f.atcCode = 'M01AE01'; return 'ok'; });
+      await p.waitForTimeout(300);
+      await expect(p.locator('#interactionAlerts')).toBeVisible();
+    },
+  },
+
+  // 52 SSRI (N06AB) + tramadol (N02AX)
+  {
+    med: 'Sertralin 50 mg', date: '2024-07-01', dose: '1', amt: '100', ref: '3', left: '',
+    atc: 'N06AB04', expected: 'valid',
+    extra: async (p) => {
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.pushMedCard(); m.appState.activeMedIdx = m.medCards.length - 1; });
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); const f = m.medCards[m.appState.activeMedIdx].form; f.medRaw = 'Tramadol 50 mg'; f.dateVal = '2024-09-01'; f.doseRaw = '1'; f.amtRaw = '100'; f.refRaw = '3'; f.atcCode = 'N02AX02'; });
+      await p.waitForTimeout(300);
+      await expect(p.locator('#interactionAlerts')).toBeVisible();
+    },
+  },
+
+  // 53 ACE-hämmare (C09AA) + kaliumsparande diuretika (C03DA)
+  {
+    med: 'Enalapril 10 mg', date: '2024-08-01', dose: '1', amt: '100', ref: '3', left: '',
+    atc: 'C09AA02', expected: 'valid',
+    extra: async (p) => {
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.pushMedCard(); m.appState.activeMedIdx = m.medCards.length - 1; });
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); const f = m.medCards[m.appState.activeMedIdx].form; f.medRaw = 'Spironolakton 25 mg'; f.dateVal = '2024-08-01'; f.doseRaw = '1'; f.amtRaw = '100'; f.refRaw = '3'; f.atcCode = 'C03DA01'; });
+      await p.waitForTimeout(300);
+      await expect(p.locator('#interactionAlerts')).toBeVisible();
+    },
+  },
+
+  // 54 warfarin + SSRI + NSAID — 3 läkemedel, flera korsinteraktioner
+  {
+    med: 'Waran 2.5 mg', date: '2025-01-01', dose: '1', amt: '100', ref: '3', left: '',
+    atc: 'B01AA03', expected: 'valid',
+    extra: async (p) => {
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.pushMedCard(); m.appState.activeMedIdx = m.medCards.length - 1; });
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); const f = m.medCards[m.appState.activeMedIdx].form; f.medRaw = 'Sertralin 50 mg'; f.dateVal = '2025-01-01'; f.doseRaw = '1'; f.amtRaw = '100'; f.refRaw = '3'; f.atcCode = 'N06AB04'; });
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.pushMedCard(); m.appState.activeMedIdx = m.medCards.length - 1; });
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); const f = m.medCards[m.appState.activeMedIdx].form; f.medRaw = 'Ipren 400 mg'; f.dateVal = '2025-01-01'; f.doseRaw = '1'; f.amtRaw = '100'; f.refRaw = '3'; f.atcCode = 'M01AE01'; });
+      await p.waitForTimeout(400);
+      const count = await p.locator('#interactionAlerts .interaction-alert').count();
+      expect(count).toBeGreaterThanOrEqual(2);
+    },
+  },
+
+  // 55 litium (N05AN) + NSAID (M01AE)
+  {
+    med: 'Litium 300 mg', date: '2025-01-01', dose: '1', amt: '100', ref: '3', left: '',
+    atc: 'N05AN01', expected: 'valid',
+    extra: async (p) => {
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.pushMedCard(); m.appState.activeMedIdx = m.medCards.length - 1; });
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); const f = m.medCards[m.appState.activeMedIdx].form; f.medRaw = 'Ipren 400 mg'; f.dateVal = '2025-01-01'; f.doseRaw = '1'; f.amtRaw = '100'; f.refRaw = '3'; f.atcCode = 'M01AE01'; });
+      await p.waitForTimeout(300);
+      await expect(p.locator('#interactionAlerts')).toBeVisible();
+    },
+  },
+
+  // 56 SSRI (N06AB) + MAO (N06AF) — danger
+  {
+    med: 'Sertralin 50 mg', date: '2024-07-01', dose: '1', amt: '100', ref: '3', left: '',
+    atc: 'N06AB04', expected: 'valid',
+    extra: async (p) => {
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.pushMedCard(); m.appState.activeMedIdx = m.medCards.length - 1; });
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); const f = m.medCards[m.appState.activeMedIdx].form; f.medRaw = 'MAO-hämmare X'; f.dateVal = '2024-07-01'; f.doseRaw = '1'; f.amtRaw = '100'; f.refRaw = '3'; f.atcCode = 'N06AF05'; });
+      await p.waitForTimeout(300);
+      await expect(p.locator('#interactionAlerts')).toBeVisible();
+    },
+  },
+
+  // 57 3 olika blodtrycksläkemedel + NSAID — komplex multi-interaktion
+  {
+    med: 'Enalapril 10 mg', date: '2024-08-01', dose: '1', amt: '100', ref: '3', left: '',
+    atc: 'C09AA02', expected: 'valid',
+    extra: async (p) => {
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.pushMedCard(); m.appState.activeMedIdx = m.medCards.length - 1; });
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); const f = m.medCards[m.appState.activeMedIdx].form; f.medRaw = 'Losartan 50 mg'; f.dateVal = '2024-08-01'; f.doseRaw = '1'; f.amtRaw = '100'; f.refRaw = '3'; f.atcCode = 'C09CA01'; });
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.pushMedCard(); m.appState.activeMedIdx = m.medCards.length - 1; });
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); const f = m.medCards[m.appState.activeMedIdx].form; f.medRaw = 'Tiazid 25 mg'; f.dateVal = '2024-08-01'; f.doseRaw = '1'; f.amtRaw = '100'; f.refRaw = '3'; f.atcCode = 'C03AA03'; });
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.pushMedCard(); m.appState.activeMedIdx = m.medCards.length - 1; });
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); const f = m.medCards[m.appState.activeMedIdx].form; f.medRaw = 'Ipren 400 mg'; f.dateVal = '2024-08-01'; f.doseRaw = '1'; f.amtRaw = '100'; f.refRaw = '3'; f.atcCode = 'M01AE01'; });
+      await p.waitForTimeout(500);
+      const count = await p.locator('#interactionAlerts .interaction-alert').count();
+      expect(count).toBeGreaterThanOrEqual(2);
+    },
+  },
+
+  // 58 warfarin + makrolid (J01FA) + SSRI
+  {
+    med: 'Waran 2.5 mg', date: '2025-01-01', dose: '1', amt: '100', ref: '3', left: '',
+    atc: 'B01AA03', expected: 'valid',
+    extra: async (p) => {
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.pushMedCard(); m.appState.activeMedIdx = m.medCards.length - 1; });
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); const f = m.medCards[m.appState.activeMedIdx].form; f.medRaw = 'Erytromycin 250 mg'; f.dateVal = '2025-01-01'; f.doseRaw = '1'; f.amtRaw = '100'; f.refRaw = '3'; f.atcCode = 'J01FA01'; });
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); m.pushMedCard(); m.appState.activeMedIdx = m.medCards.length - 1; });
+      await p.evaluate(async () => { const m = await import('/src/lib/state.svelte.ts'); const f = m.medCards[m.appState.activeMedIdx].form; f.medRaw = 'Sertralin 50 mg'; f.dateVal = '2025-01-01'; f.doseRaw = '1'; f.amtRaw = '100'; f.refRaw = '3'; f.atcCode = 'N06AB04'; });
+      await p.waitForTimeout(400);
+      await expect(p.locator('#interactionAlerts')).toBeVisible();
+    },
+  },
+
+  // 59 Rensa allt efter stress
+  {
+    med: 'Metformin 500 mg', date: '2025-01-01', dose: '2', amt: '100', ref: '3', left: '', expected: 'valid',
+    extra: async (p) => {
+      await p.evaluate(async () => {
+        const mod = await import('/src/lib/state.svelte.ts');
+        mod.clearAllMedState();
+      });
+      await p.waitForTimeout(200);
+      await expect(p.locator('.med-item')).toHaveCount(1);
+    },
+  },
 ];
 
 // ============================================================
@@ -298,7 +422,7 @@ function fmtSeq(n: number): string {
 
 async function fillForm(page: Page, seq: number, s: Scenario, errors: LogEntry[]) {
   try {
-    const patched = await page.evaluate(async ({ med, date, dose, doseInterval, amt, ref, left }) => {
+    const patched = await page.evaluate(async ({ med, date, dose, doseInterval, amt, ref, left, atc, nplId }) => {
       try {
         const mod = await import('/src/lib/state.svelte.ts');
         const idx = mod.appState.activeMedIdx;
@@ -311,11 +435,13 @@ async function fillForm(page: Page, seq: number, s: Scenario, errors: LogEntry[]
         form.amtRaw = amt;
         form.refRaw = ref;
         form.leftRaw = left || '';
+        if (atc) form.atcCode = atc;
+        if (nplId) form.nplId = nplId;
         return 'ok';
       } catch (e: any) {
         return 'err:' + (e.message || String(e));
       }
-    }, { med: s.med, date: s.date, dose: s.dose, doseInterval: s.doseInterval || '', amt: s.amt, ref: s.ref, left: s.left });
+    }, { med: s.med, date: s.date, dose: s.dose, doseInterval: s.doseInterval || '', amt: s.amt, ref: s.ref, left: s.left, atc: s.atc || '', nplId: s.nplId || '' });
     if (patched !== 'ok') {
       errors.push({ seq, type: 'consistency', msg: `fillForm state-mutation: ${patched}`, detail: fmtSeq(seq) });
     }
@@ -393,12 +519,13 @@ async function checkConsistency(page: Page, seq: number, s: Scenario, errors: Lo
 }
 
 // ============================================================
-// 3. TEST — 200 simuleringar (50 sekvenser × 4 varv)
+// 3. TEST — 2000 simuleringar (100 sekvenser × 20 varv)
 // ============================================================
 
-function build200Scenarios(): Scenario[] {
+function build2000Scenarios(): Scenario[] {
+  const ROUNDS = 20;
   const result: Scenario[] = [];
-  for (let round = 0; round < 4; round++) {
+  for (let round = 0; round < ROUNDS; round++) {
     for (const s of SEQUENCES) {
       result.push({ ...s });
     }
@@ -406,16 +533,17 @@ function build200Scenarios(): Scenario[] {
   return result;
 }
 
-test.describe('Fuzz — 200 realistiska kliniska användningar', () => {
-  test('Simulera 200 receptförnyelser', async ({ page }) => {
-    test.setTimeout(600_000);
+test.describe('Fuzz — 2000 realistiska kliniska användningar', () => {
+  test('Simulera 2000 receptförnyelser', async ({ page }) => {
+    test.setTimeout(900_000);
 
-    const SCENARIOS = build200Scenarios();
+    const SCENARIOS = build2000Scenarios();
     const errors: LogEntry[] = [];
     let lastConsoleErrorCount = 0;
     let lastPageErrorCount = 0;
     const allConsoleErrors: string[] = [];
     const allPageErrors: string[] = [];
+    const memorySamples: Array<{ seq: number; usedMB: number; limitMB: number }> = [];
 
     page.on('console', msg => {
       if (msg.type() === 'error') allConsoleErrors.push(msg.text());
@@ -476,14 +604,25 @@ test.describe('Fuzz — 200 realistiska kliniska användningar', () => {
         });
       }
 
-      await page.waitForTimeout(80);
+      await page.waitForTimeout(50);
 
       // Fill form via state mutation
       await fillForm(page, seq, s, errors);
-      await page.waitForTimeout(200);
+      await page.waitForTimeout(100);
 
       // Run consistency checks
       await checkConsistency(page, seq, s, errors);
+
+      // Memory tracking
+      try {
+        const mem = await page.evaluate(() => {
+          const p = (performance as any).memory;
+          return p && typeof p.usedJSHeapSize === 'number'
+            ? { used: p.usedJSHeapSize / 1e6, limit: p.jsHeapSizeLimit / 1e6 }
+            : null;
+        });
+        if (mem) memorySamples.push({ seq, usedMB: mem.used, limitMB: mem.limit });
+      } catch { /* memory API not available */ }
 
       // Record any new console/page errors
       if (allConsoleErrors.length > lastConsoleErrorCount) {
@@ -529,13 +668,28 @@ test.describe('Fuzz — 200 realistiska kliniska användningar', () => {
     const sortedErrors = [...errorGroups.entries()].sort((a, b) => b[1] - a[1]);
 
     console.log('='.repeat(72));
-    console.log('  FUZZ TEST RAPPORT — 200 realistiska användningar');
+    console.log('  FUZZ TEST RAPPORT — 2000 realistiska användningar');
     console.log('='.repeat(72));
     console.log(`  Totalt fel: ${errors.length}`);
     console.log(`    Console errors:  ${consoleErrCount}`);
     console.log(`    Page errors:     ${pageErrCount}`);
     console.log(`    Consistency:     ${consistencyFailCount}`);
     console.log(`  Rena sekvenser:  ${cleanSeqs}/${SCENARIOS.length} (${Math.round(cleanSeqs / SCENARIOS.length * 100)}%)`);
+
+    if (memorySamples.length > 0) {
+      const firstMem = memorySamples[0];
+      const lastMem = memorySamples[memorySamples.length - 1];
+      const mbs: number[] = memorySamples.map(s => s.usedMB);
+      const maxMem = Math.max(...mbs);
+      const avgMem = mbs.reduce((a, b) => a + b, 0) / mbs.length;
+      console.log('-'.repeat(72));
+      console.log('  Memory (JS heap):');
+      console.log(`    Första: ${firstMem.usedMB.toFixed(1)} MB | Sista: ${lastMem.usedMB.toFixed(1)} MB`);
+      console.log(`    Max:    ${maxMem.toFixed(1)} MB | Snitt:  ${avgMem.toFixed(1)} MB`);
+      console.log(`    Limit:  ${firstMem.limitMB.toFixed(0)} MB`);
+      const leakSuspected = lastMem.usedMB > firstMem.usedMB * 1.5;
+      if (leakSuspected) console.log(`    ⚠ VARNING: Minnesanvändning ökat >50% — misstänkt läcka`);
+    }
     console.log('-'.repeat(72));
 
     if (sortedErrors.length > 0) {
