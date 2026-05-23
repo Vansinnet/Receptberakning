@@ -138,10 +138,8 @@ describe('CHECK_INTERACTIONS — deduplicering', () => {
 
 // =====================================================
 // CHECK_INTERACTIONS — kliniskt verifierade interaktioner
-// Dessa interaktioner är bekräftade via nuvarande scrapad data (ATC4).
-// Efter ATC5-scraping: kör om och verifiera att följande par finns:
-//   warfarin + NSAID, SSRI + MAO-hämmare, litium + NSAID,
-//   klopidogrel + omeprazol
+// Verifierar att ATC5-scrapad Janusmed-data täcker kända interaktioner.
+// Om någon fallerar: Janusmed saknar data för just det paret.
 // =====================================================
 
 describe('CHECK_INTERACTIONS — kliniskt verifierade', () => {
@@ -149,6 +147,38 @@ describe('CHECK_INTERACTIONS — kliniskt verifierade', () => {
     const result = CHECK_INTERACTIONS([
       { i: '0', a: 'C09AA02' },
       { i: '1', a: 'C03DA01' },
+    ]);
+    expect(result.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('warfarin + NSAID → interaktion finns', () => {
+    const result = CHECK_INTERACTIONS([
+      { i: '0', a: 'B01AA03' },
+      { i: '1', a: 'M01AE01' },
+    ]);
+    expect(result.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('SSRI + MAO-hämmare → interaktion finns', () => {
+    const result = CHECK_INTERACTIONS([
+      { i: '0', a: 'N06AB04' },
+      { i: '1', a: 'N06AF05' },
+    ]);
+    expect(result.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('tramadol + SSRI → serotonerg interaktion finns', () => {
+    const result = CHECK_INTERACTIONS([
+      { i: '0', a: 'N02AX02' },
+      { i: '1', a: 'N06AB04' },
+    ]);
+    expect(result.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('litium + NSAID → interaktion finns', () => {
+    const result = CHECK_INTERACTIONS([
+      { i: '0', a: 'N05AN01' },
+      { i: '1', a: 'M01AE01' },
     ]);
     expect(result.length).toBeGreaterThanOrEqual(1);
   });
