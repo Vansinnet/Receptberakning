@@ -49,6 +49,8 @@
 
   let showPrescribe = $derived(prescribeVisible || getHasSummary());
 
+  let allNplIds = $derived(medCards.filter(c => c?.form?.nplId).map(c => c.form.nplId as string));
+
   function handleTabChange(tab: 'renew' | 'longterm') {
     activeTab = tab;
   }
@@ -135,7 +137,7 @@
 
             <!-- KOLUMN 4: Resultat -->
             <section class="result-panel" id="resultPanel" aria-label="Beräkningsresultat">
-              <InteractionAlerts warnings={interactionWarnings} />
+              <InteractionAlerts warnings={interactionWarnings} allNplIds={allNplIds} />
               {#if result?.valid && result?.calculable !== false}
                 <CalcResult
                   result={result}
