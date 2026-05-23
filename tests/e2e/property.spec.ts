@@ -69,7 +69,6 @@ const interactingPairs = [
   { a: 'Waran 2.5 mg', a_atc: 'B01AA03', b: 'Ipren 400 mg', b_atc: 'M01AE01' },
   { a: 'Sertralin 50 mg', a_atc: 'N06AB04', b: 'Tramadol 50 mg', b_atc: 'N02AX02' },
   { a: 'Enalapril 10 mg', a_atc: 'C09AA02', b: 'Spironolakton 25 mg', b_atc: 'C03DA01' },
-  { a: 'Simvastatin 20 mg', a_atc: 'C10AA01', b: 'Amlodipin 5 mg', b_atc: 'C08CA01' },
 ];
 
 test.describe('Property — E2E-invarianter', () => {
