@@ -8,10 +8,6 @@ export function getCardStatus(cardId: number): CardStatusCache | undefined {
   return _cardStatus[cardId];
 }
 
-export function getCachedResult(cardId: number): CardResult | null {
-  return _cardResultsCache[cardId]?.cr ?? null;
-}
-
 export function _resetCaches(): void {
   for (const key of Object.keys(_cardResultsCache)) { delete _cardResultsCache[Number(key)]; }
   for (const key of Object.keys(_cardStatus)) { delete _cardStatus[Number(key)]; }

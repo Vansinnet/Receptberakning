@@ -13,6 +13,7 @@
   import { canRenewMed } from '$lib/prescribe-calc';
   import { VALID_THEMES } from '$lib/constants';
   import { createInactivityTimer } from '$lib/inactivity.svelte';
+  import type { AtcEntry } from '$lib/types';
   import GitHubIcon from './GitHubIcon.svelte';
 
   let activeTab = $state<'renew' | 'longterm'>('renew');
@@ -23,9 +24,10 @@
     () => medCards.some(c => c.form.medRaw !== ''),
   );
   let card = $derived(medCards[appState.activeMedIdx] ?? null);
+  let result = $derived(getActiveResult());
 
   let interactionWarnings = $derived.by(() => {
-    const entries: Array<{ a: string; i: string; p: string | null }> = [];
+    const entries: AtcEntry[] = [];
     for (let i = 0; i < medCards.length; i++) {
       const c = medCards[i];
       if (c?.form?.atcCode && c.form.medRaw) {
@@ -37,16 +39,17 @@
   });
 
   let prescribeVisible = $derived.by(() => {
-    const r = getActiveResult();
-    return card && r ? canRenewMed({
+    return card && result ? canRenewMed({
       _cardId: card._cardId,
-      valid: r.valid ?? false,
-      calculable: r.calculable ?? false,
+      valid: result.valid ?? false,
+      calculable: result.calculable ?? false,
       decision: card.decision,
     }) : false;
   });
 
   let showPrescribe = $derived(prescribeVisible || getHasSummary());
+
+  let allNplIds = $derived(medCards.filter(c => c?.form?.nplId).map(c => c.form.nplId as string));
 
   function handleTabChange(tab: 'renew' | 'longterm') {
     activeTab = tab;
@@ -116,7 +119,7 @@
     />
 
     <main id="main-content">
-        <div id="panel-renew" class="tab-panel" class:active={activeTab === 'renew'} class:is-hidden={activeTab !== 'renew'} role="tabpanel" aria-labelledby="heading-renew">
+        <div id="panel-renew" class="tab-panel" class:active={activeTab === 'renew'} role="tabpanel" aria-labelledby="heading-renew">
           <h2 class="sr-only" id="heading-renew">Receptförnyelse</h2>
           <div class="renew-layout">
             <!-- KOLUMN 1: Läkemedelslista -->
@@ -134,27 +137,27 @@
 
             <!-- KOLUMN 4: Resultat -->
             <section class="result-panel" id="resultPanel" aria-label="Beräkningsresultat">
-              <InteractionAlerts warnings={interactionWarnings} />
-              {#if getActiveResult()?.valid && getActiveResult()?.calculable !== false}
+              <InteractionAlerts warnings={interactionWarnings} allNplIds={allNplIds} />
+              {#if result?.valid && result?.calculable !== false}
                 <CalcResult
-                  result={getActiveResult()}
+                  result={result}
                   nurseViewActive={appState.nurseViewActive}
                   onDecision={handleEarlyDecision}
                 />
               {:else}
                 <div class="result-empty-state">
                   <div class="empty-icon" aria-hidden="true">📋</div>
-                  <div>{getActiveResult()?.statusText || 'Fyll i formuläret för att se resultatet'}</div>
+                  <div>{result?.statusText || 'Fyll i formuläret för att se resultatet'}</div>
                 </div>
               {/if}
             </section>
 
             <!-- KOLUMN 5: Förskrivningspanel (alltid i DOM, reserverar plats) -->
-            <PrescribePanel visible={showPrescribe && !appState.nurseViewActive} />
+            <PrescribePanel visible={showPrescribe && !appState.nurseViewActive} eligible={prescribeVisible} />
           </div>
         </div>
 
-        <div id="panel-longterm" class="tab-panel" class:active={activeTab === 'longterm'} class:is-hidden={activeTab !== 'longterm'} role="tabpanel" aria-labelledby="heading-longterm">
+        <div id="panel-longterm" class="tab-panel" class:active={activeTab === 'longterm'} role="tabpanel" aria-labelledby="heading-longterm">
           <h2 class="sr-only" id="heading-longterm">Långvarig förbrukningsanalys</h2>
           <LongtermPanel />
         </div>

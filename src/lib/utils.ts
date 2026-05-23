@@ -7,6 +7,10 @@ import {
   COMPOUND_MFR_NAMES,
   SINGLE_MFR_NAMES,
   PROGRESS_BAR_STEP_PCT,
+  STRENGTH_UNIT_PATTERN,
+  CONSUMPTION_NORMAL_LOW,
+  CONSUMPTION_NORMAL_HIGH,
+  DAYS_REMAINING_WARN,
 } from './constants';
 
 // === DATUM ===
@@ -56,8 +60,10 @@ export function parseDateUTC(str: string): Date | null {
 
 // === DOSE UNIT EXTRACTION ===
 
+const _doseUnitRe = new RegExp('(\\d+(?:[.,]\\d+)?)\\s*(' + STRENGTH_UNIT_PATTERN + ')\\b', 'i');
+
 export function extractDoseUnit(medRaw: string): { amount: number; unit: string } | null {
-  const m = medRaw.match(/(\d+(?:[.,]\d+)?)\s*(mg|ml|µg|μg|mikrogram|mikrog|microgram|mcg|nanogram|gram|ng|IU|IE|g|mmol)\b/i);
+  const m = medRaw.match(_doseUnitRe);
   if (!m) return null;
   const amount  = parseFloat(m[1].replace(',', '.'));
   const rawUnit = m[2].toLowerCase();
@@ -74,18 +80,11 @@ export function getFassUrl(medRaw: string, nplId?: string | null): string {
 
 // === TILLVERKARSTRIPPNING ===
 
-let _mfrRe: RegExp | null = null;
-
-function buildMfrRe(): RegExp {
-  if (_mfrRe) return _mfrRe;
-  const all = COMPOUND_MFR_NAMES.concat(SINGLE_MFR_NAMES);
-  _mfrRe = new RegExp("\\b(?:" + all.join("|") + ")\\b", "gi");
-  return _mfrRe;
-}
+const _mfrRe = new RegExp("\\b(?:" + COMPOUND_MFR_NAMES.concat(SINGLE_MFR_NAMES).join("|") + ")\\b", "gi");
 
 export function stripManufacturer(name: string): string {
   if (!name) return name;
-  return name.replace(buildMfrRe(), "").replace(/\s+/g, " ").trim();
+  return name.replace(_mfrRe, "").replace(/\s+/g, " ").trim();
 }
 
 export function pctClass(pct: number, prefix: string): string {
@@ -123,4 +122,10 @@ export function applyDateMask(input: HTMLInputElement, onChanged: (val: string) 
       try { input.setSelectionRange(target, target); } catch (_) {}
     });
   }
+}
+
+export function needsRenewalWarning(consumptionPct: number, daysToPrescribedEnd: number): boolean {
+  return consumptionPct < CONSUMPTION_NORMAL_LOW
+    || consumptionPct > CONSUMPTION_NORMAL_HIGH
+    || daysToPrescribedEnd >= DAYS_REMAINING_WARN;
 }

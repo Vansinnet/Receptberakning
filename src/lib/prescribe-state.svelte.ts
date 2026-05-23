@@ -6,10 +6,6 @@ export function getPrescribeState(cardId: number): PrescribeEntry | undefined {
   return _prescribeState[cardId];
 }
 
-export function initPrescribeState(cardId: number, initial: PrescribeEntry): void {
-  _prescribeState[cardId] = initial;
-}
-
 export function applyPrescribeStatePatch(cardId: number, patch: Partial<PrescribeEntry>): void {
   if (!_prescribeState[cardId]) {
     _prescribeState[cardId] = { packageSize: '', ...patch };

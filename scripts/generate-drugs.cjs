@@ -1,6 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 
+const isForce = process.argv.includes("--force");
+
 const DATA_DIR = path.join(__dirname, "..", "data");
 const DB_FILE = path.join(DATA_DIR, "product-db.json");
 const OUT_FILE = path.join(__dirname, "..", "public", "data", "drugs.json");
@@ -259,6 +261,18 @@ function writeDrugDataJs(jsonContent) {
 
 function main() {
   console.log("=== generate-drugs.js ===\n");
+
+  if (!isForce && fs.existsSync(OUT_FILE) && fs.existsSync(DB_FILE)) {
+    const dbStat = fs.statSync(DB_FILE);
+    const outStat = fs.statSync(OUT_FILE);
+    if (outStat.mtimeMs >= dbStat.mtimeMs) {
+      console.log("  product-db.json har inte ändrats sedan förra genereringen.");
+      console.log(`  Skippar — drugs.json är redan aktuell.`);
+      console.log("  (Använd --force för att tvinga regenerering)\n");
+      return;
+    }
+    console.log("  product-db.json har uppdaterats — regenererar drugs.json.\n");
+  }
 
   console.log("Steg 1: Ladda produktdatabas...");
   const productDb = loadProductDb();

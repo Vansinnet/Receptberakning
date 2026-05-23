@@ -1,8 +1,8 @@
 /**
  * scrape-interactions.cjs
- * Skrapar Janusmed interaktioner för alla ATC5-grupper i drugs.json.
- * Grupperar läkemedel per ATC4-kod (första 4 tecken), väljer en NPL-ID-representant per grupp,
- * och för varje ATC4-par slår den upp på Janusmed om en interaktion finns.
+ * Skrapar Janusmed interaktioner för alla ATC-grupper i drugs.json.
+ * Grupperar läkemedel per ATC5-kod (första 5 tecken), väljer en NPL-ID-representant per grupp,
+ * och för varje ATC5-par slår den upp på Janusmed om en interaktion finns.
  *
  * Körning: node scripts/scrape-interactions.cjs
  * Indata:  public/data/drugs.json
@@ -11,24 +11,40 @@
  */
 
 const fs = require('fs');
+const fsp = require('fs/promises');
 const path = require('path');
 const https = require('node:https');
 const dns = require('node:dns');
+const dnsPromises = require('node:dns').promises;
 
 const isIncremental = process.argv.includes('--incremental');
 dns.setDefaultResultOrder('ipv4first');
 
-const CONCURRENCY = 30;
-const DELAY_MS = 50;
-const PROGRESS_SAVE_INTERVAL = 100; // spara progress var X:e lyckad request
+const CONCURRENCY = 48;
+const MAX_RPS = 50;
+const PROGRESS_SAVE_INTERVAL = 100;
 const RETRY_COUNT = 2;
+
+const _rateTimestamps = [];
+async function rateLimit() {
+  const now = Date.now();
+  while (_rateTimestamps.length && now - _rateTimestamps[0] > 1000) {
+    _rateTimestamps.shift();
+  }
+  if (_rateTimestamps.length >= MAX_RPS) {
+    const waitMs = _rateTimestamps[0] + 1000 - now + 1;
+    _rateTimestamps.shift();
+    await sleep(waitMs);
+  }
+  _rateTimestamps.push(Date.now());
+}
 
 const KEEP_ALIVE_AGENT = new https.Agent({
   keepAlive: true,
-  keepAliveMsecs: 30_000,
-  maxSockets: CONCURRENCY,
-  maxFreeSockets: 10,
-  timeout: 60_000,
+  keepAliveMsecs: 120_000,
+  maxSockets: CONCURRENCY * 2,
+  maxFreeSockets: CONCURRENCY,
+  timeout: 30_000,
 });
 
 const FETCH_OPTS = {
@@ -36,6 +52,7 @@ const FETCH_OPTS = {
   headers: {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
     Accept: 'text/html,application/xhtml+xml',
+    Connection: 'keep-alive',
   },
 };
 
@@ -67,13 +84,13 @@ async function fetchWithRetry(url, retries = RETRY_COUNT) {
       return await res.text();
     } catch (e) {
       if (i === retries) throw e;
-      await sleep(1000 * (i + 1));
+      await sleep(300 * (i + 1));
     }
   }
 }
 
 /**
- * Ladda drugs.json och gruppera per ATC4 (första 4 tecknen i ATC-kod).
+ * Ladda drugs.json och gruppera per ATC5 (första 5 tecknen i ATC-kod).
  * För varje grupp sparas en lista med NPL-ID:n + första namnet.
  */
 function loadAndGroup() {
@@ -84,17 +101,17 @@ function loadAndGroup() {
   const groups = {};
   for (const drug of raw) {
     if (!drug.a || !drug.i || !drug.n) continue;
-    const atc4 = drug.a.substring(0, 4).toUpperCase();
-    if (!groups[atc4]) {
-      groups[atc4] = { nplIds: [], name: drug.n, productCount: 0 };
+    const atc5 = drug.a.substring(0, 5).toUpperCase();
+    if (!groups[atc5]) {
+      groups[atc5] = { nplIds: [], name: drug.n, productCount: 0 };
     }
-    groups[atc4].nplIds.push(drug.i);
-    if (groups[atc4].productCount === 0) groups[atc4].name = drug.n;
-    groups[atc4].productCount++;
+    groups[atc5].nplIds.push(drug.i);
+    if (groups[atc5].productCount === 0) groups[atc5].name = drug.n;
+    groups[atc5].productCount++;
   }
 
   const keys = Object.keys(groups).sort();
-  console.log(`  ${keys.length} unika ATC4-grupper`);
+  console.log(`  ${keys.length} unika ATC5-grupper`);
 
   let single = 0;
   for (const k of keys) {
@@ -106,16 +123,19 @@ function loadAndGroup() {
 }
 
 /**
- * Generera alla unika par från ATC4-keys.
+ * Generera alla unika par från ATC5-keys.
  */
 function generatePairs(keys) {
-  const pairs = [];
-  for (let i = 0; i < keys.length; i++) {
-    for (let j = i + 1; j < keys.length; j++) {
-      pairs.push([keys[i], keys[j]]);
+  const n = keys.length;
+  const total = (n * (n - 1)) / 2;
+  const pairs = new Array(total);
+  let idx = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      pairs[idx++] = [keys[i], keys[j]];
     }
   }
-  console.log(`  ${pairs.length} unika ATC4-par att kontrollera`);
+  console.log(`  ${pairs.length} unika ATC5-par att kontrollera`);
   return pairs;
 }
 
@@ -190,33 +210,43 @@ function saveProgress(progress) {
   fs.writeFileSync(PROGRESS_FILE, JSON.stringify(progress, null, 2));
 }
 
+let _savePending = false;
+function saveProgressAsync(progress) {
+  if (_savePending) return;
+  _savePending = true;
+  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+  fsp.writeFile(PROGRESS_FILE, JSON.stringify(progress, null, 2)).finally(() => {
+    _savePending = false;
+  });
+}
+
 async function main() {
   console.log('=== scrape-interactions.cjs ===\n');
 
   // 1. Ladda och gruppera
-  console.log('Steg 1: Ladda läkemedelsdata och gruppera per ATC4...');
+  console.log('Steg 1: Ladda läkemedelsdata och gruppera per ATC5...');
   const { groups, keys } = loadAndGroup();
 
   // 2. Generera par
-  console.log('\nSteg 2: Generera ATC4-par...');
+  console.log('\nSteg 2: Generera ATC5-par...');
   const pairs = generatePairs(keys);
 
   // 3. Ladda progress och beräkna återstående par
   const progress = loadProgress();
 
   // Om --incremental: hitta endast par där minst en ATC4-grupp är NY
-  const existingAtc4 = new Set();
+  const existingAtc5 = new Set();
   if (isIncremental) {
     try {
       const existingRules = JSON.parse(fs.readFileSync(OUTPUT_FILE, 'utf8'));
       if (Array.isArray(existingRules)) {
         for (const r of existingRules) {
-          if (r.atcGroupA) for (const g of r.atcGroupA) existingAtc4.add(g);
-          if (r.atcGroupB) for (const g of r.atcGroupB) existingAtc4.add(g);
+          if (r.atcGroupA) for (const g of r.atcGroupA) existingAtc5.add(g);
+          if (r.atcGroupB) for (const g of r.atcGroupB) existingAtc5.add(g);
         }
       }
     } catch {}
-    console.log(`  ${existingAtc4.size} ATC4-grupper redan i interactions-scraped.json`);
+    console.log(`  ${existingAtc5.size} ATC5-grupper redan i interactions-scraped.json`);
   }
 
   const totalPairs = pairs.length;
@@ -225,7 +255,7 @@ async function main() {
     const progressStatus = progress.checked[k] || progress.checked[`${p[1]}|${p[0]}`];
 
     // --incremental: hoppa om BÅDA ATC4-grupperna redan finns i databasen
-    if (isIncremental && existingAtc4.has(p[0]) && existingAtc4.has(p[1])) {
+    if (isIncremental && existingAtc5.has(p[0]) && existingAtc5.has(p[1])) {
       // Markera som checked så vi inte gör om den
       if (!progressStatus) progress.checked[k] = true;
       return false;
@@ -237,7 +267,14 @@ async function main() {
 
   console.log(`\nSteg 3: Skrapa Janusmed...`);
   console.log(`  Redan kontrollerade: ${totalPairs - remaining.length}`);
-  console.log(`  Kvar att kontrollera: ${remaining.length}\n`);
+  console.log(`  Kvar att kontrollera: ${remaining.length}`);
+
+  // DNS+TLS pre-warm: lös upp janusmed.se och etablera TLS-session
+  try {
+    await dnsPromises.resolve4('janusmed.se');
+    await fetch('https://janusmed.se/', { agent: KEEP_ALIVE_AGENT, signal: AbortSignal.timeout(5000) });
+  } catch { /* non-critical, first real request handles it */ }
+  console.log('');
 
   if (remaining.length === 0) {
     console.log('  Alla par redan kontrollerade!');
@@ -276,6 +313,7 @@ async function main() {
       const url = `https://janusmed.se/interaktioner?nplIds=${nplA}&nplIds=${nplB}`;
 
       try {
+        await rateLimit();
         const html = await fetchWithRetry(url);
         const interactions = parseInteractionPage(html);
 
@@ -299,7 +337,7 @@ async function main() {
         const doneCount = completed - (totalPairs - remaining.length);
         if (doneCount - lastSaved >= PROGRESS_SAVE_INTERVAL) {
           lastSaved = doneCount;
-          saveProgress(progress);
+          saveProgressAsync(progress);
         }
 
         showProgress();
@@ -349,7 +387,7 @@ async function main() {
   fs.writeFileSync(OUTPUT_FILE, JSON.stringify(progress.rules, null, 2));
   console.log('  Klart!\n');
 
-  saveProgress(progress);
+  await fsp.writeFile(PROGRESS_FILE, JSON.stringify(progress, null, 2));
 
   console.log(`=== scrape-interactions.cjs slutförd ===`);
   console.log(`  Totalt: ${totalPairs} par kontrollerade`);

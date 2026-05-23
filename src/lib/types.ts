@@ -81,9 +81,6 @@ export interface CalcResult {
   displayAvgStr?: string;
   avgNote?: string;
   consumptionPct: number;
-  patientText?: string;
-  patientTextEn?: string;
-  journalText?: string;
 }
 
 // === State ===
@@ -142,6 +139,12 @@ export interface PrescribeInput {
   prescribedEndDateStr?: string;
 }
 
+export interface AtcEntry {
+  a: string;
+  i: string;
+  p?: string | null;
+}
+
 export interface RenewableCard {
   _cardId: number;
   valid: boolean;
@@ -149,7 +152,34 @@ export interface RenewableCard {
   decision: 'yes' | 'no' | null;
 }
 
+export interface NurseViewCardState {
+  _cardId: number;
+  medRaw?: string;
+  valid?: boolean;
+  calculable?: boolean;
+  prescribedEndDateStr?: string;
+  daysToPrescribedEnd?: number;
+  consumptionPct?: number;
+  decision?: 'yes' | 'no' | null;
+}
+
 // === Textgenerering ===
+
+export interface CardsForTextEntry {
+  name: string;
+  i: number;
+  dose: number;
+  doseUnitLabel: string;
+  doseUnit: string;
+  total: number;
+  pDateStr: string;
+  prescribedEndDateStr: string;
+  displayAvgStr: string;
+  avgNote: string;
+  daysToPrescribedEnd: number;
+  consumptionPct: number;
+  decision: 'yes' | 'no' | null;
+}
 
 export type CardView = {
   name: string;
@@ -166,6 +196,15 @@ export interface LTCardInput {
   medRaw: string;
   dose: number;
   periods: LTCardPeriod[];
+}
+
+export interface LongtermPeriodInternal {
+  startDate: Date;
+  endDate: Date;
+  total: number;
+  days: number;
+  avgPerDay: number;
+  classification?: string;
 }
 
 export interface LTCardPeriod {

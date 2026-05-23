@@ -2,6 +2,7 @@ import type { FormValues, MedCard } from './types';
 import { validateValues, calcCore } from './calc';
 import { MAX_MED_CARDS } from './constants';
 import { getNow } from './clock';
+import { todayStr } from './utils';
 
 export function createEmptyCard(cardId: number): MedCard {
   return {
@@ -22,7 +23,7 @@ export const appState = $state({
   nurseViewActive: false,
   nurseVitalNormal: false,
   nurseFollowUpAdequate: false,
-  currentDate: getNow().toDateString(),
+  currentDate: todayStr(),
 });
 
 export const medCards = $state<MedCard[]>([createEmptyCard(1)]);
@@ -41,7 +42,7 @@ export function resetNurseState(): void {
 }
 
 export function tickCurrentDate(): void {
-  const newKey = getNow().toDateString();
+  const newKey = todayStr();
   if (appState.currentDate !== newKey) {
     appState.currentDate = newKey;
   }
@@ -73,10 +74,6 @@ export function getActiveResult() { return _activeResult; }
 export function clearCardForm(cardId: number): void {
   const card = medCards.find(c => c._cardId === cardId);
   if (!card) return;
-  card.form = {
-    medRaw: '', dateVal: '', doseRaw: '', amtRaw: '', refRaw: '', leftRaw: '',
-    doseUnit: 'st', doseInterval: 1, notCalculable: false,
-    atcCode: null, nplId: null,
-  };
+  card.form = createEmptyCard(0).form;
   card.decision = null;
 }

@@ -21,6 +21,10 @@ export const CONSUMPTION_NORMAL_HIGH = 110;
 // Under 14 dagar kvar visas raden grön.
 export const DAYS_REMAINING_WARN = 14;
 
+// AKTIVT VAL: 14 dagar — tröskel för påminnelse om att kontakta
+// patienten för receptförnyelse (används i textgenerering).
+export const CONTACT_REMINDER_DAYS = 14;
+
 // AKTIVT VAL: 2.5x — vid denna multiplikator av ordinerad dos triggas en
 // datakontrollsvarning. Fångar orimlig inmatning (t.ex. fel enhet) utan att
 // blockera legitima fall (t.ex. titrering).
@@ -147,7 +151,7 @@ export const SINGLE_MFR_NAMES: string[] = [
   "STADA", "Sandoz", "Accord(?:pharma)?", "Teva", "Krka", "Ebb",
   "Viatris", "Orion", "Actavis", "Zentiva", "Orifarm", "Bluefish",
   "Glenmark", "Evolan", "APL", "ABECE", "Avansor", "Apofri",
-  "SUN", "Amarox", "Aurobindo", "Hexal", "HEXAL", "Alternova",
+  "SUN", "Amarox", "Aurobindo", "Hexal", "Alternova",
   "Mylan", "Bijon", "Grindeks", "Newbury", "Jubilant", "Strides",
   "Holsten", "Vitabalans", "Medartuum", "Abcur", "2care4",
   "Amdipharm", "Brown", "Pfizer", "Xiromed", "Pilum",
@@ -162,3 +166,5 @@ export const MIN_SEARCH_QUERY_LENGTH = 2;
 export const MAX_AUTOCOMPLETE_RESULTS = 20;
 export const DEDUP_THRESHOLD = 8;
 export const MAX_SEARCH_QUERY_LENGTH = 100;
+
+export const STRENGTH_UNIT_PATTERN = 'mg|ml|µg|μg|g|IE|mmol|mikrogram|mikrog|microgram|mcg|ng|gram|nanogram|IU';

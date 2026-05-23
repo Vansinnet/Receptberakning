@@ -97,11 +97,11 @@ export function validateValues(
     leftInput: _validateLeft(safeLeftRaw, remaining, isDiscreteUnit),
   };
 
-  const { outOfRange } = _validateRef(safeRefRaw, refNum);
-  fieldErrors.refInput = _validateRef(safeRefRaw, refNum).error;
+  const refValidation = _validateRef(safeRefRaw, refNum);
+  fieldErrors.refInput = refValidation.error;
 
   // ── Steg 4: Build result ──
-  if (outOfRange) return { valid: false, reason: 'too_many_refs', fieldErrors };
+  if (refValidation.outOfRange) return { valid: false, reason: 'too_many_refs', fieldErrors };
 
   const amtIsInvalid = fieldErrors.amtInput !== '';
   const doseIsInvalid = fieldErrors.doseInput !== '';
@@ -125,6 +125,14 @@ export function validateValues(
 }
 
 // === CALCCORE ===
+
+const INTERVAL_LABELS: Record<DoseInterval, string> = { 1: 'dag', 7: 'vecka', 30: 'månad' };
+
+function _buildAvgNote(hasRemaining: boolean, calcBase: number, remaining: number | null, doseUnit: string, earlyPickup: boolean): string {
+  if (!hasRemaining) return `(beräknat under antagandet att alla förskrivna ${doseUnit} är förbrukade)`;
+  const suffix = earlyPickup ? ' – patienten kan ha hämtat ut uttag i förväg' : '';
+  return `(beräknat på faktisk förbrukning: ${calcBase - remaining!} av ${calcBase} tillgängliga ${doseUnit}${suffix})`;
+}
 
 export function calcCore(inputData: CalcInput): CalcResult {
   if (!inputData.valid) {
@@ -154,10 +162,9 @@ export function calcCore(inputData: CalcInput): CalcResult {
     };
   }
 
-  const INTERVAL_LABELS: Record<DoseInterval, string> = { 1: 'dag', 7: 'vecka', 30: 'månad' };
   const doseInterval     = inputData.doseInterval || 1;
   const doseUnit: DoseUnit = inputData.doseUnit     || 'st';
-  const intervalLabel    = INTERVAL_LABELS[doseInterval] || 'dag';
+  const intervalLabel    = INTERVAL_LABELS[doseInterval];
   const doseUnitLabel    = `${doseUnit}/${intervalLabel}`;
   const effectiveDailyDose = inputData.dose / doseInterval;
 
@@ -238,9 +245,7 @@ export function calcCore(inputData: CalcInput): CalcResult {
   const mgUnit          = extractDoseUnit(inputData.medRaw);
   let displayAvg = `${avgPerInterval.toFixed(2)} ${doseUnitLabel}`;
   if (mgUnit) displayAvg += ` (${(avgPerInterval * mgUnit.amount).toFixed(1)} ${mgUnit.unit}/${intervalLabel})`;
-  const avgNote = hasRemaining
-    ? `(beräknat på faktisk förbrukning: ${calcBase - remaining} av ${calcBase} tillgängliga ${doseUnit}${earlyPickup ? ' – patienten kan ha hämtat ut uttag i förväg' : ''})`
-    : `(beräknat under antagandet att alla förskrivna ${doseUnit} är förbrukade)`;
+  const avgNote = _buildAvgNote(hasRemaining, calcBase, remaining, doseUnit, earlyPickup);
 
   const consumptionPct = (avgNum / effectiveDailyDose) * 100;
   const tlPct  = Math.min(100, Math.max(0, (daysSince / totalDays) * 100));

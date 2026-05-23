@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: './tests',
   snapshotDir: 'tests/visual-baseline/snapshots',
   webServer: {
-    command: 'npx.cmd vite --host 127.0.0.1 --port 5173',
+    command: 'npx vite --host 127.0.0.1 --port 5173',
     port: 5173,
     timeout: 30000,
     reuseExistingServer: false,

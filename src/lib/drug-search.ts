@@ -1,4 +1,4 @@
-import { MIN_SEARCH_QUERY_LENGTH, MAX_AUTOCOMPLETE_RESULTS, DEDUP_THRESHOLD, MAX_SEARCH_QUERY_LENGTH } from './constants';
+import { MIN_SEARCH_QUERY_LENGTH, MAX_AUTOCOMPLETE_RESULTS, DEDUP_THRESHOLD, MAX_SEARCH_QUERY_LENGTH, STRENGTH_UNIT_PATTERN } from './constants';
 import { loadFromCache, fetchAndCache, type RawDrugEntry } from './drug-cache';
 import { stripManufacturer } from './utils';
 
@@ -61,14 +61,17 @@ export async function loadDrugs(): Promise<void> {
   return _loadPromise;
 }
 
+const _strengthRe = new RegExp('(\\d+(?:[.,]\\d+)?)\\s*(?:' + STRENGTH_UNIT_PATTERN + ')\\b', 'gi');
+const _stripStrengthRe = new RegExp('\\d+(?:[.,]\\d+)?\\s*(?:' + STRENGTH_UNIT_PATTERN + ')\\b', 'gi');
+
 function _strengthVal(name: string): number {
-  const matches = [...name.matchAll(/(\d+(?:[.,]\d+)?)\s*(?:mg|µg|μg|g|IE|mmol|ml|mikrogram|mikrog|mcg|ng|gram|nanogram|IU)\b/gi)];
+  const matches = [...name.matchAll(_strengthRe)];
   if (matches.length === 0) return Infinity;
   return parseFloat(matches[matches.length - 1][1].replace(',', '.'));
 }
 
 function _stripStrength(name: string): string {
-  return name.replace(/\d+(?:[.,]\d+)?\s*(?:mg|µg|μg|g|IE|mmol|ml|mikrogram|mikrog|mcg|ng|gram|nanogram|IU)\b/gi, '')
+  return name.replace(_stripStrengthRe, '')
     .replace(/[/\s]+/g, ' ').trim();
 }
 
@@ -88,20 +91,21 @@ function _entryScore(entry: DrugEntry): number {
 }
 
 function _sortEntries(entries: DrugEntry[], q: string): DrugEntry[] {
-  return entries.sort((a, b) => {
-    const sa = _strengthVal(a.name);
-    const sb = _strengthVal(b.name);
-    const aStarts = a.name.toLowerCase().startsWith(q) ? 0 : 1;
-    const bStarts = b.name.toLowerCase().startsWith(q) ? 0 : 1;
-    if (aStarts !== bStarts) return aStarts - bStarts;
-    const aName = _stripStrength(stripManufacturer(a.name)).toLowerCase();
-    const bName = _stripStrength(stripManufacturer(b.name)).toLowerCase();
-    if (aName !== bName) return aName.localeCompare(bName);
-    if (sa !== sb) return sa - sb;
-    const pa = a.packageSize ?? Infinity;
-    const pb = b.packageSize ?? Infinity;
-    return pa - pb;
+  const qLower = q.toLowerCase();
+  const scored = entries.map(e => ({
+    e,
+    starts: e.name.toLowerCase().startsWith(qLower) ? 0 : 1,
+    nameKey: _stripStrength(stripManufacturer(e.name)).toLowerCase(),
+    strength: _strengthVal(e.name),
+    pkg: e.packageSize ?? Infinity,
+  }));
+  scored.sort((a, b) => {
+    if (a.starts !== b.starts) return a.starts - b.starts;
+    if (a.nameKey !== b.nameKey) return a.nameKey.localeCompare(b.nameKey);
+    if (a.strength !== b.strength) return a.strength - b.strength;
+    return a.pkg - b.pkg;
   });
+  return scored.map(s => s.e);
 }
 
 export function searchDrugs(query: string): DrugEntry[] {
@@ -138,4 +142,12 @@ export function searchDrugs(query: string): DrugEntry[] {
 export function getDrugByName(name: string): DrugEntry | undefined {
   if (!_drugMap) return undefined;
   return _drugMap.get((name || '').toLowerCase().trim());
+}
+
+export function getDrugByNplId(nplId: string | null): DrugEntry | undefined {
+  if (!nplId || !_drugList) return undefined;
+  for (let i = 0; i < _drugList.length; i++) {
+    if (_drugList[i].nplId === nplId) return _drugList[i];
+  }
+  return undefined;
 }

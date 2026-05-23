@@ -1,18 +1,34 @@
 const fs = require("fs");
+const fsp = require("fs/promises");
 const path = require("path");
 const https = require("node:https");
 const dns = require("node:dns");
+const crypto = require("node:crypto");
 
 const CONCURRENCY = 50;
-const DELAY_MS = 0;
+const MAX_RPS = 30;
 dns.setDefaultResultOrder("ipv4first");
+
+const _rateTimestamps = [];
+async function rateLimit() {
+  const now = Date.now();
+  while (_rateTimestamps.length && now - _rateTimestamps[0] > 1000) {
+    _rateTimestamps.shift();
+  }
+  if (_rateTimestamps.length >= MAX_RPS) {
+    const waitMs = _rateTimestamps[0] + 1000 - now + 1;
+    _rateTimestamps.shift();
+    await sleep(waitMs);
+  }
+  _rateTimestamps.push(Date.now());
+}
 
 const KEEP_ALIVE_AGENT = new https.Agent({
   keepAlive: true,
-  keepAliveMsecs: 30_000,
-  maxSockets: CONCURRENCY,
-  maxFreeSockets: 10,
-  timeout: 60_000,
+  keepAliveMsecs: 120_000,
+  maxSockets: CONCURRENCY * 2,
+  maxFreeSockets: CONCURRENCY,
+  timeout: 30_000,
 });
 
 const FETCH_OPTS = {
@@ -20,6 +36,7 @@ const FETCH_OPTS = {
   headers: {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
     "Accept": "text/html,application/xhtml+xml",
+    "Connection": "keep-alive",
   },
 };
 const DATA_DIR = path.join(__dirname, "..", "data");
@@ -73,26 +90,24 @@ function sleep(ms) {
 async function fetchWithRetry(url, retries = 1) {
   for (let i = 0; i <= retries; i++) {
     try {
+      await rateLimit();
       const res = await fetch(url, FETCH_OPTS);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.text();
     } catch (e) {
       if (i === retries) throw e;
-      await sleep(1000 * (i + 1));
+      await sleep(300 * (i + 1));
     }
   }
 }
 
-async function fetchSitemapNplIds(sitemapUrl) {
-  console.log(`  Hämtar sitemap: ${sitemapUrl}`);
-  const xml = await fetchWithRetry(sitemapUrl);
+function extractNplIds(xml) {
   const ids = new Set();
   const re = /<loc>https:\/\/fass\.se\/(?:health\/)?product\/(\d+)<\/loc>/g;
   let m;
   while ((m = re.exec(xml)) !== null) {
     ids.add(m[1]);
   }
-  console.log(`  Hittade ${ids.size} unika NPL-ID:n`);
   return [...ids];
 }
 
@@ -211,7 +226,7 @@ function loadProgress() {
   try {
     return JSON.parse(fs.readFileSync(PROGRESS_FILE, "utf8"));
   } catch (e) {
-    return { processed: {}, errors: {} };
+    return { processed: {}, errors: {}, sitemapHash: null };
   }
 }
 
@@ -219,14 +234,35 @@ function saveProgress(progress) {
   fs.writeFileSync(PROGRESS_FILE, JSON.stringify(progress, null, 2));
 }
 
+let _savePending = false;
+function saveProgressAsync(progress) {
+  if (_savePending) return;
+  _savePending = true;
+  fsp.writeFile(PROGRESS_FILE, JSON.stringify(progress, null, 2)).finally(() => {
+    _savePending = false;
+  });
+}
+
 async function main() {
   console.log("=== build-product-db.js ===\n");
 
   console.log("Steg 1: Hämta sitemap och extrahera NPL-ID:n...");
-  const nplIds = await fetchSitemapNplIds("https://fass.se/sitemap-health-product.xml");
+  const sitemapUrl = "https://fass.se/sitemap-health-product.xml";
+  const sitemapXml = await fetchWithRetry(sitemapUrl);
+  const sitemapHash = crypto.createHash("sha256").update(sitemapXml).digest("hex");
+
+  const progress = loadProgress();
+  if (progress.sitemapHash === sitemapHash) {
+    console.log("  Sitemap oförändrad — hoppar över crawl.\n");
+  } else {
+    progress.sitemapHash = sitemapHash;
+  }
+
+  const nplIds = extractNplIds(sitemapXml);
+  console.log(`  Hittade ${nplIds.length} unika NPL-ID:n`);
+  console.log(`  ${Object.keys(progress.processed).length} redan processade\n`);
 
   console.log("Steg 2: Crawla produktsidor...");
-  const progress = loadProgress();
   const existingIds = new Set(Object.keys(progress.processed));
 
   const remaining = nplIds.filter(id => !existingIds.has(id));
@@ -271,8 +307,7 @@ async function main() {
     if (i + CONCURRENCY < remaining.length) {
       const pct = Math.round((completed / total) * 100);
       process.stdout.write(`\r  ${completed}/${total} (${pct}%)   `);
-      if ((i / CONCURRENCY) % 5 === 0) saveProgress(progress);
-      await sleep(DELAY_MS);
+      if ((i / CONCURRENCY) % 5 === 0) saveProgressAsync(progress);
     }
   }
 

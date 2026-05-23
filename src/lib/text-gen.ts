@@ -1,8 +1,9 @@
 import { getToday, parseDateUTC } from './utils';
+import { CONTACT_REMINDER_DAYS } from './constants';
 
 // === PATIENT TEXT ===
 
-import type { CardView } from './types';
+import type { CardView, CardsForTextEntry, NurseViewCardState } from './types';
 
 const TPL = {
   sv: {
@@ -49,22 +50,24 @@ const TPL = {
   },
 };
 
-function _noBody(tpl: typeof TPL.sv | typeof TPL.en, days: number, date: string, contact?: string): string {
+function _nounVerb(tpl: typeof TPL.sv | typeof TPL.en, days: number) {
   const isSv = tpl === TPL.sv;
-  const verb = days < 0 ? (isSv ? 'beräknades' : 'was expected') : (isSv ? 'beräknas' : 'is expected');
-  const contactStr = days >= 14 && contact
+  return days < 0 ? (isSv ? 'beräknades' : 'was expected') : (isSv ? 'beräknas' : 'is expected');
+}
+
+function _contactStr(tpl: typeof TPL.sv | typeof TPL.en, days: number, contact?: string) {
+  const isSv = tpl === TPL.sv;
+  return days >= CONTACT_REMINDER_DAYS && contact
     ? (isSv ? ` Hör av dig närmare ${contact}.` : ` Please contact us again closer to ${contact}.`)
     : '';
-  return tpl.single_no_body(verb, date, contactStr);
+}
+
+function _noBody(tpl: typeof TPL.sv | typeof TPL.en, days: number, date: string, contact?: string): string {
+  return tpl.single_no_body(_nounVerb(tpl, days), date, _contactStr(tpl, days, contact));
 }
 
 function _itemNoBody(tpl: typeof TPL.sv | typeof TPL.en, name: string, days: number, date: string, contact?: string): string {
-  const isSv = tpl === TPL.sv;
-  const verb = days < 0 ? (isSv ? 'beräknades' : 'was expected') : (isSv ? 'beräknas' : 'is expected');
-  const contactStr = days >= 14 && contact
-    ? (isSv ? ` Hör av dig närmare ${contact}.` : ` Please contact us again closer to ${contact}.`)
-    : '';
-  return tpl.multi_item_no(name, verb, date, contactStr);
+  return tpl.multi_item_no(name, _nounVerb(tpl, days), date, _contactStr(tpl, days, contact));
 }
 
 function _buildSingle(lang: typeof TPL.sv, card: CardView): string[] {
@@ -121,7 +124,7 @@ export function buildPatientText(lang: string, cards: CardView[]): string {
 }
 
 export function buildJournalText(
-  cards: Array<{ name: string; i: number; dose: number; doseUnitLabel: string; doseUnit: string; total: number; pDateStr: string; prescribedEndDateStr: string; displayAvgStr: string; avgNote: string; daysToPrescribedEnd: number; consumptionPct: number; decision: 'yes' | 'no' | null }>,
+  cards: CardsForTextEntry[],
   validCount: number,
   prescribeEnds?: Record<number, string>
 ): string {
@@ -146,7 +149,7 @@ export function buildJournalText(
 }
 
 export function buildNurseJournalText(
-  states: Array<{ _cardId: number; medRaw?: string; valid?: boolean; calculable?: boolean; prescribedEndDateStr?: string; daysToPrescribedEnd?: number; consumptionPct?: number; decision?: 'yes' | 'no' | null }>,
+  states: NurseViewCardState[],
   nurseVitalNormal?: boolean,
   nurseFollowUpAdequate?: boolean
 ): string {

@@ -1,27 +1,4 @@
-﻿/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   RECEPTBERÃ„KNING â€” app.css
-   Widescreen-layout: topbar + tre-kolumnsvy
-
-   INNEHÃ…LL
-   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   l.1â€“78     CSS-variabler & teman (default + dark/klinisk/sakura)
-   l.80â€“101   Reset & noscript-fallback
-   l.103â€“115  App-shell â€” centrerad max-bredd
-   l.117â€“175  Topbar â€” sticky header med tabs & instÃ¤llningar
-   l.177â€“190  Tab-paneler â€” .tab-panel aktiv/dold
-   l.184â€“300  ReceptfÃ¶rnyelse â€” tre-kolumns widescreen-layout
-   l.302â€“     MedSidebar â€” lÃ¤kemedelslista (kolumn 1)
-   l.346â€“     FormPanel â€” formulÃ¤r (kolumn 2)
-   l.538â€“     ResultPanel â€” resultat (kolumn 4)
-   l.864â€“868  Progressbar-breddklasser (w0..w100, 5%-steg)
-   l.870â€“     Alerts, Copy-sektion, Early-decision
-   l.1062â€“    PrescribePanel â€” fÃ¶rskrivningspanel (kolumn 5)
-   l.1180â€“    NurseView â€” sjukskÃ¶terskebedÃ¶mning (kolumn 3)
-   l.1312â€“    Print â€” @media print
-   l.1481â€“    Fas 6.4 â€” komponenttillÃ¤gg (statusbadge, inactivity toast)
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-
-/* â”€â”€ CSS-variabel-bas â”€â”€ */
+﻿/* â”€â”€ CSS-variabel-bas â”€â”€ */
 :root {
   --primary: #1d4ed8;
   --primary-light: #dbeafe;
@@ -35,6 +12,7 @@
   --border-strong: #cbd5e1;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
   --shadow-md: 0 4px 16px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
+  --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --topbar-h: 82px;
@@ -599,8 +577,8 @@ html, body {
 .field input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
 .field input.input-error { border-color: var(--red); box-shadow: 0 0 0 3px var(--red-bg); }
 .field-hint { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
-.field-error-msg { display: none; font-size: 11px; color: var(--red); margin-top: 3px; }
-.field-error-msg.visible { display: block; }
+.field-error-msg { visibility: hidden; font-size: 11px; color: var(--red); margin-top: 3px; min-height: 16px; }
+.field-error-msg.visible { visibility: visible; }
 .prescribe-result-covered {
   font-size: 12px; color: var(--text-muted); font-style: italic;
   padding: 10px 0; text-align: center;
@@ -761,8 +739,6 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   flex-direction: column;
   gap: 12px;
 }
-#lt-result { display: none; }
-#lt-copySection { display: none; }
 
 .info-banner-lt {
   background: var(--blue-bg); border: 1px solid var(--blue-border);
@@ -1164,7 +1140,6 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   .nurse-col { width: 100%;   border-inline-end: none; border-bottom: 1px solid var(--border); }
   .longterm-body { flex-direction: column; }
   .longterm-form-col { flex: none;   border-inline-end: none; border-bottom: 1px solid var(--border); }
-  .metrics { grid-template-columns: repeat(3, 1fr); }
   .prescribe-panel { width: 100%;   border-inline-start: none; border-top: 1px solid var(--border); }
 }
 
@@ -1362,7 +1337,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 .alert-dialog {
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
-  background: var(--surface1);
+  background: var(--surface);
   color: var(--text);
   padding: 0;
   max-width: 420px;
@@ -1385,7 +1360,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 .alert-dialog-msg {
   margin: 0 0 20px 0;
   font-size: 14px;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   line-height: 1.5;
 }
 .alert-dialog-actions {
