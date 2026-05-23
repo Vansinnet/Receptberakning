@@ -815,7 +815,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   content: attr(data-tooltip);
   position: absolute;
   left: 0;
-  bottom: calc(100% + 6px);
+  top: calc(100% + 6px);
   background: var(--surface);
   color: var(--text);
   border: 1px solid var(--border-strong);
