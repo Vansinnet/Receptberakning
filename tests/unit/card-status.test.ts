@@ -8,7 +8,6 @@ import {
   getActiveTexts,
   clearAllMedState,
   getActiveResult,
-  _syncCardStatus,
   getTextsState,
 } from '../../src/lib/state.svelte';
 import { setMockNow } from '../../src/lib/clock';
@@ -31,7 +30,6 @@ function fillCard(idx: number, overrides: Partial<{
 
 function syncAndGetStatus(cardId: number) {
   void getTextsState();
-  _syncCardStatus();
   return getCardStatus(cardId);
 }
 
@@ -48,8 +46,8 @@ describe('getActiveTexts — TextResult shape', () => {
   });
 });
 
-describe('_syncCardStatus populates _cardStatus ($state)', () => {
-  it('getCardStatus() returns CardStatusCache after sync', () => {
+describe('getCardStatus returns correct data', () => {
+  it('getCardStatus() returns CardStatusCache', () => {
     fillCard(0, { medRaw: 'Sertralin 50 mg', dateVal: '2024-08-13', doseRaw: '1', amtRaw: '100', refRaw: '3' });
     const cs = syncAndGetStatus(1);
     expect(cs).toBeDefined();
@@ -72,7 +70,7 @@ describe('_syncCardStatus populates _cardStatus ($state)', () => {
   });
 });
 
-describe('spliceMedCard cleans both caches', () => {
+describe('spliceMedCard removes card state', () => {
   it('removed card returns undefined from getCardStatus()', () => {
     fillCard(0, { medRaw: 'Sertralin 50 mg', dateVal: '2024-08-13', doseRaw: '1', amtRaw: '100', refRaw: '3' });
     syncAndGetStatus(1);
@@ -88,12 +86,15 @@ describe('spliceMedCard cleans both caches', () => {
   });
 });
 
-describe('clearAllMedState cleans both caches', () => {
-  it('all statuses return undefined after clear', () => {
+describe('clearAllMedState resets state', () => {
+  it('card status is empty-but-valid after clear', () => {
     fillCard(0, { medRaw: 'Sertralin 50 mg', dateVal: '2024-08-13', doseRaw: '1', amtRaw: '100', refRaw: '3' });
     syncAndGetStatus(1);
     clearAllMedState();
-    expect(getCardStatus(1)).toBeUndefined();
+    const cs = getCardStatus(1);
+    expect(cs).toBeDefined();
+    expect(cs!.valid).toBe(false);
+    expect(cs!.statusText).toBe('Ej ifyllt');
   });
 });
 

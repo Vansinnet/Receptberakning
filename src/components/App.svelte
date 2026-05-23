@@ -8,7 +8,7 @@
   import LongtermPanel from './LongtermPanel.svelte';
   import InteractionAlerts from './InteractionAlerts.svelte';
   import InactivityTimer from './InactivityTimer.svelte';
-  import { medCards, appState, tickCurrentDate, clearAllMedState, getActiveResult, _syncCardStatus, getHasSummary } from '$lib/state.svelte';
+  import { medCards, appState, tickCurrentDate, clearAllMedState, getActiveResult, getHasSummary } from '$lib/state.svelte';
   import { CHECK_INTERACTIONS } from '$lib/interactions';
   import { canRenewMed } from '$lib/prescribe-calc';
   import { VALID_THEMES } from '$lib/constants';
@@ -85,10 +85,6 @@
     if (typeof document !== 'undefined') {
       document.documentElement.setAttribute('data-theme', theme);
     }
-  });
-
-  $effect(() => {
-    _syncCardStatus();
   });
 
   $effect(() => {
