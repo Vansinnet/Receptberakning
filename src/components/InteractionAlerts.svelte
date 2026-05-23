@@ -6,7 +6,7 @@
 
 {#if warnings.length > 0}
   <div id="interactionAlerts" aria-live="polite" aria-atomic="true">
-    {#each warnings as w (w.drugs.join('+'))}
+    {#each warnings as w (w.drugs.join('+') + '|' + w.title)}
       <div class="interaction-alert interaction-{w.severity}">
         <div class="interaction-header">
           <span class="interaction-icon" aria-hidden="true">{w.severity === 'danger' ? '⚠' : '⚡'}</span>
