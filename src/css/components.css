@@ -1,0 +1,874 @@
+/* â”€â”€ TOPBAR â”€â”€ */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+  border-radius: 0;
+}
+
+/* VarumÃ¤rkesrad â€” centrerad */
+.topbar-brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 16px 9px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Navigeringsrad â€” tabs till vÃ¤nster, instÃ¤llningar till hÃ¶ger */
+.topbar-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  height: 40px;
+  gap: 16px;
+}
+
+.topbar-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+.app-brand-icon {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: var(--primary); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; font-weight: 700; line-height: 1; flex-shrink: 0;
+}
+.app-brand-name { font-size: 20px; font-weight: 500; color: var(--primary); white-space: nowrap; letter-spacing: -0.02em; }
+.app-brand-date { font-size: 11px; color: var(--text-muted);   white-space: nowrap; margin-inline-start: 2px; }
+
+/* Tabs i topbar */
+.main-tabs { display: flex; gap: 2px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 3px; }
+.main-tab {
+  padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+  cursor: pointer; border: none; background: transparent; color: var(--text-muted);
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s, border-color 0.15s; white-space: nowrap; font-family: inherit;
+}
+.main-tab.active  { background: var(--surface); color: var(--primary); box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
+.main-tab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.main-tab:hover:not(.active) { color: var(--text); background: var(--clear-btn); }
+
+.topbar-setting { display: flex; align-items: center; gap: 5px; }
+.topbar-setting-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* â”€â”€ VÃ¤nster: LÃ¤kemedelslista â”€â”€ */
+.med-sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  border-inline-end: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px 6px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-label {
+  font-size: 10px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+
+.med-list {
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.med-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.12s, border-color 0.12s;
+  background: none;
+  text-align: start;
+  width: 100%;
+  font-family: inherit;
+}
+.med-item:hover { background: var(--surface2); }
+.med-item:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.med-item.active {
+  background: var(--primary-light);
+  border-color: var(--border-strong);
+}
+
+.med-item-info { flex: 1; min-width: 0; }
+.med-item-name {
+  font-size: 12px; font-weight: 600; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.med-item-status { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+.med-item.active .med-item-name { color: var(--primary); }
+
+.status-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  background: var(--border-strong); transition: background 0.3s;
+}
+.status-dot.ok    { background: var(--green); box-shadow: 0 0 0 2px var(--green-bg); }
+.status-dot.warn  { background: var(--red);   box-shadow: 0 0 0 2px var(--red-bg); }
+
+.btn-add-med {
+  display: flex; align-items: center; gap: 5px;
+  margin: 6px 8px 10px;
+  padding: 7px 10px;
+  border-radius: var(--radius-md);
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  background: none; border: 1px dashed var(--border-strong);
+  color: var(--text-muted); font-family: inherit;
+  transition: background 0.12s, color 0.12s, border-style 0.12s;
+}
+.btn-add-med:hover { background: var(--surface2); color: var(--text); border-style: solid; }
+.btn-add-med:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+#newPatientBtn {
+  margin: 10px 8px 8px;
+  width: calc(100% - 16px);
+}
+
+/* â”€â”€ Mitten: FormulÃ¤r â”€â”€ */
+.form-panel {
+  width: var(--form-w);
+  flex-shrink: 0;
+  border-inline-end: 1px solid var(--border);
+  background: var(--surface);
+  overflow-y: auto;
+  padding: 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.form-empty-state, .result-empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+  text-align: center;
+  padding: 20px;
+}
+.empty-icon { font-size: 28px; opacity: 0.4; }
+
+.form-panel-header {
+  display: flex; flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 12px; gap: 8px;
+}
+.form-med-name { font-size: 14px; font-weight: 700; color: var(--primary); min-height: 1.3em; }
+.form-panel-header > div:not(.form-panel-actions) {
+  min-height: 34px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.form-panel-actions { display: flex; gap: 6px; align-items: center; }
+
+/* â”€â”€ HÃ¶ger: Resultat â”€â”€ */
+.result-panel {
+  flex: 1;
+  background: var(--surface2);
+  overflow-y: auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;    /* staplar varning + resultat vertikalt */
+  align-items: center;       /* centrerar barnen horisontellt */
+}
+
+.result-content {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 860px;       /* hindrar texten att bli för bred på stora skärmar */
+  width: 100%;
+}
+
+/* Tidslinje */
+.tl-label {
+  font-size: 10px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px;
+}
+.tl-bar-bg {
+  height: 6px; background: var(--border); border-radius: 3px; position: relative;
+}
+.tl-fill {
+  height: 6px; border-radius: 3px; position: relative; transition: width 0.4s ease; width: 0%;
+}
+.tl-fill-ok    { background: var(--green); }
+.tl-fill-warn  { background: var(--amber); }
+.tl-fill-danger{ background: var(--red); }
+.tl-today-marker {
+  position: absolute; right: 0; top: -5px;
+  width: 2px; height: 16px; background: var(--text-muted); border-radius: 1px;
+}
+.tl-labels {
+  display: flex; justify-content: space-between; margin-top: 4px;
+  font-size: 10px; color: var(--text-muted);
+  font-family: "SF Mono", Consolas, monospace;
+}
+.tl-today-label { font-weight: 600; color: var(--text-muted); }
+
+/* Alerts */
+.alert {
+  padding: 10px 12px; border-inline-start: 3px solid; border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-size: 12px; line-height: 1.6;
+}
+.alert strong { font-weight: 700; display: block; margin-bottom: 2px; }
+.alert-danger { background: var(--red-bg);   border-color: var(--red);   color: var(--red); }
+.alert-warn   { background: var(--amber-bg); border-color: var(--amber); color: var(--amber); }
+.alert-info   { background: var(--blue-bg);  border-color: var(--blue);  color: var(--blue); }
+.alert-ok     { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+
+/* Interaktionsvarningar */
+#interactionAlerts {
+  order: -1;
+  width: 100%;
+  max-width: 860px;
+  padding: 14px 16px 0;
+}
+.interaction-alert {
+  padding: 8px 12px;
+  border-inline-start: 4px solid;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  margin-bottom: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.interaction-danger {
+  background: var(--red-bg);
+  border-color: var(--red);
+  color: var(--red);
+}
+.interaction-warn {
+  background: var(--amber-bg);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+.interaction-header {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+.interaction-icon { font-size: 14px; flex-shrink: 0; }
+.interaction-header strong { font-size: 13px; font-weight: 700; }
+.interaction-inline { font-size: 12px; }
+.interaction-link {
+  color: inherit;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+/* Statusprick fÃ¶r interagerande lÃ¤kemedel */
+.status-dot.interaction {
+  background: var(--red);
+  box-shadow: 0 0 6px rgba(220, 38, 38, 0.5);
+}
+
+/* BeslutsfrÃ¥ga â€“ fÃ¶r tidig fÃ¶rnyelse */
+.early-decision-box {
+  border: 2px solid var(--amber);
+  border-inline-start: 5px solid var(--amber);
+  background: var(--amber-bg);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 2px 10px rgba(180, 83, 9, 0.15);
+}
+.early-decision-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+.early-decision-q {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--amber);
+}
+.early-decision-actions { display: flex; gap: 8px; }
+.early-btn { font-size: 12px; font-weight: 700; }
+.early-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.early-btn-yes { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
+.early-btn-yes:hover  { background: var(--green-border); }
+.early-btn-yes.selected { background: var(--green); color: var(--btn-selected-text); border-color: var(--green); }
+.early-btn-no  { background: var(--red-bg);   color: var(--red);   border-color: var(--red-border); }
+.early-btn-no:hover   { background: var(--red-border); color: var(--red); }
+.early-btn-no.selected  { background: var(--red);   color: var(--btn-selected-text); border-color: var(--red); }
+
+/* Val av startdatum fÃ¶r fÃ¶rskrivning */
+.start-date-choice {
+  background: var(--amber-bg); border: 1px solid var(--amber-border);
+  border-radius: var(--radius-md); padding: 12px 14px; margin-top: 10px;
+}
+.start-date-choice-label { font-size: 12px; color: var(--text); margin-bottom: 8px; }
+.start-date-choice-actions { display: flex; gap: 8px; }
+.start-date-choice-actions button {
+  flex: 1; padding: 6px 10px; font-size: 12px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--text); cursor: pointer;
+  font-family: inherit;
+}
+.start-date-choice-actions button.selected {
+  background: var(--amber); color: var(--btn-selected-text); border-color: var(--amber);
+}
+
+/* Knapp fÃ¶r vy-vÃ¤xling lÃ¤kare/sjukskÃ¶terska */
+.btn-nurse-toggle {
+  padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+  cursor: pointer; border: 1px solid var(--border); background: var(--surface2);
+  color: var(--text-muted); transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s; white-space: nowrap;
+  font-family: inherit; flex-shrink: 0;
+}
+.btn-nurse-toggle[aria-pressed="true"] {
+  background: var(--primary-light); color: var(--primary);
+  border-color: var(--primary); box-shadow: var(--shadow-sm);
+}
+.btn-nurse-toggle:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.btn-nurse-toggle:hover { background: var(--clear-btn); color: var(--text); }
+
+/* Nurse-kolumn â€” mellan formulÃ¤r och resultat */
+.nurse-col {
+  width: 240px;
+  flex-shrink: 0;
+  border-inline-end: 1px solid var(--border);
+  background: var(--surface);
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* SjukskÃ¶terskebedÃ¶mning */
+.nurse-assessment {
+  background: var(--primary-light);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: background 0.3s;
+}
+.nurse-hint {
+  font-size: 10px;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+  margin-top: 2px;
+  font-style: italic;
+}
+.nurse-assessment-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+.nurse-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 0;
+}
+.nurse-checkbox input[type="checkbox"] {
+  width: 16px; height: 16px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Copy-sektion */
+.copy-section {
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  overflow: hidden; flex: 1; display: flex; flex-direction: column;
+}
+.copy-tabs-row {
+  display: flex; border-bottom: 1px solid var(--border); background: var(--surface2);
+}
+.copy-tab {
+  flex: 1; padding: 7px 12px; font-size: 12px; font-weight: 600; cursor: pointer;
+  border: none; background: transparent; color: var(--text-muted);
+  border-bottom: 2px solid transparent; transition: background 0.15s, color 0.15s, border-color 0.15s; font-family: inherit;
+}
+.copy-tab.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--primary-light); }
+.copy-tab:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.copy-body {
+  font-family: "SF Mono", "Fira Code", Consolas, monospace; font-size: 11px;
+  line-height: 1.7; background: var(--code-bg); padding: 10px 12px;
+  white-space: pre-wrap; flex: 1; overflow-y: auto; color: var(--text);
+  min-height: 80px;
+}
+.copy-footer {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+  padding: 6px 10px; background: var(--surface2); border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   LÃ…NGVARIG FÃ–RBRUKNING
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+.longterm-layout {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.longterm-layout > .card {
+  width: 100%;
+  max-width: 1100px;
+}
+
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden;
+}
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--surface2);
+}
+.card-header-left { display: flex; align-items: center; gap: 10px; }
+.card-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--primary-light); color: var(--primary);
+  font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.card-num-lt { background: var(--violet-bg); color: var(--violet); }
+.card-title { font-size: 14px; font-weight: 700; }
+
+/* TvÃ¥kolumns layout fÃ¶r LÃ¥ngvarig */
+.longterm-body {
+  display: flex;
+  min-height: 400px;
+}
+.longterm-form-col {
+  flex: 0 0 420px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-inline-end: 1px solid var(--border);
+  overflow-y: auto;
+}
+.longterm-result-col {
+  flex: 1;
+  padding: 16px;
+  background: var(--surface2);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-banner-lt {
+  background: var(--blue-bg); border: 1px solid var(--blue-border);
+  border-inline-start: 3px solid var(--blue); border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: 8px 11px; font-size: 11px; color: var(--blue);
+  margin-bottom: 10px; line-height: 1.6;
+}
+
+.lt-form-actions {
+  display: flex; gap: 8px; margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid var(--border); flex-wrap: wrap;
+}
+
+/* FÃ¶rbrukningsgraf */
+.consumption-bar-wrap {
+  margin: 8px 0 3px; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  overflow: hidden; height: 24px; position: relative;
+}
+.consumption-bar {
+  height: 100%; border-radius: 0; transition: width 0.4s ease;
+  display: flex; align-items: center; justify-content: flex-end;
+  padding-inline-end: 8px; font-size: 11px; font-weight: 700; color: #fff;
+  min-width: 36px;
+}
+.consumption-bar.ok    { background: var(--green); }
+.consumption-bar.under { background: var(--amber); }
+.consumption-bar.over  { background: var(--red); }
+.bar-ticks {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: var(--text-muted); margin-top: 2px; padding: 0 2px;
+}
+
+/* Periodtabell */
+.period-table {
+  border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden;
+  font-size: 12px; border-collapse: separate; border-spacing: 0; width: 100%;
+}
+.period-table thead tr {
+  background: var(--surface2); border-bottom: 1px solid var(--border);
+}
+.period-table th {
+  padding: 6px 12px; text-align: left;
+  font-size: 10px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--border);
+}
+.period-table tbody tr { border-bottom: 1px solid var(--border); }
+.period-table tbody tr:last-child td { border-bottom: none; }
+.period-table tbody tr:nth-child(even) { background: var(--surface2); }
+.period-cell { font-weight: 500; padding: 7px 12px; vertical-align: middle; }
+.period-cell.mono { font-family: "SF Mono", Consolas, monospace; }
+
+.section-label {
+  font-size: 10px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  margin: 14px 0 7px; padding-bottom: 5px; border-bottom: 1px solid var(--border);
+}
+.section-label-spaced { margin-top: 14px; }
+
+.btn-add-period { margin-top: 8px; }
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   NY FÃ–RSKRIVNING â€” fjÃ¤rde kolumnen
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+.prescribe-panel {
+  width: 236px;
+  flex-shrink: 0;
+  border-inline-start: 1px solid var(--border);
+  background: var(--surface);
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.prescribe-title {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+
+.prescribe-med-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.prescribe-info-row {
+  margin: 8px 0 6px;
+  padding: 7px 10px;
+  background: var(--surface2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+.prescribe-info-label {
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 1px;
+}
+.prescribe-info-val {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  font-family: "SF Mono", Consolas, monospace;
+}
+.prescribe-info-sub {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* â”€â”€ SammanstÃ¤llning: alla lÃ¤kemedel â”€â”€ */
+.prescribe-summary-wrap {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.prescribe-summary-header {
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+.prescribe-summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.prescribe-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  border-radius: var(--radius-md);
+  background: var(--surface2);
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--text-muted);
+  transition: background 0.13s, border-color 0.13s, color 0.13s;
+  text-align: start;
+  width: 100%;
+}
+.prescribe-summary-row:hover {
+  color: var(--text);
+  border-color: var(--border);
+}
+.prescribe-summary-row:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.prescribe-summary-row.active {
+  background: var(--primary-light, rgba(26,86,219,0.08));
+  border-color: var(--primary);
+  color: var(--text);
+}
+.prescribe-summary-name {
+  font-size: 12px;
+  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+.prescribe-summary-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  margin-inline-start: 8px;
+}
+.prescribe-summary-pkg {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  font-family: "SF Mono", Consolas, monospace;
+  white-space: nowrap;
+}
+.prescribe-summary-size {
+  font-size: 9px;
+  color: var(--text-muted);
+  font-family: "SF Mono", Consolas, monospace;
+  white-space: nowrap;
+}
+
+.prescribe-mode-toggle {
+  display: flex;
+  gap: 3px;
+  margin: 6px 0 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 3px;
+}
+.prescribe-mode-btn {
+  flex: 1;
+  padding: 5px 6px;
+  border: none;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+.prescribe-mode-btn.active {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+.prescribe-mode-btn:hover:not(.active) { color: var(--text); }
+.prescribe-mode-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.prescribe-select {
+  width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-family: inherit;
+  outline: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.prescribe-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.prescribe-result {
+  margin-top: 10px;
+  background: var(--green-bg);
+  border: 1px solid var(--green-border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.prescribe-result-label {
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--green);
+  opacity: 0.8;
+}
+.prescribe-result-num-row {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin: 1px 0 2px;
+}
+.prescribe-result-packages {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--green);
+  font-family: "SF Mono", Consolas, monospace;
+  line-height: 1;
+}
+.prescribe-result-unit {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+}
+.prescribe-result-details {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 5px;
+  border-top: 1px solid var(--green-border);
+  padding-top: 6px;
+  line-height: 1.6;
+}
+.prescribe-result-period {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  font-family: "SF Mono", Consolas, monospace;
+}
+.prescribe-result-days {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   UTSKRIFT
+   Visar utlÃ¥tande, mÃ¤tvÃ¤rden, kliniska alerter
+
+/* ============================================================
+   FAS 6.4: KOMPONENT-TILLÃ„GG (4.0)
+   Nya CSS-klasser fÃ¶r funktionalitet som saknas i 3.0.
+   ============================================================ */
+
+/* Statusbadge i lÃ¤kemedelslistan */
+.med-list-badge {
+  font-size: 10px; padding: 1px 6px; border-radius: 3px;
+  flex-shrink: 0; margin-left: auto;
+}
+
+/* Prescribe-panel i gÃ¶mt lÃ¤ge â€” behÃ¥ll bredd, dÃ¶lj visuellt (Flexbox) */
+.prescribe-panel.is-hidden { display: flex !important; visibility: hidden; pointer-events: none; }
+
+/* Inaktivitetstoast */
+.inactivity-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface);
+  color: var(--text);
+  border: 2px solid var(--amber-border);
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  z-index: 9999;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  animation: toast-slide-up 0.3s ease-out;
+}
+.inactivity-toast .toast-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.inactivity-toast .btn {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+@keyframes toast-slide-up {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* === AlertDialog === */
+
+.alert-dialog {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--text);
+  padding: 0;
+  max-width: 420px;
+  width: 90vw;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+}
+.alert-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+.alert-dialog-content {
+  padding: 24px;
+}
+.alert-dialog-title {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+.alert-dialog-msg {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.alert-dialog-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}

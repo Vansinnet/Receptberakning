@@ -1,0 +1,74 @@
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   RECEPTFÃ–RNYELSE â€” tre-kolumns widescreen
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+.renew-layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  /* Fyller hela hÃ¶jden minus topbar+banner */
+  height: calc(100vh - var(--topbar-h) - var(--banner-h) - 32px);
+}
+
+/* Footer */
+.site-footer {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  padding: 20px 16px 24px; font-size: 11px; color: var(--text-muted);
+  flex-shrink: 0; border-top: 1px solid var(--border);
+}
+
+.footer-disclaimer {
+  display: flex; align-items: flex-start; gap: 7px;
+  text-align: center;
+  font-size: 11px; color: var(--text-muted); line-height: 1.6;
+}
+.footer-disclaimer-icon { flex-shrink: 0; font-size: 13px; color: var(--amber); margin-top: 1px; }
+.footer-disclaimer a {
+  color: var(--amber); font-weight: 700; text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.footer-disclaimer a:hover { opacity: 0.8; }
+
+.footer-links {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
+}
+.footer-links a {
+  color: var(--text-muted); text-decoration: none; transition: color 0.2s, background 0.2s;
+  display: inline-flex; align-items: center; gap: 6px; font-weight: 600;
+  padding: 5px 10px; border-radius: var(--radius-md);
+  background: var(--surface2); border: 1px solid var(--border);
+}
+.footer-links a:hover { color: var(--text); background: var(--border); }
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   RESPONSIV â€” faller tillbaka till staplat pÃ¥ smal skÃ¤rm
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+@media (max-width: 900px) {
+  .renew-layout { flex-direction: column; height: auto; overflow-y: auto; }
+  /* result-panel fÃ¥r inte Ã¤ta upp all hÃ¶jd i kolumnriktning â€” prescribe-panel
+     mÃ¥ste fÃ¥ plats nedanfÃ¶r. overflow-y: visible fÃ¶rhindrar dubbel scroll-container. */
+  .result-panel { flex: none; overflow-y: visible; }
+  .med-sidebar { width: 100%;   border-inline-end: none; border-bottom: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; }
+  .med-list { flex-direction: row; flex-wrap: wrap; padding: 6px 8px; }
+  .med-item { width: auto; }
+  .sidebar-header { width: 100%; }
+  .btn-add-med { margin: 6px 8px; }
+  #newPatientBtn { width: auto; margin: 6px 8px; }
+  .form-panel { width: 100%;   border-inline-end: none; border-bottom: 1px solid var(--border); }
+  .nurse-col { width: 100%;   border-inline-end: none; border-bottom: 1px solid var(--border); }
+  .longterm-body { flex-direction: column; }
+  .longterm-form-col { flex: none;   border-inline-end: none; border-bottom: 1px solid var(--border); }
+  .prescribe-panel { width: 100%;   border-inline-start: none; border-top: 1px solid var(--border); }
+}
+
+@media (max-width: 768px) {
+  :root { --sidebar-w: 100%; --form-w: 100%; --topbar-h: 116px; }
+  .topbar-nav-row { flex-wrap: wrap; height: auto; padding: 6px 12px; gap: 6px; }
+  .main-tabs { width: 100%; }
+  .form-row-3 { grid-template-columns: 1fr 1fr; }
+  .period-table .ph-avg { display: none; }
+}
+
+@media (max-width: 560px) {
+  .form-row-2, .form-row-3 { grid-template-columns: 1fr; }
+  .metrics { grid-template-columns: 1fr 1fr; }
+}

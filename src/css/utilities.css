@@ -1,0 +1,95 @@
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   HJÃ„LPKLASSER
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+.is-hidden   { display: none !important; }
+.ml-auto     { margin-inline-start: auto; }
+
+/* â”€â”€ Tooltip (CSS-only â€” CSP-kompatibel) â”€â”€ */
+[data-tooltip] {
+  cursor: help;
+  position: relative;
+}
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  padding: 7px 11px;
+  border-radius: var(--radius-md);
+  font-size: 11px;
+  line-height: 1.6;
+  max-width: 240px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.30);
+  white-space: normal;
+  word-wrap: break-word;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 9999;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+}
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-visible::after {
+  opacity: 1;
+}
+/* â”€â”€ CSP-sÃ¤kra breddklasser (progressbars, 5%-steg) â”€â”€ */
+.w0 { width: 0%; } .w5 { width: 5%; } .w10 { width: 10%; } .w15 { width: 15%; }
+.w20 { width: 20%; } .w25 { width: 25%; } .w30 { width: 30%; } .w35 { width: 35%; }
+.w40 { width: 40%; } .w45 { width: 45%; } .w50 { width: 50%; } .w55 { width: 55%; }
+.w60 { width: 60%; } .w65 { width: 65%; } .w70 { width: 70%; } .w75 { width: 75%; }
+.w80 { width: 80%; } .w85 { width: 85%; } .w90 { width: 90%; } .w95 { width: 95%; }
+.w100 { width: 100%; }
+
+.prescribe-pkg-field { margin-top: 10px; }
+.btn-remove-period { font-size: 11px; margin-bottom: 8px; }
+.flag-icon { vertical-align: middle; margin-right: 5px; border-radius: 2px; display: inline-block; }
+
+/* â”€â”€ Autocomplete-dropdown â”€â”€ */
+.autocomplete-dropdown {
+  position: absolute;
+  z-index: 200;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-top: none;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  box-shadow: var(--shadow-md);
+  max-height: 240px;
+  overflow-y: auto;
+  width: 100%;
+  margin-top: -1px;
+  /* Placera i fÃ¶rhÃ¥llande till .field (position:relative krÃ¤vs pÃ¥ fÃ¶rÃ¤ldern) */
+}
+.autocomplete-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.1s;
+  border-bottom: 1px solid var(--border);
+}
+.autocomplete-item:last-child { border-bottom: none; }
+.autocomplete-item:hover,
+.autocomplete-item.active {
+  background: var(--primary-light);
+}
+.ac-drug-name {
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ac-drug-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}

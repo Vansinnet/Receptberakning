@@ -1,0 +1,74 @@
+/* â”€â”€ CSS-variabel-bas â”€â”€ */
+:root {
+  --primary: #1d4ed8;
+  --primary-light: #dbeafe;
+  --primary-hover: #1e40af;
+  --bg: #f1f5f9;
+  --surface: #ffffff;
+  --surface2: #f8fafc;
+  --text: #0f172a;
+  --text-muted: #475569;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --topbar-h: 82px;
+  --banner-h: 0px;
+  --green: #15803d; --green-bg: #f0fdf4; --green-border: #86efac;
+  --amber: #b45309; --amber-bg: #fffbeb; --amber-border: #fcd34d;
+  --red: #b91c1c;   --red-bg: #fef2f2;   --red-border: #fca5a5;
+  --blue: #1d4ed8;  --blue-bg: #eff6ff;  --blue-border: #bfdbfe;
+  --violet: #7c3aed; --violet-bg: #f5f3ff; --violet-border: #ddd6fe;
+  --input-bg: #ffffff;
+  --clear-btn: #f1f5f9; --clear-btn-hover: #e2e8f0; --clear-btn-text: #334155;
+  --code-bg: #f8fafc;
+  --danger-bg: var(--red-bg); --danger-color: var(--red); --danger-border: var(--red-border); --danger-hover: var(--red-border);
+  --btn-selected-text: #fff;
+  --sidebar-w: 178px;
+  --form-w: 440px;
+}
+
+[data-theme="dark"] {
+  --primary: #58a6ff; --primary-light: #1c2d3f; --primary-hover: #79b8ff;
+  --bg: #0d1117; --surface: #161b22; --surface2: #21262d;
+  --text: #e6edf3; --text-muted: #8b949e;
+  --border: #30363d; --border-strong: #3d444d;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.40); --shadow-md: 0 4px 14px rgba(0,0,0,0.55);
+  --green: #3fb950; --green-bg: #0c1f15; --green-border: #1a4229;
+  --amber: #e3b341; --amber-bg: #191108; --amber-border: #4a3100;
+  --red: #f85149;   --red-bg: #1c0c0a;   --red-border: #4d1a16;
+  --blue: #58a6ff;  --blue-bg: #061a2e;  --blue-border: #0c3259;
+  --violet: #a371f7; --violet-bg: #160d30; --violet-border: #311a68;
+  --input-bg: #0d1117; --code-bg: #0d1117;
+  --clear-btn: #21262d; --clear-btn-hover: #30363d; --clear-btn-text: #c9d1d9;
+  --danger-bg: var(--red-bg); --danger-color: var(--red); --danger-border: var(--red-border); --danger-hover: var(--red-border);
+  --btn-selected-text: var(--bg);
+}
+
+[data-theme="klinisk"] {
+  --primary: #0f766e; --primary-light: #f0fdfa; --primary-hover: #115e59;
+  --bg: #f0fdfa; --surface2: #ccfbf1;
+  --text: #11554c; --text-muted: #3d706b;
+  --border: #99f6e4; --border-strong: #5eead4;
+  --shadow-sm: 0 1px 3px rgba(13,148,136,0.08), 0 1px 2px rgba(13,148,136,0.05);
+  --shadow-md: 0 4px 16px rgba(13,148,136,0.10), 0 2px 6px rgba(13,148,136,0.06);
+  --blue: #0369a1; --blue-bg: #f0f9ff; --blue-border: #bae6fd;
+  --code-bg: #f0fdfa;
+  --clear-btn: #ccfbf1; --clear-btn-hover: #99f6e4; --clear-btn-text: #11554c;
+}
+
+
+[data-theme="sakura"] {
+  --primary: #db2777; --primary-light: #fce7f3; --primary-hover: #be185d;
+  --bg: #fdf2f8; --surface2: #fce7f3;
+  --text: #831843; --text-muted: #9d174d;
+  --border: #fbcfe8; --border-strong: #f9a8d4;
+  --shadow-sm: 0 1px 3px rgba(219,39,119,0.08), 0 1px 2px rgba(219,39,119,0.05);
+  --shadow-md: 0 4px 16px rgba(219,39,119,0.10), 0 2px 6px rgba(219,39,119,0.06);
+  --blue: #0369a1; --blue-bg: #f0f9ff; --blue-border: #bae6fd;
+  --code-bg: #fdf2f8;
+  --clear-btn: #fce7f3; --clear-btn-hover: #fbcfe8; --clear-btn-text: #831843;
+}

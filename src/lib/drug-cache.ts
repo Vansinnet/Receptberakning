@@ -26,7 +26,7 @@ function getDB(): Promise<IDBDatabase> {
       const req = indexedDB.open(DB_NAME, 1);
       req.onupgradeneeded = () => { req.result.createObjectStore(STORE_NAME); };
       req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
+      req.onerror = () => { console.warn('[drug-cache] IndexedDB open failed:', req.error); reject(req.error); };
     });
   }
   return _dbPromise;
@@ -49,7 +49,8 @@ export async function loadFromCache(): Promise<CacheData | null> {
       req.onerror = () => { resolve(null); };
       tx.onerror = () => { resolve(null); };
     });
-  } catch {
+  } catch (e) {
+    console.warn('[drug-cache] IndexedDB read misslyckades:', e instanceof Error ? e.message : e);
     return null;
   }
 }
