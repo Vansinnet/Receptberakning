@@ -19,7 +19,7 @@
   --banner-h: 0px;
   --green: #15803d; --green-bg: #f0fdf4; --green-border: #86efac;
   --amber: #b45309; --amber-bg: #fffbeb; --amber-border: #fcd34d;
-  --red: #dc2626;   --red-bg: #fef2f2;   --red-border: #fca5a5;
+  --red: #b91c1c;   --red-bg: #fef2f2;   --red-border: #fca5a5;
   --blue: #1d4ed8;  --blue-bg: #eff6ff;  --blue-border: #bfdbfe;
   --violet: #7c3aed; --violet-bg: #f5f3ff; --violet-border: #ddd6fe;
   --input-bg: #ffffff;
@@ -440,8 +440,8 @@ html, body {
 .early-btn-yes { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
 .early-btn-yes:hover  { background: var(--green-border); }
 .early-btn-yes.selected { background: var(--green); color: var(--btn-selected-text); border-color: var(--green); }
-.early-btn-no  { background: var(--red-bg);   color: #b91c1c;   border-color: var(--red-border); }
-.early-btn-no:hover   { background: var(--red-border); color: #991b1b; }
+.early-btn-no  { background: var(--red-bg);   color: var(--red);   border-color: var(--red-border); }
+.early-btn-no:hover   { background: var(--red-border); color: var(--red); }
 .early-btn-no.selected  { background: var(--red);   color: var(--btn-selected-text); border-color: var(--red); }
 
 /* Val av startdatum fÃ¶r fÃ¶rskrivning */
