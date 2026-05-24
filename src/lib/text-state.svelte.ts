@@ -134,6 +134,7 @@ const _texts = $derived.by((): TextResult => {
 	}
 });
 
+/** Returnerar patienttexter (sv+en) och journaltext för samtliga giltiga kort. */
 export function getActiveTexts(): ActiveTexts {
 	const { patientText, patientTextEn, journalText } = _texts;
 	return { patientText, patientTextEn, journalText };

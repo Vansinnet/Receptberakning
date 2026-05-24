@@ -61,6 +61,10 @@ function _validateLeft(safeLeftRaw: string, remaining: number | null, isDiscrete
     : 'Ange ett tal (0 eller fler), eller lämna tomt.';
 }
 
+/**
+ * Validerar formulärvärden. Hanterar datumparse, dosintervall och enhetsnormalisering.
+ * @returns ValidatedInput vid godkänd validering, InvalidInput annars.
+ */
 export function validateValues(
   medRaw: string,
   dateVal: string,
@@ -134,6 +138,10 @@ function _buildAvgNote(hasRemaining: boolean, calcBase: number, remaining: numbe
   return `(beräknat på faktisk förbrukning: ${calcBase - remaining!} av ${calcBase} tillgängliga ${doseUnit}${suffix})`;
 }
 
+/**
+ * Beräknar läkemedelsförbrukning. DOM-fri, stateless.
+ * Returnerar diskriminerad union: CalcFailure | CalcNonCalculable | CalcSuccess.
+ */
 export function calcCore(inputData: CalcInput): CalcResult {
   if (!inputData.valid) {
     if (inputData.reason === 'too_many_refs') {

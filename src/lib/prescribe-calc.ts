@@ -42,6 +42,10 @@ export interface PrescribeResult {
   unitLabelShort: string;
 }
 
+/**
+ * Beräknar antal förpackningar att förskriva.
+ * Returnerar null om indata är ogiltigt (saknar dos, förpackningsstorlek <= 0 etc.).
+ */
 export function calcPrescribeResult(
   s: PrescribeInput,
   ps: { packageSize: string; mode?: string; months?: number; endDate?: string; startFromToday?: boolean } | null

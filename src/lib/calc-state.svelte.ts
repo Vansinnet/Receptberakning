@@ -44,6 +44,7 @@ const _allCalcs = $derived.by((): Record<number, CalcEntry> => {
 	return out;
 });
 
+/** Returnerar CardStatusCache för ett givet kort, eller undefined om kortet saknas. */
 export function getCardStatus(cardId: number): CardStatusCache | undefined {
 	return _allCalcs[cardId]?.status;
 }

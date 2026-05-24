@@ -44,6 +44,10 @@ async function _doLoad(): Promise<void> {
   }
 }
 
+/**
+ * Laddar interaktionsdata från interactions-scraped.json (lazy-load).
+ * Idempotent — returnerar redan löst Promise om data redan är laddad.
+ */
 export function loadInteractions(): Promise<void> {
   if (_loaded) return Promise.resolve();
   if (!_promise) _promise = _doLoad();

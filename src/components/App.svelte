@@ -13,11 +13,14 @@
   import { canRenewMed } from '$lib/prescribe-calc';
   import { VALID_THEMES } from '$lib/constants';
   import { createInactivityTimer } from '$lib/inactivity.svelte';
+  import { setDrugsLoadErrorHandler } from '$lib/drug-cache';
   import type { AtcEntry } from '$lib/types';
   import GitHubIcon from './GitHubIcon.svelte';
 
   let activeTab = $state<'renew' | 'longterm'>('renew');
   let theme = $state<'dark' | 'klinisk' | 'sakura'>('klinisk');
+  let drugsLoadFailed = $state(false);
+  setDrugsLoadErrorHandler(() => drugsLoadFailed = true);
 
   const inactivityTimer = createInactivityTimer(
     () => clearAllMedState(),
@@ -119,6 +122,13 @@
       <strong>JavaScript krävs.</strong> Aktivera JavaScript i din webbläsare för att använda receptberäkningsverktyget.
     </div>
   </noscript>
+
+  {#if drugsLoadFailed}
+    <div class="alert alert-warn" role="alert" style="text-align:center;border-radius:0;margin:0">
+      <strong>Läkemedelsdatabasen kunde inte laddas.</strong> Kontrollera din internetanslutning.
+      <button class="btn btn-ghost" onclick={() => { drugsLoadFailed = false; location.reload(); }}>Försök igen</button>
+    </div>
+  {/if}
 
   <div id="a11y-announce" class="sr-only" aria-live="polite" bind:this={announceEl}></div>
 

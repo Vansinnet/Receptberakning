@@ -1,7 +1,7 @@
 {
   "name": "recept-4.0",
   "private": true,
-  "version": "3.0.61",
+  "version": "3.0.62",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,6 +9,7 @@
     "validate:data": "node scripts/validate-data.mjs",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:unit": "vitest run tests/unit",
     "test:properties": "vitest run tests/unit/calc.properties.test.ts",
     "test:e2e": "playwright test tests/e2e",
@@ -28,6 +29,7 @@
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/svelte": "^5.3.1",
+    "@vitest/coverage-v8": "^4.1.7",
     "fast-check": "^4.8.0",
     "jsdom": "^29.1.1",
     "svelte": "^5.55.9",

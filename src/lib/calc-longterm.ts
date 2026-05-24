@@ -7,6 +7,10 @@ import {
   LT_BAR_MAX_PCT,
 } from './constants';
 
+/**
+ * Beräknar långvarigt förbrukningsmönster över flera receptperioder.
+ * Returnerar diskriminerad union: LTFailure | LTSuccess.
+ */
 export function calcLongtermCore(
   medRaw: string,
   ordDose: number,

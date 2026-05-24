@@ -30,6 +30,7 @@ export const appState = $state({
 
 export const medCards = $state<MedCard[]>([createEmptyCard(1)]);
 
+/** Lägger till ett nytt tomt läkemedelskort. Returnerar cardId, eller null om MAX_MED_CARDS nåtts. */
 export function pushMedCard(): number | null {
   if (medCards.length >= MAX_MED_CARDS) return null;
   const cardId = appState.nextCardId++;
@@ -90,6 +91,7 @@ export function spliceMedCard(i: number): void {
   }
 }
 
+/** Rensar all patientdata — återställer medCards, appState, ltState och prescribeState. */
 export function clearAllMedState(): void {
   medCards.length = 0;
   medCards.push(createEmptyCard(1));
