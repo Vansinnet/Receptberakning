@@ -70,8 +70,8 @@
           </div>
           <div class="field">
             <label for="lt-dose" data-tooltip="Patientens ordinerade dygnsdos i enheter per dag.">Ordinerad dos (enheter/dag)</label>
-            <input id="lt-dose" type="text" inputmode="decimal" placeholder="T.ex. 1" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value={ltState.doseRaw} oninput={(e) => ltState.doseRaw = (e.target as HTMLInputElement).value} class:input-error={doseInvalid} aria-invalid={doseInvalid} />
-            <FieldError error={doseInvalid ? 'Ange ett positivt tal' : ''} />
+            <input id="lt-dose" type="text" inputmode="decimal" placeholder="T.ex. 1" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value={ltState.doseRaw} oninput={(e) => ltState.doseRaw = (e.target as HTMLInputElement).value} class:input-error={doseInvalid} aria-invalid={doseInvalid} aria-describedby="error-lt-dose" />
+            <FieldError id="error-lt-dose" error={doseInvalid ? 'Ange ett positivt tal' : ''} />
           </div>
         </div>
 
@@ -84,18 +84,18 @@
               <div class="form-row-3" id="lt-period-{i}">
                 <div class="field">
                   <label for="lt-start-{i}" data-tooltip="Startdatum för perioden.">Startdatum</label>
-                  <input id="lt-start-{i}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" maxlength="10" autocomplete="off" value={period.start} oninput={(e) => handleDateInput('start', i, e)} class:input-error={pe?.startError} aria-invalid={pe?.startError} />
-                   <FieldError error={pe?.startError ? 'Ogiltigt datum' : ''} />
+                  <input id="lt-start-{i}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" maxlength="10" autocomplete="off" value={period.start} oninput={(e) => handleDateInput('start', i, e)} class:input-error={pe?.startError} aria-invalid={pe?.startError} aria-describedby="error-lt-start-{i}" />
+                   <FieldError id="error-lt-start-{i}" error={pe?.startError ? 'Ogiltigt datum' : ''} />
                 </div>
                 <div class="field">
                   <label for="lt-total-{i}" data-tooltip="Totalt antal enheter uttagna under perioden.">Antal uttagna enheter</label>
-                  <input id="lt-total-{i}" type="number" placeholder="100" min="1" step="1" value={period.total} oninput={(e) => setLtPeriodField(i, 'total', (e.target as HTMLInputElement).value)} class:input-error={!!pe?.totalError} aria-invalid={!!pe?.totalError} />
-                  <FieldError error={pe?.totalError ? 'Ange ett positivt heltal' : ''} />
+                  <input id="lt-total-{i}" type="number" placeholder="100" min="1" step="1" value={period.total} oninput={(e) => setLtPeriodField(i, 'total', (e.target as HTMLInputElement).value)} class:input-error={!!pe?.totalError} aria-invalid={!!pe?.totalError} aria-describedby="error-lt-total-{i}" />
+                  <FieldError id="error-lt-total-{i}" error={pe?.totalError ? 'Ange ett positivt heltal' : ''} />
                 </div>
                 <div class="field">
                   <label for="lt-end-{i}" data-tooltip="Slutdatum för perioden.">Slutdatum</label>
-                  <input id="lt-end-{i}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" maxlength="10" autocomplete="off" value={period.end} oninput={(e) => handleDateInput('end', i, e)} class:input-error={pe?.endError} aria-invalid={pe?.endError} />
-                  <FieldError error={pe?.endError ? 'Slutdatum måste vara efter startdatum och ej i framtiden' : ''} />
+                  <input id="lt-end-{i}" type="text" inputmode="numeric" placeholder="ÅÅÅÅ-MM-DD" pattern="\d{4}-\d{2}-\d{2}" maxlength="10" autocomplete="off" value={period.end} oninput={(e) => handleDateInput('end', i, e)} class:input-error={pe?.endError} aria-invalid={pe?.endError} aria-describedby="error-lt-end-{i}" />
+                  <FieldError id="error-lt-end-{i}" error={pe?.endError ? 'Slutdatum måste vara efter startdatum och ej i framtiden' : ''} />
                 </div>
               </div>
               {#if pe?.spanError}

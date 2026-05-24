@@ -9,6 +9,23 @@
   } = $props();
 
   const version = __APP_VERSION__;
+
+  const tabIds = ['renew', 'longterm'] as const;
+
+  function handleTabKeydown(e: KeyboardEvent) {
+    const idx = tabIds.indexOf(activeTab);
+    let nextIdx = idx;
+    if (e.key === 'ArrowRight') nextIdx = (idx + 1) % tabIds.length;
+    else if (e.key === 'ArrowLeft') nextIdx = (idx - 1 + tabIds.length) % tabIds.length;
+    else if (e.key === 'Home') nextIdx = 0;
+    else if (e.key === 'End') nextIdx = tabIds.length - 1;
+    else return;
+    e.preventDefault();
+    onTabChange(tabIds[nextIdx]);
+    const tablist = e.currentTarget as HTMLElement;
+    const btns = tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+    btns[nextIdx]?.focus();
+  }
 </script>
 
 <header class="topbar">
@@ -27,15 +44,15 @@
     <span class="app-brand-date">{version}</span>
   </div>
   <div class="topbar-nav-row">
-    <div class="main-tabs" role="tablist">
-      <button class="main-tab" class:active={activeTab === 'renew'} role="tab" aria-selected={activeTab === 'renew'} aria-controls="panel-renew" data-tab="renew" data-tooltip="Beräkna förbrukning och avgör om receptet kan förnyas." onclick={() => onTabChange('renew')}>💊 Receptförnyelse</button>
-      <button class="main-tab" class:active={activeTab === 'longterm'} role="tab" aria-selected={activeTab === 'longterm'} aria-controls="panel-longterm" data-tab="longterm" data-tooltip="Analysera förbrukningsmönster över flera receptperioder." onclick={() => onTabChange('longterm')}>📊 Långvarig förbrukning</button>
+    <div class="main-tabs" role="tablist" onkeydown={handleTabKeydown}>
+      <button class="main-tab" class:active={activeTab === 'renew'} role="tab" aria-selected={activeTab === 'renew'} aria-controls="panel-renew" tabindex={activeTab === 'renew' ? 0 : -1} data-tab="renew" data-tooltip="Beräkna förbrukning och avgör om receptet kan förnyas." onclick={() => onTabChange('renew')}>💊 Receptförnyelse</button>
+      <button class="main-tab" class:active={activeTab === 'longterm'} role="tab" aria-selected={activeTab === 'longterm'} aria-controls="panel-longterm" tabindex={activeTab === 'longterm' ? 0 : -1} data-tab="longterm" data-tooltip="Analysera förbrukningsmönster över flera receptperioder." onclick={() => onTabChange('longterm')}>📊 Långvarig förbrukning</button>
     </div>
     <button class="btn-nurse-toggle" aria-pressed={nurseViewActive} data-tooltip="Växla till sjuksköterskans dokumentationsvy" onclick={() => onNurseToggle()}>🩺 Sjuksköterskevy</button>
     <div class="topbar-right">
       <div class="topbar-setting">
-        <label for="themeSelect" class="topbar-setting-label">Tema</label>
-        <select id="themeSelect" class="theme-select" aria-label="Välj färgtema" value={theme} onchange={(e) => onThemeChange((e.target as HTMLSelectElement).value)}>
+         <label for="themeSelect" class="topbar-setting-label">Tema</label>
+         <select id="themeSelect" class="theme-select" value={theme} onchange={(e) => onThemeChange((e.target as HTMLSelectElement).value)}>
           <option value="dark">🌙 Mörkt</option>
           <option value="klinisk">🩺 Klinisk</option>
           <option value="sakura">🌸 Körsbär</option>

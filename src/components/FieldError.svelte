@@ -1,5 +1,5 @@
 <script lang="ts">
-  let { error = '' }: { error?: string } = $props();
+  let { error = '', id = '' }: { error?: string; id?: string } = $props();
 </script>
 
-<span class="field-error-msg" class:visible={!!error} aria-live="polite">{error || ''}</span>
+<span {id} class="field-error-msg" class:visible={!!error} role="alert">{error || ''}</span>

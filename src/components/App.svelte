@@ -51,17 +51,30 @@
 
   let allNplIds = $derived(medCards.map(c => c?.form?.nplId).filter((id): id is string => id !== null && id !== undefined));
 
+  let announceEl = $state<HTMLDivElement | null>(null);
+
+  function announce(msg: string) {
+    if (announceEl) {
+      announceEl.textContent = '';
+      requestAnimationFrame(() => { if (announceEl) announceEl.textContent = msg; });
+    }
+  }
+
   function handleTabChange(tab: 'renew' | 'longterm') {
     activeTab = tab;
+    announce(tab === 'renew' ? 'Receptförnyelse' : 'Långvarig förbrukningsanalys');
   }
 
   function handleNurseToggle() {
     appState.nurseViewActive = !appState.nurseViewActive;
+    announce(appState.nurseViewActive ? 'Sjuksköterskevy aktiverad' : 'Sjuksköterskevy inaktiverad');
   }
 
   function handleThemeChange(t: string) {
     if (!VALID_THEMES.has(t)) return;
     theme = t as 'dark' | 'klinisk' | 'sakura';
+    const labels: Record<string, string> = { dark: 'Mörkt tema', klinisk: 'Kliniskt tema', sakura: 'Körsbärstema' };
+    announce(labels[t] || 'Tema ändrat');
   }
 
   function handleEarlyDecision(decision: 'yes' | 'no') {
@@ -103,7 +116,7 @@
     </div>
   </noscript>
 
-  <div id="a11y-announce" class="sr-only" aria-live="polite"></div>
+  <div id="a11y-announce" class="sr-only" aria-live="polite" bind:this={announceEl}></div>
 
   <div class="app-shell">
     <h1 class="sr-only">Receptberäkning – kliniskt beslutsstöd</h1>
@@ -114,7 +127,7 @@
       onThemeChange={handleThemeChange}
     />
 
-    <main id="main-content">
+    <main id="main-content" aria-label="Huvudinnehåll">
         <div id="panel-renew" class="tab-panel" class:active={activeTab === 'renew'} role="tabpanel" aria-labelledby="heading-renew">
           <h2 class="sr-only" id="heading-renew">Receptförnyelse</h2>
           <div class="renew-layout">

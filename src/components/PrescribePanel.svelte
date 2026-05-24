@@ -64,9 +64,9 @@
 <section class="prescribe-panel" class:is-hidden={!visible} aria-label="Ny förskrivning">
   <!-- Duration -->
     <div id="prescribeDuration">
-      <div class="prescribe-mode-toggle">
-        <button type="button" class="prescribe-mode-btn {entryMode === 'months' ? 'active' : ''}" data-tooltip="Välj period i hela månader." onclick={() => handleModeChange('months')}>Månader</button>
-        <button type="button" class="prescribe-mode-btn {entryMode === 'date' ? 'active' : ''}" data-tooltip="Välj ett specifikt slutdatum för förskrivningen." onclick={() => handleModeChange('date')}>Datum</button>
+       <div class="prescribe-mode-toggle" role="radiogroup" aria-label="Förskrivningssätt">
+         <button type="button" class="prescribe-mode-btn {entryMode === 'months' ? 'active' : ''}" role="radio" aria-checked={entryMode === 'months'} data-tooltip="Välj period i hela månader." onclick={() => handleModeChange('months')}>Månader</button>
+         <button type="button" class="prescribe-mode-btn {entryMode === 'date' ? 'active' : ''}" role="radio" aria-checked={entryMode === 'date'} data-tooltip="Välj ett specifikt slutdatum för förskrivningen." onclick={() => handleModeChange('date')}>Datum</button>
       </div>
       {#if entryMode === 'months'}
         <div class="field">

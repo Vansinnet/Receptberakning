@@ -23,9 +23,9 @@
   });
 </script>
 
-<dialog bind:this={dialogEl} class="alert-dialog" aria-describedby="dialog-msg" onclose={() => onCancel()} onclick={handleBackdropClick}>
+<dialog bind:this={dialogEl} class="alert-dialog" aria-labelledby="dialog-title" aria-describedby="dialog-msg" onclose={() => onCancel()} onclick={handleBackdropClick}>
   <div class="alert-dialog-content">
-    <h3 class="alert-dialog-title">{title}</h3>
+    <h3 id="dialog-title" class="alert-dialog-title">{title}</h3>
     <p id="dialog-msg" class="alert-dialog-msg">{message}</p>
     <div class="alert-dialog-actions">
       <button class="btn btn-ghost" onclick={() => onCancel()}>Avbryt</button>
