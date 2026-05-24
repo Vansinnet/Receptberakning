@@ -30,7 +30,7 @@ För varje läkemedel genereras direkt:
 
 Stöd för upp till **8 läkemedel** i samma session — en sammanhållen patienttext och journalanteckning skapas för alla.
 
-Vid flera läkemedel detekteras automatiskt **läkemedelsinteraktioner** — 89 regler baserade på ATC-koder som identifierar potentiella interaktioner. En genväg till Janusmed visas med läkemedlen redan ifyllda för klinisk bedömning.
+Vid flera läkemedel detekteras automatiskt **läkemedelsinteraktioner** — 2926 regler baserade på ATC-koder som identifierar potentiella interaktioner. En genväg till Janusmed visas med läkemedlen redan ifyllda för klinisk bedömning.
 
 När förnyelse beviljas visas en **nyförskrivningspanel** — läkaren anger förskrivningsperiod (1–12 månader eller slutdatum) och verktyget beräknar exakt antal förpackningar med hänsyn till kvarvarande dagar på befintligt recept.
 
@@ -62,7 +62,7 @@ Analysera förbrukningsmönster över flera receptperioder (upp till 10 perioder
 - **Kliniskt beslut** – läkaren väljer Förnya eller Avslå för varje läkemedel. Vid Förnya med ≥14 dagar kvar: följdfråga om förskrivning ska räknas från dagens datum eller receptets slutdatum.
 - **Svar till patient på svenska och engelska** – växla med SVG-flaggor, ingen översättningstjänst krävs.
 - **Journalanteckning** – anpassas efter förnyelsebeslut och klinisk bedömning.
-- **Interaktionsdetektion** – 89 ATC-regler detekterar potentiella interaktioner. Visar vilka läkemedel som berörs med direktlänk till Janusmed för klinisk bedömning (ingen medicinsk vägledning i verktyget).
+- **Interaktionsdetektion** – 2926 ATC-regler detekterar potentiella interaktioner. Visar vilka läkemedel som berörs med direktlänk till Janusmed för klinisk bedömning (ingen medicinsk vägledning i verktyget).
 - **Kopieringsknappar** – för snabb inklistring i journalsystem/1177. Tillfällig bekräftelsetext ("✅ Text kopierad till urklipp.") visas i 2 sekunder.
 
 ### 📦 Nyförskrivning
@@ -111,8 +111,8 @@ Tre inbyggda teman som växlas direkt:
 - **Svelte 5 + TypeScript** — reaktiva komponenter med `$state`/`$derived`, strict type-checking
 - **Vite** — byggsystem med HMR i dev, tree-shaking och code-splitting i production
 - **Vitest** — 241 enhetstester (123 calc + 21 interactions + 5 properties + 8 card-status + 75 utils + 9 components)
-- **Playwright** — 46 E2E-tester + 200 fuzz-simuleringar + axe-core a11y-checkar
-- **PWA** — offline-first via `vite-plugin-pwa` + Workbox, precache av alla assets
+- **Playwright** — 46 E2E-tester (varav 2000 fuzz-scenarier) + axe-core a11y-checkar
+- **PWA** — `vite-plugin-pwa` + Workbox, precache av alla assets. Fungerar offline efter första laddning (drugs.json cachas).
 
 ### Projektstruktur
 ```
@@ -168,8 +168,9 @@ npm run build             # Production build → dist/
 npm test                  # Kör 241 vitest-tester
 npm run test:coverage     # Kör tester + kodtäckningsanalys
 npm run test:e2e          # Kör 46 Playwright E2E-tester
+npm run test:e2e:smoke    # Kör 33 E2E smoke-tester (~30s)
 npm run check             # TypeScript-kontroll (svelte-check)
-npm run build:db          # Crawla FASS och bygg product-db.json (~20–25 min)
+npm run build:db          # Crawla FASS och bygg product-db.json (~45 min)
 npm run generate:drugs    # Generera drugs.json → public/data/drugs.json (~1 min)
 ```
 
