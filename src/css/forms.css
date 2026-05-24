@@ -29,7 +29,7 @@
   color: var(--text-muted); background: var(--surface2); border: 1px solid var(--border);
   border-radius: 4px; padding: 1px 5px; margin-inline-start: 4px; vertical-align: middle;
 }
-.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: end; }
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; }
 .form-row-2-uneven { grid-template-columns: 1.5fr 1fr; }
 .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; align-items: end; }
 /* Dos-fältet: input + period-dropdown sida vid sida */
