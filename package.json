@@ -1,7 +1,7 @@
 {
   "name": "recept-4.0",
   "private": true,
-  "version": "3.0.67",
+  "version": "3.0.68",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,6 +13,7 @@
     "test:unit": "vitest run tests/unit",
     "test:properties": "vitest run tests/unit/calc.properties.test.ts",
     "test:e2e": "playwright test tests/e2e",
+    "test:e2e:smoke": "playwright test tests/e2e/app-state.spec.ts tests/e2e/renewal-flow.spec.ts",
     "test:lighthouse": "node scripts/lighthouse.mjs",
     "test:all": "vitest run && playwright test tests/e2e",
     "test:visual": "playwright test tests/visual-baseline/regression.spec.ts",
