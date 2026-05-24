@@ -9,7 +9,7 @@
   import InteractionAlerts from './InteractionAlerts.svelte';
   import InactivityTimer from './InactivityTimer.svelte';
   import { medCards, appState, tickCurrentDate, clearAllMedState, getActiveResult, getHasSummary } from '$lib/state.svelte';
-  import { CHECK_INTERACTIONS } from '$lib/interactions';
+  import { CHECK_INTERACTIONS, loadInteractions } from '$lib/interactions';
   import { canRenewMed } from '$lib/prescribe-calc';
   import { VALID_THEMES } from '$lib/constants';
   import { createInactivityTimer } from '$lib/inactivity.svelte';
@@ -26,7 +26,11 @@
   let card = $derived(medCards[appState.activeMedIdx] ?? null);
   let result = $derived(getActiveResult());
 
+  let interactionVersion = $state(0);
+  loadInteractions().then(() => interactionVersion++);
+
   let interactionWarnings = $derived.by(() => {
+    void interactionVersion;
     const entries: AtcEntry[] = [];
     for (let i = 0; i < medCards.length; i++) {
       const c = medCards[i];
