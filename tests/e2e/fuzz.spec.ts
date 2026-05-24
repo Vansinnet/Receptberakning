@@ -565,6 +565,14 @@ test.describe('Fuzz — 2000 realistiska kliniska användningar', () => {
       } catch (e) { /* non-critical */ }
     });
 
+    // Ladda interactions-scraped.json (lazy-load)
+    await page.evaluate(async () => {
+      try {
+        const im = await import('/src/lib/interactions.ts');
+        await im.loadInteractions();
+      } catch (e) { /* non-critical */ }
+    });
+
     for (let seq = 1; seq <= SCENARIOS.length; seq++) {
       const s = SCENARIOS[seq - 1];
       const seqInRound = ((seq - 1) % SEQUENCES.length) + 1;
