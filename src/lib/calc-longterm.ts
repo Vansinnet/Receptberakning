@@ -112,7 +112,7 @@ export function calcLongtermCore(
     total: p.total,
     avg: p.avgPerDay,
     consumptionPct: (p.avgPerDay / ordDose) * 100,
-    classification: p.classification as 'ok' | 'over' | 'under',
+    classification: p.classification,
   }));
 
   return {

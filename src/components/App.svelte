@@ -49,7 +49,7 @@
 
   let showPrescribe = $derived(prescribeVisible || getHasSummary());
 
-  let allNplIds = $derived(medCards.filter(c => c?.form?.nplId).map(c => c.form.nplId as string));
+  let allNplIds = $derived(medCards.map(c => c?.form?.nplId).filter((id): id is string => id !== null && id !== undefined));
 
   function handleTabChange(tab: 'renew' | 'longterm') {
     activeTab = tab;

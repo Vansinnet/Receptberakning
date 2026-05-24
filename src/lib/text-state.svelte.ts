@@ -49,15 +49,16 @@ function _buildCardsForText(calcs: Record<number, { calc: CalcResult | null }>):
 		const entry = calcs[card._cardId];
 		if (!entry?.calc) continue;
 		const c = entry.calc;
-		if (!c.valid || c.calculable === false) continue;
+		if (!c.valid) continue;
+		if (c.calculable === false) continue;
 		const medNameStripped = stripManufacturer(card.form.medRaw) || card.form.medRaw;
 		entries.push({
 			name: medNameStripped, i: card._cardId,
-			dose: c.dose ?? 0, doseUnitLabel: c.doseUnitLabel ?? 'st/dag',
-			doseUnit: c.doseUnit ?? 'st', total: c.total ?? 0,
-			pDateStr: c.pDateStr ?? '', prescribedEndDateStr: c.prescribedEndDateStr ?? '',
-			displayAvgStr: c.displayAvgStr ?? '', avgNote: c.avgNote ?? '',
-			daysToPrescribedEnd: c.daysToPrescribedEnd ?? 0,
+			dose: c.dose, doseUnitLabel: c.doseUnitLabel,
+			doseUnit: c.doseUnit, total: c.total,
+			pDateStr: c.pDateStr, prescribedEndDateStr: c.prescribedEndDateStr,
+			displayAvgStr: c.displayAvgStr, avgNote: c.avgNote,
+			daysToPrescribedEnd: c.daysToPrescribedEnd,
 			consumptionPct: c.consumptionPct,
 			decision: card.decision,
 		});

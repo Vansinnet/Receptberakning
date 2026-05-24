@@ -1,7 +1,7 @@
 <script lang="ts">
   import { medCards, getPrescribeState, applyPrescribeStatePatch, appState, getCardStatus, getActiveResult, getHasSummary, getPrescribeSummary, getActivePrescribeResult } from '$lib/state.svelte';
   import { canRenewMed, prescribeValidationHint } from '$lib/prescribe-calc';
-  import { UNIT_DISPLAY, DEFAULT_PRESCRIBE_MODE, DEFAULT_PRESCRIBE_MONTHS, MAX_PRESCRIBE_MONTHS } from '$lib/constants';
+  import { getUnitDisplay, DEFAULT_PRESCRIBE_MODE, DEFAULT_PRESCRIBE_MONTHS, MAX_PRESCRIBE_MONTHS } from '$lib/constants';
   import { applyDateMask, stripManufacturer } from '$lib/utils';
 
   let { visible = false, eligible = false } = $props();
@@ -91,7 +91,7 @@
         <div class="prescribe-med-name">{stripManufacturer(result.medRaw || '') || `Läkemedel ${appState.activeMedIdx + 1}`}</div>
 
         <div class="field prescribe-pkg-field">
-          <label for="ps-pkg" data-tooltip="Antal enheter per förpackning.">Förpackningsstorlek ({UNIT_DISPLAY[(result.doseUnit ?? 'st') as keyof typeof UNIT_DISPLAY]?.long ?? 'tabletter'})</label>
+          <label for="ps-pkg" data-tooltip="Antal enheter per förpackning.">Förpackningsstorlek ({getUnitDisplay((result?.doseUnit ?? 'st') as string).long})</label>
           <input id="ps-pkg" type="number" min="1" step="1" placeholder="T.ex. 30" value={displayPkgSize} oninput={handlePkgInput} />
         </div>
 

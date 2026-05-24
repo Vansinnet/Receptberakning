@@ -121,6 +121,12 @@ export const UNIT_DISPLAY = {
   dos: { short: 'dos', long: 'doser' },
 } as const;
 
+export type UnitDisplayKey = keyof typeof UNIT_DISPLAY;
+
+export function getUnitDisplay(unit: string): { short: string; long: string } {
+  return (UNIT_DISPLAY as Record<string, { short: string; long: string }>)[unit] ?? UNIT_DISPLAY.st;
+}
+
 // Dos-enhetsnormalisering: rå enhet → kanonisk enhet.
 export const DOSE_UNIT_NORMALIZE: Record<string, string> = {
   mikrogram: 'µg', mikrog: 'µg', microgram: 'µg', mcg: 'µg',
