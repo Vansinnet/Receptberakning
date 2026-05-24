@@ -110,8 +110,8 @@ Tre inbyggda teman som växlas direkt:
 
 - **Svelte 5 + TypeScript** — reaktiva komponenter med `$state`/`$derived`, strict type-checking
 - **Vite** — byggsystem med HMR i dev, tree-shaking och code-splitting i production
-- **Vitest** — 254 enhetstester (123 calc + 43 interactions + 5 properties + 8 card-status + 75 utils)
-- **Playwright** — 34 E2E-tester + 200 fuzz-simuleringar
+- **Vitest** — 241 enhetstester (123 calc + 21 interactions + 5 properties + 8 card-status + 75 utils + 9 components)
+- **Playwright** — 46 E2E-tester + 200 fuzz-simuleringar + axe-core a11y-checkar
 - **PWA** — offline-first via `vite-plugin-pwa` + Workbox, precache av alla assets
 
 ### Projektstruktur
@@ -124,10 +124,10 @@ src/
     drug-cache.ts,
     state.svelte.ts           — Barrel-export (5 statemoduler)
     form-state.svelte.ts      — Formulär, validering, aktiv beräkning
+    calc-state.svelte.ts      — Per-kort beräkning, getCardStatus
     prescribe-state.svelte.ts — Förskrivar-state (per cardId)
     longterm-state.svelte.ts  — Långvarig förbrukning
-    cache-state.svelte.ts     — Resultatcache + statuscache
-    text-state.svelte.ts      — Textorkestrering + prescribe-derivations
+    text-state.svelte.ts      — Textorkestrering, prescribe-derivations
     autocomplete.svelte.ts    — Autocomplete-modul (generisk)
     inactivity.svelte.ts      — Inaktivitetstimer
     actions.svelte.ts         — Svelte actions (copyable)
@@ -138,7 +138,11 @@ src/
     GitHubIcon.svelte, FieldError.svelte, FlagIcon.svelte,
     InteractionAlerts.svelte, InactivityTimer.svelte,
     AlertDialog.svelte
-  app.css        — CSS (global, inga scoped styles)
+  css/           — 7 CSS-filer (@import i app.css)
+    variables.css, base.css, layout.css,
+    components.css, forms.css, utilities.css,
+    a11y.css, print.css
+  app.css        — @import-sammanställning
   app.d.ts       — TypeScript-deklarationer
   main.ts        — Entrypoint
 public/
@@ -149,7 +153,7 @@ public/
 
 - **Standardiserad datumhantering** — alla datum hanteras som UTC för att undvika tidszonsproblem. `clock.ts` möjliggör mockning i tester.
 - **Rena beräkningsfunktioner** (`calcCore`, `calcLongtermCore`, `calcPrescribeResult`) saknar DOM-beroenden.
-- **WCAG 2.1 AA** — 0 axe-core violations, 27 passes.
+- **WCAG 2.1 AA** — axe-core integrerat i E2E (4 kontrollpunkter), 0 violationer i produktion.
 - **CSP** — strikt Content Security Policy (`style-src 'self'`, `script-src 'self'`, `connect-src 'self'`).
 
 ---
@@ -161,8 +165,8 @@ public/
 npm install               # Installera beroenden
 npm run dev               # Starta Vite dev-server (HMR)
 npm run build             # Production build → dist/
-npm test                  # Kör 254 vitest-tester
-npm run test:e2e          # Kör 34 Playwright E2E-tester
+npm test                  # Kör 241 vitest-tester
+npm run test:e2e          # Kör 46 Playwright E2E-tester
 npm run check             # TypeScript-kontroll (svelte-check)
 npm run build:db          # Crawla FASS och bygg product-db.json (~20–25 min)
 npm run generate:drugs    # Generera drugs.json → public/data/drugs.json (~1 min)
