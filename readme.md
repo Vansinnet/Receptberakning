@@ -166,6 +166,7 @@ npm install               # Installera beroenden
 npm run dev               # Starta Vite dev-server (HMR)
 npm run build             # Production build → dist/
 npm test                  # Kör 241 vitest-tester
+npm run test:coverage     # Kör tester + kodtäckningsanalys
 npm run test:e2e          # Kör 46 Playwright E2E-tester
 npm run check             # TypeScript-kontroll (svelte-check)
 npm run build:db          # Crawla FASS och bygg product-db.json (~20–25 min)
