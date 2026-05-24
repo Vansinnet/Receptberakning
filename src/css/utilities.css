@@ -1,10 +1,10 @@
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   HJÃ„LPKLASSER
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* HJÄLPKLASSER */
+
 .is-hidden   { display: none !important; }
 .ml-auto     { margin-inline-start: auto; }
 
-/* â”€â”€ Tooltip (CSS-only â€” CSP-kompatibel) â”€â”€ */
+/* Tooltip (CSS-only CSP-kompatibel) */
+
 [data-tooltip] {
   cursor: help;
   position: relative;
@@ -37,7 +37,8 @@
 [data-tooltip]:focus-visible::after {
   opacity: 1;
 }
-/* â”€â”€ CSP-sÃ¤kra breddklasser (progressbars, 5%-steg) â”€â”€ */
+/* CSP-säkra breddklasser (progressbars, 5%-steg) */
+
 .w0 { width: 0%; } .w5 { width: 5%; } .w10 { width: 10%; } .w15 { width: 15%; }
 .w20 { width: 20%; } .w25 { width: 25%; } .w30 { width: 30%; } .w35 { width: 35%; }
 .w40 { width: 40%; } .w45 { width: 45%; } .w50 { width: 50%; } .w55 { width: 55%; }
@@ -49,7 +50,8 @@
 .btn-remove-period { font-size: 11px; margin-bottom: 8px; }
 .flag-icon { vertical-align: middle; margin-right: 5px; border-radius: 2px; display: inline-block; }
 
-/* â”€â”€ Autocomplete-dropdown â”€â”€ */
+/* Autocomplete-dropdown */
+
 .autocomplete-dropdown {
   position: absolute;
   z-index: 200;
@@ -62,7 +64,8 @@
   overflow-y: auto;
   width: 100%;
   margin-top: -1px;
-  /* Placera i fÃ¶rhÃ¥llande till .field (position:relative krÃ¤vs pÃ¥ fÃ¶rÃ¤ldern) */
+  /* Placera i förhållande till .field (position:relative krävs på föräldern) */
+
 }
 .autocomplete-item {
   display: flex;

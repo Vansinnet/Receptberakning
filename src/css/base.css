@@ -1,4 +1,5 @@
-/* â”€â”€ Reset â”€â”€ */
+/* Reset */
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
@@ -11,7 +12,8 @@ html, body {
   transition: background 0.3s, color 0.3s;
 }
 
-/* â”€â”€ Noscript-fallback â”€â”€ */
+/* Noscript-fallback */
+
 .noscript-msg {
   padding: 20px 24px;
   background: var(--amber-bg);
@@ -21,11 +23,13 @@ html, body {
   text-align: center;
 }
 
-/* â”€â”€ TAB PANELS â”€â”€ */
+/* TAB PANELS */
+
 .tab-panel { display: none; flex: 1; min-height: 0; }
 .tab-panel.active { display: flex; flex-direction: column; flex: 1; }
 
-/* â”€â”€ Skip-to-content â”€â”€ */
+/* Skip-to-content */
+
 .skip-link {
   position: absolute;
   top: -100%;
@@ -44,7 +48,8 @@ html, body {
   top: 8px;
 }
 
-/* â”€â”€ Screen-reader-only â”€â”€ */
+/* Screen-reader-only */
+
 .sr-only {
   position: absolute;
   width: 1px;

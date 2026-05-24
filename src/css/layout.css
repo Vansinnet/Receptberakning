@@ -1,15 +1,16 @@
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   RECEPTFÃ–RNYELSE â€” tre-kolumns widescreen
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* RECEPTFÖRNYELSE — tre-kolumns widescreen */
+
 .renew-layout {
   display: flex;
   flex: 1;
   min-height: 0;
-  /* Fyller hela hÃ¶jden minus topbar+banner */
+  /* Fyller hela höjden minus topbar+banner */
+
   height: calc(100vh - var(--topbar-h) - var(--banner-h) - 32px);
 }
 
 /* Footer */
+
 .site-footer {
   display: flex; flex-direction: column; align-items: center; gap: 12px;
   padding: 20px 16px 24px; font-size: 11px; color: var(--text-muted);
@@ -39,13 +40,12 @@
 }
 .footer-links a:hover { color: var(--text); background: var(--border); }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   RESPONSIV â€” faller tillbaka till staplat pÃ¥ smal skÃ¤rm
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* RESPONSIV — faller tillbaka till staplat på smal skärm */
+
 @media (max-width: 900px) {
   .renew-layout { flex-direction: column; height: auto; overflow-y: auto; }
-  /* result-panel fÃ¥r inte Ã¤ta upp all hÃ¶jd i kolumnriktning â€” prescribe-panel
-     mÃ¥ste fÃ¥ plats nedanfÃ¶r. overflow-y: visible fÃ¶rhindrar dubbel scroll-container. */
+  /* result-panel fr inte ta upp all hjd i kolumnriktning prescribe-panel mste f plats nedanfr. overflow-y: visible frhindrar dubbel scroll-container. */
+
   .result-panel { flex: none; overflow-y: visible; }
   .med-sidebar { width: 100%;   border-inline-end: none; border-bottom: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; }
   .med-list { flex-direction: row; flex-wrap: wrap; padding: 6px 8px; }

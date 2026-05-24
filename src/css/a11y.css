@@ -1,4 +1,5 @@
-/* â”€â”€ Reduced motion â”€â”€ */
+/* Reduced motion */
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -8,7 +9,8 @@
   html, body { transition: none; }
 }
 
-/* â”€â”€ Windows High Contrast Mode â”€â”€ */
+/* Windows High Contrast Mode */
+
 @media (forced-colors: active) {
   .btn:focus-visible,
   .main-tab:focus-visible,

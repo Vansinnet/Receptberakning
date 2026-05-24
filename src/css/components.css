@@ -1,4 +1,5 @@
-/* â”€â”€ TOPBAR â”€â”€ */
+/* TOPBAR */
+
 .topbar {
   position: sticky;
   top: 0;
@@ -12,7 +13,8 @@
   border-radius: 0;
 }
 
-/* VarumÃ¤rkesrad â€” centrerad */
+/* Varumärkesrad — centrerad */
+
 .topbar-brand-row {
   display: flex;
   align-items: center;
@@ -22,7 +24,8 @@
   border-bottom: 1px solid var(--border);
 }
 
-/* Navigeringsrad â€” tabs till vÃ¤nster, instÃ¤llningar till hÃ¶ger */
+/* Navigeringsrad — tabs till vänster, inställningar till höger */
+
 .topbar-nav-row {
   display: flex;
   align-items: center;
@@ -44,6 +47,7 @@
 .app-brand-date { font-size: 11px; color: var(--text-muted);   white-space: nowrap; margin-inline-start: 2px; }
 
 /* Tabs i topbar */
+
 .main-tabs { display: flex; gap: 2px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 3px; }
 .main-tab {
   padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
@@ -57,7 +61,8 @@
 .topbar-setting { display: flex; align-items: center; gap: 5px; }
 .topbar-setting-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
-/* â”€â”€ VÃ¤nster: LÃ¤kemedelslista â”€â”€ */
+/* Vänster: Läkemedelslista */
+
 .med-sidebar {
   width: var(--sidebar-w);
   flex-shrink: 0;
@@ -139,7 +144,8 @@
   width: calc(100% - 16px);
 }
 
-/* â”€â”€ Mitten: FormulÃ¤r â”€â”€ */
+/* Mitten: Formulär */
+
 .form-panel {
   width: var(--form-w);
   flex-shrink: 0;
@@ -180,7 +186,8 @@
 }
 .form-panel-actions { display: flex; gap: 6px; align-items: center; }
 
-/* â”€â”€ HÃ¶ger: Resultat â”€â”€ */
+/* Höger: Resultat */
+
 .result-panel {
   flex: 1;
   background: var(--surface2);
@@ -188,7 +195,9 @@
   min-width: 0;
   display: flex;
   flex-direction: column;    /* staplar varning + resultat vertikalt */
+
   align-items: center;       /* centrerar barnen horisontellt */
+
 }
 
 .result-content {
@@ -197,10 +206,12 @@
   flex-direction: column;
   gap: 12px;
   max-width: 860px;       /* hindrar texten att bli för bred på stora skärmar */
+
   width: 100%;
 }
 
 /* Tidslinje */
+
 .tl-label {
   font-size: 10px; font-weight: 700; color: var(--text-muted);
   text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px;
@@ -226,6 +237,7 @@
 .tl-today-label { font-weight: 600; color: var(--text-muted); }
 
 /* Alerts */
+
 .alert {
   padding: 10px 12px; border-inline-start: 3px solid; border-radius: 0 var(--radius-md) var(--radius-md) 0;
   font-size: 12px; line-height: 1.6;
@@ -237,6 +249,7 @@
 .alert-ok     { background: var(--green-bg); border-color: var(--green); color: var(--green); }
 
 /* Interaktionsvarningar */
+
 #interactionAlerts {
   order: -1;
   width: 100%;
@@ -276,13 +289,15 @@
   white-space: nowrap;
 }
 
-/* Statusprick fÃ¶r interagerande lÃ¤kemedel */
+/* Statusprick för interagerande läkemedel */
+
 .status-dot.interaction {
   background: var(--red);
   box-shadow: 0 0 6px rgba(220, 38, 38, 0.5);
 }
 
-/* BeslutsfrÃ¥ga â€“ fÃ¶r tidig fÃ¶rnyelse */
+/* Beslutsfråga för tidig förnyelse */
+
 .early-decision-box {
   border: 2px solid var(--amber);
   border-inline-start: 5px solid var(--amber);
@@ -316,7 +331,8 @@
 .early-btn-no:hover   { background: var(--red-border); color: var(--red); }
 .early-btn-no.selected  { background: var(--red);   color: var(--btn-selected-text); border-color: var(--red); }
 
-/* Val av startdatum fÃ¶r fÃ¶rskrivning */
+/* Val av startdatum för förskrivning */
+
 .start-date-choice {
   background: var(--amber-bg); border: 1px solid var(--amber-border);
   border-radius: var(--radius-md); padding: 12px 14px; margin-top: 10px;
@@ -333,7 +349,8 @@
   background: var(--amber); color: var(--btn-selected-text); border-color: var(--amber);
 }
 
-/* Knapp fÃ¶r vy-vÃ¤xling lÃ¤kare/sjukskÃ¶terska */
+/* Knapp för vy-växling läkare/sjuksköterska */
+
 .btn-nurse-toggle {
   padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
   cursor: pointer; border: 1px solid var(--border); background: var(--surface2);
@@ -347,7 +364,8 @@
 .btn-nurse-toggle:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .btn-nurse-toggle:hover { background: var(--clear-btn); color: var(--text); }
 
-/* Nurse-kolumn â€” mellan formulÃ¤r och resultat */
+/* Nurse-kolumn — mellan formulär och resultat */
+
 .nurse-col {
   width: 240px;
   flex-shrink: 0;
@@ -359,7 +377,8 @@
   flex-direction: column;
 }
 
-/* SjukskÃ¶terskebedÃ¶mning */
+/* Sjuksköterskebedömning */
+
 .nurse-assessment {
   background: var(--primary-light);
   border-radius: var(--radius-md);
@@ -403,6 +422,7 @@
 }
 
 /* Copy-sektion */
+
 .copy-section {
   border: 1px solid var(--border); border-radius: var(--radius-md);
   overflow: hidden; flex: 1; display: flex; flex-direction: column;
@@ -429,9 +449,8 @@
   flex-shrink: 0;
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   LÃ…NGVARIG FÃ–RBRUKNING
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* LÅNGVARIG FÖRBRUKNING */
+
 .longterm-layout {
   padding: 16px;
   flex: 1;
@@ -461,7 +480,8 @@
 .card-num-lt { background: var(--violet-bg); color: var(--violet); }
 .card-title { font-size: 14px; font-weight: 700; }
 
-/* TvÃ¥kolumns layout fÃ¶r LÃ¥ngvarig */
+/* Tvåkolumns layout för Långvarig */
+
 .longterm-body {
   display: flex;
   min-height: 400px;
@@ -497,7 +517,8 @@
   border-top: 1px solid var(--border); flex-wrap: wrap;
 }
 
-/* FÃ¶rbrukningsgraf */
+/* Förbrukningsgraf */
+
 .consumption-bar-wrap {
   margin: 8px 0 3px; background: var(--surface2);
   border: 1px solid var(--border); border-radius: var(--radius-md);
@@ -518,6 +539,7 @@
 }
 
 /* Periodtabell */
+
 .period-table {
   border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden;
   font-size: 12px; border-collapse: separate; border-spacing: 0; width: 100%;
@@ -545,9 +567,8 @@
 
 .btn-add-period { margin-top: 8px; }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   NY FÃ–RSKRIVNING â€” fjÃ¤rde kolumnen
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* NY FÖRSKRIVNING — fjärde kolumnen */
+
 .prescribe-panel {
   width: 236px;
   flex-shrink: 0;
@@ -606,7 +627,8 @@
   margin-top: 2px;
 }
 
-/* â”€â”€ SammanstÃ¤llning: alla lÃ¤kemedel â”€â”€ */
+/* Sammanställning: alla läkemedel */
+
 .prescribe-summary-wrap {
   margin-bottom: 12px;
   padding-bottom: 12px;
@@ -786,25 +808,22 @@
   color: var(--text-muted);
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   UTSKRIFT
-   Visar utlÃ¥tande, mÃ¤tvÃ¤rden, kliniska alerter
+/* UTSKRIFT Visar utltande, mtvrden, kliniska alerter/* ============================================================ FAS 6.4: KOMPONENT-TILLGG (4.0) Nya CSS-klasser fr funktionalitet som saknas i 3.0. ============================================================ */
 
-/* ============================================================
-   FAS 6.4: KOMPONENT-TILLÃ„GG (4.0)
-   Nya CSS-klasser fÃ¶r funktionalitet som saknas i 3.0.
-   ============================================================ */
 
-/* Statusbadge i lÃ¤kemedelslistan */
+/* Statusbadge i läkemedelslistan */
+
 .med-list-badge {
   font-size: 10px; padding: 1px 6px; border-radius: 3px;
   flex-shrink: 0; margin-left: auto;
 }
 
-/* Prescribe-panel i gÃ¶mt lÃ¤ge â€” behÃ¥ll bredd, dÃ¶lj visuellt (Flexbox) */
+/* Prescribe-panel i gmt lge behll bredd, dlj visuellt (Flexbox) */
+
 .prescribe-panel.is-hidden { display: flex !important; visibility: hidden; pointer-events: none; }
 
 /* Inaktivitetstoast */
+
 .inactivity-toast {
   position: fixed;
   bottom: 24px;
@@ -837,6 +856,7 @@
 }
 
 /* === AlertDialog === */
+
 
 .alert-dialog {
   border: 1px solid var(--border-strong);

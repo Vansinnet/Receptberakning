@@ -1,6 +1,5 @@
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   GEMENSAMMA FORM-ELEMENT
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* GEMENSAMMA FORM-ELEMENT */
+
 .field { margin-bottom: 10px; display: flex; flex-direction: column; position: relative; }
 .field label {
   display: block; font-size: 10px; font-weight: 700; color: var(--text-muted);
@@ -33,7 +32,8 @@
 .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: end; }
 .form-row-2-uneven { grid-template-columns: 1.5fr 1fr; }
 .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; align-items: end; }
-/* Dos-fÃ¤ltet: input + period-dropdown sida vid sida */
+/* Dos-fältet: input + period-dropdown sida vid sida */
+
 .dose-input-row { display: flex; gap: 6px; align-items: stretch; }
 .dose-input-row input { flex: 1 1 0; min-width: 0; }
 .dose-input-row select {
@@ -49,7 +49,8 @@
   outline: none;
 }
 
-/* Se till att labels i sidoordnade fÃ¤lt tar samma hÃ¶jd sÃ¥ input-fÃ¤lten linjerar */
+/* Se till att labels i sidoordnade fält tar samma höjd så input-fälten linjerar */
+
 .form-row-2 .field label,
 .form-row-3 .field label {
   min-height: 2.6em;
@@ -57,7 +58,8 @@
   align-items: flex-start;
 }
 
-/* â”€â”€ Knappar â”€â”€ */
+/* Knappar */
+
 .btn {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 6px 12px; border-radius: var(--radius-md);
@@ -97,6 +99,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 }
 
 /* Badges */
+
 .badge {
   display: inline-flex; align-items: center;
   font-size: 11px; font-weight: 700; padding: 2px 7px;
@@ -106,15 +109,16 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 .badge-over  { background: var(--red-bg);   color: var(--red);   border-color: var(--red-border); }
 .badge-under { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
 
-/* FÃ¶rhindra layoutfÃ¶rskjutning nÃ¤r FASS-lÃ¤nk dyker upp:
-   reservera alltid plats men dÃ¶lj med visibility istÃ¤llet fÃ¶r display:none */
+/* Förhindra layoutförskjutning när FASS-länk dyker upp: reservera alltid plats men dölj med visibility istället för display:none */
+
 .fass-link.is-hidden {
   display: inline-flex !important;
   visibility: hidden;
   pointer-events: none;
 }
 
-/* Resultat-grid (nyckel/vÃ¤rde-tabell) */
+/* Resultat-grid (nyckel/värde-tabell) */
+
 .result-grid {
   display: grid; grid-template-columns: auto 1fr;
   gap: 4px 12px; font-size: 12px; margin-bottom: 8px;
@@ -123,9 +127,8 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 .result-grid .rv { font-weight: 600;   text-align: end; }
 .result-grid .divider { grid-column: 1 / -1; border: none; border-top: 1px solid var(--border); margin: 4px 0; }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   LÃ…NGVARIG FÃ–RBRUKNING
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* LÅNGVARIG FÖRBRUKNING */
+
 .longterm-layout {
   padding: 16px;
   flex: 1;
@@ -155,7 +158,8 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 .card-num-lt { background: var(--violet-bg); color: var(--violet); }
 .card-title { font-size: 14px; font-weight: 700; }
 
-/* TvÃ¥kolumns layout fÃ¶r LÃ¥ngvarig */
+/* Tvåkolumns layout för Långvarig */
+
 .longterm-body {
   display: flex;
   min-height: 400px;
@@ -191,7 +195,8 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   border-top: 1px solid var(--border); flex-wrap: wrap;
 }
 
-/* FÃ¶rbrukningsgraf */
+/* Förbrukningsgraf */
+
 .consumption-bar-wrap {
   margin: 8px 0 3px; background: var(--surface2);
   border: 1px solid var(--border); border-radius: var(--radius-md);
@@ -212,6 +217,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 }
 
 /* Periodtabell */
+
 .period-table {
   border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden;
   font-size: 12px; border-collapse: separate; border-spacing: 0; width: 100%;
