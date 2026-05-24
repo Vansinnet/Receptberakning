@@ -20,18 +20,41 @@ export interface CacheData {
 
 let _dbPromise: Promise<IDBDatabase> | null = null;
 
+let _onLoadError: (() => void) | null = null;
+
+export function setDrugsLoadErrorHandler(cb: () => void) {
+	_onLoadError = cb;
+}
+
+async function _fetchWithRetry(url: string, retries = 3): Promise<Response> {
+	let lastErr: unknown;
+	for (let i = 0; i < retries; i++) {
+		try {
+			const resp = await fetch(url);
+			if (resp.ok) return resp;
+			if (resp.status >= 400 && resp.status < 500) throw new Error(`${url}: HTTP ${resp.status}`);
+		} catch (e) {
+			lastErr = e;
+		}
+		if (i < retries - 1) await new Promise(r => setTimeout(r, 500 * Math.pow(2, i)));
+	}
+	_onLoadError?.();
+	throw lastErr ?? new Error(`${url}: misslyckades efter ${retries} försök`);
+}
+
 function getDB(): Promise<IDBDatabase> {
   if (!_dbPromise) {
     _dbPromise = new Promise((resolve, reject) => {
       const req = indexedDB.open(DB_NAME, 1);
       req.onupgradeneeded = () => { req.result.createObjectStore(STORE_NAME); };
       req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
+      req.onerror = () => { console.warn('[drug-cache] IndexedDB open failed:', req.error); reject(req.error); };
     });
   }
   return _dbPromise;
 }
 
+/** Laddar läkemedelsdata från IndexedDB-cache. Returnerar null vid cachemiss eller fel. */
 export async function loadFromCache(): Promise<CacheData | null> {
   try {
     const db = await getDB();
@@ -49,13 +72,15 @@ export async function loadFromCache(): Promise<CacheData | null> {
       req.onerror = () => { resolve(null); };
       tx.onerror = () => { resolve(null); };
     });
-  } catch {
+  } catch (e) {
+    console.warn('[drug-cache] IndexedDB read misslyckades:', e instanceof Error ? e.message : e);
     return null;
   }
 }
 
+/** Hämtar drugs.json från nätverk, validerar och cachrar i IndexedDB. */
 export async function fetchAndCache(serverVersion: number): Promise<RawDrugEntry[]> {
-  const resp = await fetch('/data/drugs.json');
+  const resp = await _fetchWithRetry('/data/drugs.json');
   if (!resp.ok) throw new Error(`drugs.json: ${resp.status}`);
   const text = await resp.text();
   const entries = JSON.parse(text, (key, val) => {

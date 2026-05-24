@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { medCards, appState, pushMedCard, getActiveResult, clearAllMedState, getCardStatus } from '$lib/state.svelte';
+  import { medCards, appState, pushMedCard, clearAllMedState, getCardStatus } from '$lib/state.svelte';
   import { MAX_MED_CARDS } from '$lib/constants';
   import { needsRenewalWarning, stripManufacturer } from '$lib/utils';
   import AlertDialog from './AlertDialog.svelte';
@@ -30,25 +30,16 @@
   }
 
   let activeIdx = $derived(appState.activeMedIdx);
-  let result = $derived(getActiveResult());
 
   function getStatusDot(idx: number): { cls: string; text: string } {
-    if (idx !== activeIdx) {
-      const card = medCards[idx];
-      const cs = getCardStatus(card._cardId);
-      if (!card?.form?.medRaw) return { cls: '', text: 'Ej ifyllt' };
-      if (!cs) return { cls: '', text: '—' };
-      if (!cs.valid) return { cls: '', text: 'Ej ifyllt' };
-      if (!cs.calculable) return { cls: '', text: cs.statusText || '—' };
-      const warn = needsRenewalWarning(cs.consumptionPct, cs.daysToPrescribedEnd);
-      return { cls: warn ? 'warn' : 'ok', text: cs.statusText };
-    }
-    // getActiveResult() är $derived — alltid aktuell. getCardStatus() uppdateras via $effect och kan vara en tick efter.
-    if (!result) return { cls: '', text: '—' };
-    if (!result.valid) return { cls: '', text: 'Ej ifyllt' };
-    if (!result.calculable) return { cls: '', text: result.statusText || '—' };
-    const warn = needsRenewalWarning(result.consumptionPct, result.daysToPrescribedEnd ?? 0);
-    return { cls: warn ? 'warn' : 'ok', text: result.statusText || '' };
+    const card = medCards[idx];
+    const cs = getCardStatus(card._cardId);
+    if (!card?.form?.medRaw) return { cls: '', text: 'Ej ifyllt' };
+    if (!cs) return { cls: '', text: '—' };
+    if (!cs.valid) return { cls: '', text: 'Ej ifyllt' };
+    if (!cs.calculable) return { cls: '', text: cs.statusText || '—' };
+    const warn = needsRenewalWarning(cs.consumptionPct, cs.daysToPrescribedEnd);
+    return { cls: warn ? 'warn' : 'ok', text: cs.statusText };
   }
 </script>
 

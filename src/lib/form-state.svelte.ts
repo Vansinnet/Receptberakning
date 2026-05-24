@@ -1,8 +1,10 @@
-import type { FormValues, MedCard } from './types';
-import { validateValues, calcCore } from './calc';
+import type { MedCard } from './types';
 import { MAX_MED_CARDS } from './constants';
-import { getNow } from './clock';
 import { todayStr } from './utils';
+import { validateValues } from './calc';
+import { getActiveCalc } from './calc-state.svelte';
+import { clearCardPrescribeState, clearPrescribeState } from './prescribe-state.svelte';
+import { resetLtPeriods, ltState } from './longterm-state.svelte';
 
 export function createEmptyCard(cardId: number): MedCard {
   return {
@@ -28,6 +30,7 @@ export const appState = $state({
 
 export const medCards = $state<MedCard[]>([createEmptyCard(1)]);
 
+/** Lägger till ett nytt tomt läkemedelskort. Returnerar cardId, eller null om MAX_MED_CARDS nåtts. */
 export function pushMedCard(): number | null {
   if (medCards.length >= MAX_MED_CARDS) return null;
   const cardId = appState.nextCardId++;
@@ -67,13 +70,36 @@ const _activeValidated = $derived.by(() => {
 
 export function getActiveValidated() { return _activeValidated; }
 
-const _activeResult = $derived(calcCore(_activeValidated));
-
-export function getActiveResult() { return _activeResult; }
+export function getActiveResult() { return getActiveCalc(); }
 
 export function clearCardForm(cardId: number): void {
   const card = medCards.find(c => c._cardId === cardId);
   if (!card) return;
   card.form = createEmptyCard(0).form;
   card.decision = null;
+}
+
+export function spliceMedCard(i: number): void {
+  if (medCards.length <= 1) return;
+  const removedCardId = medCards[i]._cardId;
+  medCards.splice(i, 1);
+  clearCardPrescribeState(removedCardId);
+  if (appState.activeMedIdx > i) {
+    appState.activeMedIdx -= 1;
+  } else if (appState.activeMedIdx >= medCards.length) {
+    appState.activeMedIdx = medCards.length - 1;
+  }
+}
+
+/** Rensar all patientdata — återställer medCards, appState, ltState och prescribeState. */
+export function clearAllMedState(): void {
+  medCards.length = 0;
+  medCards.push(createEmptyCard(1));
+  appState.activeMedIdx = 0;
+  appState.nextCardId = 2;
+  clearPrescribeState();
+  resetLtPeriods();
+  ltState.medRaw = '';
+  ltState.doseRaw = '';
+  resetNurseState();
 }

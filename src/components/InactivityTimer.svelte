@@ -5,7 +5,7 @@
 {#if showToast}
   <div class="inactivity-toast" role="alert" aria-live="assertive">
     <span class="toast-icon" aria-hidden="true">⏰</span>
-    <span>Inaktivitet — sessionen rensas om <strong>{countdown}s</strong></span>
+    <span>Inaktivitet — sessionen rensas om <strong>{countdown} sekunder</strong></span>
     <button class="btn btn-ghost" onclick={() => onDismiss()}>Fortsätt</button>
   </div>
 {/if}

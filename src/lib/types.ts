@@ -56,31 +56,53 @@ export interface CalcMetric {
   tooltip: string;
 }
 
-export interface CalcResult {
-  valid: boolean;
-  calculable?: boolean;
+export interface CalcFailure {
+  valid: false;
+  calculable?: undefined;
   statusText: string;
-  metrics?: CalcMetric[];
-  alerts?: CalcAlert[];
-  tlPct?: number;
-  tlStart?: string;
-  tlEnd?: string;
-  medRaw?: string;
-  amt?: number;
-  dose?: number;
-  doseInterval?: DoseInterval;
-  doseUnit?: DoseUnit;
-  doseUnitLabel?: string;
-  pDateStr?: string;
-  total?: number;
-  remainingDoses?: number | null;
-  estimatedEndDateStr?: string;
-  prescribedEndDateStr?: string;
-  daysRemaining?: number;
-  daysToPrescribedEnd?: number;
-  displayAvgStr?: string;
-  avgNote?: string;
+  consumptionPct: 0;
+}
+
+export interface CalcNonCalculable {
+  valid: true;
+  calculable: false;
+  statusText: string;
+  metrics: CalcMetric[];
+  alerts: CalcAlert[];
+  consumptionPct: 0;
+}
+
+export interface CalcSuccess {
+  valid: true;
+  calculable: true;
+  statusText: string;
+  metrics: CalcMetric[];
+  alerts: CalcAlert[];
+  tlPct: number;
+  tlStart: string;
+  tlEnd: string;
+  medRaw: string;
+  amt: number;
+  dose: number;
+  doseInterval: DoseInterval;
+  doseUnit: DoseUnit;
+  doseUnitLabel: string;
+  pDateStr: string;
+  total: number;
+  remainingDoses: number | null;
+  estimatedEndDateStr: string;
+  prescribedEndDateStr: string;
+  daysRemaining: number;
+  daysToPrescribedEnd: number;
+  displayAvgStr: string;
+  avgNote: string;
   consumptionPct: number;
+}
+
+export type CalcResult = CalcFailure | CalcNonCalculable | CalcSuccess;
+
+export function isCalcSuccess(c: CalcResult): c is CalcSuccess {
+  return c.valid === true && (c as { calculable?: boolean }).calculable === true;
 }
 
 // === State ===
@@ -125,7 +147,7 @@ export interface PrescribeEntry {
   packageSize: string;
   _lastAmt?: string;
   _pkgUserEdited?: boolean;
-  mode?: string;
+  mode?: 'months' | 'date';
   months?: number;
   endDate?: string;
   startFromToday?: boolean;
@@ -204,7 +226,7 @@ export interface LongtermPeriodInternal {
   total: number;
   days: number;
   avgPerDay: number;
-  classification?: string;
+  classification: 'ok' | 'over' | 'under';
 }
 
 export interface LTCardPeriod {
@@ -231,22 +253,30 @@ export interface LTPeriodResult {
   classification: 'ok' | 'over' | 'under';
 }
 
-export interface LTResult {
-  valid: boolean;
-  overallStatus?: 'ok' | 'over' | 'under';
-  alertType?: AlertType;
-  alertTitle?: string;
-  alertMsg?: string;
-  avgStr?: string;
-  ordDose?: number;
-  totalDays?: number;
-  totalTablets?: number;
-  overallAvg?: number;
-  consumptionPct?: number;
-  barPct?: number;
-  hasOverlap?: boolean;
+export interface LTFailure {
+  valid: false;
+  periodErrors: LTPeriodError[];
+  periods: [];
+}
+
+export interface LTSuccess {
+  valid: true;
   periodErrors: LTPeriodError[];
   periods: LTPeriodResult[];
-  fassUrl?: string;
-  journalText?: string;
+  overallStatus: 'ok' | 'over' | 'under';
+  alertType: AlertType;
+  alertTitle: string;
+  alertMsg: string;
+  avgStr: string;
+  ordDose: number;
+  totalDays: number;
+  totalTablets: number;
+  overallAvg: number;
+  consumptionPct: number;
+  barPct: number;
+  hasOverlap: boolean;
+  fassUrl: string;
+  journalText: string;
 }
+
+export type LTResult = LTFailure | LTSuccess;

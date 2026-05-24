@@ -4,6 +4,7 @@
  * Kör mot 4.0 dev-server: npx vite
  */
 import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 
 const BASE = 'http://localhost:5173';
 const MOCK_DATE = new Date('2025-06-15T00:00:00Z');
@@ -26,6 +27,8 @@ test.describe('Formulär → beräkning → resultat', () => {
 
     await expect(page.locator('.result-grid')).toBeVisible();
     await expect(page.locator('.copy-body')).not.toBeEmpty();
+    const a11y = await new AxeBuilder({ page }).analyze();
+    expect(a11y.violations).toEqual([]);
   });
 
   test('Ofullständigt — fyll bara läkemedelsnamn → status "Ej ifyllt"', async ({ page }) => {
@@ -195,6 +198,8 @@ test.describe('Sjuksköterskevy', () => {
     await page.fill('#refInput', '3');
     await page.waitForTimeout(400);
     await expect(page.locator('.copy-body')).toContainText('adekvat');
+    const a11y = await new AxeBuilder({ page }).analyze();
+    expect(a11y.violations).toEqual([]);
   });
 });
 

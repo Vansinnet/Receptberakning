@@ -82,6 +82,10 @@ test.describe('Property — E2E-invarianter', () => {
     await page.clock.setFixedTime(MOCK_DATE);
     await page.goto(BASE);
     await page.waitForLoadState('networkidle');
+    await page.evaluate(async () => {
+      const { loadInteractions } = await import('/src/lib/interactions.ts');
+      await loadInteractions();
+    });
   });
 
   test('Property: form ↔ result — inga kraschar vid 500 form', async ({ page }) => {

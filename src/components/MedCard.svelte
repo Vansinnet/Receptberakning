@@ -85,6 +85,7 @@
         bind:value={card.form.medRaw} oninput={handleMedInput} onkeydown={ac.handleKeydown} onblur={ac.handleBlur}
         class:input-error={!!(fieldErrors?.medInput)}
         aria-invalid={!!(fieldErrors?.medInput)}
+        aria-describedby="error-med"
         role="combobox"
         aria-haspopup="listbox"
         aria-autocomplete="list"
@@ -102,7 +103,7 @@
             {/each}
           </div>
         {/if}
-      <FieldError error={fieldErrors?.medInput} />
+      <FieldError id="error-med" error={fieldErrors?.medInput} />
     </div>
 
     <div class="field">
@@ -114,8 +115,9 @@
         value={dateDisplay} oninput={handleDateInput}
         class:input-error={!!(fieldErrors?.dateInput)}
         aria-invalid={!!(fieldErrors?.dateInput)}
+        aria-describedby="error-date"
       />
-      <FieldError error={fieldErrors?.dateInput} />
+      <FieldError id="error-date" error={fieldErrors?.dateInput} />
     </div>
 
     <div class="form-row-2 form-row-2-uneven">
@@ -128,6 +130,7 @@
             bind:value={card.form.doseRaw}
             class:input-error={!!(fieldErrors?.doseInput)}
             aria-invalid={!!(fieldErrors?.doseInput)}
+            aria-describedby="error-dose"
           />
           <select id="doseIntervalSelect" aria-label="Tidsperiod för dos" bind:value={card.form.doseInterval}>
             <option value={1}>per dag</option>
@@ -135,7 +138,7 @@
             <option value={30}>per månad</option>
           </select>
         </div>
-        <FieldError error={fieldErrors?.doseInput} />
+        <FieldError id="error-dose" error={fieldErrors?.doseInput} />
       </div>
       <div class="field">
         <label for="amtInput" data-tooltip="Mängd per förpackning (expediering).">Förpackningsstorlek</label>
@@ -144,8 +147,9 @@
           bind:value={card.form.amtRaw}
           class:input-error={!!(fieldErrors?.amtInput)}
           aria-invalid={!!(fieldErrors?.amtInput)}
+          aria-describedby="error-amt"
         />
-        <FieldError error={fieldErrors?.amtInput} />
+        <FieldError id="error-amt" error={fieldErrors?.amtInput} />
       </div>
     </div>
 
@@ -156,8 +160,9 @@
         bind:value={card.form.refRaw}
         class:input-error={!!(fieldErrors?.refInput)}
         aria-invalid={!!(fieldErrors?.refInput)}
+        aria-describedby="error-ref"
       />
-      <FieldError error={fieldErrors?.refInput} />
+      <FieldError id="error-ref" error={fieldErrors?.refInput} />
     </div>
 
     <div class="field field-optional">
@@ -167,8 +172,9 @@
         bind:value={card.form.leftRaw}
         class:input-error={!!(fieldErrors?.leftInput)}
         aria-invalid={!!(fieldErrors?.leftInput)}
+        aria-describedby="error-left"
       />
-      <FieldError error={fieldErrors?.leftInput} />
+      <FieldError id="error-left" error={fieldErrors?.leftInput} />
       <span class="field-hint">Ger exaktare snittberäkning om patienten uppger kvarvarande mängd</span>
     </div>
 {:else}

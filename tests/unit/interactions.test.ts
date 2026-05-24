@@ -1,5 +1,9 @@
-import { describe, it, expect } from 'vitest';
-import { atcMatches, CHECK_INTERACTIONS } from '../../src/lib/interactions';
+import { describe, it, expect, beforeAll } from 'vitest';
+import { atcMatches, CHECK_INTERACTIONS, loadInteractions } from '../../src/lib/interactions';
+
+beforeAll(async () => {
+  await loadInteractions();
+});
 
 // =====================================================
 // atcMatches — prefix-matchning

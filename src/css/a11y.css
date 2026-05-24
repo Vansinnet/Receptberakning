@@ -1,0 +1,50 @@
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html, body { transition: none; }
+}
+
+/* Windows High Contrast Mode */
+
+@media (forced-colors: active) {
+  .btn:focus-visible,
+  .main-tab:focus-visible,
+  .med-item:focus-visible,
+  .btn-add-med:focus-visible,
+  .early-btn:focus-visible,
+  .copy-tab:focus-visible,
+  .fass-link:focus-visible,
+  .prescribe-mode-btn:focus-visible,
+  .prescribe-summary-row:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  .field input:focus,
+  .prescribe-select:focus {
+    outline: 2px solid Highlight;
+    box-shadow: none;
+  }
+
+  .theme-select:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 1px;
+  }
+
+  .status-dot.ok   { background: Highlight; }
+  .status-dot.warn { background: Mark; }
+
+  .tl-fill,
+  .consumption-bar {
+    border-bottom: 4px solid Highlight;
+  }
+
+  .alert {
+    border-inline-start-width: 5px;
+  }
+}

@@ -1,4 +1,3 @@
-import interactionsScraped from './data/interactions-scraped.json';
 import type { AtcEntry } from './types';
 
 export interface InteractionRule {
@@ -19,20 +18,44 @@ export interface InteractionWarning {
   nplIds: [string | null, string | null];
 }
 
-export const INTERACTIONS: InteractionRule[] = [
-  ...(Array.isArray(interactionsScraped) ? interactionsScraped : []) as InteractionRule[],
-];
-
+let _INTERACTIONS: InteractionRule[] = [];
 const _idxA = new Map<string, number[]>();
 const _idxB = new Map<string, number[]>();
-for (let i = 0; i < INTERACTIONS.length; i++) {
-  for (const p of INTERACTIONS[i].atcGroupA) {
-    const arr = _idxA.get(p) ?? []; _idxA.set(p, arr); arr.push(i);
-  }
-  for (const p of INTERACTIONS[i].atcGroupB) {
-    const arr = _idxB.get(p) ?? []; _idxB.set(p, arr); arr.push(i);
+let _loaded = false;
+let _promise: Promise<void> | null = null;
+
+async function _doLoad(): Promise<void> {
+  try {
+    const mod = await import('./data/interactions-scraped.json');
+    const raw: unknown = mod.default;
+    _INTERACTIONS = Array.isArray(raw) ? raw as InteractionRule[] : [];
+    for (let i = 0; i < _INTERACTIONS.length; i++) {
+      for (const p of _INTERACTIONS[i].atcGroupA) {
+        const arr = _idxA.get(p) ?? []; _idxA.set(p, arr); arr.push(i);
+      }
+      for (const p of _INTERACTIONS[i].atcGroupB) {
+        const arr = _idxB.get(p) ?? []; _idxB.set(p, arr); arr.push(i);
+      }
+    }
+    _loaded = true;
+  } catch (e) {
+    console.warn('[interactions] Kunde inte ladda interaktionsdata:', e);
+    _loaded = true;
   }
 }
+
+/**
+ * Laddar interaktionsdata från interactions-scraped.json (lazy-load).
+ * Idempotent — returnerar redan löst Promise om data redan är laddad.
+ */
+export function loadInteractions(): Promise<void> {
+  if (_loaded) return Promise.resolve();
+  if (!_promise) _promise = _doLoad();
+  return _promise;
+}
+
+// Trigger background load immediately
+loadInteractions();
 
 function _prefixMatches(code: string, idx: Map<string, number[]>): number[] {
   const matches: number[] = [];
@@ -53,12 +76,12 @@ function _intersect(a: number[], b: number[]): Set<number> {
   return result;
 }
 
-// @internal — exponeras för testkompatibilitet
 export function atcMatches(atcCode: string | null | undefined, pattern: string): boolean {
   return atcCode ? atcCode.startsWith(pattern) : false;
 }
 
 export function CHECK_INTERACTIONS(atcEntries: AtcEntry[]): InteractionWarning[] {
+  if (!_loaded || _INTERACTIONS.length === 0) return [];
   if (atcEntries.length < 2) return [];
 
   const warnings: InteractionWarning[] = [];
@@ -80,7 +103,7 @@ export function CHECK_INTERACTIONS(atcEntries: AtcEntry[]): InteractionWarning[]
       for (const v of _intersect(bMatchesA, aMatchesB)) candidateIndices.add(v);
 
       for (const ruleIdx of candidateIndices) {
-        const ix = INTERACTIONS[ruleIdx];
+        const ix = _INTERACTIONS[ruleIdx];
         const key = `${ruleIdx}|${ix.title}|${atcEntries[x].i}|${atcEntries[y].i}`;
         if (seen.has(key)) continue;
         seen.add(key);

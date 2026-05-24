@@ -1,116 +1,5 @@
-﻿/* â”€â”€ CSS-variabel-bas â”€â”€ */
-:root {
-  --primary: #1d4ed8;
-  --primary-light: #dbeafe;
-  --primary-hover: #1e40af;
-  --bg: #f1f5f9;
-  --surface: #ffffff;
-  --surface2: #f8fafc;
-  --text: #0f172a;
-  --text-muted: #475569;
-  --border: #e2e8f0;
-  --border-strong: #cbd5e1;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --topbar-h: 82px;
-  --banner-h: 0px;
-  --green: #15803d; --green-bg: #f0fdf4; --green-border: #86efac;
-  --amber: #b45309; --amber-bg: #fffbeb; --amber-border: #fcd34d;
-  --red: #b91c1c;   --red-bg: #fef2f2;   --red-border: #fca5a5;
-  --blue: #1d4ed8;  --blue-bg: #eff6ff;  --blue-border: #bfdbfe;
-  --violet: #7c3aed; --violet-bg: #f5f3ff; --violet-border: #ddd6fe;
-  --input-bg: #ffffff;
-  --clear-btn: #f1f5f9; --clear-btn-hover: #e2e8f0; --clear-btn-text: #334155;
-  --code-bg: #f8fafc;
-  --danger-bg: var(--red-bg); --danger-color: var(--red); --danger-border: var(--red-border); --danger-hover: var(--red-border);
-  --btn-selected-text: #fff;
-  --sidebar-w: 178px;
-  --form-w: 440px;
-}
+/* TOPBAR */
 
-[data-theme="dark"] {
-  --primary: #58a6ff; --primary-light: #1c2d3f; --primary-hover: #79b8ff;
-  --bg: #0d1117; --surface: #161b22; --surface2: #21262d;
-  --text: #e6edf3; --text-muted: #8b949e;
-  --border: #30363d; --border-strong: #3d444d;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.40); --shadow-md: 0 4px 14px rgba(0,0,0,0.55);
-  --green: #3fb950; --green-bg: #0c1f15; --green-border: #1a4229;
-  --amber: #e3b341; --amber-bg: #191108; --amber-border: #4a3100;
-  --red: #f85149;   --red-bg: #1c0c0a;   --red-border: #4d1a16;
-  --blue: #58a6ff;  --blue-bg: #061a2e;  --blue-border: #0c3259;
-  --violet: #a371f7; --violet-bg: #160d30; --violet-border: #311a68;
-  --input-bg: #0d1117; --code-bg: #0d1117;
-  --clear-btn: #21262d; --clear-btn-hover: #30363d; --clear-btn-text: #c9d1d9;
-  --danger-bg: var(--red-bg); --danger-color: var(--red); --danger-border: var(--red-border); --danger-hover: var(--red-border);
-  --btn-selected-text: var(--bg);
-}
-
-[data-theme="klinisk"] {
-  --primary: #0f766e; --primary-light: #f0fdfa; --primary-hover: #115e59;
-  --bg: #f0fdfa; --surface2: #ccfbf1;
-  --text: #11554c; --text-muted: #3d706b;
-  --border: #99f6e4; --border-strong: #5eead4;
-  --shadow-sm: 0 1px 3px rgba(13,148,136,0.08), 0 1px 2px rgba(13,148,136,0.05);
-  --shadow-md: 0 4px 16px rgba(13,148,136,0.10), 0 2px 6px rgba(13,148,136,0.06);
-  --blue: #0369a1; --blue-bg: #f0f9ff; --blue-border: #bae6fd;
-  --code-bg: #f0fdfa;
-  --clear-btn: #ccfbf1; --clear-btn-hover: #99f6e4; --clear-btn-text: #11554c;
-}
-
-
-[data-theme="sakura"] {
-  --primary: #db2777; --primary-light: #fce7f3; --primary-hover: #be185d;
-  --bg: #fdf2f8; --surface2: #fce7f3;
-  --text: #831843; --text-muted: #9d174d;
-  --border: #fbcfe8; --border-strong: #f9a8d4;
-  --shadow-sm: 0 1px 3px rgba(219,39,119,0.08), 0 1px 2px rgba(219,39,119,0.05);
-  --shadow-md: 0 4px 16px rgba(219,39,119,0.10), 0 2px 6px rgba(219,39,119,0.06);
-  --blue: #0369a1; --blue-bg: #f0f9ff; --blue-border: #bae6fd;
-  --code-bg: #fdf2f8;
-  --clear-btn: #fce7f3; --clear-btn-hover: #fbcfe8; --clear-btn-text: #831843;
-}
-
-/* â”€â”€ Reset â”€â”€ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html, body {
-  height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  font-size: 13px;
-  line-height: 1.5;
-  transition: background 0.3s, color 0.3s;
-}
-
-/* â”€â”€ Noscript-fallback â”€â”€ */
-.noscript-msg {
-  padding: 20px 24px;
-  background: var(--amber-bg);
-  border-bottom: 1px solid var(--amber-border);
-  color: var(--text);
-  font-size: 14px;
-  text-align: center;
-}
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   APP SHELL â€” centrerad max-bredd
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-.app-shell {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  max-width: 1400px;
-  margin: 0 auto;
-  /* Skugga pÃ¥ sidorna fÃ¶r att markera bredden mot bakgrunden */
-  box-shadow: 0 0 0 1px var(--border), 0 4px 32px rgba(0,0,0,0.08);
-  background: var(--bg);
-}
-
-/* â”€â”€ TOPBAR â”€â”€ */
 .topbar {
   position: sticky;
   top: 0;
@@ -124,7 +13,8 @@ html, body {
   border-radius: 0;
 }
 
-/* VarumÃ¤rkesrad â€” centrerad */
+/* Varumärkesrad — centrerad */
+
 .topbar-brand-row {
   display: flex;
   align-items: center;
@@ -134,7 +24,8 @@ html, body {
   border-bottom: 1px solid var(--border);
 }
 
-/* Navigeringsrad â€” tabs till vÃ¤nster, instÃ¤llningar till hÃ¶ger */
+/* Navigeringsrad — tabs till vänster, inställningar till höger */
+
 .topbar-nav-row {
   display: flex;
   align-items: center;
@@ -156,6 +47,7 @@ html, body {
 .app-brand-date { font-size: 11px; color: var(--text-muted);   white-space: nowrap; margin-inline-start: 2px; }
 
 /* Tabs i topbar */
+
 .main-tabs { display: flex; gap: 2px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 3px; }
 .main-tab {
   padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
@@ -169,23 +61,8 @@ html, body {
 .topbar-setting { display: flex; align-items: center; gap: 5px; }
 .topbar-setting-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
+/* Vänster: Läkemedelslista */
 
-/* â”€â”€ TAB PANELS â”€â”€ */
-.tab-panel { display: none; flex: 1; min-height: 0; }
-.tab-panel.active { display: flex; flex-direction: column; flex: 1; }
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   RECEPTFÃ–RNYELSE â€” tre-kolumns widescreen
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-.renew-layout {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-  /* Fyller hela hÃ¶jden minus topbar+banner */
-  height: calc(100vh - var(--topbar-h) - var(--banner-h) - 32px);
-}
-
-/* â”€â”€ VÃ¤nster: LÃ¤kemedelslista â”€â”€ */
 .med-sidebar {
   width: var(--sidebar-w);
   flex-shrink: 0;
@@ -267,7 +144,8 @@ html, body {
   width: calc(100% - 16px);
 }
 
-/* â”€â”€ Mitten: FormulÃ¤r â”€â”€ */
+/* Mitten: Formulär */
+
 .form-panel {
   width: var(--form-w);
   flex-shrink: 0;
@@ -308,7 +186,8 @@ html, body {
 }
 .form-panel-actions { display: flex; gap: 6px; align-items: center; }
 
-/* â”€â”€ HÃ¶ger: Resultat â”€â”€ */
+/* Höger: Resultat */
+
 .result-panel {
   flex: 1;
   background: var(--surface2);
@@ -316,7 +195,9 @@ html, body {
   min-width: 0;
   display: flex;
   flex-direction: column;    /* staplar varning + resultat vertikalt */
+
   align-items: center;       /* centrerar barnen horisontellt */
+
 }
 
 .result-content {
@@ -325,10 +206,12 @@ html, body {
   flex-direction: column;
   gap: 12px;
   max-width: 860px;       /* hindrar texten att bli för bred på stora skärmar */
+
   width: 100%;
 }
 
 /* Tidslinje */
+
 .tl-label {
   font-size: 10px; font-weight: 700; color: var(--text-muted);
   text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px;
@@ -354,6 +237,7 @@ html, body {
 .tl-today-label { font-weight: 600; color: var(--text-muted); }
 
 /* Alerts */
+
 .alert {
   padding: 10px 12px; border-inline-start: 3px solid; border-radius: 0 var(--radius-md) var(--radius-md) 0;
   font-size: 12px; line-height: 1.6;
@@ -365,6 +249,7 @@ html, body {
 .alert-ok     { background: var(--green-bg); border-color: var(--green); color: var(--green); }
 
 /* Interaktionsvarningar */
+
 #interactionAlerts {
   order: -1;
   width: 100%;
@@ -404,13 +289,15 @@ html, body {
   white-space: nowrap;
 }
 
-/* Statusprick fÃ¶r interagerande lÃ¤kemedel */
+/* Statusprick för interagerande läkemedel */
+
 .status-dot.interaction {
   background: var(--red);
   box-shadow: 0 0 6px rgba(220, 38, 38, 0.5);
 }
 
-/* BeslutsfrÃ¥ga â€“ fÃ¶r tidig fÃ¶rnyelse */
+/* Beslutsfråga för tidig förnyelse */
+
 .early-decision-box {
   border: 2px solid var(--amber);
   border-inline-start: 5px solid var(--amber);
@@ -444,7 +331,8 @@ html, body {
 .early-btn-no:hover   { background: var(--red-border); color: var(--red); }
 .early-btn-no.selected  { background: var(--red);   color: var(--btn-selected-text); border-color: var(--red); }
 
-/* Val av startdatum fÃ¶r fÃ¶rskrivning */
+/* Val av startdatum för förskrivning */
+
 .start-date-choice {
   background: var(--amber-bg); border: 1px solid var(--amber-border);
   border-radius: var(--radius-md); padding: 12px 14px; margin-top: 10px;
@@ -461,7 +349,8 @@ html, body {
   background: var(--amber); color: var(--btn-selected-text); border-color: var(--amber);
 }
 
-/* Knapp fÃ¶r vy-vÃ¤xling lÃ¤kare/sjukskÃ¶terska */
+/* Knapp för vy-växling läkare/sjuksköterska */
+
 .btn-nurse-toggle {
   padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
   cursor: pointer; border: 1px solid var(--border); background: var(--surface2);
@@ -475,7 +364,8 @@ html, body {
 .btn-nurse-toggle:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .btn-nurse-toggle:hover { background: var(--clear-btn); color: var(--text); }
 
-/* Nurse-kolumn â€” mellan formulÃ¤r och resultat */
+/* Nurse-kolumn — mellan formulär och resultat */
+
 .nurse-col {
   width: 240px;
   flex-shrink: 0;
@@ -487,7 +377,8 @@ html, body {
   flex-direction: column;
 }
 
-/* SjukskÃ¶terskebedÃ¶mning */
+/* Sjuksköterskebedömning */
+
 .nurse-assessment {
   background: var(--primary-light);
   border-radius: var(--radius-md);
@@ -531,6 +422,7 @@ html, body {
 }
 
 /* Copy-sektion */
+
 .copy-section {
   border: 1px solid var(--border); border-radius: var(--radius-md);
   overflow: hidden; flex: 1; display: flex; flex-direction: column;
@@ -557,134 +449,8 @@ html, body {
   flex-shrink: 0;
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   GEMENSAMMA FORM-ELEMENT
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-.field { margin-bottom: 10px; display: flex; flex-direction: column; position: relative; }
-.field label {
-  display: block; font-size: 10px; font-weight: 700; color: var(--text-muted);
-  margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.04em;
-}
-.field input {
-  width: 100%; height: 34px; padding: 0 10px;
-  background: var(--input-bg); color: var(--text);
-  border: 1px solid var(--border-strong); border-radius: var(--radius-md);
-  font-size: 13px; font-family: inherit; outline: 2px solid transparent;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-.field input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
-.field input.input-error { border-color: var(--red); box-shadow: 0 0 0 3px var(--red-bg); }
-.field-hint { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
-.field-error-msg { visibility: hidden; font-size: 11px; color: var(--red); margin-top: 3px; min-height: 16px; }
-.field-error-msg.visible { visibility: visible; }
-.prescribe-result-covered {
-  font-size: 12px; color: var(--text-muted); font-style: italic;
-  padding: 10px 0; text-align: center;
-}
-.field-optional {
-  border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 2px;
-}
-.optional-tag {
-  font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
-  color: var(--text-muted); background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 4px; padding: 1px 5px; margin-inline-start: 4px; vertical-align: middle;
-}
-.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: end; }
-.form-row-2-uneven { grid-template-columns: 1.5fr 1fr; }
-.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; align-items: end; }
-/* Dos-fÃ¤ltet: input + period-dropdown sida vid sida */
-.dose-input-row { display: flex; gap: 6px; align-items: stretch; }
-.dose-input-row input { flex: 1 1 0; min-width: 0; }
-.dose-input-row select {
-  flex: 0 0 auto; height: 34px; padding: 0 8px;
-  background: var(--input-bg); color: var(--text);
-  border: 1px solid var(--border-strong); border-radius: var(--radius-md);
-  font-size: 12px; font-family: inherit; outline: 2px solid transparent;
-  cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
-  white-space: nowrap;
-}
-.dose-input-row select:focus {
-  border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light);
-  outline: none;
-}
+/* LÅNGVARIG FÖRBRUKNING */
 
-/* Se till att labels i sidoordnade fÃ¤lt tar samma hÃ¶jd sÃ¥ input-fÃ¤lten linjerar */
-.form-row-2 .field label,
-.form-row-3 .field label {
-  min-height: 2.6em;
-  display: flex;
-  align-items: flex-start;
-}
-
-/* â”€â”€ Knappar â”€â”€ */
-.btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 6px 12px; border-radius: var(--radius-md);
-  font-size: 12px; font-weight: 600; cursor: pointer;
-  border: 1px solid transparent; transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
-  white-space: nowrap; line-height: 1; font-family: inherit;
-}
-.btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.btn-ghost {
-  background: var(--clear-btn); color: var(--clear-btn-text);
-  border-color: var(--border-strong);
-}
-.btn-ghost:hover { background: var(--clear-btn-hover); }
-.btn-danger {
-  background: var(--danger-bg); color: var(--danger-color);
-  border-color: var(--danger-border);
-}
-.btn-danger:hover { background: var(--danger-hover); }
-
-select.theme-select {
-  height: 28px; padding: 3px 8px;
-  background: var(--clear-btn); color: var(--clear-btn-text);
-  border: 1px solid var(--border-strong); border-radius: var(--radius-md);
-  font-size: 12px; font-family: inherit; outline: 2px solid transparent; cursor: pointer;
-}
-select.theme-select option { background: var(--surface); color: var(--text); }
-.theme-select:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
-
-.fass-link {
-  text-decoration: none;
-}
-.fass-link:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: var(--radius-md); }
-
-.narc-btn:disabled {
-  opacity: 1;
-  cursor: default;
-}
-
-/* Badges */
-.badge {
-  display: inline-flex; align-items: center;
-  font-size: 11px; font-weight: 700; padding: 2px 7px;
-  border-radius: 99px; border: 1px solid transparent; white-space: nowrap;
-}
-.badge-ok    { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
-.badge-over  { background: var(--red-bg);   color: var(--red);   border-color: var(--red-border); }
-.badge-under { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
-
-/* FÃ¶rhindra layoutfÃ¶rskjutning nÃ¤r FASS-lÃ¤nk dyker upp:
-   reservera alltid plats men dÃ¶lj med visibility istÃ¤llet fÃ¶r display:none */
-.fass-link.is-hidden {
-  display: inline-flex !important;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-/* Resultat-grid (nyckel/vÃ¤rde-tabell) */
-.result-grid {
-  display: grid; grid-template-columns: auto 1fr;
-  gap: 4px 12px; font-size: 12px; margin-bottom: 8px;
-}
-.result-grid .rk { color: var(--text-muted); font-weight: 500; white-space: nowrap; }
-.result-grid .rv { font-weight: 600;   text-align: end; }
-.result-grid .divider { grid-column: 1 / -1; border: none; border-top: 1px solid var(--border); margin: 4px 0; }
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   LÃ…NGVARIG FÃ–RBRUKNING
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .longterm-layout {
   padding: 16px;
   flex: 1;
@@ -714,7 +480,8 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 .card-num-lt { background: var(--violet-bg); color: var(--violet); }
 .card-title { font-size: 14px; font-weight: 700; }
 
-/* TvÃ¥kolumns layout fÃ¶r LÃ¥ngvarig */
+/* Tvåkolumns layout för Långvarig */
+
 .longterm-body {
   display: flex;
   min-height: 400px;
@@ -750,7 +517,8 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   border-top: 1px solid var(--border); flex-wrap: wrap;
 }
 
-/* FÃ¶rbrukningsgraf */
+/* Förbrukningsgraf */
+
 .consumption-bar-wrap {
   margin: 8px 0 3px; background: var(--surface2);
   border: 1px solid var(--border); border-radius: var(--radius-md);
@@ -771,6 +539,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 }
 
 /* Periodtabell */
+
 .period-table {
   border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden;
   font-size: 12px; border-collapse: separate; border-spacing: 0; width: 100%;
@@ -798,90 +567,8 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 
 .btn-add-period { margin-top: 8px; }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   HJÃ„LPKLASSER
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-.is-hidden   { display: none !important; }
-.ml-auto     { margin-inline-start: auto; }
+/* NY FÖRSKRIVNING — fjärde kolumnen */
 
-/* â”€â”€ Tooltip (CSS-only â€” CSP-kompatibel) â”€â”€ */
-[data-tooltip] {
-  cursor: help;
-  position: relative;
-}
-[data-tooltip]::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  left: 0;
-  top: calc(100% + 6px);
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border-strong);
-  padding: 7px 11px;
-  border-radius: var(--radius-md);
-  font-size: 11px;
-  line-height: 1.6;
-  max-width: 240px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.30);
-  white-space: normal;
-  word-wrap: break-word;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.15s;
-  z-index: 9999;
-  font-weight: 400;
-  text-transform: none;
-  letter-spacing: normal;
-}
-[data-tooltip]:hover::after,
-[data-tooltip]:focus-visible::after {
-  opacity: 1;
-}
-/* â”€â”€ CSP-sÃ¤kra breddklasser (progressbars, 5%-steg) â”€â”€ */
-.w0 { width: 0%; } .w5 { width: 5%; } .w10 { width: 10%; } .w15 { width: 15%; }
-.w20 { width: 20%; } .w25 { width: 25%; } .w30 { width: 30%; } .w35 { width: 35%; }
-.w40 { width: 40%; } .w45 { width: 45%; } .w50 { width: 50%; } .w55 { width: 55%; }
-.w60 { width: 60%; } .w65 { width: 65%; } .w70 { width: 70%; } .w75 { width: 75%; }
-.w80 { width: 80%; } .w85 { width: 85%; } .w90 { width: 90%; } .w95 { width: 95%; }
-.w100 { width: 100%; }
-
-.prescribe-pkg-field { margin-top: 10px; }
-.btn-remove-period { font-size: 11px; margin-bottom: 8px; }
-.flag-icon { vertical-align: middle; margin-right: 5px; border-radius: 2px; display: inline-block; }
-
-/* Footer */
-.site-footer {
-  display: flex; flex-direction: column; align-items: center; gap: 12px;
-  padding: 20px 16px 24px; font-size: 11px; color: var(--text-muted);
-  flex-shrink: 0; border-top: 1px solid var(--border);
-}
-
-.footer-disclaimer {
-  display: flex; align-items: flex-start; gap: 7px;
-  text-align: center;
-  font-size: 11px; color: var(--text-muted); line-height: 1.6;
-}
-.footer-disclaimer-icon { flex-shrink: 0; font-size: 13px; color: var(--amber); margin-top: 1px; }
-.footer-disclaimer a {
-  color: var(--amber); font-weight: 700; text-decoration: underline;
-  text-underline-offset: 2px;
-}
-.footer-disclaimer a:hover { opacity: 0.8; }
-
-.footer-links {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
-}
-.footer-links a {
-  color: var(--text-muted); text-decoration: none; transition: color 0.2s, background 0.2s;
-  display: inline-flex; align-items: center; gap: 6px; font-weight: 600;
-  padding: 5px 10px; border-radius: var(--radius-md);
-  background: var(--surface2); border: 1px solid var(--border);
-}
-.footer-links a:hover { color: var(--text); background: var(--border); }
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   NY FÃ–RSKRIVNING â€” fjÃ¤rde kolumnen
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .prescribe-panel {
   width: 236px;
   flex-shrink: 0;
@@ -940,7 +627,8 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   margin-top: 2px;
 }
 
-/* â”€â”€ SammanstÃ¤llning: alla lÃ¤kemedel â”€â”€ */
+/* Sammanställning: alla läkemedel */
+
 .prescribe-summary-wrap {
   margin-bottom: 12px;
   padding-bottom: 12px;
@@ -1120,185 +808,22 @@ select.theme-select option { background: var(--surface); color: var(--text); }
   color: var(--text-muted);
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   RESPONSIV â€” faller tillbaka till staplat pÃ¥ smal skÃ¤rm
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-@media (max-width: 900px) {
-  .renew-layout { flex-direction: column; height: auto; overflow-y: auto; }
-  /* result-panel fÃ¥r inte Ã¤ta upp all hÃ¶jd i kolumnriktning â€” prescribe-panel
-     mÃ¥ste fÃ¥ plats nedanfÃ¶r. overflow-y: visible fÃ¶rhindrar dubbel scroll-container. */
-  .result-panel { flex: none; overflow-y: visible; }
-  .med-sidebar { width: 100%;   border-inline-end: none; border-bottom: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; }
-  .med-list { flex-direction: row; flex-wrap: wrap; padding: 6px 8px; }
-  .med-item { width: auto; }
-  .sidebar-header { width: 100%; }
-  .btn-add-med { margin: 6px 8px; }
-  #newPatientBtn { width: auto; margin: 6px 8px; }
-  .form-panel { width: 100%;   border-inline-end: none; border-bottom: 1px solid var(--border); }
-  .nurse-col { width: 100%;   border-inline-end: none; border-bottom: 1px solid var(--border); }
-  .longterm-body { flex-direction: column; }
-  .longterm-form-col { flex: none;   border-inline-end: none; border-bottom: 1px solid var(--border); }
-  .prescribe-panel { width: 100%;   border-inline-start: none; border-top: 1px solid var(--border); }
-}
+/* UTSKRIFT Visar utltande, mtvrden, kliniska alerter/* ============================================================ FAS 6.4: KOMPONENT-TILLGG (4.0) Nya CSS-klasser fr funktionalitet som saknas i 3.0. ============================================================ */
 
-@media (max-width: 768px) {
-  :root { --sidebar-w: 100%; --form-w: 100%; --topbar-h: 116px; }
-  .topbar-nav-row { flex-wrap: wrap; height: auto; padding: 6px 12px; gap: 6px; }
-  .main-tabs { width: 100%; }
-  .form-row-3 { grid-template-columns: 1fr 1fr; }
-  .period-table .ph-avg { display: none; }
-}
 
-@media (max-width: 560px) {
-  .form-row-2, .form-row-3 { grid-template-columns: 1fr; }
-  .metrics { grid-template-columns: 1fr 1fr; }
-}
+/* Statusbadge i läkemedelslistan */
 
-/* â”€â”€ Skip-to-content â”€â”€ */
-.skip-link {
-  position: absolute;
-  top: -100%;
-  inset-inline-start: 12px;
-  z-index: 10001;
-  padding: 8px 16px;
-  background: var(--surface);
-  color: var(--primary);
-  border: 2px solid var(--primary);
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  font-size: 13px;
-  text-decoration: none;
-}
-.skip-link:focus {
-  top: 8px;
-}
-
-/* â”€â”€ Autocomplete-dropdown â”€â”€ */
-.autocomplete-dropdown {
-  position: absolute;
-  z-index: 200;
-  background: var(--surface);
-  border: 1px solid var(--border-strong);
-  border-top: none;
-  border-radius: 0 0 var(--radius-md) var(--radius-md);
-  box-shadow: var(--shadow-md);
-  max-height: 240px;
-  overflow-y: auto;
-  width: 100%;
-  margin-top: -1px;
-  /* Placera i fÃ¶rhÃ¥llande till .field (position:relative krÃ¤vs pÃ¥ fÃ¶rÃ¤ldern) */
-}
-.autocomplete-item {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 8px 10px;
-  cursor: pointer;
-  font-size: 13px;
-  transition: background 0.1s;
-  border-bottom: 1px solid var(--border);
-}
-.autocomplete-item:last-child { border-bottom: none; }
-.autocomplete-item:hover,
-.autocomplete-item.active {
-  background: var(--primary-light);
-}
-.ac-drug-name {
-  font-weight: 600;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.ac-drug-meta {
-  font-size: 11px;
-  color: var(--text-muted);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-/* â”€â”€ Screen-reader-only â”€â”€ */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* â”€â”€ Reduced motion â”€â”€ */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-  html, body { transition: none; }
-}
-
-/* â”€â”€ Windows High Contrast Mode â”€â”€ */
-@media (forced-colors: active) {
-  .btn:focus-visible,
-  .main-tab:focus-visible,
-  .med-item:focus-visible,
-  .btn-add-med:focus-visible,
-  .early-btn:focus-visible,
-  .copy-tab:focus-visible,
-  .fass-link:focus-visible,
-  .prescribe-mode-btn:focus-visible,
-  .prescribe-summary-row:focus-visible {
-    outline: 2px solid Highlight;
-    outline-offset: 2px;
-  }
-
-  .field input:focus,
-  .prescribe-select:focus {
-    outline: 2px solid Highlight;
-    box-shadow: none;
-  }
-
-  .theme-select:focus-visible {
-    outline: 2px solid Highlight;
-    outline-offset: 1px;
-  }
-
-  .status-dot.ok   { background: Highlight; }
-  .status-dot.warn { background: Mark; }
-
-  .tl-fill,
-  .consumption-bar {
-    border-bottom: 4px solid Highlight;
-  }
-
-  .alert {
-    border-inline-start-width: 5px;
-  }
-}
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   UTSKRIFT
-   Visar utlÃ¥tande, mÃ¤tvÃ¤rden, kliniska alerter
-
-/* ============================================================
-   FAS 6.4: KOMPONENT-TILLÃ„GG (4.0)
-   Nya CSS-klasser fÃ¶r funktionalitet som saknas i 3.0.
-   ============================================================ */
-
-/* Statusbadge i lÃ¤kemedelslistan */
 .med-list-badge {
   font-size: 10px; padding: 1px 6px; border-radius: 3px;
   flex-shrink: 0; margin-left: auto;
 }
 
-/* Prescribe-panel i gÃ¶mt lÃ¤ge â€” behÃ¥ll bredd, dÃ¶lj visuellt (Flexbox) */
+/* Prescribe-panel i gmt lge behll bredd, dlj visuellt (Flexbox) */
+
 .prescribe-panel.is-hidden { display: flex !important; visibility: hidden; pointer-events: none; }
 
 /* Inaktivitetstoast */
+
 .inactivity-toast {
   position: fixed;
   bottom: 24px;
@@ -1331,6 +856,7 @@ select.theme-select option { background: var(--surface); color: var(--text); }
 }
 
 /* === AlertDialog === */
+
 
 .alert-dialog {
   border: 1px solid var(--border-strong);

@@ -15,6 +15,7 @@ import {
 
 // === DATUM ===
 
+/** Formaterar Date-objekt som "ÅÅÅÅ-MM-DD" i UTC. */
 export function fmtDate(d: Date): string {
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
 }
@@ -45,6 +46,7 @@ export function getDaysDiff(d1: Date, d2: Date): number {
   return Math.round((d1.getTime() - d2.getTime()) / MS_PER_DAY);
 }
 
+/** Parsar datumsträng i UTC. Returnerar null vid ogiltigt format. */
 export function parseDateUTC(str: string): Date | null {
   if (!str) return null;
   const parts = str.split('-');
@@ -82,6 +84,7 @@ export function getFassUrl(medRaw: string, nplId?: string | null): string {
 
 const _mfrRe = new RegExp("\\b(?:" + COMPOUND_MFR_NAMES.concat(SINGLE_MFR_NAMES).join("|") + ")\\b", "gi");
 
+/** Extraherar läkemedelsnamn utan tillverkare. "Sertralin Krka 50 mg" → "Sertralin 50 mg". */
 export function stripManufacturer(name: string): string {
   if (!name) return name;
   return name.replace(_mfrRe, "").replace(/\s+/g, " ").trim();

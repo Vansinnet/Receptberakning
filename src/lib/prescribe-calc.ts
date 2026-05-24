@@ -4,7 +4,7 @@ import {
   DEFAULT_PRESCRIBE_MODE,
   DEFAULT_PRESCRIBE_MONTHS,
   DEFAULT_PRESCRIBE_END_DATE,
-  UNIT_DISPLAY,
+  getUnitDisplay,
 } from './constants';
 
 // === CAN RENEW ===
@@ -42,6 +42,10 @@ export interface PrescribeResult {
   unitLabelShort: string;
 }
 
+/**
+ * Beräknar antal förpackningar att förskriva.
+ * Returnerar null om indata är ogiltigt (saknar dos, förpackningsstorlek <= 0 etc.).
+ */
 export function calcPrescribeResult(
   s: PrescribeInput,
   ps: { packageSize: string; mode?: string; months?: number; endDate?: string; startFromToday?: boolean } | null
@@ -93,7 +97,7 @@ export function calcPrescribeResult(
   const totalTablets = Math.ceil(totalDays * effectiveDose);
   const packages     = Math.ceil(totalTablets / packageSize);
   const doseUnitVal  = s.doseUnit || 'st';
-  const ds           = UNIT_DISPLAY[doseUnitVal as keyof typeof UNIT_DISPLAY] || UNIT_DISPLAY.st;
+  const ds           = getUnitDisplay(doseUnitVal);
   const unitLabelLong  = ds.long;
   const unitLabelShort = ds.short;
   return {

@@ -34,6 +34,25 @@
   let effectiveTab = $derived(nurseViewActive ? 'journal' : activeTab);
   let texts = $derived(getActiveTexts());
 
+  const copyTabIds = $derived.by(() => nurseViewActive ? ['journal'] as const : ['patient', 'journal'] as const);
+
+  function handleCopyTabKeydown(e: KeyboardEvent) {
+    const ids = copyTabIds;
+    const idx = ids.indexOf(effectiveTab);
+    let nextIdx = idx;
+    if (e.key === 'ArrowRight') nextIdx = (idx + 1) % ids.length;
+    else if (e.key === 'ArrowLeft') nextIdx = (idx - 1 + ids.length) % ids.length;
+    else if (e.key === 'Home') nextIdx = 0;
+    else if (e.key === 'End') nextIdx = ids.length - 1;
+    else return;
+    e.preventDefault();
+    const tab = ids[nextIdx];
+    if (tab === 'patient') activeTab = 'patient'; else activeTab = 'journal';
+    const tablist = e.currentTarget as HTMLElement;
+    const btns = tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+    btns[nextIdx]?.focus();
+  }
+
   let tlWidthClass = $derived(pctClass(result?.tlPct ?? 0, 'w'));
   let displayText = $derived(effectiveTab === 'patient' ? (patientLang === 'en' ? texts.patientTextEn : texts.patientText) : texts.journalText);
 </script>
@@ -108,11 +127,11 @@
 
     <!-- Copy Section -->
     <div class="copy-section">
-      <div class="copy-tabs-row" role="tablist" aria-label="Texttyp att kopiera">
+      <div class="copy-tabs-row" role="tablist" aria-label="Texttyp att kopiera" onkeydown={handleCopyTabKeydown}>
         {#if !nurseViewActive}
-          <button class="copy-tab {effectiveTab === 'patient' ? 'active' : ''}" role="tab" aria-selected={effectiveTab === 'patient'} data-tooltip="Förslag på formulering att skicka till patienten via 1177." onclick={() => activeTab = 'patient'}>Svar till patient (förslag)</button>
+          <button class="copy-tab {effectiveTab === 'patient' ? 'active' : ''}" role="tab" aria-selected={effectiveTab === 'patient'} tabindex={effectiveTab === 'patient' ? 0 : -1} data-tooltip="Förslag på formulering att skicka till patienten via 1177." onclick={() => activeTab = 'patient'}>Svar till patient (förslag)</button>
         {/if}
-        <button class="copy-tab {effectiveTab === 'journal' ? 'active' : ''}" role="tab" aria-selected={effectiveTab === 'journal'} data-tooltip="Förslag på formulering för dokumentation i journalen." onclick={() => activeTab = 'journal'}>Journalanteckning (förslag)</button>
+        <button class="copy-tab {effectiveTab === 'journal' ? 'active' : ''}" role="tab" aria-selected={effectiveTab === 'journal'} tabindex={effectiveTab === 'journal' ? 0 : -1} data-tooltip="Förslag på formulering för dokumentation i journalen." onclick={() => activeTab = 'journal'}>Journalanteckning (förslag)</button>
       </div>
       <div class="copy-body">{displayText}</div>
       <div class="copy-footer">

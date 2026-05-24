@@ -8,16 +8,19 @@
   import LongtermPanel from './LongtermPanel.svelte';
   import InteractionAlerts from './InteractionAlerts.svelte';
   import InactivityTimer from './InactivityTimer.svelte';
-  import { medCards, appState, tickCurrentDate, clearAllMedState, getActiveResult, _syncCardStatus, getHasSummary } from '$lib/state.svelte';
-  import { CHECK_INTERACTIONS } from '$lib/interactions';
+  import { medCards, appState, tickCurrentDate, clearAllMedState, getActiveResult, getHasSummary } from '$lib/state.svelte';
+  import { CHECK_INTERACTIONS, loadInteractions } from '$lib/interactions';
   import { canRenewMed } from '$lib/prescribe-calc';
   import { VALID_THEMES } from '$lib/constants';
   import { createInactivityTimer } from '$lib/inactivity.svelte';
+  import { setDrugsLoadErrorHandler } from '$lib/drug-cache';
   import type { AtcEntry } from '$lib/types';
   import GitHubIcon from './GitHubIcon.svelte';
 
   let activeTab = $state<'renew' | 'longterm'>('renew');
   let theme = $state<'dark' | 'klinisk' | 'sakura'>('klinisk');
+  let drugsLoadFailed = $state(false);
+  setDrugsLoadErrorHandler(() => drugsLoadFailed = true);
 
   const inactivityTimer = createInactivityTimer(
     () => clearAllMedState(),
@@ -26,7 +29,11 @@
   let card = $derived(medCards[appState.activeMedIdx] ?? null);
   let result = $derived(getActiveResult());
 
+  let interactionVersion = $state(0);
+  loadInteractions().then(() => interactionVersion++);
+
   let interactionWarnings = $derived.by(() => {
+    void interactionVersion;
     const entries: AtcEntry[] = [];
     for (let i = 0; i < medCards.length; i++) {
       const c = medCards[i];
@@ -49,19 +56,32 @@
 
   let showPrescribe = $derived(prescribeVisible || getHasSummary());
 
-  let allNplIds = $derived(medCards.filter(c => c?.form?.nplId).map(c => c.form.nplId as string));
+  let allNplIds = $derived(medCards.map(c => c?.form?.nplId).filter((id): id is string => id !== null && id !== undefined));
+
+  let announceEl = $state<HTMLDivElement | null>(null);
+
+  function announce(msg: string) {
+    if (announceEl) {
+      announceEl.textContent = '';
+      requestAnimationFrame(() => { if (announceEl) announceEl.textContent = msg; });
+    }
+  }
 
   function handleTabChange(tab: 'renew' | 'longterm') {
     activeTab = tab;
+    announce(tab === 'renew' ? 'Receptförnyelse' : 'Långvarig förbrukningsanalys');
   }
 
   function handleNurseToggle() {
     appState.nurseViewActive = !appState.nurseViewActive;
+    announce(appState.nurseViewActive ? 'Sjuksköterskevy aktiverad' : 'Sjuksköterskevy inaktiverad');
   }
 
   function handleThemeChange(t: string) {
     if (!VALID_THEMES.has(t)) return;
     theme = t as 'dark' | 'klinisk' | 'sakura';
+    const labels: Record<string, string> = { dark: 'Mörkt tema', klinisk: 'Kliniskt tema', sakura: 'Körsbärstema' };
+    announce(labels[t] || 'Tema ändrat');
   }
 
   function handleEarlyDecision(decision: 'yes' | 'no') {
@@ -88,10 +108,6 @@
   });
 
   $effect(() => {
-    _syncCardStatus();
-  });
-
-  $effect(() => {
     void medCards.length;
     inactivityTimer.reset();
   });
@@ -107,10 +123,16 @@
     </div>
   </noscript>
 
-  <div id="a11y-announce" class="sr-only" aria-live="polite"></div>
+  {#if drugsLoadFailed}
+    <div class="alert alert-warn" role="alert" style="text-align:center;border-radius:0;margin:0">
+      <strong>Läkemedelsdatabasen kunde inte laddas.</strong> Kontrollera din internetanslutning.
+      <button class="btn btn-ghost" onclick={() => { drugsLoadFailed = false; location.reload(); }}>Försök igen</button>
+    </div>
+  {/if}
+
+  <div id="a11y-announce" class="sr-only" aria-live="polite" bind:this={announceEl}></div>
 
   <div class="app-shell">
-    <h1 class="sr-only">Receptberäkning – kliniskt beslutsstöd</h1>
 
     <TopBar {activeTab} {theme} nurseViewActive={appState.nurseViewActive}
       onTabChange={handleTabChange}
@@ -118,7 +140,8 @@
       onThemeChange={handleThemeChange}
     />
 
-    <main id="main-content">
+    <main id="main-content" aria-label="Huvudinnehåll">
+        <h1 class="sr-only">Receptberäkning – kliniskt beslutsstöd</h1>
         <div id="panel-renew" class="tab-panel" class:active={activeTab === 'renew'} role="tabpanel" aria-labelledby="heading-renew">
           <h2 class="sr-only" id="heading-renew">Receptförnyelse</h2>
           <div class="renew-layout">

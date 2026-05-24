@@ -23,6 +23,7 @@ const _mapRaw = (entries: RawDrugEntry[]): DrugEntry[] => entries.map(e => ({
   unit: e.u, form: e.f, regulation: e.r, notCalculable: e.c,
 }));
 
+/** Laddar läkemedelsdatabasen från IndexedDB eller nätverk. */
 export async function loadDrugs(): Promise<void> {
   if (_drugList) return;
   if (_loadPromise) return _loadPromise;
@@ -108,6 +109,7 @@ function _sortEntries(entries: DrugEntry[], q: string): DrugEntry[] {
   return scored.map(s => s.e);
 }
 
+/** Söker läkemedel med prefix-matchning. Kräver att loadDrugs() körts först. */
 export function searchDrugs(query: string): DrugEntry[] {
   if (!_drugList || !_drugListLower) return [];
   if (!query || query.length < MIN_SEARCH_QUERY_LENGTH || query.length > MAX_SEARCH_QUERY_LENGTH) return [];
@@ -139,6 +141,7 @@ export function searchDrugs(query: string): DrugEntry[] {
   return _sortEntries(entries, q).slice(0, MAX_AUTOCOMPLETE_RESULTS);
 }
 
+/** Slår upp läkemedel exakt på namn (O(1)). */
 export function getDrugByName(name: string): DrugEntry | undefined {
   if (!_drugMap) return undefined;
   return _drugMap.get((name || '').toLowerCase().trim());
