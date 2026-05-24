@@ -428,7 +428,6 @@ html, body {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--amber);
-  opacity: 0.75;
 }
 .early-decision-q {
   font-size: 13px;
@@ -441,8 +440,8 @@ html, body {
 .early-btn-yes { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
 .early-btn-yes:hover  { background: var(--green-border); }
 .early-btn-yes.selected { background: var(--green); color: var(--btn-selected-text); border-color: var(--green); }
-.early-btn-no  { background: var(--red-bg);   color: var(--red);   border-color: var(--red-border); }
-.early-btn-no:hover   { background: var(--red-border); }
+.early-btn-no  { background: var(--red-bg);   color: #b91c1c;   border-color: var(--red-border); }
+.early-btn-no:hover   { background: var(--red-border); color: #991b1b; }
 .early-btn-no.selected  { background: var(--red);   color: var(--btn-selected-text); border-color: var(--red); }
 
 /* Val av startdatum fÃ¶r fÃ¶rskrivning */
@@ -512,7 +511,6 @@ html, body {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--primary);
-  opacity: 0.75;
 }
 .nurse-checkbox {
   display: flex;

@@ -119,7 +119,6 @@
   <div id="a11y-announce" class="sr-only" aria-live="polite" bind:this={announceEl}></div>
 
   <div class="app-shell">
-    <h1 class="sr-only">Receptberäkning – kliniskt beslutsstöd</h1>
 
     <TopBar {activeTab} {theme} nurseViewActive={appState.nurseViewActive}
       onTabChange={handleTabChange}
@@ -128,6 +127,7 @@
     />
 
     <main id="main-content" aria-label="Huvudinnehåll">
+        <h1 class="sr-only">Receptberäkning – kliniskt beslutsstöd</h1>
         <div id="panel-renew" class="tab-panel" class:active={activeTab === 'renew'} role="tabpanel" aria-labelledby="heading-renew">
           <h2 class="sr-only" id="heading-renew">Receptförnyelse</h2>
           <div class="renew-layout">

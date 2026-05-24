@@ -4,6 +4,7 @@
  * Kör mot 4.0 dev-server: npx vite
  */
 import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 
 const BASE = 'http://localhost:5173';
 const MOCK_DATE = new Date('2025-06-15T00:00:00Z');
@@ -23,6 +24,8 @@ test.describe('Lägg till / ta bort kort', () => {
     await expect(page.locator('#medInput')).toHaveValue('');
     // Två kort i listan
     await expect(page.locator('.med-item')).toHaveCount(2);
+    const a11y = await new AxeBuilder({ page }).analyze();
+    expect(a11y.violations).toEqual([]);
   });
 
   test('Max 8 kort — efter 7 tillägg finns 8 kort', async ({ page }) => {
@@ -132,6 +135,8 @@ test.describe('Förskrivningspanel', () => {
     await page.fill('#refInput', '3');
     await page.waitForTimeout(400);
     await expect(page.locator('.prescribe-panel')).toBeVisible();
+    const a11y = await new AxeBuilder({ page }).analyze();
+    expect(a11y.violations).toEqual([]);
   });
 
   test('Månad/Datum-växling fungerar', async ({ page }) => {
