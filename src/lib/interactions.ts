@@ -40,7 +40,7 @@ async function _doLoad(): Promise<void> {
     _loaded = true;
   } catch (e) {
     console.warn('[interactions] Kunde inte ladda interaktionsdata:', e);
-    _loaded = true;
+    _promise = null;
   }
 }
 

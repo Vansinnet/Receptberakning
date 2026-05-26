@@ -216,19 +216,20 @@ describe('buildPatientText (v3)', () => {
   it('en yes→"We will renew"',()=>{expect(buildPatientText('en',[{name:'Sertralin',decision:'yes'}])).toContain('We will renew');});
   it('en no',()=>{expect(buildPatientText('en',[{name:'Sertralin',decision:'no'}])).toContain('unable to renew');});
   it('multi',()=>{const t=buildPatientText('sv',[{name:'A',decision:'yes'},{name:'B',decision:'no'}]);expect(t).toContain('A');expect(t).toContain('B');});
+  it('multi with null→"bedömning"',()=>{const t=buildPatientText('sv',[{name:'A',decision:'yes'},{name:'B',decision:null}]);expect(t).toContain('bedömning');});
   it('lang fallback',()=>{expect(buildPatientText('sv',[{name:'X',decision:'yes'}])).toBe(buildPatientText('xx',[{name:'X',decision:'yes'}]));});
 });
 
 // =====================================================
 describe('buildJournalText (v3)', () => {
   const c=(o:any={})=>({name:'Sertralin',i:0,dose:1,doseUnitLabel:'st/dag',doseUnit:'st',total:300,pDateStr:'2025-01-15',prescribedEndDateStr:'2025-11-12',displayAvgStr:'1.00 st/dag',avgNote:'(test)',daysToPrescribedEnd:180,consumptionPct:100,decision:'yes'as any,...o});
-  it('yes+prescribeEnd→date in action',()=>{expect(buildJournalText([c()],1,{0:'2026-06-15'})).toContain('räcker till 2026-06-15');});
-  it('yes no prescribeEnd',()=>{expect(buildJournalText([c()],1)).toContain('Åtgärd: Förnyat.');});
-  it('no',()=>{expect(buildJournalText([c({decision:'no'})],1)).toContain('Ej förnyat');});
-  it('null',()=>{expect(buildJournalText([c({decision:null})],1)).toContain('Klinisk bedömning krävs');});
-  it('days<0→beräknades',()=>{expect(buildJournalText([c({daysToPrescribedEnd:-50,prescribedEndDateStr:'2026-03-31'})],1)).toContain('beräknades räcka');});
-  it('days>=0→beräknas',()=>{expect(buildJournalText([c({daysToPrescribedEnd:30})],1)).toContain('beräknas räcka');});
-  it('consumptionPct in text',()=>{expect(buildJournalText([c({consumptionPct:85.5})],1)).toContain('85.5%');});
+  it('yes+prescribeEnd→date in action',()=>{expect(buildJournalText([c()],{0:'2026-06-15'})).toContain('räcker till 2026-06-15');});
+  it('yes no prescribeEnd',()=>{expect(buildJournalText([c()])).toContain('Åtgärd: Förnyat.');});
+  it('no',()=>{expect(buildJournalText([c({decision:'no'})])).toContain('Ej förnyat');});
+  it('null',()=>{expect(buildJournalText([c({decision:null})])).toContain('Klinisk bedömning krävs');});
+  it('days<0→beräknades',()=>{expect(buildJournalText([c({daysToPrescribedEnd:-50,prescribedEndDateStr:'2026-03-31'})])).toContain('beräknades räcka');});
+  it('days>=0→beräknas',()=>{expect(buildJournalText([c({daysToPrescribedEnd:30})])).toContain('beräknas räcka');});
+  it('consumptionPct in text',()=>{expect(buildJournalText([c({consumptionPct:85.5})])).toContain('85.5%');});
 });
 
 // =====================================================
