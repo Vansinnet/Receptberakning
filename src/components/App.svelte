@@ -124,7 +124,7 @@
   </noscript>
 
   {#if drugsLoadFailed}
-    <div class="alert alert-warn" role="alert" style="text-align:center;border-radius:0;margin:0">
+    <div class="alert alert-warn" role="alert" style:text-align="center" style:border-radius="0" style:margin="0">
       <strong>Läkemedelsdatabasen kunde inte laddas.</strong> Kontrollera din internetanslutning.
       <button class="btn btn-ghost" onclick={() => { drugsLoadFailed = false; location.reload(); }}>Försök igen</button>
     </div>

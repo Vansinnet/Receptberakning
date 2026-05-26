@@ -28,6 +28,7 @@ const _prescribeResults = $derived.by((): Record<number, PrescribeResult | null>
 		const entry = calcs[card._cardId];
 		if (!entry?.calc) { out[card._cardId] = null; continue; }
 		const calc = entry.calc;
+		if (!calc.valid) { out[card._cardId] = null; continue; }
 		if (calc.calculable === false) { out[card._cardId] = null; continue; }
 		const ps = getPrescribeState(card._cardId);
 		if (!ps) { out[card._cardId] = null; continue; }
@@ -76,7 +77,6 @@ const _texts = $derived.by((): TextResult => {
 		if (cardsForText.length === 0) {
 			return { patientText: '', patientTextEn: '', journalText: '' };
 		}
-		const validCount = cardsForText.length;
 
 		const prescribeEnds: Record<number, string> = {};
 		for (const cft of cardsForText) {
@@ -104,7 +104,7 @@ const _texts = $derived.by((): TextResult => {
 		try {
 			patientText   = buildPatientText('sv', ptCards);
 			patientTextEn = buildPatientText('en', ptCards);
-			journalText   = buildJournalText(cardsForText, validCount, prescribeEnds);
+			journalText   = buildJournalText(cardsForText, prescribeEnds);
 		} catch (e) {
 			console.error('[text-state] Textgenerering kraschade:', e);
 			patientText = patientTextEn = journalText = 'Ett internt fel uppstod vid textgenerering.';

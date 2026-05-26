@@ -47,7 +47,7 @@ export const LT_UNDER = 0.80;
 
 // AKTIVT VAL: 50 år (18250 dagar) — maximal rimlig periodlängd för
 // långvarig förbrukningsanalys.
-export const MAX_PERIOD_SPAN_DAYS = 365 * 50;
+export const MAX_PERIOD_SPAN_DAYS = 365 * 50 + 13;
 
 // AKTIVT VAL: 150% — maxgräns för förbrukningsstapeln i UI:t. Värden över
 // 150% av ordination är extrema och klampas visuellt.

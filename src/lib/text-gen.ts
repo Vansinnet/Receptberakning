@@ -26,6 +26,8 @@ const TPL = {
       `  ${name}: Nuvarande recept ${verb} räcka t.o.m. ${date}.${contact} Vi kan tyvärr inte förnya receptet vid detta tillfälle efter klinisk individuell bedömning av läkare.`,
     multi_item_no_nodate: (name: string) =>
       `  ${name}: Kan tyvärr inte förnyas efter klinisk individuell bedömning av läkare.`,
+    multi_item_null: (name: string) =>
+      `  ${name}: Din förfrågan är under bedömning.`,
   },
   en: {
     greeting: 'Hello,',
@@ -47,6 +49,8 @@ const TPL = {
       `  ${name}: Prescription ${verb} to last until ${date}.${contact} We are unfortunately unable to renew the prescription at this time following an individual clinical assessment by a physician.`,
     multi_item_no_nodate: (name: string) =>
       `  ${name}: Unable to renew following clinical assessment.`,
+    multi_item_null: (name: string) =>
+      `  ${name}: Your request is currently being assessed.`,
   },
 };
 
@@ -104,6 +108,8 @@ function _buildMulti(lang: typeof TPL.sv, cards: CardView[]): string[] {
         const days = c.daysToPrescribedEnd ?? 0;
         lines.push(_itemNoBody(lang, c.name, days, date, c.contactDateStr));
       }
+    } else {
+      lines.push(lang.multi_item_null(c.name));
     }
   }
   return lines;
@@ -125,7 +131,6 @@ export function buildPatientText(lang: string, cards: CardView[]): string {
 
 export function buildJournalText(
   cards: CardsForTextEntry[],
-  validCount: number,
   prescribeEnds?: Record<number, string>
 ): string {
   const lines: string[] = [];
