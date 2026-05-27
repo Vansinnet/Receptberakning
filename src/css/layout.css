@@ -1,3 +1,14 @@
+/* APP SHELL — centrerad max-bredd */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+  box-shadow: 0 0 0 1px var(--border), 0 4px 32px rgba(0,0,0,0.08);
+  background: var(--bg);
+}
+
 /* RECEPTFÖRNYELSE — tre-kolumns widescreen */
 
 .renew-layout {
@@ -44,7 +55,7 @@
 
 @media (max-width: 900px) {
   .renew-layout { flex-direction: column; height: auto; overflow-y: auto; }
-  /* result-panel fr inte ta upp all hjd i kolumnriktning prescribe-panel mste f plats nedanfr. overflow-y: visible frhindrar dubbel scroll-container. */
+  /* result-panel får inte äta upp all höjd i kolumnriktning — prescribe-panel måste få plats nedanför. overflow-y: visible förhindrar dubbel scroll-container. */
 
   .result-panel { flex: none; overflow-y: visible; }
   .med-sidebar { width: 100%;   border-inline-end: none; border-bottom: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; }
