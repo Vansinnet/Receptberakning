@@ -32,19 +32,19 @@ function _validateDate(dateVal: string, pDate: Date | null, today: Date): { erro
 }
 
 function _validateAmt(safeAmtRaw: string, amt: number): string {
-  if (safeAmtRaw === '') return '';
+  if (safeAmtRaw === '') return `Ange ett heltal mellan 1 och ${MAX_AMT_VALUE}.`;
   const invalid = isNaN(amt) || amt <= 0 || amt > MAX_AMT_VALUE || !Number.isInteger(Number(safeAmtRaw));
   return invalid ? `Ange ett heltal mellan 1 och ${MAX_AMT_VALUE}.` : '';
 }
 
 function _validateDose(doseRaw: string, dose: number): string {
-  if (doseRaw === '') return '';
+  if (doseRaw === '') return `Ange ett tal mellan ${MIN_DOSE_VALUE} och ${MAX_DOSE_VALUE}.`;
   const invalid = isNaN(dose) || dose < MIN_DOSE_VALUE || dose > MAX_DOSE_VALUE;
   return invalid ? `Ange ett tal mellan ${MIN_DOSE_VALUE} och ${MAX_DOSE_VALUE}.` : '';
 }
 
 function _validateRef(safeRefRaw: string, refNum: number): { error: string; outOfRange: boolean } {
-  if (safeRefRaw === '') return { error: '', outOfRange: false };
+  if (safeRefRaw === '') return { error: `Ange ett heltal mellan ${MIN_REF_VALUE} och ${MAX_REF_VALUE}.`, outOfRange: false };
   const outOfRange = Number.isFinite(refNum) && Number.isInteger(refNum) && refNum > MAX_REF_VALUE;
   if (outOfRange) return { error: `Max ${MAX_REF_VALUE} uttag stöds.`, outOfRange: true };
   const invalid = !Number.isFinite(refNum) || !Number.isInteger(refNum) || refNum < MIN_REF_VALUE;
@@ -103,6 +103,13 @@ export function validateValues(
 
   const refValidation = _validateRef(safeRefRaw, refNum);
   fieldErrors.refInput = refValidation.error;
+
+  // Suppress required-field errors when form is completely untouched
+  if (!medRaw && !dateVal && !doseRaw && !safeAmtRaw && !safeRefRaw && !safeLeftRaw) {
+    fieldErrors.doseInput = '';
+    fieldErrors.amtInput = '';
+    fieldErrors.refInput = '';
+  }
 
   // ── Steg 4: Build result ──
   if (refValidation.outOfRange) return { valid: false, reason: 'too_many_refs', fieldErrors };
