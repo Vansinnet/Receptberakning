@@ -76,10 +76,6 @@ function _intersect(a: number[], b: number[]): Set<number> {
   return result;
 }
 
-export function atcMatches(atcCode: string | null | undefined, pattern: string): boolean {
-  return atcCode ? atcCode.startsWith(pattern) : false;
-}
-
 export function CHECK_INTERACTIONS(atcEntries: AtcEntry[]): InteractionWarning[] {
   if (!_loaded || _INTERACTIONS.length === 0) return [];
   if (atcEntries.length < 2) return [];

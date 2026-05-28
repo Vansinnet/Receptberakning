@@ -1,42 +1,8 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { atcMatches, CHECK_INTERACTIONS, loadInteractions } from '../../src/lib/interactions';
+import { CHECK_INTERACTIONS, loadInteractions } from '../../src/lib/interactions';
 
 beforeAll(async () => {
   await loadInteractions();
-});
-
-// =====================================================
-// atcMatches — prefix-matchning
-// =====================================================
-
-describe('atcMatches', () => {
-  it('exakt prefix-match (N06AB04 startswith N06AB)', () => {
-    expect(atcMatches('N06AB04', 'N06AB')).toBe(true);
-  });
-
-  it('ingen match (N06AX börjar inte med N06AB)', () => {
-    expect(atcMatches('N06AX16', 'N06AB')).toBe(false);
-  });
-
-  it('null ATC returnerar false', () => {
-    expect(atcMatches(null, 'N06AB')).toBe(false);
-  });
-
-  it('undefined ATC returnerar false', () => {
-    expect(atcMatches(undefined, 'N06AB')).toBe(false);
-  });
-
-  it('hela ATC-koden matchar sig själv', () => {
-    expect(atcMatches('B01AA03', 'B01AA03')).toBe(true);
-  });
-
-  it('ATC-kod matchar sin 5-char ATC5-grupp', () => {
-    expect(atcMatches('A10BA02', 'A10BA')).toBe(true);
-  });
-
-  it('ATC-kod matchar sin 4-char ATC-grupp', () => {
-    expect(atcMatches('C09AA02', 'C09A')).toBe(true);
-  });
 });
 
 // =====================================================
