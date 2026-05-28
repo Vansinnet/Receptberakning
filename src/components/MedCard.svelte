@@ -125,7 +125,7 @@
         <label for="doseInput" data-tooltip="Ordinerad dos per vald tidsperiod.">Dos (st / ml / mg)</label>
         <div class="dose-input-row">
           <input
-            id="doseInput" type="text" inputmode="decimal" placeholder="1" maxlength="10"
+            id="doseInput" type="text" inputmode="decimal" placeholder="T. ex. 1" maxlength="10"
             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
             bind:value={card.form.doseRaw}
             class:input-error={!!(fieldErrors?.doseInput)}
