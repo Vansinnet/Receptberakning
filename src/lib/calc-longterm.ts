@@ -126,6 +126,7 @@ export function calcLongtermCore(
     totalTablets,
     totalDays,
     overallAvg,
+    avgStr,
     consumptionPct,
     overallStatus,
     alertType,
