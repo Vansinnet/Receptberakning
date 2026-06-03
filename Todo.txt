@@ -1,1 +1,1 @@
-#1 Förbättra 'Långvarig förbrukning' så att användaren kan analysera flera styrkor av samma läkemedel. Många gånger har patienten fått exempelvis Stesolid 2 mg och Stesolid 5 mg under analysperiod. Då vill användaren veta faktisk förbrukning i mg/dag.
+#1 Förbättra 'Långvarig förbrukning' så att användaren kan analysera flera styrkor av samma läkemedel. Många gånger har patienten fått exempelvis Stesolid 2 mg och Stesolid 5 mg under samma analysperiod. Då vill användaren veta faktisk förbrukning i mg/dag.
