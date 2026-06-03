@@ -1,5 +1,1 @@
-Interaktioner ska inte tolkas, bara detekteras med uppmaning att gå in på janusinfo:s interaktionssite
-
-Förpackningsstorlek i prescribe-panelen ska spegla renew-kolumnen, men inte tvärtom
-
-Bredda lämedelsfältet i renew-kolumnen för att få plats med långa läkemedelsnamn?
+#1 Förbättra 'Långvarig förbrukning' så att användaren kan analysera flera styrkor av samma läkemedel. Många gånger har patienten fått exempelvis Stesolid 2 mg och Stesolid 5 mg under analysperiod. Då vill användaren veta faktisk förbrukning i mg/dag.
