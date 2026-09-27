@@ -4,7 +4,7 @@ import { flushSync } from 'svelte';
 import { setMockNow } from '../../src/lib/clock';
 import {
   caseState, addMed, applyDrug, clearCase, editText, getResult, getText, isTextEdited, refreshToday,
-  removeMed, resetText, setDecision, setNameManually, setPrescribePackage,
+  removeMed, resetText, selectMed, setDecision, setNameManually, setPrescribePackage,
 } from '../../src/lib/state/case.svelte';
 import type { DrugEntry } from '../../src/lib/drug-search';
 
@@ -102,5 +102,56 @@ describe('Ärendet', () => {
     caseState.role = 'nurse';
     flushSync();
     expect(getText()).toContain('Ärendet lämnas till läkare för bedömning.');
+  });
+});
+
+describe('Ärendet — porterat från 4.0', () => {
+  it('ta bort läkemedlet i mitten väljer grannen och behåller de andra', () => {
+    const a = caseState.activeId; setNameManually(a, 'A');
+    addMed(); const b = caseState.activeId; setNameManually(b, 'B');
+    addMed(); const c = caseState.activeId; setNameManually(c, 'C');
+    selectMed(b);
+    removeMed(b);
+    expect(caseState.meds.map((m) => m.form.name)).toEqual(['A', 'C']);
+    expect(caseState.activeId).toBe(c);
+  });
+  it('beslut hålls isär mellan läkemedlen', () => {
+    const a = caseState.activeId;
+    addMed(); const b = caseState.activeId;
+    setDecision(a, 'yes');
+    setDecision(b, 'no');
+    expect(caseState.meds.map((m) => m.decision)).toEqual(['yes', 'no']);
+  });
+  it('50 snabba ändringar ger samma resultat som en', () => {
+    const id = caseState.activeId;
+    applyDrug(id, sertralin);
+    fillSlutRecept(id);
+    for (let i = 0; i < 50; i++) caseState.meds[0].form.doseRaw = String((i % 5) + 1);
+    caseState.meds[0].form.doseRaw = '1';
+    flushSync();
+    const r = getResult(id)!.renewal;
+    expect(r.kind === 'ok' && r.coverDays).toBe(300);
+  });
+});
+
+describe('Midnattsbyte', () => {
+  it('resultaten räknas om när datumet byts', () => {
+    setMockNow(new Date(2026, 9, 1, 23, 59, 0).getTime());
+    refreshToday();
+    const id = caseState.activeId;
+    setNameManually(id, 'Test 1 mg');
+    const m = caseState.meds[0];
+    m.form.dateRaw = '2026-08-12'; m.form.doseRaw = '1'; m.form.packageRaw = '100'; m.form.refillsRaw = '3';
+    flushSync();
+    const before = getResult(id)!.renewal;
+    expect(before.kind === 'ok' && before.daysLeft).toBe(249);
+    setMockNow(new Date(2026, 9, 2, 0, 1, 0).getTime());
+    refreshToday();
+    flushSync();
+    const after = getResult(id)!.renewal;
+    expect(caseState.today).toBe('2026-10-02');
+    expect(after.kind === 'ok' && after.daysLeft).toBe(248);
+    setMockNow(new Date(2026, 9, 1, 10, 0, 0).getTime());
+    refreshToday();
   });
 });

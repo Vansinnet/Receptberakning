@@ -22,6 +22,16 @@ export const LONG_OVERDUE_DAYS = 90;
 export const CONSUMPTION_NORMAL_LOW = 80;
 export const CONSUMPTION_NORMAL_HIGH = 110;
 
+/**
+ * Är procenten inom 80–110 %? Avgörs på värdet avrundat till en decimal — samma värde
+ * som visas — så att färgen alltid stämmer med siffran. Utan avrundning blir t.ex.
+ * 1100 ÷ 1000 × 100 = 110,00000000000001 och visas gult trots texten "110 %".
+ */
+export function isWithinNormal(pct: number): boolean {
+  const shown = Math.round(pct * 10) / 10;
+  return shown >= CONSUMPTION_NORMAL_LOW && shown <= CONSUMPTION_NORMAL_HIGH;
+}
+
 // AKTIVT VAL: 7 dagar — i patienttexten vid avslag ombeds patienten höra av sig
 // denna tid före beräknat slutdatum.
 export const CONTACT_BEFORE_END_DAYS = 7;

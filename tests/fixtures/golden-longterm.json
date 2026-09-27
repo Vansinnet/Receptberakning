@@ -1,0 +1,763 @@
+[
+ {
+  "input": "2025-02-21–2025-05-25:153 2025-05-17–2025-06-18:76 2025-03-31–2025-06-14:75 2025-05-29–2025-08-11:186 dos 0,5",
+  "unionDays": 172,
+  "total": 490,
+  "pct": 569.767442,
+  "cls": "over",
+  "overlap": true,
+  "periods": [
+   "over",
+   "over",
+   "over",
+   "over"
+  ]
+ },
+ {
+  "input": "2026-03-09–2026-04-14:199 2025-03-07–2025-04-15:8 2024-12-02–2025-03-07:46 dos 1",
+  "unionDays": 172,
+  "total": 253,
+  "pct": 147.093023,
+  "cls": "over",
+  "overlap": true,
+  "periods": [
+   "under",
+   "under",
+   "over"
+  ]
+ },
+ {
+  "input": "2025-10-08–2025-12-03:34 2025-12-29–2026-03-28:111 2026-06-12–2026-09-15:171 dos 0,5",
+  "unionDays": 243,
+  "total": 316,
+  "pct": 260.082305,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over",
+   "over",
+   "over"
+  ]
+ },
+ {
+  "input": "2026-06-11–2026-06-22:146 2025-10-29–2025-11-19:18 dos 3",
+  "unionDays": 34,
+  "total": 164,
+  "pct": 160.784314,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "under",
+   "over"
+  ]
+ },
+ {
+  "input": "2026-02-19–2026-04-11:134 dos 1",
+  "unionDays": 52,
+  "total": 134,
+  "pct": 257.692308,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over"
+  ]
+ },
+ {
+  "input": "2025-09-12–2025-10-04:197 2026-04-11–2026-05-26:129 2024-12-04–2025-03-11:76 2025-11-16–2026-02-02:126 2025-12-04–2025-12-27:180 dos 1",
+  "unionDays": 246,
+  "total": 708,
+  "pct": 287.804878,
+  "cls": "over",
+  "overlap": true,
+  "periods": [
+   "under",
+   "over",
+   "over",
+   "over",
+   "over"
+  ]
+ },
+ {
+  "input": "2026-06-13–2026-06-28:47 2025-01-30–2025-04-07:114 2025-11-03–2026-02-22:169 2025-08-05–2025-09-17:24 dos 3",
+  "unionDays": 240,
+  "total": 354,
+  "pct": 49.166667,
+  "cls": "under",
+  "overlap": false,
+  "periods": [
+   "under",
+   "under",
+   "under",
+   "ok"
+  ]
+ },
+ {
+  "input": "2025-08-20–2025-11-01:16 2025-10-19–2025-11-11:88 2024-11-21–2025-02-11:109 2025-02-09–2025-02-13:168 2025-12-21–2026-01-04:14 dos 1",
+  "unionDays": 184,
+  "total": 395,
+  "pct": 214.673913,
+  "cls": "over",
+  "overlap": true,
+  "periods": [
+   "over",
+   "over",
+   "under",
+   "over",
+   "ok"
+  ]
+ },
+ {
+  "input": "2025-03-16–2025-05-24:186 dos 3",
+  "unionDays": 70,
+  "total": 186,
+  "pct": 88.571429,
+  "cls": "ok",
+  "overlap": false,
+  "periods": [
+   "ok"
+  ]
+ },
+ {
+  "input": "2024-12-02–2025-01-03:18 dos 0,5",
+  "unionDays": 33,
+  "total": 18,
+  "pct": 109.090909,
+  "cls": "ok",
+  "overlap": false,
+  "periods": [
+   "ok"
+  ]
+ },
+ {
+  "input": "2026-04-01–2026-06-07:20 2026-09-05–2026-10-29:70 2025-11-12–2026-01-27:26 2026-08-28–2026-10-08:46 2025-03-24–2025-06-23:134 dos 0,5",
+  "unionDays": 237,
+  "total": 180,
+  "pct": 151.898734,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over",
+   "under",
+   "under"
+  ]
+ },
+ {
+  "input": "2025-05-21–2025-06-22:117 2026-06-07–2026-06-13:189 2026-02-19–2026-03-13:160 2024-12-11–2025-03-19:129 dos 0,5",
+  "unionDays": 162,
+  "total": 595,
+  "pct": 734.567901,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over",
+   "over",
+   "over",
+   "over"
+  ]
+ },
+ {
+  "input": "2026-01-13–2026-04-07:199 2026-02-14–2026-03-08:137 dos 0,5",
+  "unionDays": 85,
+  "total": 336,
+  "pct": 790.588235,
+  "cls": "over",
+  "overlap": true,
+  "periods": [
+   "over",
+   "over"
+  ]
+ },
+ {
+  "input": "2026-01-17–2026-03-24:155 2025-05-27–2025-07-29:107 2026-01-31–2026-04-05:182 2025-05-14–2025-08-25:96 dos 0,5",
+  "unionDays": 183,
+  "total": 540,
+  "pct": 590.163934,
+  "cls": "over",
+  "overlap": true,
+  "periods": [
+   "over",
+   "over",
+   "over",
+   "over"
+  ]
+ },
+ {
+  "input": "2026-01-25–2026-03-27:200 2026-05-06–2026-09-01:147 dos 2",
+  "unionDays": 181,
+  "total": 347,
+  "pct": 95.856354,
+  "cls": "ok",
+  "overlap": false,
+  "periods": [
+   "over",
+   "under"
+  ]
+ },
+ {
+  "input": "2026-07-21–2026-07-25:176 2024-12-17–2024-12-23:91 2025-06-03–2025-08-26:29 dos 2",
+  "unionDays": 97,
+  "total": 296,
+  "pct": 152.57732,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over",
+   "under",
+   "over"
+  ]
+ },
+ {
+  "input": "2025-01-06–2025-04-01:128 dos 1",
+  "unionDays": 86,
+  "total": 128,
+  "pct": 148.837209,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over"
+  ]
+ },
+ {
+  "input": "2026-06-05–2026-09-17:5 2025-02-16–2025-05-30:149 2024-11-07–2024-12-25:79 2026-03-03–2026-03-10:149 2025-05-23–2025-08-17:124 dos 2",
+  "unionDays": 345,
+  "total": 506,
+  "pct": 73.333333,
+  "cls": "under",
+  "overlap": true,
+  "periods": [
+   "ok",
+   "under",
+   "under",
+   "over",
+   "under"
+  ]
+ },
+ {
+  "input": "2026-07-27–2026-11-07:92 2025-09-13–2025-12-12:18 2026-02-11–2026-05-22:138 dos 2",
+  "unionDays": 192,
+  "total": 156,
+  "pct": 40.625,
+  "cls": "under",
+  "overlap": false,
+  "periods": [
+   "under",
+   "under"
+  ]
+ },
+ {
+  "input": "2025-05-01–2025-08-25:45 2025-08-25–2025-10-28:25 2025-12-28–2026-04-08:179 2026-03-24–2026-06-09:100 dos 2",
+  "unionDays": 345,
+  "total": 349,
+  "pct": 50.57971,
+  "cls": "under",
+  "overlap": true,
+  "periods": [
+   "under",
+   "under",
+   "ok",
+   "under"
+  ]
+ },
+ {
+  "input": "2025-09-27–2025-10-20:90 dos 1",
+  "unionDays": 24,
+  "total": 90,
+  "pct": 375,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over"
+  ]
+ },
+ {
+  "input": "2025-05-31–2025-08-11:100 2026-04-06–2026-05-23:116 2026-07-15–2026-07-26:155 dos 3",
+  "unionDays": 133,
+  "total": 371,
+  "pct": 92.982456,
+  "cls": "ok",
+  "overlap": false,
+  "periods": [
+   "under",
+   "ok",
+   "over"
+  ]
+ },
+ {
+  "input": "2025-06-25–2025-09-04:61 2024-11-24–2024-12-14:17 2025-09-11–2025-12-01:28 dos 3",
+  "unionDays": 175,
+  "total": 106,
+  "pct": 20.190476,
+  "cls": "under",
+  "overlap": false,
+  "periods": [
+   "under",
+   "under",
+   "under"
+  ]
+ },
+ {
+  "input": "2025-08-11–2025-10-21:176 2025-07-08–2025-11-01:175 2026-02-12–2026-06-02:168 2025-07-06–2025-08-01:2 dos 2",
+  "unionDays": 230,
+  "total": 521,
+  "pct": 113.26087,
+  "cls": "over",
+  "overlap": true,
+  "periods": [
+   "under",
+   "under",
+   "over",
+   "under"
+  ]
+ },
+ {
+  "input": "2025-05-16–2025-07-17:174 dos 3",
+  "unionDays": 63,
+  "total": 174,
+  "pct": 92.063492,
+  "cls": "ok",
+  "overlap": false,
+  "periods": [
+   "ok"
+  ]
+ },
+ {
+  "input": "2025-10-16–2025-11-28:188 2026-03-20–2026-03-23:190 2025-12-24–2026-03-27:177 dos 0,5",
+  "unionDays": 138,
+  "total": 555,
+  "pct": 804.347826,
+  "cls": "over",
+  "overlap": true,
+  "periods": [
+   "over",
+   "over",
+   "over"
+  ]
+ },
+ {
+  "input": "2025-01-09–2025-02-08:168 2025-04-29–2025-07-26:3 2026-05-05–2026-05-12:150 2026-07-18–2026-09-14:91 dos 2",
+  "unionDays": 187,
+  "total": 412,
+  "pct": 110.160428,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over",
+   "under",
+   "over",
+   "under"
+  ]
+ },
+ {
+  "input": "2025-11-25–2026-03-16:83 2025-05-25–2025-08-02:83 dos 3",
+  "unionDays": 182,
+  "total": 166,
+  "pct": 30.40293,
+  "cls": "under",
+  "overlap": false,
+  "periods": [
+   "under",
+   "under"
+  ]
+ },
+ {
+  "input": "2024-12-11–2025-03-19:188 2025-07-18–2025-11-10:143 dos 3",
+  "unionDays": 215,
+  "total": 331,
+  "pct": 51.317829,
+  "cls": "under",
+  "overlap": false,
+  "periods": [
+   "under",
+   "under"
+  ]
+ },
+ {
+  "input": "2026-02-19–2026-03-22:88 dos 1",
+  "unionDays": 32,
+  "total": 88,
+  "pct": 275,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over"
+  ]
+ },
+ {
+  "input": "2026-06-20–2026-08-26:12 dos 0,5",
+  "unionDays": 68,
+  "total": 12,
+  "pct": 35.294118,
+  "cls": "under",
+  "overlap": false,
+  "periods": [
+   "under"
+  ]
+ },
+ {
+  "input": "2026-06-01–2026-09-06:26 dos 2",
+  "unionDays": 98,
+  "total": 26,
+  "pct": 13.265306,
+  "cls": "under",
+  "overlap": false,
+  "periods": [
+   "under"
+  ]
+ },
+ {
+  "input": "2025-05-18–2025-09-09:16 dos 2",
+  "unionDays": 115,
+  "total": 16,
+  "pct": 6.956522,
+  "cls": "under",
+  "overlap": false,
+  "periods": [
+   "under"
+  ]
+ },
+ {
+  "input": "2026-01-06–2026-03-14:2 2026-06-07–2026-09-14:11 dos 3",
+  "unionDays": 168,
+  "total": 13,
+  "pct": 2.579365,
+  "cls": "under",
+  "overlap": false,
+  "periods": [
+   "under",
+   "under"
+  ]
+ },
+ {
+  "input": "2025-10-11–2025-10-23:170 2026-07-13–2026-10-29:41 dos 0,5",
+  "unionDays": 13,
+  "total": 170,
+  "pct": 2615.384615,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over"
+  ]
+ },
+ {
+  "input": "2025-11-19–2026-03-05:144 dos 2",
+  "unionDays": 107,
+  "total": 144,
+  "pct": 67.28972,
+  "cls": "under",
+  "overlap": false,
+  "periods": [
+   "under"
+  ]
+ },
+ {
+  "input": "2025-11-26–2025-12-18:45 2025-08-05–2025-11-16:138 2025-12-14–2025-12-26:95 2025-05-23–2025-07-30:182 2024-12-27–2025-03-13:164 dos 1",
+  "unionDays": 281,
+  "total": 624,
+  "pct": 222.064057,
+  "cls": "over",
+  "overlap": true,
+  "periods": [
+   "over",
+   "over",
+   "over",
+   "over",
+   "over"
+  ]
+ },
+ {
+  "input": "2025-05-03–2025-05-15:101 2026-06-16–2026-08-10:113 dos 1",
+  "unionDays": 69,
+  "total": 214,
+  "pct": 310.144928,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over",
+   "over"
+  ]
+ },
+ {
+  "input": "2025-01-02–2025-02-07:56 dos 3",
+  "unionDays": 37,
+  "total": 56,
+  "pct": 50.45045,
+  "cls": "under",
+  "overlap": false,
+  "periods": [
+   "under"
+  ]
+ },
+ {
+  "input": "2024-12-24–2025-01-11:62 2025-12-31–2026-03-28:10 2024-11-09–2025-01-09:63 dos 0,5",
+  "unionDays": 152,
+  "total": 135,
+  "pct": 177.631579,
+  "cls": "over",
+  "overlap": true,
+  "periods": [
+   "over",
+   "over",
+   "under"
+  ]
+ },
+ {
+  "input": "2025-05-19–2025-07-28:153 2024-12-06–2025-02-03:177 2025-10-19–2025-12-03:128 2025-04-04–2025-04-12:6 dos 2",
+  "unionDays": 186,
+  "total": 464,
+  "pct": 124.731183,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over",
+   "under",
+   "ok",
+   "over"
+  ]
+ },
+ {
+  "input": "2025-07-03–2025-08-10:149 2026-01-08–2026-01-20:99 2025-02-05–2025-04-12:76 dos 0,5",
+  "unionDays": 119,
+  "total": 324,
+  "pct": 544.537815,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over",
+   "over",
+   "over"
+  ]
+ },
+ {
+  "input": "2026-02-26–2026-04-08:29 2025-03-31–2025-04-27:88 2026-01-08–2026-05-01:121 dos 3",
+  "unionDays": 142,
+  "total": 238,
+  "pct": 55.868545,
+  "cls": "under",
+  "overlap": true,
+  "periods": [
+   "ok",
+   "under",
+   "under"
+  ]
+ },
+ {
+  "input": "2026-04-25–2026-06-12:79 dos 0,5",
+  "unionDays": 49,
+  "total": 79,
+  "pct": 322.44898,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over"
+  ]
+ },
+ {
+  "input": "2026-05-07–2026-07-15:85 2025-06-19–2025-06-29:61 dos 1",
+  "unionDays": 81,
+  "total": 146,
+  "pct": 180.246914,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over",
+   "over"
+  ]
+ },
+ {
+  "input": "2024-11-12–2025-01-02:199 2025-10-30–2025-12-13:91 2025-08-12–2025-10-17:171 2026-07-31–2026-08-13:84 2026-04-15–2026-05-30:158 dos 0,5",
+  "unionDays": 224,
+  "total": 703,
+  "pct": 627.678571,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over",
+   "over",
+   "over",
+   "over",
+   "over"
+  ]
+ },
+ {
+  "input": "2025-10-17–2026-01-23:200 dos 1",
+  "unionDays": 99,
+  "total": 200,
+  "pct": 202.020202,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over"
+  ]
+ },
+ {
+  "input": "2025-10-29–2025-11-28:167 dos 1",
+  "unionDays": 31,
+  "total": 167,
+  "pct": 538.709677,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over"
+  ]
+ },
+ {
+  "input": "2026-05-11–2026-06-26:142 2026-02-21–2026-03-15:199 2025-05-25–2025-07-05:107 2026-08-05–2026-11-17:95 2026-05-06–2026-07-09:99 dos 1",
+  "unionDays": 130,
+  "total": 547,
+  "pct": 420.769231,
+  "cls": "over",
+  "overlap": true,
+  "periods": [
+   "over",
+   "over",
+   "over",
+   "over"
+  ]
+ },
+ {
+  "input": "2025-04-30–2025-05-21:147 2026-07-23–2026-11-02:64 2026-03-07–2026-05-23:68 dos 2",
+  "unionDays": 100,
+  "total": 215,
+  "pct": 107.5,
+  "cls": "ok",
+  "overlap": false,
+  "periods": [
+   "over",
+   "under"
+  ]
+ },
+ {
+  "input": "2026-08-25–2026-12-13:92 2026-08-16–2026-10-12:128 2026-02-21–2026-02-21:150 2026-06-04–2026-06-05:45 2025-11-30–2026-02-16:153 dos 3",
+  "unionDays": 82,
+  "total": 348,
+  "pct": 141.463415,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "under",
+   "over",
+   "over"
+  ]
+ },
+ {
+  "input": "2025-01-25–2025-02-08:148 2025-03-29–2025-04-19:129 2026-07-14–2026-07-27:100 dos 3",
+  "unionDays": 51,
+  "total": 377,
+  "pct": 246.405229,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over",
+   "over",
+   "over"
+  ]
+ },
+ {
+  "input": "2024-12-14–2025-03-17:163 2025-06-19–2025-10-10:2 2025-05-31–2025-09-13:121 dos 2",
+  "unionDays": 227,
+  "total": 286,
+  "pct": 62.995595,
+  "cls": "under",
+  "overlap": true,
+  "periods": [
+   "ok",
+   "under",
+   "under"
+  ]
+ },
+ {
+  "input": "2025-08-24–2025-11-28:46 dos 2",
+  "unionDays": 97,
+  "total": 46,
+  "pct": 23.71134,
+  "cls": "under",
+  "overlap": false,
+  "periods": [
+   "under"
+  ]
+ },
+ {
+  "input": "2026-03-15–2026-03-29:97 2025-11-10–2026-02-06:77 2026-01-25–2026-03-03:179 dos 0,5",
+  "unionDays": 129,
+  "total": 353,
+  "pct": 547.286822,
+  "cls": "over",
+  "overlap": true,
+  "periods": [
+   "over",
+   "over",
+   "over"
+  ]
+ },
+ {
+  "input": "2026-06-03–2026-07-16:49 dos 2",
+  "unionDays": 44,
+  "total": 49,
+  "pct": 55.681818,
+  "cls": "under",
+  "overlap": false,
+  "periods": [
+   "under"
+  ]
+ },
+ {
+  "input": "2026-01-04–2026-03-24:62 2025-08-10–2025-08-11:167 2024-11-28–2024-12-02:184 2025-05-28–2025-08-24:170 2026-02-23–2026-02-25:54 dos 3",
+  "unionDays": 174,
+  "total": 637,
+  "pct": 122.030651,
+  "cls": "over",
+  "overlap": true,
+  "periods": [
+   "over",
+   "under",
+   "over",
+   "under",
+   "over"
+  ]
+ },
+ {
+  "input": "2025-03-22–2025-06-13:55 2024-11-16–2025-01-17:6 2025-08-02–2025-09-05:96 2026-06-08–2026-08-13:63 2025-11-29–2026-01-29:135 dos 1",
+  "unionDays": 311,
+  "total": 355,
+  "pct": 114.14791,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "under",
+   "under",
+   "over",
+   "over",
+   "ok"
+  ]
+ },
+ {
+  "input": "2025-08-10–2025-10-06:52 2026-01-11–2026-03-24:90 2025-12-02–2025-12-04:77 2025-06-25–2025-07-16:84 2026-07-14–2026-09-13:189 dos 2",
+  "unionDays": 218,
+  "total": 492,
+  "pct": 112.844037,
+  "cls": "over",
+  "overlap": false,
+  "periods": [
+   "over",
+   "under",
+   "over",
+   "under",
+   "over"
+  ]
+ },
+ {
+  "input": "2026-06-09–2026-06-18:24 2025-01-14–2025-03-09:63 2025-07-27–2025-08-04:80 2025-01-02–2025-02-05:108 2025-08-06–2025-08-28:164 dos 1",
+  "unionDays": 109,
+  "total": 439,
+  "pct": 402.752294,
+  "cls": "over",
+  "overlap": true,
+  "periods": [
+   "over",
+   "over",
+   "over",
+   "over",
+   "over"
+  ]
+ }
+]

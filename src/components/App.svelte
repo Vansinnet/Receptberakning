@@ -53,6 +53,10 @@
     inactivity.reset();
   });
 
+  // Dagens datum kontrolleras varje minut, så att beräkningarna stämmer även om fliken
+  // står öppen över midnatt. App monteras en gång och lever hela sessionen.
+  setInterval(refreshToday, 60_000);
+
   function onVisibility() {
     if (document.visibilityState === 'visible') refreshToday();
   }

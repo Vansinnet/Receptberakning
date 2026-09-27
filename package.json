@@ -1,11 +1,11 @@
 {
   "name": "recept-5.0",
   "private": true,
-  "version": "5.0.3",
+  "version": "5.0.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run validate:data && vite build",
+    "build": "npm run validate:data && vitest run && vite build",
     "validate:data": "node scripts/validate-data.mjs",
     "preview": "vite preview",
     "test": "vitest run",
@@ -22,7 +22,9 @@
     "update:drugs": "node scripts/build-product-db.cjs && node scripts/generate-drugs.cjs",
     "update:all": "node scripts/build-product-db.cjs && node scripts/generate-drugs.cjs && node scripts/scrape-interactions.cjs --incremental",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "test:properties": "vitest run tests/unit/properties.test.ts"
+    "test:properties": "vitest run tests/unit/properties.test.ts",
+    "build:nocheck": "vite build",
+    "test:golden:update": "vitest run tests/unit/golden.test.ts -u"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",

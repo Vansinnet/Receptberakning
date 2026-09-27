@@ -75,3 +75,34 @@ describe('Långtidsanalysens text', () => {
   });
 });
 
+
+describe('Texter — fler kombinationer (porterat från 4.0)', () => {
+  it('flera läkemedel där ett avslås med påminnelsedatum', () => {
+    const t = buildPatientText('sv', [item('A 1 mg', {}, 'yes'), item('B 2 mg', { dateRaw: '2026-08-12' }, 'no')]);
+    expect(t).toContain('  B 2 mg: Nuvarande recept beräknas räcka t.o.m. 2027-06-07. Hör av dig närmare 2027-05-31. Vi kan tyvärr inte förnya');
+  });
+  it('avslag på engelska, recept redan slut', () => {
+    const t = buildPatientText('en', [item('Melatonin 2 mg', { dateRaw: '2026-06-01', packageRaw: '30', refillsRaw: '1' }, 'no')]);
+    expect(t).toContain('The current prescription was expected to last until 2026-06-30.');
+    expect(t).toContain('unable to renew the prescription');
+    expect(t).not.toContain('Please contact us again');
+  });
+  it('avslag av ej beräkningsbar beredning i flerläkemedelstext saknar datum', () => {
+    const t = buildPatientText('sv', [item('A 1 mg', {}, 'yes'), item('Kräm 1 %', { notCalculable: true }, 'no')]);
+    expect(t).toContain('  Kräm 1 %: Kan tyvärr inte förnyas efter klinisk individuell bedömning av läkare.');
+  });
+  it('journal: bedömning pågår och manuell bedömning', () => {
+    const t = buildJournalText([item('A 1 mg', {}, null), item('Kräm 1 %', { notCalculable: true }, 'yes')]);
+    expect(t).toContain('Åtgärd: Bedömning pågår.');
+    expect(t).toContain('Kräm 1 %: Beredningsformen lämpar sig inte för beräkning. Manuell bedömning.');
+    expect(t).toContain('Åtgärd: Förnyat.');
+  });
+  it('journal: recept som tagit slut skrivs "Beräknades"', () => {
+    const t = buildJournalText([item('A 1 mg', { dateRaw: '2025-06-01' }, null)]);
+    expect(t).toMatch(/Beräknades räcka t\.o\.m\. 2026-03-27 \(slut sedan 188 dagar\)/);
+  });
+  it('sjuksköterska: avvikande i båda', () => {
+    const t = buildNurseText([item('A 1 mg', {}, null)], 'deviating', 'deviating');
+    expect(t).toContain('Vitalparametrar bedöms avvikande. Medicinsk uppföljning bedöms avvikande.');
+  });
+});

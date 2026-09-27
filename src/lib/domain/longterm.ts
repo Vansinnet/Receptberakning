@@ -4,7 +4,7 @@
 // men allt uttaget räknas. Godkänt i Kliniska testfall (T30–T32).
 
 import type { LtPeriodInput, Tone } from '../types';
-import { CONSUMPTION_NORMAL_HIGH, CONSUMPTION_NORMAL_LOW, MAX_PERIOD_SPAN_DAYS } from '../constants';
+import { CONSUMPTION_NORMAL_HIGH, isWithinNormal, MAX_PERIOD_SPAN_DAYS } from '../constants';
 import { getDaysDiff, parseDateUTC, parseNum } from '../utils';
 
 export interface LtPeriodError {
@@ -37,7 +37,8 @@ export type LongtermResult =
     };
 
 function classify(pct: number): LtClass {
-  return pct > CONSUMPTION_NORMAL_HIGH ? 'over' : pct < CONSUMPTION_NORMAL_LOW ? 'under' : 'ok';
+  if (isWithinNormal(pct)) return 'ok';
+  return pct > CONSUMPTION_NORMAL_HIGH ? 'over' : 'under';
 }
 
 export function calcLongterm(periods: LtPeriodInput[], doseRaw: string, today: Date): LongtermResult {

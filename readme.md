@@ -46,16 +46,21 @@ Status: **Räcker** (14 dagar eller mer kvar), **Tar snart slut** (0–13 dagar)
 
 ## Kvalitet
 
-- 32 kliniska testfall, godkända av verksamheten, körs som automatiska tester.
-- Egenskapstester med tusentals slumpade fall.
-- Webbläsartester av hela flödet med tillgänglighetskontroll (WCAG 2.1 AA) i ljust och mörkt tema.
+Beräkningen skyddas i fyra lager, och **bygget avbryts om ett enda test faller** — en felaktig beräkning kan inte publiceras:
+
+1. **Godkända kliniska testfall** från verksamheten.
+2. **Gränsfall** för inmatning, statusgränser, månadsskiften och nyförskrivning.
+3. **Oberoende kontrollräkning:** en andra, enkel implementation av formlerna jämförs med appen i 10 000 slumpade fall.
+4. **Referensfacit:** 360 fall med frysta resultat. Ändras en siffra syns exakt vilka fall som påverkas.
+
+Webbläsartester kontrollerar dessutom att siffrorna på skärmen är exakt desamma som beräkningens, och att allt är tillgängligt enligt WCAG 2.1 AA i ljust och mörkt tema.
 
 ## Kom igång
 
 ```bash
 npm install
 npm run dev          # utvecklingsserver
-npm test             # 129 enhetstester
+npm test             # 238 enhetstester
 npm run test:e2e     # webbläsartester
 npm run build        # production-build → dist/
 ```

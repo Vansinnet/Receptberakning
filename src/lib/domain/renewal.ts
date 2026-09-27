@@ -12,7 +12,7 @@
 
 import type { MedForm, Tone } from '../types';
 import {
-  CONSUMPTION_NORMAL_HIGH, CONSUMPTION_NORMAL_LOW, DAYS_REMAINING_WARN, LONG_OVERDUE_DAYS,
+  isWithinNormal, DAYS_REMAINING_WARN, LONG_OVERDUE_DAYS,
   MAX_DAILY_DOSE, MAX_PACKAGE_SIZE, MAX_REFILLS, MAX_TOTAL_DAYS, MIN_REFILLS, MAX_MED_NAME_LENGTH,
   UNIT_DISPLAY,
 } from '../constants';
@@ -151,7 +151,7 @@ export function calcRenewal(f: MedForm, today: Date): RenewalResult {
     consumption = {
       pct,
       perInterval: (total / daysSince) * f.interval,
-      tone: pct >= CONSUMPTION_NORMAL_LOW && pct <= CONSUMPTION_NORMAL_HIGH ? 'ok' : 'warn',
+      tone: isWithinNormal(pct) ? 'ok' : 'warn',
     };
   }
 
