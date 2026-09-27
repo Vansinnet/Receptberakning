@@ -21,21 +21,11 @@ function mk(i: { daysAgo: number; dose: string; interval: 1 | 7 | 30; pkg: numbe
   return {
     name: 'Test 10 mg', atcCode: null, nplId: null, doseForm: '', regulation: null, notCalculable: false, unit: 'st',
     dateRaw: fmtDate(addDays(TODAY, -i.daysAgo)), doseRaw: i.dose, interval: i.interval,
-    packageRaw: String(i.pkg), refillsRaw: String(i.refills), reportedRaw: '', refillsLeftRaw: '', ...extra,
+    packageRaw: String(i.pkg), refillsRaw: String(i.refills), ...extra,
   };
 }
 
 describe('Egenskaper — förnyelse', () => {
-  it('patientens uppgift ändrar aldrig någon beräkning', () => {
-    fc.assert(fc.property(arbInput, fc.integer({ min: 0, max: 3000 }), (i, reported) => {
-      const a = calcRenewal(mk(i), TODAY);
-      const b = calcRenewal(mk(i, { reportedRaw: String(reported), refillsLeftRaw: String(Math.min(reported, i.refills)) }), TODAY);
-      if (!isRenewalOk(a) || !isRenewalOk(b)) return a.kind === b.kind;
-      return a.endDate.getTime() === b.endDate.getTime() && a.expectedLeft === b.expectedLeft
-        && a.daysLeft === b.daysLeft && a.status === b.status && a.consumption?.pct === b.consumption?.pct;
-    }), { numRuns: 2000 });
-  });
-
   it('fler dagar sedan receptdatum ger aldrig mer kvar', () => {
     fc.assert(fc.property(arbInput, (i) => {
       if (i.daysAgo === 0) return true;

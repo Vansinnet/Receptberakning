@@ -1,8 +1,9 @@
 <script lang="ts">
   import type { RenewalResult } from '$lib/domain/renewal';
-  import { daysLeftText, STATUS_TONE } from '$lib/domain/renewal';
+  import { daysLeftText, STATUS_LABEL, STATUS_TONE } from '$lib/domain/renewal';
+  import StatusChip from './StatusChip.svelte';
   import { INTERVAL_LABEL, UNIT_DISPLAY } from '$lib/constants';
-  import type { MedForm, Tone } from '$lib/types';
+  import type { MedForm } from '$lib/types';
   import { fmtDate, fmtFixed, fmtPct, fmtQty } from '$lib/utils';
 
   let { form, renewal }: { form: MedForm; renewal: RenewalResult } = $props();
@@ -10,30 +11,11 @@
   let u = $derived(UNIT_DISPLAY[form.unit].short);
   let per = $derived(INTERVAL_LABEL[form.interval]);
 
-  let notes = $derived.by((): { tone: Tone; text: string }[] => {
-    if (renewal.kind !== 'ok') return [];
-    const out: { tone: Tone; text: string }[] = [];
-    const rep = renewal.reported;
-    if (rep) {
-      if (rep.noConsumption) out.push({ tone: 'warn', text: 'Ingen förbrukning registrerad: patienten uppger samma mängd som förskrevs.' });
-      else if (Math.abs(rep.diff) < 0.05) out.push({ tone: 'ok', text: `Patienten uppger ${fmtQty(rep.amount)} ${u} kvar, vilket stämmer med förväntat.` });
-      else out.push({
-        tone: rep.diff < 0 ? 'bad' : 'warn',
-        text: `Patienten uppger ${fmtQty(rep.amount)} ${u} kvar: ${fmtQty(Math.abs(rep.diff))} ${u} ${rep.diff < 0 ? 'färre' : 'fler'} än förväntat, vilket motsvarar ${fmtQty(Math.abs(rep.diffDays))} dagars dos.`,
-      });
-    }
-    const s = renewal.split;
-    if (s) {
-      out.push(s.homeOutSinceDays === null
-        ? { tone: 'muted', text: `Av det som borde finnas kvar ligger ${fmtQty(s.atPharmacy)} ${u} på apoteket och ${fmtQty(s.atHome)} ${u} hemma.` }
-        : { tone: 'warn', text: `${fmtQty(s.atPharmacy)} ${u} ligger på apoteket. Hemma borde det ha tagit slut för ${fmtQty(s.homeOutSinceDays)} dagar sedan om dosen följts.` });
-    }
-    return out;
-  });
 </script>
 
 {#if renewal.kind === 'ok'}
   <section class="results" aria-label="Resultat">
+    <div class="results__status"><StatusChip large tone={STATUS_TONE[renewal.status]} label={STATUS_LABEL[renewal.status]} /></div>
     <div class="tiles">
       <div class="tile">
         <span class="tile__k">Räcker t.o.m.</span>
@@ -69,13 +51,6 @@
       </div>
     </div>
 
-    {#if notes.length}
-      <div class="notes" aria-live="polite">
-        {#each notes as n (n.text)}
-          <div class="note tone-{n.tone}">{n.text}</div>
-        {/each}
-      </div>
-    {/if}
   </section>
 {:else if renewal.kind === 'incomplete'}
   <div class="empty">Fyll i {renewal.missing.join(', ')} från receptet för att se resultatet.</div>

@@ -346,3 +346,24 @@ textarea.input { height: auto; padding: 12px; line-height: 1.5; resize: none; fo
 .fg-warn { color: var(--warn); }
 .fg-bad { color: var(--bad); }
 .fg-muted { color: var(--ink-2); }
+
+/* ── Förnyelse: formulär lodrätt till vänster, resultat bredvid ───────── */
+.renew-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.renew-cols__form { display: flex; flex-direction: column; gap: 14px; }
+.renew-cols__result { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.form-stack { display: flex; flex-direction: column; gap: 12px; }
+.results__status { display: flex; }
+.renew-cols .med-head__name { flex: 1 1 100%; max-width: none; }
+.renew-cols .tiles { flex-direction: column; gap: 8px; }
+.renew-cols .tile { flex-direction: row; align-items: baseline; flex-wrap: wrap; column-gap: 10px; padding: 10px 14px; }
+.renew-cols .tile__k { flex: 0 0 100%; }
+.renew-cols .tile__v { font-size: 20px; }
+.renew-cols .section { padding-top: 12px; }
+@media (max-width: 1180px) { .renew-cols { grid-template-columns: 1fr; } }
+.renew-cols .timeline__labels { flex-wrap: wrap; row-gap: 2px; }
+.renew-cols .timeline__now { order: -1; flex: 0 0 100%; text-align: center; }
+.renew-cols .presc-row { flex-direction: column; align-items: stretch; }
+.renew-cols .presc-field, .renew-cols .presc-field--date { width: auto; }
+.renew-cols .presc-result { align-items: flex-start; text-align: left; }
+.renew-cols .assess-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+.renew-cols .assess-row__label { width: auto; }

@@ -1,7 +1,6 @@
 // === FÖRNYELSEBERÄKNING ===
 // Ren funktion utan DOM eller state. Räknar enbart på receptet och ordinerad dos.
-// Patientens uppgift om kvarvarande mängd och uttag kvar på receptet visas som
-// jämförelse men ingår ALDRIG i en formel (beslut 2026-09-27).
+// Patientens uppgift om kvarvarande mängd används inte alls (beslut 2026-09-27).
 //
 // Regler, godkända i Kliniska testfall:
 //   dygnsdos          = dos ÷ 1, 7 eller 30
@@ -19,7 +18,7 @@ import {
 } from '../constants';
 import { addDays, fmtQty, getDaysDiff, parseDateUTC, parseNum } from '../utils';
 
-export type FieldKey = 'name' | 'date' | 'dose' | 'package' | 'refills' | 'reported' | 'refillsLeft';
+export type FieldKey = 'name' | 'date' | 'dose' | 'package' | 'refills';
 export type FieldErrors = Partial<Record<FieldKey, string>>;
 
 export type RenewalStatus = 'enough' | 'soon' | 'out' | 'longOut';
@@ -43,23 +42,6 @@ export interface Consumption {
   tone: Tone;
 }
 
-export interface ReportedComparison {
-  amount: number;
-  /** Uppgiven − förväntad. Negativt = färre än förväntat. */
-  diff: number;
-  diffDays: number;
-  /** Patienten uppger exakt samma mängd som förskrevs. */
-  noConsumption: boolean;
-}
-
-export interface PharmacySplit {
-  atPharmacy: number;
-  /** Förväntad mängd hemma, lägst 0. */
-  atHome: number;
-  /** Om det som ligger på apoteket överstiger det som borde finnas kvar: hur många dagar sedan det tog slut hemma. */
-  homeOutSinceDays: number | null;
-}
-
 export interface RenewalOk {
   kind: 'ok';
   errors: FieldErrors;
@@ -75,8 +57,6 @@ export interface RenewalOk {
   expectedLeft: number;
   status: RenewalStatus;
   consumption: Consumption | null;
-  reported: ReportedComparison | null;
-  split: PharmacySplit | null;
   /** Andel av receptperioden som förflutit, 0–100. */
   elapsedPct: number;
 }
@@ -175,39 +155,10 @@ export function calcRenewal(f: MedForm, today: Date): RenewalResult {
     };
   }
 
-  // Jämförelser — påverkar aldrig värdena ovan.
-  let reported: ReportedComparison | null = null;
-  if (f.reportedRaw.trim()) {
-    const amount = parseNum(f.reportedRaw);
-    if (!(amount >= 0)) errors.reported = 'Ange ett tal, 0 eller mer.';
-    else if (amount > total + EPS) errors.reported = `Mer än förskrivet (${fmtQty(total)} ${unitShort}).`;
-    else {
-      const diff = amount - expectedLeft;
-      // "Ingen förbrukning" först när minst en dag har gått sedan receptdatum.
-      reported = { amount, diff, diffDays: diff / dailyDose, noConsumption: daysSince > 0 && Math.abs(amount - total) < EPS };
-    }
-  }
-
-  let split: PharmacySplit | null = null;
-  if (f.refillsLeftRaw.trim()) {
-    const left = parseNum(f.refillsLeftRaw);
-    if (!Number.isInteger(left) || left < 0) errors.refillsLeft = 'Ange ett heltal, 0 eller mer.';
-    else if (left > refills) errors.refillsLeft = `Receptet har bara ${refills} uttag.`;
-    else {
-      const atPharmacy = left * pkg;
-      const home = expectedLeft - atPharmacy;
-      split = {
-        atPharmacy,
-        atHome: Math.max(0, home),
-        homeOutSinceDays: home < -EPS ? -home / dailyDose : null,
-      };
-    }
-  }
-
   return {
     kind: 'ok', errors,
     dailyDose, total, packageSize: pkg, refills, prescribedDate, daysSince, coverDays,
-    endDate, daysLeft, expectedLeft, status, consumption, reported, split,
+    endDate, daysLeft, expectedLeft, status, consumption,
     elapsedPct: Math.max(0, Math.min(100, (daysSince / coverDays) * 100)),
   };
 }

@@ -17,7 +17,7 @@ Räcker det som förskrevs senast till nu, eller är det läge att förnya? Verk
 | Borde finnas kvar idag | förskrivet − dygnsdos × dagar sedan receptdatum |
 | Förbrukning om patienten har slut nu | förskrivet ÷ dagar sedan receptdatum, i procent av dygnsdosen |
 
-Patientens egen uppgift om kvarvarande mängd och antal uttag kvar på receptet visas som **jämförelse** — de påverkar aldrig beräkningen.
+Patientens egen uppgift om kvarvarande mängd används inte — den saknas ofta och är ibland fel.
 
 Status: **Räcker** (14 dagar eller mer kvar), **Tar snart slut** (0–13 dagar), **Slut**, **Slut sedan länge** (mer än 90 dagar). Förbrukningen visas grön vid 80–110 % av ordinerad dos.
 
@@ -47,7 +47,7 @@ Status: **Räcker** (14 dagar eller mer kvar), **Tar snart slut** (0–13 dagar)
 ## Kvalitet
 
 - 32 kliniska testfall, godkända av verksamheten, körs som automatiska tester.
-- Egenskapstester med tusentals slumpade fall, till exempel att patientens uppgift aldrig ändrar beräkningen.
+- Egenskapstester med tusentals slumpade fall.
 - Webbläsartester av hela flödet med tillgänglighetskontroll (WCAG 2.1 AA) i ljust och mörkt tema.
 
 ## Kom igång
@@ -55,7 +55,7 @@ Status: **Räcker** (14 dagar eller mer kvar), **Tar snart slut** (0–13 dagar)
 ```bash
 npm install
 npm run dev          # utvecklingsserver
-npm test             # 139 enhetstester
+npm test             # 129 enhetstester
 npm run test:e2e     # webbläsartester
 npm run build        # production-build → dist/
 ```

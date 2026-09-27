@@ -2,10 +2,8 @@
   import { applyDrug, caseState, getActiveMed, getResult, removeMed, setNameManually } from '$lib/state/case.svelte';
   import { loadDrugs, searchDrugs, type DrugEntry } from '$lib/drug-search';
   import { createAutocomplete } from '$lib/autocomplete.svelte';
-  import { STATUS_LABEL, STATUS_TONE } from '$lib/domain/renewal';
   import { MAX_MED_NAME_LENGTH, UNIT_DISPLAY } from '$lib/constants';
   import { getFassUrl, stripManufacturer } from '$lib/utils';
-  import StatusChip from './StatusChip.svelte';
   import DateField from './DateField.svelte';
   import Icon from './Icon.svelte';
 
@@ -64,11 +62,6 @@
         </div>
         {#if errors.name}<div class="field-error" id="err-name">{errors.name}</div>{/if}
       </div>
-      {#if result?.renewal.kind === 'ok'}
-        <div class="med-head__status">
-          <StatusChip large tone={STATUS_TONE[result.renewal.status]} label={STATUS_LABEL[result.renewal.status]} />
-        </div>
-      {/if}
     </div>
 
     {#if med.form.notCalculable}
@@ -77,7 +70,7 @@
         Beslut och texter fungerar som vanligt, utan datum.
       </div>
     {:else}
-      <section class="form-grid" aria-label="Underlag från receptet">
+      <section class="form-stack" aria-label="Underlag från receptet">
         <div>
           <label class="lbl" for="f-date">Receptdatum</label>
           <DateField id="f-date" value={med.form.dateRaw} onchange={(v) => { if (med) med.form.dateRaw = v; }}
@@ -116,19 +109,6 @@
             bind:value={med.form.refillsRaw} aria-invalid={!!errors.refills} aria-describedby="err-refills" />
           {#if errors.refills}<div class="field-error" id="err-refills">{errors.refills}</div>{/if}
         </div>
-        <div>
-          <label class="lbl" for="f-reported">Patienten uppger kvar <span class="lbl__opt">valfritt</span></label>
-          <input id="f-reported" class="input" type="text" inputmode="decimal" autocomplete="off" placeholder="Okänt"
-            bind:value={med.form.reportedRaw} aria-invalid={!!errors.reported} aria-describedby="err-reported" />
-          {#if errors.reported}<div class="field-error" id="err-reported">{errors.reported}</div>{/if}
-        </div>
-        <div>
-          <label class="lbl" for="f-refills-left">Uttag kvar på receptet <span class="lbl__opt">valfritt</span></label>
-          <input id="f-refills-left" class="input" type="text" inputmode="numeric" autocomplete="off" placeholder="Okänt"
-            bind:value={med.form.refillsLeftRaw} aria-invalid={!!errors.refillsLeft} aria-describedby="err-refills-left" />
-          {#if errors.refillsLeft}<div class="field-error" id="err-refills-left">{errors.refillsLeft}</div>{/if}
-        </div>
-        <p class="hint form-grid__wide">Patientens uppgift och uttag kvar påverkar aldrig beräkningen. De visas bara som jämförelse.</p>
       </section>
     {/if}
   {/key}

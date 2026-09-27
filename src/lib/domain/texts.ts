@@ -109,13 +109,6 @@ export function buildJournalText(items: TextItem[]): string {
       s += `${r.daysLeft < 0 ? 'Beräknades' : 'Beräknas'} räcka t.o.m. ${fmtDate(r.endDate)} (${daysLeftText(r.daysLeft).toLowerCase()}). `;
       s += `Borde finnas kvar idag: ${fmtQty(r.expectedLeft)} ${u}.`;
       if (r.consumption) s += ` Om patienten har slut nu motsvarar det ${fmtPct(r.consumption.pct)} av ordinerad dos.`;
-      if (r.reported) {
-        const d = r.reported.diff;
-        s += ` Patienten uppger ${fmtQty(r.reported.amount)} ${u} kvar`;
-        s += r.reported.noConsumption ? ', samma mängd som förskrevs (ingen förbrukning registrerad).'
-          : Math.abs(d) < 0.05 ? ', vilket stämmer med förväntat.'
-          : ` (${fmtQty(Math.abs(d))} ${u} ${d < 0 ? 'färre' : 'fler'} än förväntat).`;
-      }
       lines.push(s);
     } else {
       lines.push(`${it.name}: Beredningsformen lämpar sig inte för beräkning. Manuell bedömning.`);

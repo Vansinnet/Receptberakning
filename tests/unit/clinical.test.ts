@@ -14,7 +14,7 @@ function form(o: Partial<MedForm>): MedForm {
   return {
     name: 'Testmedel 10 mg', atcCode: null, nplId: null, doseForm: '', regulation: null, notCalculable: false,
     unit: 'st', dateRaw: '', doseRaw: '1', interval: 1, packageRaw: '100', refillsRaw: '3',
-    reportedRaw: '', refillsLeftRaw: '', ...o,
+    ...o,
   };
 }
 
@@ -116,46 +116,8 @@ describe('B. Dos och enheter', () => {
   });
 });
 
-describe('C. Patientens uppgift och uttag kvar', () => {
-  const base = { doseRaw: '2', packageRaw: '100', refillsRaw: '3', dateRaw: '2026-08-12' };
-  const without = ok(base);
-  it('grundrecept för T14–T17', () => {
-    expect(summary(without)).toMatchObject({ tom: '2027-01-08', kvar: '99 dagar kvar', borde: '200' });
-  });
-  it('T14 uppger 20 kvar', () => {
-    const r = ok({ ...base, reportedRaw: '20' });
-    expect(r.reported!.diff).toBe(-180);
-    expect(r.reported!.diffDays).toBe(-90);
-    expect(summary(r)).toEqual(summary(without));
-  });
-  it('T15 uppger 250 kvar', () => {
-    const r = ok({ ...base, reportedRaw: '250' });
-    expect(r.reported!.diff).toBe(50);
-    expect(r.reported!.diffDays).toBe(25);
-    expect(summary(r)).toEqual(summary(without));
-  });
-  it('T16 uppger 300 kvar, ingen förbrukning', () => {
-    const r = ok({ ...base, reportedRaw: '300' });
-    expect(r.reported!.noConsumption).toBe(true);
-    expect(summary(r)).toEqual(summary(without));
-  });
-  it('T17 uppger 400 kvar, fältfel', () => {
-    const r = ok({ ...base, reportedRaw: '400' });
-    expect(r.errors.reported).toBe('Mer än förskrivet (300 st).');
-    expect(r.reported).toBeNull();
-    expect(summary(r)).toEqual(summary(without));
-  });
-  it('T18 2 uttag kvar på receptet', () => {
-    const r = ok({ dateRaw: '2026-08-12', refillsLeftRaw: '2' });
-    expect(r.expectedLeft).toBe(250);
-    expect(r.split).toEqual({ atPharmacy: 200, atHome: 50, homeOutSinceDays: null });
-  });
-  it('T19 uttag kvar men slut hemma', () => {
-    const r = ok({ dateRaw: '2026-05-04', refillsLeftRaw: '2' });
-    expect(r.expectedLeft).toBe(150);
-    expect(r.split).toEqual({ atPharmacy: 200, atHome: 0, homeOutSinceDays: 50 });
-  });
-});
+// C. Patientens uppgift och uttag kvar (T14–T19) togs bort 2026-09-27 på verksamhetens
+// begäran: fälten finns inte längre i verktyget.
 
 describe('D. Validering och ej beräkningsbara beredningar', () => {
   it('T20 framtida receptdatum', () => {
@@ -274,12 +236,6 @@ describe('Rättelser efter oberoende granskning', () => {
     const r = ok({ dateRaw: '2025-06-01' });
     const p = calcPrescription(r, settings({ period: 'date', endDateRaw: '2026-09-30' }), TODAY);
     expect(p).toMatchObject({ kind: 'badDate', message: 'Slutdatumet har redan passerat.' });
-  });
-  it('"ingen förbrukning" först när minst en dag har gått', () => {
-    const sameDay = ok({ dateRaw: '2026-10-01', reportedRaw: '300' });
-    expect(sameDay.reported!.noConsumption).toBe(false);
-    const later = ok({ dateRaw: '2026-09-05', reportedRaw: '300' });
-    expect(later.reported!.noConsumption).toBe(true);
   });
   it('långtidsanalysen behåller radnumret när perioderna sorteras', () => {
     const r = calcLongterm([

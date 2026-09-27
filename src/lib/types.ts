@@ -29,10 +29,6 @@ export interface MedForm {
   interval: DoseInterval;
   packageRaw: string;
   refillsRaw: string;
-  /** Patientens egen uppgift om kvarvarande mängd. Påverkar aldrig beräkningen. */
-  reportedRaw: string;
-  /** Uttag kvar på receptet enligt läkemedelslistan. Påverkar aldrig beräkningen. */
-  refillsLeftRaw: string;
 }
 
 /** Inställningar för nyförskrivning. Ligger på läkemedlet så att allt har en enda källa. */

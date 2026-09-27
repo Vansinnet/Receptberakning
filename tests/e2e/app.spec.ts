@@ -6,14 +6,13 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/');
 });
 
-async function fillMed(page: Page, o: { name: string; date: string; dose: string; pkg: string; refills: string; reported?: string }) {
+async function fillMed(page: Page, o: { name: string; date: string; dose: string; pkg: string; refills: string }) {
   await page.getByRole('combobox', { name: 'Läkemedel och styrka' }).fill(o.name);
   await page.keyboard.press('Escape');
   await page.getByLabel('Receptdatum', { exact: true }).fill(o.date);
   await page.locator('#f-dose').fill(o.dose);
   await page.locator('#f-pkg').fill(o.pkg);
   await page.getByLabel('Antal uttag').fill(o.refills);
-  if (o.reported) await page.locator('#f-reported').fill(o.reported);
 }
 
 async function axe(page: Page) {
@@ -28,7 +27,7 @@ test('förnyelse från början till kopierad text (T03 + T25)', async ({ page })
   await expect(results).toContainText('4 dagar kvar');
   await expect(results).toContainText('5 st');
   await expect(results).toContainText('101,7 %');
-  await expect(page.locator('.med-head__status')).toContainText('Tar snart slut');
+  await expect(results).toContainText('Tar snart slut');
 
   await page.getByRole('button', { name: 'Förnya' }).click();
   await expect(page.getByLabel('Nyförskrivning')).toContainText('2 förp. à 100 st');
@@ -44,13 +43,6 @@ test('förnyelse från början till kopierad text (T03 + T25)', async ({ page })
   await axe(page);
 });
 
-test('patientens uppgift ändrar inte beräkningen (T14)', async ({ page }) => {
-  await fillMed(page, { name: 'Metylfenidat 36 mg', date: '2026-08-12', dose: '2', pkg: '100', refills: '3', reported: '20' });
-  const results = page.getByRole('region', { name: 'Resultat' });
-  await expect(results).toContainText('2027-01-08');
-  await expect(results).toContainText('200 st');
-  await expect(results).toContainText('180 st färre än förväntat, vilket motsvarar 90 dagars dos');
-});
 
 test('fältfel visas vid fältet (T20)', async ({ page }) => {
   await fillMed(page, { name: 'Sertralin 50 mg', date: '20261002', dose: '1', pkg: '100', refills: '3' });

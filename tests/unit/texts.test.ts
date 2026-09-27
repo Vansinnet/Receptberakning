@@ -10,7 +10,7 @@ const TODAY = new Date(Date.UTC(2026, 9, 1));
 function item(name: string, o: Partial<MedForm>, decision: Decision, period = 6): TextItem {
   const f: MedForm = {
     name, atcCode: null, nplId: null, doseForm: '', regulation: null, notCalculable: false, unit: 'st',
-    dateRaw: '2025-12-10', doseRaw: '1', interval: 1, packageRaw: '100', refillsRaw: '3', reportedRaw: '', refillsLeftRaw: '', ...o,
+    dateRaw: '2025-12-10', doseRaw: '1', interval: 1, packageRaw: '100', refillsRaw: '3', ...o,
   };
   const r = calcRenewal(f, TODAY);
   const renewal = isRenewalOk(r) ? r : null;
@@ -51,10 +51,9 @@ describe('Patientsvar', () => {
 
 describe('Journalanteckning', () => {
   it('innehåller underlag, jämförelse och åtgärd', () => {
-    const t = buildJournalText([item('Metylfenidat 36 mg', { dateRaw: '2026-08-12', packageRaw: '30', reportedRaw: '5' }, 'yes', 3)]);
+    const t = buildJournalText([item('Metylfenidat 36 mg', { dateRaw: '2026-08-12', packageRaw: '30' }, 'yes', 3)]);
     expect(t).toContain('Metylfenidat 36 mg: Senaste recept 2026-08-12, 30 st × 3 uttag = 90 st, ordination 1 st/dag.');
     expect(t).toContain('Beräknas räcka t.o.m. 2026-11-09 (39 dagar kvar). Borde finnas kvar idag: 40 st.');
-    expect(t).toContain('Patienten uppger 5 st kvar (35 st färre än förväntat).');
     expect(t).toContain('Åtgärd: Förnyat, 2 förp. à 30 st (53 st), räcker till 2027-01-01.');
   });
 });
@@ -76,9 +75,3 @@ describe('Långtidsanalysens text', () => {
   });
 });
 
-describe('Journal vid ingen förbrukning', () => {
-  it('nämner att samma mängd som förskrevs finns kvar', () => {
-    const t = buildJournalText([item('Test 5 mg', { dateRaw: '2026-09-05', packageRaw: '30', refillsRaw: '1', reportedRaw: '30' }, null)]);
-    expect(t).toContain('Patienten uppger 30 st kvar, samma mängd som förskrevs (ingen förbrukning registrerad).');
-  });
-});

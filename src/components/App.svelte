@@ -78,19 +78,23 @@
   <div id="view-renew" role="tabpanel" aria-labelledby="tab-renew" class="workspace" class:is-hidden={uiState.view !== 'renew'}>
     <CaseList {warnings} {nplIds} />
     <main class="main-pane" id="main" tabindex="-1">
-      <MedEditor />
-      {#if med && result}
-        {#if !med.form.notCalculable}
-          <RenewalView form={med.form} renewal={result.renewal} />
-        {/if}
-        {#if result.renewal.kind === 'ok' || result.renewal.kind === 'manual'}
-          {#if caseState.role === 'doctor'}
-            <DecisionPanel {med} {result} />
-          {:else}
-            <NursePanel />
+      <div class="renew-cols">
+        <div class="renew-cols__form">
+          <MedEditor />
+          {#if med && result && (result.renewal.kind === 'ok' || result.renewal.kind === 'manual')}
+            {#if caseState.role === 'doctor'}
+              <DecisionPanel {med} {result} />
+            {:else}
+              <NursePanel />
+            {/if}
           {/if}
-        {/if}
-      {/if}
+        </div>
+        <div class="renew-cols__result">
+          {#if med && result && !med.form.notCalculable}
+            <RenewalView form={med.form} renewal={result.renewal} />
+          {/if}
+        </div>
+      </div>
     </main>
     <TextPanel />
   </div>

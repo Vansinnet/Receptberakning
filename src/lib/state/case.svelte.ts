@@ -16,7 +16,6 @@ export function emptyForm(): MedForm {
   return {
     name: '', atcCode: null, nplId: null, doseForm: '', regulation: null, notCalculable: false,
     unit: 'st', dateRaw: '', doseRaw: '', interval: 1, packageRaw: '', refillsRaw: '',
-    reportedRaw: '', refillsLeftRaw: '',
   };
 }
 
