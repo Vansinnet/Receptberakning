@@ -114,11 +114,13 @@ export function searchDrugs(query: string): DrugEntry[] {
   if (!_drugList || !_drugListLower) return [];
   if (!query || query.length < MIN_SEARCH_QUERY_LENGTH || query.length > MAX_SEARCH_QUERY_LENGTH) return [];
   const q = query.toLowerCase().trim();
+  // Alla ord i sökningen ska finnas med, i valfri ordning: "sertralin 50" hittar "Sertralin Accord 50 mg".
+  const tokens = q.split(/\s+/).filter(Boolean);
   const results: Array<{ entry: DrugEntry; idx: number }> = [];
   const lower = _drugListLower;
   const rawLimit = MAX_AUTOCOMPLETE_RESULTS * 3;
   for (let i = 0; i < _drugList.length; i++) {
-    if (lower[i].includes(q)) {
+    if (tokens.every((t) => lower[i].includes(t))) {
       results.push({ entry: _drugList[i], idx: i });
       if (results.length >= rawLimit) break;
     }

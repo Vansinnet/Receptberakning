@@ -18,8 +18,16 @@ export default defineConfig({
     svelte(),
     VitePWA({
       registerType: 'autoUpdate',
+      manifest: {
+        name: 'Recept – beräkningshjälpmedel vid receptförnyelse',
+        short_name: 'Recept',
+        lang: 'sv',
+        theme_color: '#0e5a73',
+        background_color: '#f4f3ef',
+        display: 'standalone',
+      },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}', 'data/drugs-version.json'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}', 'data/drugs-version.json'],
         runtimeCaching: [{
           urlPattern: /\/data\/drugs\.json/,
           handler: 'StaleWhileRevalidate',

@@ -1,0 +1,21 @@
+/* === UTSKRIFT ===
+   Ärendets läkemedel, resultat och texter på vitt papper. Kontroller döljs. */
+@media print {
+  @page { size: A4 portrait; margin: 15mm 18mm; }
+
+  :root, html[data-theme='dark'] {
+    --bg: #fff; --surface: #fff; --surface-2: #fff; --ink: #000; --ink-2: #333; --ink-3: #444;
+    --line: #bbb; --line-2: #999; --ok-bg: #fff; --warn-bg: #fff; --bad-bg: #fff; --muted-bg: #fff;
+    --ok: #1d6a44; --warn: #6b4000; --bad: #8a1f15;
+  }
+
+  body { font-size: 10pt; }
+  .app, .workspace { display: block; height: auto; overflow: visible; }
+  .case-aside, .main-pane, .texts-aside, .lt-form, .lt-result { width: auto; border: 0; overflow: visible; padding: 0 0 12pt; }
+  .topbar__nav, .topbar__controls, .btn, .seg-group, .ac-dropdown, .toast, .skip-link,
+  .confirm, .privacy, .text-tabs__spacer, .text-actions { display: none !important; }
+  .input { border: 0; padding: 0; height: auto; }
+  textarea.input { white-space: pre-wrap; }
+  .chip, .note { border: 1px solid currentColor; }
+  .tile, .panel, .chart, .table { break-inside: avoid; }
+}

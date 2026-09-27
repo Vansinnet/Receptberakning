@@ -1,206 +1,104 @@
 <script lang="ts">
   import TopBar from './TopBar.svelte';
-  import MedList from './MedList.svelte';
-  import MedCard from './MedCard.svelte';
-  import CalcResult from './CalcResult.svelte';
-  import NurseView from './NurseView.svelte';
-  import PrescribePanel from './PrescribePanel.svelte';
-  import LongtermPanel from './LongtermPanel.svelte';
-  import InteractionAlerts from './InteractionAlerts.svelte';
-  import InactivityTimer from './InactivityTimer.svelte';
-  import { medCards, appState, tickCurrentDate, clearAllMedState, getActiveResult, getHasSummary } from '$lib/state.svelte';
+  import CaseList from './CaseList.svelte';
+  import MedEditor from './MedEditor.svelte';
+  import RenewalView from './RenewalView.svelte';
+  import DecisionPanel from './DecisionPanel.svelte';
+  import NursePanel from './NursePanel.svelte';
+  import TextPanel from './TextPanel.svelte';
+  import LongtermView from './LongtermView.svelte';
+  import InactivityToast from './InactivityToast.svelte';
+  import { caseState, clearCase, getActiveMed, getResult, hasCaseData, refreshToday } from '$lib/state/case.svelte';
+  import { clearLongterm, ltState } from '$lib/state/longterm.svelte';
+  import { getTheme, uiState } from '$lib/state/ui.svelte';
   import { CHECK_INTERACTIONS, loadInteractions } from '$lib/interactions';
-  import { canRenewMed } from '$lib/prescribe-calc';
-  import { VALID_THEMES } from '$lib/constants';
-  import { createInactivityTimer } from '$lib/inactivity.svelte';
   import { setDrugsLoadErrorHandler } from '$lib/drug-cache';
+  import { createInactivityTimer } from '$lib/inactivity.svelte';
   import type { AtcEntry } from '$lib/types';
-  import GitHubIcon from './GitHubIcon.svelte';
 
-  let activeTab = $state<'renew' | 'longterm'>('renew');
-  let theme = $state<'dark' | 'klinisk' | 'sakura'>('klinisk');
-  let drugsLoadFailed = $state(false);
-  setDrugsLoadErrorHandler(() => drugsLoadFailed = true);
+  let drugsFailed = $state(false);
+  setDrugsLoadErrorHandler(() => (drugsFailed = true));
 
-  const inactivityTimer = createInactivityTimer(
-    () => clearAllMedState(),
-    () => medCards.some(c => c.form.medRaw !== ''),
+  let interactionsReady = $state(0);
+  loadInteractions().then(() => interactionsReady++);
+
+  function clearAll() {
+    clearCase();
+    clearLongterm();
+  }
+
+  const inactivity = createInactivityTimer(
+    clearAll,
+    () => hasCaseData() || !!ltState.medName || ltState.periods.some((p) => p.startRaw || p.totalRaw),
   );
-  let card = $derived(medCards[appState.activeMedIdx] ?? null);
-  let result = $derived(getActiveResult());
 
-  let interactionVersion = $state(0);
-  loadInteractions().then(() => interactionVersion++);
+  let med = $derived(getActiveMed());
+  let result = $derived(med ? getResult(med.id) : undefined);
 
-  let interactionWarnings = $derived.by(() => {
-    void interactionVersion;
-    const entries: AtcEntry[] = [];
-    for (let i = 0; i < medCards.length; i++) {
-      const c = medCards[i];
-      if (c?.form?.atcCode && c.form.medRaw) {
-        entries.push({ a: c.form.atcCode, i: c.form.medRaw, p: c.form.nplId });
-      }
-    }
-    if (entries.length < 2) return [];
-    return CHECK_INTERACTIONS(entries);
+  let interactionEntries = $derived(caseState.meds
+    .filter((m) => m.form.atcCode && m.form.name.trim())
+    .map((m): AtcEntry => ({ a: m.form.atcCode!, i: m.form.name.trim(), p: m.form.nplId })));
+  let warnings = $derived.by(() => {
+    void interactionsReady;
+    return interactionEntries.length >= 2 ? CHECK_INTERACTIONS(interactionEntries) : [];
   });
-
-  let prescribeVisible = $derived.by(() => {
-    return card && result ? canRenewMed({
-      _cardId: card._cardId,
-      valid: result.valid ?? false,
-      calculable: result.calculable ?? false,
-      decision: card.decision,
-    }) : false;
-  });
-
-  let showPrescribe = $derived(prescribeVisible || getHasSummary());
-
-  let allNplIds = $derived(medCards.map(c => c?.form?.nplId).filter((id): id is string => id !== null && id !== undefined));
-
-  let announceEl = $state<HTMLDivElement | null>(null);
-
-  function announce(msg: string) {
-    if (announceEl) {
-      announceEl.textContent = '';
-      requestAnimationFrame(() => { if (announceEl) announceEl.textContent = msg; });
-    }
-  }
-
-  function handleTabChange(tab: 'renew' | 'longterm') {
-    activeTab = tab;
-    announce(tab === 'renew' ? 'Receptförnyelse' : 'Långvarig förbrukningsanalys');
-  }
-
-  function handleNurseToggle() {
-    appState.nurseViewActive = !appState.nurseViewActive;
-    announce(appState.nurseViewActive ? 'Sjuksköterskevy aktiverad' : 'Sjuksköterskevy inaktiverad');
-  }
-
-  function handleThemeChange(t: string) {
-    if (!VALID_THEMES.has(t)) return;
-    theme = t as 'dark' | 'klinisk' | 'sakura';
-    const labels: Record<string, string> = { dark: 'Mörkt tema', klinisk: 'Kliniskt tema', sakura: 'Körsbärstema' };
-    announce(labels[t] || 'Tema ändrat');
-  }
-
-  function handleEarlyDecision(decision: 'yes' | 'no') {
-    const idx = appState.activeMedIdx;
-    if (idx >= 0 && idx < medCards.length) {
-      medCards[idx].decision = decision;
-    }
-  }
-
-  function onVisibilityChange() {
-    if (document.visibilityState === 'visible') {
-      tickCurrentDate();
-    }
-  }
-
-  function onPageHide() {
-    clearAllMedState();
-  }
+  let nplIds = $derived(caseState.meds.map((m) => m.form.nplId).filter((x): x is string => !!x));
 
   $effect(() => {
-    if (typeof document !== 'undefined') {
-      document.documentElement.setAttribute('data-theme', theme);
-    }
+    document.documentElement.setAttribute('data-theme', getTheme());
   });
 
   $effect(() => {
-    void medCards.length;
-    inactivityTimer.reset();
+    void caseState.meds.length;
+    inactivity.reset();
   });
+
+  function onVisibility() {
+    if (document.visibilityState === 'visible') refreshToday();
+  }
 </script>
 
-<svelte:window onvisibilitychange={onVisibilityChange} onpagehide={onPageHide} />
+<svelte:window onpagehide={clearAll} />
+<svelte:document onvisibilitychange={onVisibility} />
 
-  <a href="#main-content" class="skip-link">Hoppa till innehåll</a>
+<a class="skip-link" href="#main">Hoppa till innehåll</a>
 
-  <noscript>
-    <div class="noscript-msg" role="alert">
-      <strong>JavaScript krävs.</strong> Aktivera JavaScript i din webbläsare för att använda receptberäkningsverktyget.
-    </div>
-  </noscript>
-
-  {#if drugsLoadFailed}
-    <div class="alert alert-warn" role="alert" style:text-align="center" style:border-radius="0" style:margin="0">
-      <strong>Läkemedelsdatabasen kunde inte laddas.</strong> Kontrollera din internetanslutning.
-      <button class="btn btn-ghost" onclick={() => { drugsLoadFailed = false; location.reload(); }}>Försök igen</button>
+<div class="app">
+  {#if drugsFailed}
+    <div class="banner tone-warn" role="alert">
+      Läkemedelsdatabasen kunde inte laddas. Du kan fortfarande skriva in läkemedel för hand.
+      <button type="button" class="btn btn--sm" onclick={() => location.reload()}>Försök igen</button>
     </div>
   {/if}
 
-  <div id="a11y-announce" class="sr-only" aria-live="polite" bind:this={announceEl}></div>
+  <TopBar />
 
-  <div class="app-shell">
+  <h1 class="sr-only">Recept – beräkningshjälpmedel vid receptförnyelse</h1>
 
-    <TopBar {activeTab} {theme} nurseViewActive={appState.nurseViewActive}
-      onTabChange={handleTabChange}
-      onNurseToggle={handleNurseToggle}
-      onThemeChange={handleThemeChange}
-    />
-
-    <main id="main-content" aria-label="Huvudinnehåll">
-        <h1 class="sr-only">Receptberäkning – kliniskt beslutsstöd</h1>
-        <div id="panel-renew" class="tab-panel" class:active={activeTab === 'renew'} role="tabpanel" aria-labelledby="heading-renew">
-          <h2 class="sr-only" id="heading-renew">Receptförnyelse</h2>
-          <div class="renew-layout">
-            <!-- KOLUMN 1: Läkemedelslista -->
-            <MedList />
-
-            <!-- KOLUMN 2: Formulär -->
-            <section class="form-panel" id="formPanel" aria-label="Receptformulär">
-              <MedCard />
-            </section>
-
-            <!-- KOLUMN 3: Sjuksköterskebedömning (villkorad) -->
-            {#if appState.nurseViewActive}
-              <NurseView />
-            {/if}
-
-            <!-- KOLUMN 4: Resultat -->
-            <section class="result-panel" id="resultPanel" aria-label="Beräkningsresultat">
-              <InteractionAlerts warnings={interactionWarnings} allNplIds={allNplIds} />
-              {#if result?.valid && result?.calculable !== false}
-                <CalcResult
-                  result={result}
-                  nurseViewActive={appState.nurseViewActive}
-                  onDecision={handleEarlyDecision}
-                />
-              {:else}
-                <div class="result-empty-state">
-                  <div class="empty-icon" aria-hidden="true">📋</div>
-                  <div>{result?.statusText || 'Fyll i formuläret för att se resultatet'}</div>
-                </div>
-              {/if}
-            </section>
-
-            <!-- KOLUMN 5: Förskrivningspanel (alltid i DOM, reserverar plats) -->
-            <PrescribePanel visible={showPrescribe && !appState.nurseViewActive} eligible={prescribeVisible} />
-          </div>
-        </div>
-
-        <div id="panel-longterm" class="tab-panel" class:active={activeTab === 'longterm'} role="tabpanel" aria-labelledby="heading-longterm">
-          <h2 class="sr-only" id="heading-longterm">Långvarig förbrukningsanalys</h2>
-          <LongtermPanel />
-        </div>
+  <div id="view-renew" role="tabpanel" aria-labelledby="tab-renew" class="workspace" class:is-hidden={uiState.view !== 'renew'}>
+    <CaseList {warnings} {nplIds} />
+    <main class="main-pane" id="main" tabindex="-1">
+      <MedEditor />
+      {#if med && result}
+        {#if !med.form.notCalculable}
+          <RenewalView form={med.form} renewal={result.renewal} />
+        {/if}
+        {#if result.renewal.kind === 'ok' || result.renewal.kind === 'manual'}
+          {#if caseState.role === 'doctor'}
+            <DecisionPanel {med} {result} />
+          {:else}
+            <NursePanel />
+          {/if}
+        {/if}
+      {/if}
     </main>
-
-    <footer class="site-footer">
-      <div class="footer-disclaimer" role="note">
-        <span class="footer-disclaimer-icon" aria-hidden="true">⚠</span>
-        <span>Verktyget är ett beräkningshjälpmedel — förskrivaren ansvarar alltid för kliniska beslut.
-          <a href="https://github.com/Vansinnet/Receptberakning/blob/main/disclaimer.md" target="_blank" rel="noopener noreferrer">Läs ansvarsfriskrivningen</a>
-        </span>
-      </div>
-      <div class="footer-links">
-        <a href="https://github.com/Vansinnet/Receptberakning/blob/main/readme.md" target="_blank" rel="noopener noreferrer">Licens och tillåtet användande</a>
-        <a href="https://github.com/Vansinnet/Receptberakning" target="_blank" rel="noopener noreferrer">
-          <GitHubIcon />
-          GitHub
-        </a>
-      </div>
-    </footer>
+    <TextPanel />
   </div>
 
-  <InactivityTimer showToast={inactivityTimer.showToast} countdown={inactivityTimer.countdown} onDismiss={() => inactivityTimer.dismiss()} />
+  <div id="view-longterm" role="tabpanel" aria-labelledby="tab-longterm" class="lt-view" class:is-hidden={uiState.view !== 'longterm'}>
+    <LongtermView />
+  </div>
+
+</div>
+
+<InactivityToast show={inactivity.showToast} countdown={inactivity.countdown} onContinue={() => inactivity.dismiss()} />

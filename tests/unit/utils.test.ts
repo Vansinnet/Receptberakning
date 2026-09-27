@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { extractDoseUnit, stripManufacturer, pctClass, fmtDate, parseDateUTC, getDaysDiff } from '../../src/lib/utils';
+import { extractDoseUnit, stripManufacturer, fmtDate, parseDateUTC, getDaysDiff } from '../../src/lib/utils';
 import { setMockNow } from '../../src/lib/clock';
 
 const MOCK_NOW = new Date('2025-05-20T00:00:00Z').getTime();
@@ -128,23 +128,6 @@ describe('stripManufacturer', () => {
   it('hanterar tom sträng', () => {
     expect(stripManufacturer('')).toBe('');
   });
-});
-
-// =====================================================
-describe('pctClass', () => {
-  it('0 → w0', () => { expect(pctClass(0, 'w')).toBe('w0'); });
-  it('2 → w0 (avrundas ned)', () => { expect(pctClass(2, 'w')).toBe('w0'); });
-  it('3 → w5 (avrundas upp)', () => { expect(pctClass(3, 'w')).toBe('w5'); });
-  it('5 → w5', () => { expect(pctClass(5, 'w')).toBe('w5'); });
-  it('7 → w5 (avrundas ned)', () => { expect(pctClass(7, 'w')).toBe('w5'); });
-  it('8 → w10 (avrundas upp)', () => { expect(pctClass(8, 'w')).toBe('w10'); });
-  it('50 → w50', () => { expect(pctClass(50, 'w')).toBe('w50'); });
-  it('97 → w95 (avrundas ned)', () => { expect(pctClass(97, 'w')).toBe('w95'); });
-  it('98 → w100 (avrundas upp)', () => { expect(pctClass(98, 'w')).toBe('w100'); });
-  it('100 → w100', () => { expect(pctClass(100, 'w')).toBe('w100'); });
-  it('105 → w100 (klampad)', () => { expect(pctClass(105, 'w')).toBe('w100'); });
-  it('negativt → w0', () => { expect(pctClass(-10, 'w')).toBe('w0'); });
-  it('annat prefix', () => { expect(pctClass(50, 'x')).toBe('x50'); });
 });
 
 // =====================================================

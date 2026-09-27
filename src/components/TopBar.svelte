@@ -1,63 +1,54 @@
 <script lang="ts">
-  let {
-    activeTab = 'renew' as 'renew' | 'longterm',
-    nurseViewActive = false,
-    theme = 'klinisk' as 'dark' | 'klinisk' | 'sakura',
-    onTabChange = (_tab: 'renew' | 'longterm'): void => {},
-    onNurseToggle = (): void => {},
-    onThemeChange = (_theme: string): void => {},
-  } = $props();
+  import { caseState, setRole } from '$lib/state/case.svelte';
+  import { getTheme, setView, toggleTheme, uiState, type View } from '$lib/state/ui.svelte';
+  import Icon from './Icon.svelte';
 
   const version = __APP_VERSION__;
+  const views: { id: View; label: string }[] = [
+    { id: 'renew', label: 'Förnyelse' },
+    { id: 'longterm', label: 'Långtidsanalys' },
+  ];
 
-  const tabIds = ['renew', 'longterm'] as const;
-
-  function handleTabKeydown(e: KeyboardEvent) {
-    const idx = tabIds.indexOf(activeTab);
-    let nextIdx = idx;
-    if (e.key === 'ArrowRight') nextIdx = (idx + 1) % tabIds.length;
-    else if (e.key === 'ArrowLeft') nextIdx = (idx - 1 + tabIds.length) % tabIds.length;
-    else if (e.key === 'Home') nextIdx = 0;
-    else if (e.key === 'End') nextIdx = tabIds.length - 1;
+  function onTabKey(e: KeyboardEvent) {
+    const i = views.findIndex((v) => v.id === uiState.view);
+    let n = i;
+    if (e.key === 'ArrowRight') n = (i + 1) % views.length;
+    else if (e.key === 'ArrowLeft') n = (i - 1 + views.length) % views.length;
     else return;
     e.preventDefault();
-    onTabChange(tabIds[nextIdx]);
-    const tablist = e.currentTarget as HTMLElement;
-    const btns = tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]');
-    btns[nextIdx]?.focus();
+    setView(views[n].id);
+    (e.currentTarget as HTMLElement).querySelectorAll<HTMLButtonElement>('[role="tab"]')[n]?.focus();
   }
 </script>
 
 <header class="topbar">
-  <div class="topbar-brand-row">
-    <span class="app-brand-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
-        <rect x="3" y="2" width="14" height="18" rx="2" fill="white" fill-opacity="0.2" stroke="white" stroke-width="1.5"/>
-        <line x1="6" y1="7" x2="14" y2="7" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="6" y1="10.5" x2="14" y2="10.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="6" y1="14" x2="10" y2="14" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-        <rect x="13.5" y="13" width="4" height="8.5" rx="1" transform="rotate(-45 13.5 13)" fill="white"/>
-        <polygon points="9.5,20.5 11,19 12.5,20.5 11,22" fill="white"/>
-      </svg>
-    </span>
-    <span class="app-brand-name">Receptberäkning</span>
-    <span class="app-brand-date">{version}</span>
+  <div class="brand">
+    <span class="brand__name">Recept</span>
+    <span class="brand__meta">{version}</span>
   </div>
-  <div class="topbar-nav-row">
-    <div class="main-tabs" role="tablist" onkeydown={handleTabKeydown}>
-      <button class="main-tab" class:active={activeTab === 'renew'} role="tab" aria-selected={activeTab === 'renew'} aria-controls="panel-renew" tabindex={activeTab === 'renew' ? 0 : -1} data-tab="renew" data-tooltip="Beräkna förbrukning och avgör om receptet kan förnyas." onclick={() => onTabChange('renew')}>💊 Receptförnyelse</button>
-      <button class="main-tab" class:active={activeTab === 'longterm'} role="tab" aria-selected={activeTab === 'longterm'} aria-controls="panel-longterm" tabindex={activeTab === 'longterm' ? 0 : -1} data-tab="longterm" data-tooltip="Analysera förbrukningsmönster över flera receptperioder." onclick={() => onTabChange('longterm')}>📊 Långvarig förbrukning</button>
-    </div>
-    <button class="btn-nurse-toggle" aria-pressed={nurseViewActive} data-tooltip="Växla till sjuksköterskans dokumentationsvy" onclick={() => onNurseToggle()}>🩺 Sjuksköterskevy</button>
-    <div class="topbar-right">
-      <div class="topbar-setting">
-         <label for="themeSelect" class="topbar-setting-label">Tema</label>
-         <select id="themeSelect" class="theme-select" value={theme} onchange={(e) => onThemeChange((e.target as HTMLSelectElement).value)}>
-          <option value="dark">🌙 Mörkt</option>
-          <option value="klinisk">🩺 Klinisk</option>
-          <option value="sakura">🌸 Körsbär</option>
-        </select>
+
+  <div class="topbar__nav" role="tablist" aria-label="Huvudvyer" tabindex="-1" onkeydown={onTabKey}>
+    {#each views as v (v.id)}
+      <button type="button" class="nav-tab" role="tab" id="tab-{v.id}" aria-controls="view-{v.id}"
+        aria-selected={uiState.view === v.id} tabindex={uiState.view === v.id ? 0 : -1}
+        onclick={() => setView(v.id)}>{v.label}</button>
+    {/each}
+  </div>
+
+  <div class="topbar__spacer"></div>
+
+  <div class="topbar__controls section__row">
+    {#if uiState.view === 'renew'}
+      <div class="seg-group" role="group" aria-label="Roll">
+        <button type="button" class="seg" aria-pressed={caseState.role === 'doctor'} onclick={() => setRole('doctor')}>Läkare</button>
+        <button type="button" class="seg" aria-pressed={caseState.role === 'nurse'} onclick={() => setRole('nurse')}>Sjuksköterska</button>
       </div>
-    </div>
+    {/if}
+    <button type="button" class="btn btn--ghost" onclick={toggleTheme}
+      aria-label={getTheme() === 'dark' ? 'Byt till ljust tema' : 'Byt till mörkt tema'}>
+      <Icon name={getTheme() === 'dark' ? 'sun' : 'moon'} />
+      {getTheme() === 'dark' ? 'Ljust' : 'Mörkt'}
+    </button>
   </div>
+  <span class="topbar__date">Idag {caseState.today}</span>
 </header>

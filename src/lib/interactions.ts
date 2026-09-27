@@ -28,7 +28,11 @@ async function _doLoad(): Promise<void> {
   try {
     const mod = await import('./data/interactions-scraped.json');
     const raw: unknown = mod.default;
-    _INTERACTIONS = Array.isArray(raw) ? raw as InteractionRule[] : [];
+    // Den skrapade datan innehåller HTML-rester ("<!---->") och radbrytningar i texterna.
+    const clean = (t: unknown) => String(t ?? '').replace(/<!--.*?-->/g, '').replace(/\s+/g, ' ').trim();
+    _INTERACTIONS = Array.isArray(raw)
+      ? (raw as InteractionRule[]).map((r) => ({ ...r, title: clean(r.title), description: clean(r.description), recommendation: clean(r.recommendation) }))
+      : [];
     for (let i = 0; i < _INTERACTIONS.length; i++) {
       for (const p of _INTERACTIONS[i].atcGroupA) {
         const arr = _idxA.get(p) ?? []; _idxA.set(p, arr); arr.push(i);
