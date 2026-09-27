@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => {
 async function fillMed(page: Page, o: { name: string; date: string; dose: string; pkg: string; refills: string; reported?: string }) {
   await page.getByRole('combobox', { name: 'Läkemedel och styrka' }).fill(o.name);
   await page.keyboard.press('Escape');
-  await page.getByLabel('Receptdatum').fill(o.date);
+  await page.getByLabel('Receptdatum', { exact: true }).fill(o.date);
   await page.locator('#f-dose').fill(o.dose);
   await page.locator('#f-pkg').fill(o.pkg);
   await page.getByLabel('Antal uttag').fill(o.refills);
@@ -55,7 +55,7 @@ test('patientens uppgift ändrar inte beräkningen (T14)', async ({ page }) => {
 test('fältfel visas vid fältet (T20)', async ({ page }) => {
   await fillMed(page, { name: 'Sertralin 50 mg', date: '20261002', dose: '1', pkg: '100', refills: '3' });
   await expect(page.getByText('Datumet är satt i framtiden.')).toBeVisible();
-  await expect(page.getByLabel('Receptdatum')).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.getByLabel('Receptdatum', { exact: true })).toHaveAttribute('aria-invalid', 'true');
 });
 
 test('sjuksköterskeläge: journaltext med tre lägen', async ({ page }) => {
@@ -85,13 +85,13 @@ test('långtidsanalys med överlapp (T31) och mörkt tema', async ({ page }) => 
   await page.getByRole('tab', { name: 'Långtidsanalys' }).click();
   await page.locator('#lt-med').fill('Metylfenidat 36 mg');
   await page.locator('#lt-dose').fill('1');
-  await page.getByLabel('Från, period 1').fill('20260101');
-  await page.getByLabel('Till och med, period 1').fill('20260415');
-  await page.getByLabel('Uttaget, period 1').fill('105');
+  await page.getByLabel('Från, period 1', { exact: true }).fill('20260101');
+  await page.getByLabel('Till och med, period 1', { exact: true }).fill('20260415');
+  await page.getByLabel('Uttaget, period 1', { exact: true }).fill('105');
   await page.getByRole('button', { name: 'Lägg till period' }).click();
-  await page.getByLabel('Från, period 2').fill('20260401');
-  await page.getByLabel('Till och med, period 2').fill('20260630');
-  await page.getByLabel('Uttaget, period 2').fill('91');
+  await page.getByLabel('Från, period 2', { exact: true }).fill('20260401');
+  await page.getByLabel('Till och med, period 2', { exact: true }).fill('20260630');
+  await page.getByLabel('Uttaget, period 2', { exact: true }).fill('91');
   const res = page.getByRole('region', { name: 'Resultat' });
   await expect(res).toContainText('Perioderna överlappar');
   await expect(res).toContainText('181 dagar');
@@ -100,4 +100,17 @@ test('långtidsanalys med överlapp (T31) och mörkt tema', async ({ page }) => 
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.waitForTimeout(200);
   await axe(page);
+});
+
+test('receptdatum kan väljas i kalendern', async ({ page }) => {
+  await page.getByRole('combobox', { name: 'Läkemedel och styrka' }).fill('Sertralin 50 mg');
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button', { name: 'Välj datum i kalender' }).first()).toBeVisible();
+  // Kalendern är webbläsarens egen; här väljs datumet via det underliggande datumfältet.
+  await page.locator('.date-field__native').first().fill('2025-12-10');
+  await expect(page.getByLabel('Receptdatum', { exact: true })).toHaveValue('2025-12-10');
+  await page.locator('#f-dose').fill('1');
+  await page.locator('#f-pkg').fill('100');
+  await page.getByLabel('Antal uttag').fill('3');
+  await expect(page.getByRole('region', { name: 'Resultat' })).toContainText('2026-10-05');
 });

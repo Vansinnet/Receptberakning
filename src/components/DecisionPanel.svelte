@@ -1,10 +1,11 @@
 <script lang="ts">
   import type { MedCard } from '$lib/types';
   import type { MedResult } from '$lib/state/case.svelte';
-  import { setDecision, setPrescribePackage } from '$lib/state/case.svelte';
+  import { caseState, setDecision, setPrescribePackage } from '$lib/state/case.svelte';
   import { MAX_PRESCRIBE_MONTHS, UNIT_DISPLAY } from '$lib/constants';
-  import { applyDateMask, fmtDate, fmtQty } from '$lib/utils';
+  import { fmtDate, fmtQty } from '$lib/utils';
   import Icon from './Icon.svelte';
+  import DateField from './DateField.svelte';
 
   let { med, result }: { med: MedCard; result: MedResult } = $props();
 
@@ -17,9 +18,6 @@
   function onPeriod(e: Event) {
     const v = (e.currentTarget as HTMLSelectElement).value;
     med.prescribe.period = v === 'date' ? 'date' : Number(v);
-  }
-  function onEndDate(e: Event) {
-    applyDateMask(e.currentTarget as HTMLInputElement, (v) => { med.prescribe.endDateRaw = v; });
   }
   function onPackage(e: Event) {
     setPrescribePackage(med.id, (e.currentTarget as HTMLInputElement).value);
@@ -60,9 +58,8 @@
         {#if med.prescribe.period === 'date'}
           <div class="presc-field presc-field--date">
             <label class="lbl" for="p-end">T.o.m.</label>
-            <input id="p-end" class="input" type="text" inputmode="numeric" maxlength="10" placeholder="ÅÅÅÅ-MM-DD"
-              value={med.prescribe.endDateRaw} oninput={onEndDate}
-              aria-invalid={p.kind === 'badDate'} aria-describedby="p-msg" />
+            <DateField id="p-end" value={med.prescribe.endDateRaw} onchange={(v) => (med.prescribe.endDateRaw = v)}
+              min={caseState.today} invalid={p.kind === 'badDate'} describedby="p-msg" />
           </div>
         {/if}
         <div class="presc-field">

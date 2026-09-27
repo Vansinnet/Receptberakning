@@ -1,8 +1,10 @@
 <script lang="ts">
   import { addPeriod, clearLongterm, getLtResult, getLtText, ltState, removePeriod } from '$lib/state/longterm.svelte';
   import { CONSUMPTION_NORMAL_HIGH, CONSUMPTION_NORMAL_LOW, COPY_CONFIRM_MS, LT_CHART_MAX_PCT, MAX_LT_PERIODS } from '$lib/constants';
-  import { applyDateMask, copyToClipboard, fmtDate, fmtFixed, fmtPct } from '$lib/utils';
+  import { copyToClipboard, fmtDate, fmtFixed, fmtPct } from '$lib/utils';
   import Icon from './Icon.svelte';
+  import DateField from './DateField.svelte';
+  import { caseState } from '$lib/state/case.svelte';
 
   let r = $derived(getLtResult());
   let text = $derived(getLtText());
@@ -11,9 +13,6 @@
   const CLS_LABEL = { ok: 'I nivå', over: 'Över', under: 'Under' } as const;
   const h = (pct: number) => `${Math.min(100, (pct / LT_CHART_MAX_PCT) * 100)}%`;
 
-  function onDate(i: number, field: 'startRaw' | 'endRaw', e: Event) {
-    applyDateMask(e.currentTarget as HTMLInputElement, (v) => { ltState.periods[i][field] = v; });
-  }
 
   async function copy() {
     if (await copyToClipboard(text)) {
@@ -49,13 +48,13 @@
         {@const e = r.errors[i] ?? {}}
         <span class="lt-grid__no">{i + 1}</span>
         <div>
-          <input class="input" type="text" inputmode="numeric" maxlength="10" placeholder="ÅÅÅÅ-MM-DD" aria-label="Från, period {i + 1}"
-            value={p.startRaw} oninput={(ev) => onDate(i, 'startRaw', ev)} aria-invalid={!!e.start} />
+          <DateField compact label="Från, period {i + 1}" value={p.startRaw} onchange={(v) => (ltState.periods[i].startRaw = v)}
+            max={caseState.today} invalid={!!e.start} />
           {#if e.start}<div class="field-error">{e.start}</div>{/if}
         </div>
         <div>
-          <input class="input" type="text" inputmode="numeric" maxlength="10" placeholder="ÅÅÅÅ-MM-DD" aria-label="Till och med, period {i + 1}"
-            value={p.endRaw} oninput={(ev) => onDate(i, 'endRaw', ev)} aria-invalid={!!e.end} />
+          <DateField compact label="Till och med, period {i + 1}" value={p.endRaw} onchange={(v) => (ltState.periods[i].endRaw = v)}
+            max={caseState.today} invalid={!!e.end} />
           {#if e.end}<div class="field-error">{e.end}</div>{/if}
         </div>
         <div>
@@ -78,7 +77,9 @@
     <p class="hint">Båda datumen räknas in i perioden. Överlappande dagar räknas en gång. Uttaget = antal enheter som hämtats ut under perioden.</p>
   </section>
 
-  <section class="lt-result" aria-label="Resultat">
+  <!-- Scrollbar resultatyta ska kunna nås med tangentbordet (axe: scrollable-region-focusable). -->
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+  <section class="lt-result" aria-label="Resultat" tabindex="0">
     {#if r.kind === 'ok'}
       {#if r.overlap}
         <div class="note tone-warn">Perioderna överlappar. Överlappande dagar räknas bara en gång i den totala tiden.</div>

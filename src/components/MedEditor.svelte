@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { applyDrug, getActiveMed, getResult, removeMed, setNameManually } from '$lib/state/case.svelte';
+  import { applyDrug, caseState, getActiveMed, getResult, removeMed, setNameManually } from '$lib/state/case.svelte';
   import { loadDrugs, searchDrugs, type DrugEntry } from '$lib/drug-search';
   import { createAutocomplete } from '$lib/autocomplete.svelte';
   import { STATUS_LABEL, STATUS_TONE } from '$lib/domain/renewal';
   import { MAX_MED_NAME_LENGTH, UNIT_DISPLAY } from '$lib/constants';
-  import { applyDateMask, getFassUrl, stripManufacturer } from '$lib/utils';
+  import { getFassUrl, stripManufacturer } from '$lib/utils';
   import StatusChip from './StatusChip.svelte';
+  import DateField from './DateField.svelte';
   import Icon from './Icon.svelte';
 
   let med = $derived(getActiveMed());
@@ -24,9 +25,6 @@
     ac.search(v.trim());
   }
 
-  function onDateInput(e: Event) {
-    applyDateMask(e.currentTarget as HTMLInputElement, (v) => { if (med) med.form.dateRaw = v; });
-  }
 </script>
 
 {#if med}
@@ -82,9 +80,8 @@
       <section class="form-grid" aria-label="Underlag från receptet">
         <div>
           <label class="lbl" for="f-date">Receptdatum</label>
-          <input id="f-date" class="input" type="text" inputmode="numeric" autocomplete="off" placeholder="ÅÅÅÅ-MM-DD"
-            maxlength="10" value={med.form.dateRaw} oninput={onDateInput}
-            aria-invalid={!!errors.date} aria-describedby="err-date" />
+          <DateField id="f-date" value={med.form.dateRaw} onchange={(v) => { if (med) med.form.dateRaw = v; }}
+            max={caseState.today} invalid={!!errors.date} describedby="err-date" />
           {#if errors.date}<div class="field-error" id="err-date">{errors.date}</div>{/if}
         </div>
         <div>
