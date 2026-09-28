@@ -14,6 +14,7 @@
   import { checkInteractions, loadInteractions, type InteractionResult } from '$lib/interactions';
   import { setDrugsLoadErrorHandler } from '$lib/drug-cache';
   import { createInactivityTimer } from '$lib/inactivity.svelte';
+  import { createBackgroundGuard } from '$lib/background';
 
   let drugsFailed = $state(false);
   setDrugsLoadErrorHandler(() => (drugsFailed = true));
@@ -56,12 +57,21 @@
   // står öppen över midnatt. App monteras en gång och lever hela sessionen.
   setInterval(refreshToday, 60_000);
 
+  const background = createBackgroundGuard(clearAll);
+
+  function onReturn() {
+    background.onReturn();
+    inactivity.checkElapsed();
+    refreshToday();
+  }
+
   function onVisibility() {
-    if (document.visibilityState === 'visible') refreshToday();
+    if (document.visibilityState === 'visible') onReturn();
+    else if (matchMedia('(pointer: coarse)').matches) background.onHidden();
   }
 </script>
 
-<svelte:window onpagehide={clearAll} />
+<svelte:window onpagehide={(e) => background.onPageHide(e)} onpageshow={(e) => { if (e.persisted) onReturn(); }} />
 <svelte:document onvisibilitychange={onVisibility} />
 
 <a class="skip-link" href="#main">Hoppa till innehåll</a>
@@ -78,7 +88,7 @@
 
   <h1 class="sr-only">Recept – beräkningshjälpmedel vid receptförnyelse</h1>
 
-  <div id="view-renew" role="tabpanel" aria-labelledby="tab-renew" class="workspace" class:is-hidden={uiState.view !== 'renew'}>
+  <div id="view-renew" role="tabpanel" aria-labelledby="tab-renew" class="workspace workspace--renew" class:is-hidden={uiState.view !== 'renew'}>
     <CaseList {interactions} {nplIds} />
     <main class="main-pane" id="main" tabindex="-1">
       <div class="renew-cols">

@@ -4,6 +4,8 @@ export function createInactivityTimer(onClear: () => void, getHasData: () => boo
   let warnTimer: ReturnType<typeof setTimeout> | null = null;
   let countdownTimer: ReturnType<typeof setInterval> | null = null;
   let lastActivityTs = 0;
+  /** När nedräkningen senast startades om. Timers står still när en mobil sover. */
+  let armedAt = 0;
   let showToast = $state(false);
   let countdown = $state(INACTIVITY_COUNTDOWN_SEC);
 
@@ -12,6 +14,7 @@ export function createInactivityTimer(onClear: () => void, getHasData: () => boo
     if (countdownTimer) clearInterval(countdownTimer);
     showToast = false;
     if (!getHasData()) return;
+    armedAt = Date.now();
     countdown = INACTIVITY_COUNTDOWN_SEC;
     warnTimer = setTimeout(() => {
       showToast = true;
@@ -45,8 +48,24 @@ export function createInactivityTimer(onClear: () => void, getHasData: () => boo
     };
   });
 
+  /**
+   * Anropas när sidan syns igen. På en mobil kan timers ha stått still i bakgrunden;
+   * har den totala tiden utan aktivitet passerats rensas allt direkt.
+   */
+  function checkElapsed() {
+    if (!armedAt || !getHasData()) return;
+    if (Date.now() - armedAt >= INACTIVITY_WARN_MS + INACTIVITY_COUNTDOWN_SEC * 1000) {
+      if (warnTimer) clearTimeout(warnTimer);
+      if (countdownTimer) clearInterval(countdownTimer);
+      showToast = false;
+      armedAt = 0;
+      onClear();
+    }
+  }
+
   return {
     get showToast() { return showToast; },
+    checkElapsed,
     get countdown() { return countdown; },
     reset,
     dismiss() { reset(); },

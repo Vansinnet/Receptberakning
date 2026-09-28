@@ -78,6 +78,22 @@ button, input, select, textarea { font: inherit; color: inherit; }
   padding: 8px 18px 16px; border-left: 1px solid var(--line); background: var(--surface-2);
 }
 
+/* Förnyelse: ärendelistan överst till vänster, "Ny patient" och friskrivning under den.
+   På smal skärm hamnar de sist, efter texterna (se nedan). */
+.workspace--renew {
+  display: grid;
+  grid-template-columns: var(--aside-w) minmax(0, 1fr) var(--texts-w);
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas: 'aside main texts' 'foot main texts';
+}
+.workspace--renew .case-aside { grid-area: aside; width: auto; }
+.workspace--renew .main-pane { grid-area: main; }
+.workspace--renew .texts-aside { grid-area: texts; width: auto; }
+.case-foot {
+  grid-area: foot; display: flex; flex-direction: column; gap: 4px;
+  padding: 8px 12px 14px; border-right: 1px solid var(--line);
+}
+
 @media (max-width: 1180px) {
   :root { --texts-w: 360px; --aside-w: 208px; }
 }
@@ -86,6 +102,11 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .workspace { flex-direction: column; }
   .case-aside, .texts-aside { width: auto; border: 0; border-bottom: 1px solid var(--line); }
   .texts-aside { min-height: 420px; }
+  .workspace--renew {
+    grid-template-columns: minmax(0, 1fr); grid-template-rows: none;
+    grid-template-areas: 'aside' 'main' 'texts' 'foot';
+  }
+  .case-foot { border-right: 0; padding: 14px 16px 20px; }
 }
 
 /* ── Kontroller ───────────────────────────────────────────────────────── */
@@ -176,7 +197,6 @@ textarea.input { height: auto; padding: 12px; line-height: 1.5; resize: none; fo
 .med-item[aria-current='true'] .med-item__name { color: var(--accent); }
 .med-item__name { font-size: 14px; font-weight: 600; line-height: 1.25; }
 .med-item__meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); }
-.aside-spacer { flex-grow: 1; min-height: 12px; }
 .aside-box {
   font-size: 12px; line-height: 1.45; color: var(--ink-2); padding: 10px;
   border: 1px solid var(--line); border-radius: 8px; background: var(--surface);
@@ -384,3 +404,61 @@ textarea.input { height: auto; padding: 12px; line-height: 1.5; resize: none; fo
 .renew-cols .presc-result { align-items: flex-start; text-align: left; }
 .renew-cols .assess-row { flex-direction: column; align-items: flex-start; gap: 6px; }
 .renew-cols .assess-row__label { width: auto; }
+
+/* ── Mobil ─────────────────────────────────────────────────────────────── */
+
+/* Smal skärm: långtidsanalysens formulär och texter i full bredd (efter deras grundregler ovan). */
+@media (max-width: 980px) {
+  .lt-form { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+  .lt-view .texts-aside { width: auto; }
+}
+
+/* Pekskärm: 16 px text i fält (annars zoomar iPhone vid tryck) och minst 44 px höga mål. */
+@media (pointer: coarse) {
+  .input, .input--compact, .lt-grid .input { height: 44px; font-size: 16px; }
+  .input--name { height: 44px; font-size: 17px; }
+  textarea.input { height: auto; font-size: 16px; }
+  .date-field__text { padding-right: 46px; }
+  .date-field__btn { width: 40px; height: 38px; }
+  .btn { height: 44px; }
+  .btn--sm { height: 40px; }
+  .btn--icon { width: 44px; }
+  .seg { height: 40px; }
+  .seg--sm { height: 36px; }
+  .nav-tab { height: 40px; }
+  .text-tab { height: 44px; }
+  .med-item { min-height: 44px; }
+}
+
+/* Telefon: en kolumn, kompakt topp och ärendelista, perioder som två rader. */
+@media (max-width: 640px) {
+  .topbar { height: auto; flex-wrap: wrap; gap: 8px 12px; padding: 8px 12px; }
+  .topbar__spacer { display: none; }
+  .topbar__nav { margin-left: auto; }
+  .topbar__date { margin-left: auto; }
+
+  .case-aside { padding: 12px 12px 10px; }
+  .med-list { flex-direction: row; flex-wrap: wrap; gap: 6px; }
+  .med-item { width: auto; padding: 6px 10px; gap: 4px; border-color: var(--line); }
+  .main-pane { padding: 14px 16px 20px; }
+  .texts-aside { padding: 8px 16px 16px; }
+  .text-tabs, .text-tabs__list { flex-wrap: wrap; gap: 4px 14px; }
+  .text-tab { white-space: nowrap; }
+  .text-actions { position: sticky; bottom: 0; padding: 8px 0; background: var(--surface-2); }
+
+  .lt-form { padding: 14px 16px; }
+  .lt-result { padding: 14px 16px 20px; }
+  .lt-top { flex-wrap: wrap; }
+  .lt-top__dose { width: 100%; }
+  .lt-grid { grid-template-columns: 16px minmax(0, 1fr) minmax(0, 1fr) 44px; row-gap: 8px; }
+  .lt-grid__head--total { display: none; }
+  .lt-grid__total { grid-column: 2 / 4; display: flex; flex-wrap: wrap; align-items: center; column-gap: 8px; }
+  .lt-grid__total::before { content: 'Uttaget'; font-size: 12px; font-weight: 700; color: var(--ink-2); }
+  .lt-grid__total .input { flex: 1 1 0; min-width: 0; }
+  .lt-grid__total .field-error { flex-basis: 100%; }
+  .lt-grid__del { grid-column: 4; }
+  .tiles { flex-wrap: wrap; }
+  .tile { flex: 1 1 140px; }
+  .table th, .table td { white-space: normal; padding: 6px; }
+}
+

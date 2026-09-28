@@ -93,6 +93,10 @@ export const ACTIVITY_RESET_DEBOUNCE_MS = 2000;
 // patientdata på delade kliniska datorer utan att avbryta pågående arbete.
 export const INACTIVITY_WARN_MS = 22 * 60 * 1000;
 export const INACTIVITY_COUNTDOWN_SEC = 60;
+// AKTIVT VAL: 5 minuter — om sidan läggs i bakgrunden (t.ex. appbyte på mobilen) rensas
+// ingenting direkt; kommer användaren tillbaka efter 5 minuter eller mer rensas allt.
+// Stängs fliken på riktigt rensas allt direkt. Godkänt 2026-09-28.
+export const BACKGROUND_CLEAR_MS = 5 * 60 * 1000;
 export const COUNTDOWN_TICK_MS = 1000;
 export const COPY_CONFIRM_MS = 2000;
 

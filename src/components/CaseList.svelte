@@ -99,8 +99,9 @@
     </div>
   {/if}
 
-  <div class="aside-spacer"></div>
+</aside>
 
+<div class="case-foot">
   {#if caseState.confirmClear}
     <div class="confirm" role="alertdialog" aria-labelledby="confirm-q">
       <span class="confirm__q" id="confirm-q">Rensa all data för patienten?</span>
@@ -112,10 +113,10 @@
   {:else}
     <button type="button" class="btn btn--block" onclick={() => (caseState.confirmClear = true)}>Ny patient</button>
   {/if}
-  <span class="privacy">Ingen data lämnar webbläsaren. Allt rensas efter 22 minuter utan aktivitet och när fliken stängs.</span>
+  <span class="privacy">Ingen data lämnar webbläsaren. Allt rensas efter 22 minuter utan aktivitet, när fliken stängs och – på mobil – efter 5 minuter i bakgrunden.</span>
   <span class="privacy">
     Beräkningshjälpmedel – förskrivaren ansvarar alltid för kliniska beslut.
     <a href="https://github.com/Vansinnet/Receptberakning/blob/main/disclaimer.md" target="_blank" rel="noopener noreferrer">Ansvarsfriskrivning</a> ·
     <a href="https://github.com/Vansinnet/Receptberakning/blob/main/readme.md" target="_blank" rel="noopener noreferrer">Licens</a>
   </span>
-</aside>
+</div>

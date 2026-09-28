@@ -42,7 +42,7 @@
       <span></span>
       <span class="lt-grid__head">Från</span>
       <span class="lt-grid__head">Till och med</span>
-      <span class="lt-grid__head">Uttaget</span>
+      <span class="lt-grid__head lt-grid__head--total">Uttaget</span>
       <span></span>
       {#each ltState.periods as p, i (i)}
         {@const e = r.errors[i] ?? {}}
@@ -57,11 +57,11 @@
             max={caseState.today} invalid={!!e.end} />
           {#if e.end}<div class="field-error">{e.end}</div>{/if}
         </div>
-        <div>
+        <div class="lt-grid__total">
           <input class="input" type="text" inputmode="numeric" aria-label="Uttaget, period {i + 1}" bind:value={p.totalRaw} aria-invalid={!!e.total} />
           {#if e.total}<div class="field-error">{e.total}</div>{/if}
         </div>
-        <button type="button" class="btn btn--ghost btn--icon" aria-label="Ta bort period {i + 1}" onclick={() => removePeriod(i)}>
+        <button type="button" class="btn btn--ghost btn--icon lt-grid__del" aria-label="Ta bort period {i + 1}" onclick={() => removePeriod(i)}>
           <Icon name="x" size={14} />
         </button>
       {/each}
