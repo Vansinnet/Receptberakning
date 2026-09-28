@@ -4,37 +4,38 @@
    All text når minst 4,5:1 i kontrast mot sin bakgrund i båda teman. */
 
 :root {
-  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-serif: 'IBM Plex Serif', Georgia, serif;
+  /* Färgsättning och typsnitt som i Recept 4.0 (temat "Klinisk" som ljust, 4.0:s mörka som mörkt). */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: var(--font-sans);
 
-  --bg: #f4f3ef;
+  --bg: #f0fdfa;
   --surface: #ffffff;
-  --surface-2: #faf9f6;
-  --ink: #16191d;
-  --ink-2: #454c54;
-  --ink-3: #626a72;
-  --line: #e2dfd8;
-  --line-2: #cbc7bd;
-  --accent: #0e5a73;
+  --surface-2: #e6fbf6;
+  --ink: #11554c;
+  --ink-2: #2f6660;
+  --ink-3: #3d706b;
+  --line: #99f6e4;
+  --line-2: #5eead4;
+  --accent: #0f766e;
   --accent-ink: #ffffff;
-  --accent-soft: #e2eef2;
-  --ok: #1d6a44;
-  --ok-bg: #e5f1e9;
-  --warn: #855000;
-  --warn-bg: #faefd9;
-  --bad: #a3271b;
-  --bad-bg: #fbe6e2;
-  --muted: #555c63;
-  --muted-bg: #eceae5;
+  --accent-soft: #ccfbf1;
+  --ok: #15803d;
+  --ok-bg: #f0fdf4;
+  --warn: #b45309;
+  --warn-bg: #fffbeb;
+  --bad: #b91c1c;
+  --bad-bg: #fef2f2;
+  --muted: #3d706b;
+  --muted-bg: #ccfbf1;
   --on-strong: #ffffff;
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-1: 0 1px 3px rgba(13, 148, 136, 0.08), 0 1px 2px rgba(13, 148, 136, 0.05);
   --focus: 2px solid var(--accent);
 
-  --r-sm: 5px;
-  --r-md: 6px;
-  --r-lg: 10px;
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-lg: 12px;
 
-  --topbar-h: 48px;
+  --topbar-h: 52px;
   --aside-w: 236px;
   --texts-w: 420px;
 
@@ -42,26 +43,26 @@
 }
 
 html[data-theme='dark'] {
-  --bg: #111417;
-  --surface: #181c20;
-  --surface-2: #1d2226;
-  --ink: #e8eaec;
-  --ink-2: #b9bfc5;
-  --ink-3: #959ca3;
-  --line: #2a3036;
-  --line-2: #3b434a;
-  --accent: #79bfd6;
-  --accent-ink: #0b1216;
-  --accent-soft: #17323c;
-  --ok: #74d09b;
-  --ok-bg: #12291d;
-  --warn: #f0b457;
-  --warn-bg: #2e220e;
-  --bad: #ff8f80;
-  --bad-bg: #351814;
-  --muted: #a3aab1;
-  --muted-bg: #23282d;
-  --on-strong: #0b1216;
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface-2: #161b22;
+  --ink: #e6edf3;
+  --ink-2: #c9d1d9;
+  --ink-3: #8b949e;
+  --line: #30363d;
+  --line-2: #3d444d;
+  --accent: #58a6ff;
+  --accent-ink: #0d1117;
+  --accent-soft: #1c2d3f;
+  --ok: #3fb950;
+  --ok-bg: #0c1f15;
+  --warn: #e3b341;
+  --warn-bg: #191108;
+  --bad: #f85149;
+  --bad-bg: #1c0c0a;
+  --muted: #8b949e;
+  --muted-bg: #21262d;
+  --on-strong: #0d1117;
+  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.4);
   color-scheme: dark;
 }
