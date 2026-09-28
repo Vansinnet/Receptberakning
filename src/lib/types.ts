@@ -54,10 +54,3 @@ export interface LtPeriodInput {
   endRaw: string;
   totalRaw: string;
 }
-
-/** Indata till interaktionskontrollen: ATC-kod, visningsnamn, NPL-id. */
-export interface AtcEntry {
-  a: string;
-  i: string;
-  p?: string | null;
-}

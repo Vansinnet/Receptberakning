@@ -179,6 +179,19 @@ textarea.input { height: auto; padding: 12px; line-height: 1.5; resize: none; fo
   display: flex; flex-direction: column; gap: 6px;
 }
 .aside-box--warn { border-color: var(--warn); }
+.aside-box--danger { border-color: var(--bad); }
+.ix-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ix { display: flex; flex-direction: column; gap: 2px; }
+.ix__drugs { font-weight: 600; color: var(--ink); }
+.ix__pair { display: flex; align-items: center; gap: 6px; }
+.ix__label { color: var(--ink-3); }
+.ix__cls {
+  font-size: 11px; font-weight: 700; line-height: 1; padding: 3px 5px; border-radius: 4px;
+  font-variant-numeric: tabular-nums; border: 1px solid currentColor;
+}
+.ix__cls--D { color: var(--bad); background: var(--bad-bg); }
+.ix__cls--C { color: var(--warn); background: var(--warn-bg); }
+.ix__cls--B { color: var(--ink-2); background: var(--surface-2); }
 .aside-box__title { font-weight: 600; color: var(--ink); }
 .confirm {
   padding: 10px; border: 1px solid var(--bad); border-radius: 8px; background: var(--bad-bg);

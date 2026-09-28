@@ -1,155 +1,92 @@
-import { describe, it, expect, beforeAll } from 'vitest';
-import { CHECK_INTERACTIONS, loadInteractions } from '../../src/lib/interactions';
+// Interaktionskontrollen i appen, med konstruerad data (oberoende av månadens Janusmed-data).
+// Kontroller mot den riktiga datan finns i data.test.ts.
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { checkInteractions, setInteractionData } from '../../src/lib/interactions';
+import type { InteractionData } from '../../src/lib/interaction-data';
 
-beforeAll(async () => {
-  await loadInteractions();
-});
+// Profiler: 0 sertralin, 1 citalopram, 2 tramadol, 3 kombination (tramadol + paracetamol), 4 paracetamol
+const DATA: InteractionData = {
+  format: 1,
+  janusmedUpdated: '2026-09-25',
+  substances: ['citalopram', 'paracetamol', 'sertralin', 'tramadol'],
+  profiles: 5,
+  products: {
+    '20000000000001': 0, '20000000000002': 0, // två sertralinprodukter, samma profil
+    '20000000000011': 1,
+    '20000000000021': 2,
+    '20000000000031': 3,
+    '20000000000041': 4,
+  },
+  interactions: [
+    [0, 1, 2, 0, 'D0'], // sertralin – citalopram
+    [0, 2, 2, 3, 'C1'], // sertralin – tramadol
+    [0, 3, 2, 3, 'C1'], // sertralin – tramadol (i kombinationen)
+    [1, 2, 0, 3, 'C1'], // citalopram – tramadol
+    [1, 3, 0, 3, 'C1'],
+    [2, 3, 3, 1, 'B0'], // påhittad, för att testa flera rader
+  ],
+};
 
-// =====================================================
-// CHECK_INTERACTIONS — tomma / ogiltiga indata
-// =====================================================
+const e = (label: string, nplId: string | null) => ({ label, nplId });
+const SERT = e('Sertralin 50 mg', '20000000000001');
+const SERT2 = e('Zoloft 100 mg', '20000000000002');
+const CIT = e('Citalopram 20 mg', '20000000000011');
+const TRAM = e('Tramadol 50 mg', '20000000000021');
+const COMBO = e('Tramadol/Paracetamol', '20000000000031');
+const PCM = e('Paracetamol 500 mg', '20000000000041');
 
-describe('CHECK_INTERACTIONS — tomma indata', () => {
-  it('tom array → tomt resultat', () => {
-    const result = CHECK_INTERACTIONS([]);
-    expect(result).toEqual([]);
+beforeEach(() => setInteractionData(DATA));
+
+describe('checkInteractions', () => {
+  it('inga läkemedel eller ett läkemedel → inga varningar', () => {
+    expect(checkInteractions([])).toEqual({ warnings: [], unchecked: [] });
+    expect(checkInteractions([SERT])).toEqual({ warnings: [], unchecked: [] });
   });
 
-  it('ett läkemedel → tomt (inget par att kontrollera)', () => {
-    const result = CHECK_INTERACTIONS([{ i: '0', a: 'N06AB04' }]);
-    expect(result.length).toBe(0);
+  it('sertralin + citalopram → klass D, röd varning', () => {
+    const { warnings } = checkInteractions([SERT, CIT]);
+    expect(warnings).toEqual([{
+      drugs: ['Sertralin 50 mg', 'Citalopram 20 mg'], cls: 'D0', severity: 'danger',
+      pairs: [{ a: 'sertralin', b: 'citalopram', cls: 'D0' }],
+    }]);
   });
 
-  it('två läkemedel utan ATC → tomt', () => {
-    const result = CHECK_INTERACTIONS([{ i: '0', a: '' }, { i: '1', a: '' }]);
-    expect(result.length).toBe(0);
+  it('ordningen spelar ingen roll, men substanserna följer läkemedlen', () => {
+    const [w] = checkInteractions([CIT, SERT]).warnings;
+    expect(w.drugs).toEqual(['Citalopram 20 mg', 'Sertralin 50 mg']);
+    expect(w.pairs).toEqual([{ a: 'citalopram', b: 'sertralin', cls: 'D0' }]);
   });
 
-  it('ett med ATC, ett utan → tomt', () => {
-    const result = CHECK_INTERACTIONS([{ i: '0', a: 'N06AB04' }, { i: '1', a: '' }]);
-    expect(result.length).toBe(0);
-  });
-});
-
-// =====================================================
-// CHECK_INTERACTIONS — matchning
-// =====================================================
-
-describe('CHECK_INTERACTIONS — matchning', () => {
-  it('dubbelriktad: ordning spelar ingen roll', () => {
-    const r1 = CHECK_INTERACTIONS([
-      { i: '0', a: 'C09AA02' },
-      { i: '1', a: 'C03DA01' },
-    ]);
-    const r2 = CHECK_INTERACTIONS([
-      { i: '0', a: 'C03DA01' },
-      { i: '1', a: 'C09AA02' },
-    ]);
-    expect(r1.length).toBeGreaterThanOrEqual(1);
-    expect(r1.length).toBe(r2.length);
+  it('klass C → gul varning', () => {
+    const [w] = checkInteractions([SERT, TRAM]).warnings;
+    expect(w).toMatchObject({ cls: 'C1', severity: 'warn' });
   });
 
-  it('två identiska ATC-koder → ingen självinteraktion', () => {
-    const result = CHECK_INTERACTIONS([
-      { i: 'a', a: 'N05AN01' },
-      { i: 'b', a: 'N05AN01' },
-    ]);
-    expect(result.length).toBe(0);
+  it('varningarna sorteras med den allvarligaste först', () => {
+    expect(checkInteractions([TRAM, COMBO]).warnings.map((x) => x.cls)).toEqual(['B0']);
+    expect(checkInteractions([TRAM, SERT, CIT]).warnings.map((x) => x.cls)).toEqual(['D0', 'C1', 'C1']);
   });
 
-  it('paracetamol + kalcium → ingen förväntad varning', () => {
-    const result = CHECK_INTERACTIONS([
-      { i: '0', a: 'N02BE01' },
-      { i: '1', a: 'A12AA04' },
-    ]);
-    expect(result.length).toBe(0);
+  it('samma profil (två sertralinprodukter) → ingen interaktionsvarning', () => {
+    expect(checkInteractions([SERT, SERT2]).warnings).toEqual([]);
   });
-});
 
-// =====================================================
-// CHECK_INTERACTIONS — output-struktur
-// =====================================================
+  it('par utan interaktion → ingen varning', () => {
+    expect(checkInteractions([SERT, PCM]).warnings).toEqual([]);
+  });
 
-describe('CHECK_INTERACTIONS — output-struktur', () => {
-  it('varningsobjekt har korrekt struktur', () => {
-    const result = CHECK_INTERACTIONS([
-      { i: '0', a: 'C09AA02' },
-      { i: '1', a: 'C03DA01' },
-    ]);
-    expect(result.length).toBeGreaterThanOrEqual(1);
-    const w = result[0];
-    expect(w).toBeDefined();
-    expect(['danger', 'warn']).toContain(w.severity);
-    expect(typeof w.title).toBe('string');
-    expect(w.title.length).toBeGreaterThan(0);
-    expect(typeof w.description).toBe('string');
-    expect(typeof w.recommendation).toBe('string');
-    expect(Array.isArray(w.drugs)).toBe(true);
-    expect(w.drugs.length).toBe(2);
-    expect(w.drugs[0]).toBe('0');
-    expect(w.drugs[1]).toBe('1');
+  it('handskrivna och okända läkemedel rapporteras som ej kontrollerade', () => {
+    const r = checkInteractions([SERT, e('Egen blandning', null), e('Okänd', '29999999999999'), CIT]);
+    expect(r.unchecked).toEqual(['Egen blandning', 'Okänd']);
+    expect(r.warnings).toHaveLength(1);
   });
 });
 
-// =====================================================
-// CHECK_INTERACTIONS — deduplicering
-// =====================================================
-
-describe('CHECK_INTERACTIONS — deduplicering', () => {
-  it('samma titel + olika läkemedelspar → två separata varningar', () => {
-    const result = CHECK_INTERACTIONS([
-      { i: '0', a: 'C09AA02' },
-      { i: '1', a: 'M01AE01' },
-      { i: '2', a: 'N02BA01' },
-    ]);
-    expect(result.length).toBeGreaterThanOrEqual(2);
-  });
-});
-
-// =====================================================
-// CHECK_INTERACTIONS — kliniskt verifierade interaktioner
-// Verifierar att ATC5-scrapad Janusmed-data täcker kända interaktioner.
-// Om någon fallerar: Janusmed saknar data för just det paret.
-// =====================================================
-
-describe('CHECK_INTERACTIONS — kliniskt verifierade', () => {
-  it('ACE-hämmare + kaliumsparande diuretika → interaktion finns', () => {
-    const result = CHECK_INTERACTIONS([
-      { i: '0', a: 'C09AA02' },
-      { i: '1', a: 'C03DA01' },
-    ]);
-    expect(result.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('warfarin + NSAID → interaktion finns', () => {
-    const result = CHECK_INTERACTIONS([
-      { i: '0', a: 'B01AA03' },
-      { i: '1', a: 'M01AE01' },
-    ]);
-    expect(result.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('SSRI + MAO-hämmare → interaktion finns', () => {
-    const result = CHECK_INTERACTIONS([
-      { i: '0', a: 'N06AB04' },
-      { i: '1', a: 'N06AF05' },
-    ]);
-    expect(result.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('tramadol + SSRI → serotonerg interaktion finns', () => {
-    const result = CHECK_INTERACTIONS([
-      { i: '0', a: 'N02AX02' },
-      { i: '1', a: 'N06AB04' },
-    ]);
-    expect(result.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('litium + NSAID → interaktion finns', () => {
-    const result = CHECK_INTERACTIONS([
-      { i: '0', a: 'N05AN01' },
-      { i: '1', a: 'M01AE01' },
-    ]);
-    expect(result.length).toBeGreaterThanOrEqual(1);
+describe('innan datan har laddats', () => {
+  it('allt rapporteras som ej kontrollerat, aldrig ett falskt "inga interaktioner"', async () => {
+    vi.resetModules();
+    const fresh = await import('../../src/lib/interactions');
+    expect(fresh.interactionsLoaded()).toBe(false);
+    expect(fresh.checkInteractions([SERT, CIT])).toEqual({ warnings: [], unchecked: ['Sertralin 50 mg', 'Citalopram 20 mg'] });
   });
 });

@@ -106,3 +106,25 @@ test('receptdatum kan väljas i kalendern', async ({ page }) => {
   await page.getByLabel('Antal uttag').fill('3');
   await expect(page.getByRole('region', { name: 'Resultat' })).toContainText('2026-10-05');
 });
+
+test('interaktioner enligt Janusmed visas direkt under Lägg till läkemedel', async ({ page }) => {
+  const combo = page.getByRole('combobox', { name: 'Läkemedel och styrka' });
+  const pick = async (query: string) => {
+    await combo.fill(query);
+    await page.getByRole('listbox', { name: 'Förslag från läkemedelsdatabasen' }).getByRole('option').first().click();
+  };
+  await pick('Sertralin 50');
+  await page.getByRole('button', { name: 'Lägg till läkemedel' }).click();
+  await pick('Citalopram 20');
+  const box = page.getByRole('status').filter({ hasText: 'Interaktioner enligt Janusmed' });
+  await expect(box).toContainText('sertralin – citalopram');
+  await expect(box).toContainText('Bör undvikas');
+  await expect(box.getByRole('link', { name: /Janusmed/ })).toHaveAttribute('href', /^https:\/\/janusmed\.se\/interaktioner\?nplIds=\d{14}&nplIds=\d{14}$/);
+
+  // Ett handskrivet läkemedel kan inte kontrolleras — det ska framgå.
+  await page.getByRole('button', { name: 'Lägg till läkemedel' }).click();
+  await combo.fill('Egen beredning');
+  await page.keyboard.press('Escape');
+  await expect(page.getByText('Kunde inte kontrolleras mot interaktionsdatan: Egen beredning.')).toBeVisible();
+  await axe(page);
+});

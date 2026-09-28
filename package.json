@@ -1,12 +1,11 @@
 {
   "name": "recept-5.0",
   "private": true,
-  "version": "5.0.4",
+  "version": "5.0.5",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run validate:data && vitest run && vite build",
-    "validate:data": "node scripts/validate-data.mjs",
+    "build": "vitest run && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
@@ -15,16 +14,14 @@
     "test:e2e:smoke": "playwright test",
     "test:lighthouse": "node scripts/lighthouse.mjs",
     "test:all": "vitest run && playwright test",
-    "build:db": "node scripts/build-product-db.cjs",
-    "generate:drugs": "node scripts/generate-drugs.cjs",
-    "scrape:interactions": "node scripts/scrape-interactions.cjs",
-    "update:interactions": "node scripts/scrape-interactions.cjs --incremental",
-    "update:drugs": "node scripts/build-product-db.cjs && node scripts/generate-drugs.cjs",
-    "update:all": "node scripts/build-product-db.cjs && node scripts/generate-drugs.cjs && node scripts/scrape-interactions.cjs --incremental",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test:properties": "vitest run tests/unit/properties.test.ts",
     "build:nocheck": "vite build",
-    "test:golden:update": "vitest run tests/unit/golden.test.ts -u"
+    "test:golden:update": "vitest run tests/unit/golden.test.ts -u",
+    "data:update": "node scripts/data/update.ts",
+    "data:update:fass": "node scripts/data/update.ts --only=fass",
+    "data:update:janusmed": "node scripts/data/update.ts --only=janusmed",
+    "data:check": "node scripts/data/update.ts --dry-run"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
@@ -35,7 +32,9 @@
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/svelte": "^5.3.1",
+    "@types/node": "^22.20.4",
     "@vitest/coverage-v8": "^4.1.7",
+    "acorn": "^8.18.0",
     "fast-check": "^4.8.0",
     "jsdom": "^29.1.1",
     "puppeteer": "^25.0.4",
@@ -45,5 +44,8 @@
     "vite": "^7.3.3",
     "vite-plugin-pwa": "^1.0.0",
     "vitest": "^4.1.7"
+  },
+  "engines": {
+    "node": ">=22.18"
   }
 }

@@ -11,10 +11,9 @@
   import { caseState, clearCase, getActiveMed, getResult, hasCaseData, refreshToday } from '$lib/state/case.svelte';
   import { clearLongterm, ltState } from '$lib/state/longterm.svelte';
   import { getTheme, uiState } from '$lib/state/ui.svelte';
-  import { CHECK_INTERACTIONS, loadInteractions } from '$lib/interactions';
+  import { checkInteractions, loadInteractions, type InteractionResult } from '$lib/interactions';
   import { setDrugsLoadErrorHandler } from '$lib/drug-cache';
   import { createInactivityTimer } from '$lib/inactivity.svelte';
-  import type { AtcEntry } from '$lib/types';
 
   let drugsFailed = $state(false);
   setDrugsLoadErrorHandler(() => (drugsFailed = true));
@@ -36,11 +35,11 @@
   let result = $derived(med ? getResult(med.id) : undefined);
 
   let interactionEntries = $derived(caseState.meds
-    .filter((m) => m.form.atcCode && m.form.name.trim())
-    .map((m): AtcEntry => ({ a: m.form.atcCode!, i: m.form.name.trim(), p: m.form.nplId })));
-  let warnings = $derived.by(() => {
+    .filter((m) => m.form.name.trim())
+    .map((m) => ({ label: m.form.name.trim(), nplId: m.form.nplId })));
+  let interactions = $derived.by((): InteractionResult => {
     void interactionsReady;
-    return interactionEntries.length >= 2 ? CHECK_INTERACTIONS(interactionEntries) : [];
+    return interactionEntries.length >= 2 ? checkInteractions(interactionEntries) : { warnings: [], unchecked: [] };
   });
   let nplIds = $derived(caseState.meds.map((m) => m.form.nplId).filter((x): x is string => !!x));
 
@@ -80,7 +79,7 @@
   <h1 class="sr-only">Recept – beräkningshjälpmedel vid receptförnyelse</h1>
 
   <div id="view-renew" role="tabpanel" aria-labelledby="tab-renew" class="workspace" class:is-hidden={uiState.view !== 'renew'}>
-    <CaseList {warnings} {nplIds} />
+    <CaseList {interactions} {nplIds} />
     <main class="main-pane" id="main" tabindex="-1">
       <div class="renew-cols">
         <div class="renew-cols__form">

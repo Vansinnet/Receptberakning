@@ -31,7 +31,8 @@ export default defineConfig({
         runtimeCaching: [{
           urlPattern: /\/data\/drugs\.json/,
           handler: 'StaleWhileRevalidate',
-          options: { cacheName: 'drugs-data' }
+          // Adressen innehåller versionen (?v=…); bara den senaste behöver sparas.
+          options: { cacheName: 'drugs-data', expiration: { maxEntries: 2 } }
         }]
       }
     }),
@@ -52,7 +53,9 @@ export default defineConfig({
     }
   ],
   build: {
-    target: 'es2022'
+    target: 'es2022',
+    // Interaktionsdatan (~1 MB, ~230 kB komprimerad) är en egen chunk som laddas i bakgrunden.
+    chunkSizeWarningLimit: 1500,
   },
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),

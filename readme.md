@@ -60,19 +60,27 @@ Webbläsartester kontrollerar dessutom att siffrorna på skärmen är exakt desa
 ```bash
 npm install
 npm run dev          # utvecklingsserver
-npm test             # 238 enhetstester
+npm test             # 359 enhetstester
 npm run test:e2e     # webbläsartester
 npm run build        # production-build → dist/
 ```
 
 Cloudflare Pages: build command `npm run build`, output directory `dist`.
 
-## Datapipeline
+## Läkemedels- och interaktionsdata
+
+Uppdateras automatiskt den 2:a varje månad av GitHub Actions (`.github/workflows/update-data.yml`):
 
 ```
-FASS.se → npm run build:db → data/product-db.json → npm run generate:drugs → public/data/drugs.json
-Janusmed → npm run update:interactions → src/lib/data/interactions-scraped.json
+fass.se   → alla produktsidor → public/data/drugs.json (+ drugs-version.json)
+janusmed.se → interaktioner per substans och administrationsväg → src/lib/data/janusmed.json
 ```
+
+Den nya datan kontrolleras (format, kända interaktioner, stickprov mot Janusmed, alla tester)
+och publiceras utan manuell granskning. Om något nyckeltal minskar med 20 % eller mer, eller
+om något går fel, publiceras ingenting och ett ärende öppnas under Issues.
+
+Manuellt: `npm run data:update` (eller `data:check` för en provkörning utan att skriva filer).
 
 ---
 

@@ -3,12 +3,14 @@
   import { STATUS_LABEL, STATUS_TONE } from '$lib/domain/renewal';
   import { addMed, caseState, clearCase, getResults, selectMed } from '$lib/state/case.svelte';
   import { clearLongterm } from '$lib/state/longterm.svelte';
-  import type { InteractionWarning } from '$lib/interactions';
+  import { CLASS_LABEL, interactionsUpdated, type InteractionResult } from '$lib/interactions';
   import type { Tone } from '$lib/types';
   import { stripManufacturer } from '$lib/utils';
   import Icon from './Icon.svelte';
 
-  let { warnings = [], nplIds = [] }: { warnings?: InteractionWarning[]; nplIds?: string[] } = $props();
+  let { interactions = { warnings: [], unchecked: [] }, nplIds = [] }: { interactions?: InteractionResult; nplIds?: string[] } = $props();
+  let warnings = $derived(interactions.warnings);
+  let checkedCount = $derived(caseState.meds.filter((m) => m.form.name.trim()).length - interactions.unchecked.length);
 
   const DECISION: Record<string, string> = { yes: 'Förnyas', no: 'Avslås' };
 
@@ -65,22 +67,39 @@
     </button>
   {/if}
 
-  <div class="aside-spacer"></div>
-
   {#if warnings.length > 0}
-    <div class="aside-box aside-box--warn" role="status">
-      <span class="aside-box__title">Möjlig interaktion</span>
-      {#each warnings as w (w.drugs.join('+'))}
-        <span>{w.drugs[0]} + {w.drugs[1]}</span>
-      {/each}
-      {#if janusmedUrl}<a href={janusmedUrl} target="_blank" rel="noopener noreferrer">Se kombinationerna i Janusmed</a>{/if}
+    <div class="aside-box aside-box--{warnings[0].severity}" role="status">
+      <span class="aside-box__title">Interaktioner enligt Janusmed</span>
+      <ul class="ix-list">
+        {#each warnings as w, i (i)}
+          <li class="ix">
+            <span class="ix__drugs">{stripManufacturer(w.drugs[0])} + {stripManufacturer(w.drugs[1])}</span>
+            {#each w.pairs as p (p.a + p.b)}
+              <span class="ix__pair">
+                <span class="ix__cls ix__cls--{p.cls[0]}" title="Klass {p.cls[0]}: {CLASS_LABEL[p.cls[0] as 'B' | 'C' | 'D']}. Dokumentationsgrad {p.cls[1]} av 4.">{p.cls}</span>
+                {p.a} – {p.b}
+              </span>
+            {/each}
+            <span class="ix__label">{CLASS_LABEL[w.cls[0] as 'B' | 'C' | 'D']}</span>
+          </li>
+        {/each}
+      </ul>
+      {#if janusmedUrl}<a href={janusmedUrl} target="_blank" rel="noopener noreferrer">Läs mer och se åtgärder i Janusmed</a>{/if}
     </div>
-  {:else if janusmedUrl}
+  {:else if checkedCount >= 2}
     <div class="aside-box">
-      Inga interaktioner hittades i verktygets regler.
-      <a href={janusmedUrl} target="_blank" rel="noopener noreferrer">Kontrollera i Janusmed</a>
+      Inga interaktioner av klass B–D enligt Janusmed{#if interactionsUpdated()} ({interactionsUpdated()}){/if}.
+      {#if janusmedUrl}<a href={janusmedUrl} target="_blank" rel="noopener noreferrer">Kontrollera i Janusmed</a>{/if}
     </div>
   {/if}
+  {#if interactions.unchecked.length > 0 && caseState.meds.filter((m) => m.form.name.trim()).length >= 2}
+    <div class="aside-box">
+      <span>Kunde inte kontrolleras mot interaktionsdatan: {interactions.unchecked.map(stripManufacturer).join(', ')}.</span>
+      <span class="ix__label">Välj läkemedlet ur listan, eller kontrollera i Janusmed.</span>
+    </div>
+  {/if}
+
+  <div class="aside-spacer"></div>
 
   {#if caseState.confirmClear}
     <div class="confirm" role="alertdialog" aria-labelledby="confirm-q">

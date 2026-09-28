@@ -1,5 +1,5 @@
 import { MIN_SEARCH_QUERY_LENGTH, MAX_AUTOCOMPLETE_RESULTS, DEDUP_THRESHOLD, MAX_SEARCH_QUERY_LENGTH, STRENGTH_UNIT_PATTERN } from './constants';
-import { loadFromCache, fetchAndCache, type RawDrugEntry } from './drug-cache';
+import { loadFromCache, fetchAndCache, type DrugsVersionId, type RawDrugEntry } from './drug-cache';
 import { stripManufacturer } from './utils';
 
 export interface DrugEntry {
@@ -29,9 +29,9 @@ export async function loadDrugs(): Promise<void> {
   if (_loadPromise) return _loadPromise;
   _loadPromise = (async () => {
     try {
-      let serverVersion = 0;
+      let serverVersion: DrugsVersionId = 0;
       try {
-        const vResp = await fetch('/data/drugs-version.json');
+        const vResp = await fetch('/data/drugs-version.json', { cache: 'no-cache' });
         if (vResp.ok) {
           const vData = await vResp.json();
           serverVersion = vData.version || 0;

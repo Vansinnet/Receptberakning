@@ -51,7 +51,7 @@
   </div>
 
   {#if getTextItems().length === 0}
-    <div class="empty">Texterna skapas när minst ett läkemedel är ifyllt.</div>
+    <div id="text-body" class="empty">Texterna skapas när minst ett läkemedel är ifyllt.</div>
   {:else}
     <textarea id="text-body" class="input text-area" aria-label={label} spellcheck="true"
       lang={tab === 'patient' && caseState.lang === 'en' ? 'en' : 'sv'}
