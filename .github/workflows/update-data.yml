@@ -1,0 +1,130 @@
+# Månatlig uppdatering av läkemedelslistan (FASS) och interaktionsdatan (Janusmed).
+#
+# Körs den 2:a varje månad kl. 03:17 UTC och kan startas manuellt under Actions.
+# Ändrad data testas (alla enhetstester + bygget) och committas sedan direkt till
+# grenen, vilket får Cloudflare Pages att publicera den. Ingen manuell granskning
+# behövs — men om något nyckeltal krymper med 20 % eller mer, eller om något går
+# fel, publiceras ingenting och ett ärende (issue) öppnas i stället.
+#
+# Gren: schemalagda körningar startar alltid från standardgrenen (main). Så länge
+# main inte innehåller den nya datakedjan (scripts/data/update.ts) uppdateras v5;
+# när v5 har slagits ihop med main uppdateras main automatiskt.
+
+name: Uppdatera läkemedelsdata
+
+on:
+  schedule:
+    - cron: '17 3 2 * *'
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Gren att uppdatera (tomt = automatiskt val)'
+        required: false
+        default: ''
+      dry_run:
+        description: 'Provkörning: hämta och kontrollera, men committa inget'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      GH_TOKEN: ${{ github.token }}
+      ISSUE_LABEL: dataupdatering
+    steps:
+      - name: Välj gren
+        id: target
+        run: |
+          if [ -n "${{ inputs.branch }}" ]; then
+            branch="${{ inputs.branch }}"
+          elif gh api "repos/${{ github.repository }}/contents/scripts/data/update.ts?ref=main" --silent 2>/dev/null; then
+            branch=main
+          else
+            branch=v5
+          fi
+          echo "Uppdaterar grenen $branch"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.target.outputs.branch }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installera beroenden
+        run: npm ci
+
+      - name: Hämta data från FASS och Janusmed
+        id: update
+        continue-on-error: true
+        run: node scripts/data/update.ts ${{ inputs.dry_run && '--dry-run' || '' }}
+
+      - name: Testa och bygg med den nya datan
+        id: build
+        if: steps.update.outcome == 'success' && steps.update.outputs.changed == 'true'
+        run: npm run build
+
+      - name: Committa och publicera
+        if: steps.update.outcome == 'success' && steps.update.outputs.changed == 'true' && steps.build.outcome == 'success'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/data/drugs.json public/data/drugs-version.json src/lib/data/janusmed.json
+          git commit -m "data: månadsuppdatering från FASS och Janusmed ($(date -u +%F))" \
+                     -m "$(sed -n '/^## Nyckeltal/,$p' data/update-report.md)"
+          for attempt in 1 2 3; do
+            git push origin "HEAD:${{ steps.target.outputs.branch }}" && exit 0
+            git pull --rebase origin "${{ steps.target.outputs.branch }}"
+          done
+          exit 1
+
+      - name: Spara rapporten
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: datauppdatering
+          path: data/update-report.md
+          if-no-files-found: ignore
+
+      - name: Öppna ärende vid stopp eller fel
+        if: failure() || steps.update.outcome == 'failure'
+        run: |
+          run_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          if [ "${{ steps.update.outputs.blocked }}" = "true" ]; then
+            title="Datauppdateringen stoppades: databasen krympte"
+            intro="Minst ett nyckeltal minskade med 20 % eller mer jämfört med datan som är publicerad nu. Ingenting har publicerats."
+          else
+            title="Datauppdateringen misslyckades"
+            intro="Den månatliga uppdateringen kunde inte slutföras. Ingenting har publicerats; verktyget använder fortfarande förra månadens data."
+          fi
+          {
+            echo "$intro"
+            echo
+            echo "Gren: \`${{ steps.target.outputs.branch }}\` · Körning: $run_url"
+            echo
+            if [ -f data/update-report.md ]; then cat data/update-report.md; fi
+          } > issue.md
+          gh label create "$ISSUE_LABEL" --color D93F0B --description 'Automatisk datauppdatering' 2>/dev/null || true
+          existing=$(gh issue list --label "$ISSUE_LABEL" --state open --search "\"$title\" in:title" --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body-file issue.md
+          else
+            gh issue create --title "$title" --label "$ISSUE_LABEL" --body-file issue.md
+          fi
+
+      - name: Markera körningen som misslyckad
+        if: steps.update.outcome == 'failure'
+        run: exit 1

@@ -6,11 +6,7 @@ import {
   DOSE_UNIT_NORMALIZE,
   COMPOUND_MFR_NAMES,
   SINGLE_MFR_NAMES,
-  PROGRESS_BAR_STEP_PCT,
   STRENGTH_UNIT_PATTERN,
-  CONSUMPTION_NORMAL_LOW,
-  CONSUMPTION_NORMAL_HIGH,
-  DAYS_REMAINING_WARN,
 } from './constants';
 
 // === DATUM ===
@@ -36,21 +32,33 @@ export function todayStr(): string {
   return fmtDate(getToday());
 }
 
-export function oneYearAgoStr(): string {
-  const n = getNow();
-  const d = new Date(Date.UTC(n.getFullYear() - 1, n.getMonth(), n.getDate()));
-  return fmtDate(d);
+/** Lägger till n dagar (kan vara negativt). Returnerar nytt Date-objekt. */
+export function addDays(d: Date, n: number): Date {
+  return new Date(d.getTime() + n * MS_PER_DAY);
 }
 
+/**
+ * Lägger till n kalendermånader. Dag som saknas i målmånaden klampas till månadens
+ * sista dag (31 januari + 1 månad → 28/29 februari).
+ */
+export function addMonths(d: Date, n: number): Date {
+  const y = d.getUTCFullYear(), m = d.getUTCMonth() + n, day = d.getUTCDate();
+  const last = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+  return new Date(Date.UTC(y, m, Math.min(day, last)));
+}
+
+/** Antal hela dagar från d2 till d1 (d1 − d2). */
 export function getDaysDiff(d1: Date, d2: Date): number {
   return Math.round((d1.getTime() - d2.getTime()) / MS_PER_DAY);
 }
 
-/** Parsar datumsträng i UTC. Returnerar null vid ogiltigt format. */
+/**
+ * Parsar ett datum i strikt format ÅÅÅÅ-MM-DD (UTC-midnatt). Returnerar null vid annat format,
+ * t.ex. ett ofullständigt "2026-09-1" som annars skulle tolkas som 1 september.
+ */
 export function parseDateUTC(str: string): Date | null {
-  if (!str) return null;
+  if (!str || !/^\d{4}-\d{2}-\d{2}$/.test(str)) return null;
   const parts = str.split('-');
-  if (parts.length !== 3) return null;
   const y = parseInt(parts[0], 10), m = parseInt(parts[1], 10), day = parseInt(parts[2], 10);
   if (isNaN(y) || isNaN(m) || isNaN(day) || m < 1 || m > 12 || day < 1 || day > 31) return null;
   if (y < MIN_VALID_YEAR || y > MAX_VALID_YEAR) return null;
@@ -90,11 +98,6 @@ export function stripManufacturer(name: string): string {
   return name.replace(_mfrRe, "").replace(/\s+/g, " ").trim();
 }
 
-export function pctClass(pct: number, prefix: string): string {
-  const step = Math.round(Math.min(100, Math.max(0, pct)) / PROGRESS_BAR_STEP_PCT) * PROGRESS_BAR_STEP_PCT;
-  return `${prefix}${step}`;
-}
-
 export async function copyToClipboard(text: string): Promise<boolean> {
   if (!text || !navigator.clipboard) return false;
   try {
@@ -127,8 +130,28 @@ export function applyDateMask(input: HTMLInputElement, onChanged: (val: string) 
   }
 }
 
-export function needsRenewalWarning(consumptionPct: number, daysToPrescribedEnd: number): boolean {
-  return consumptionPct < CONSUMPTION_NORMAL_LOW
-    || consumptionPct > CONSUMPTION_NORMAL_HIGH
-    || daysToPrescribedEnd >= DAYS_REMAINING_WARN;
+// === SIFFROR PÅ SVENSKA ===
+
+/** Tal med fast antal decimaler och decimalkomma: 6.5 → "6,50". */
+export function fmtFixed(n: number, decimals: number): string {
+  return n.toFixed(decimals).replace('.', ',');
+}
+
+/** Tal med högst en decimal, heltal utan decimal: 7.714 → "7,7", 250 → "250". */
+export function fmtQty(n: number): string {
+  const r = Math.round(n * 10) / 10;
+  return Number.isInteger(r) ? String(r) : fmtFixed(r, 1);
+}
+
+/** Procent med högst en decimal: 101.69 → "101,7 %", 600 → "600 %". */
+export function fmtPct(p: number): string {
+  return fmtQty(p) + ' %';
+}
+
+/** Parsar ett tal från inmatning, med komma eller punkt. Tom sträng → NaN. */
+export function parseNum(raw: string): number {
+  const s = (raw ?? '').trim().replace(',', '.');
+  if (s === '') return NaN;
+  const v = Number(s);
+  return Number.isFinite(v) ? v : NaN;
 }

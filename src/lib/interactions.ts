@@ -1,115 +1,122 @@
-import type { AtcEntry } from './types';
+// Interaktionskontroll mot Janusmeds data (hämtad månadsvis, se scripts/data/update.ts).
+//
+// Varje läkemedel i listan har ett NPL-id. Datan knyter NPL-id till en profil
+// (substanser + administrationsväg) och anger för varje par av profiler vilka
+// substanspar som interagerar och med vilken klass. Läkemedel som skrivits in för
+// hand, eller som Janusmed inte känner till, kan inte kontrolleras — de rapporteras
+// separat så att användaren inte tror att kombinationen är kontrollerad.
 
-export interface InteractionRule {
-  atcGroupA: string[];
-  atcGroupB: string[];
-  severity: 'danger' | 'warn';
-  title: string;
-  description: string;
-  recommendation: string;
+import type { InteractionClass, InteractionData } from './interaction-data';
+
+export type Severity = 'danger' | 'warn';
+
+export interface SubstancePair {
+  /** Substans i det första läkemedlet. */
+  a: string;
+  /** Substans i det andra läkemedlet. */
+  b: string;
+  cls: InteractionClass;
 }
 
 export interface InteractionWarning {
-  severity: 'danger' | 'warn';
-  title: string;
-  description: string;
-  recommendation: string;
+  /** Etiketterna (läkemedelsnamnen) i den ordning läkemedlen lagts till. */
   drugs: [string, string];
-  nplIds: [string | null, string | null];
+  /** Allvarligaste klassen bland substansparen. */
+  cls: InteractionClass;
+  severity: Severity;
+  pairs: SubstancePair[];
 }
 
-let _INTERACTIONS: InteractionRule[] = [];
-const _idxA = new Map<string, number[]>();
-const _idxB = new Map<string, number[]>();
-let _loaded = false;
-let _promise: Promise<void> | null = null;
-
-async function _doLoad(): Promise<void> {
-  try {
-    const mod = await import('./data/interactions-scraped.json');
-    const raw: unknown = mod.default;
-    _INTERACTIONS = Array.isArray(raw) ? raw as InteractionRule[] : [];
-    for (let i = 0; i < _INTERACTIONS.length; i++) {
-      for (const p of _INTERACTIONS[i].atcGroupA) {
-        const arr = _idxA.get(p) ?? []; _idxA.set(p, arr); arr.push(i);
-      }
-      for (const p of _INTERACTIONS[i].atcGroupB) {
-        const arr = _idxB.get(p) ?? []; _idxB.set(p, arr); arr.push(i);
-      }
-    }
-    _loaded = true;
-  } catch (e) {
-    console.warn('[interactions] Kunde inte ladda interaktionsdata:', e);
-    _promise = null;
-  }
+export interface InteractionEntry {
+  /** Etikett som visas, t.ex. "Sertralin Accord 50 mg". */
+  label: string;
+  nplId: string | null;
 }
 
-/**
- * Laddar interaktionsdata från interactions-scraped.json (lazy-load).
- * Idempotent — returnerar redan löst Promise om data redan är laddad.
- */
+export interface InteractionResult {
+  warnings: InteractionWarning[];
+  /** Etiketter för läkemedel som inte kunde kontrolleras. */
+  unchecked: string[];
+}
+
+/** Janusmeds beskrivning av klassens bokstav, i kort form. */
+export const CLASS_LABEL: Record<'B' | 'C' | 'D', string> = {
+  D: 'Bör undvikas',
+  C: 'Kan hanteras, t.ex. med dosjustering',
+  B: 'Klinisk betydelse okänd eller varierar',
+};
+
+let data: InteractionData | null = null;
+/** "profilA|profilB" → rader */
+const index = new Map<string, InteractionData['interactions']>();
+let loading: Promise<void> | null = null;
+
+/** Laddar datan en gång (lat inläsning, delas av alla anrop). */
 export function loadInteractions(): Promise<void> {
-  if (_loaded) return Promise.resolve();
-  if (!_promise) _promise = _doLoad();
-  return _promise;
+  if (data) return Promise.resolve();
+  loading ??= import('./data/janusmed.json')
+    .then((mod) => setInteractionData(mod.default as unknown as InteractionData))
+    .catch((e: unknown) => {
+      console.warn('[interactions] Kunde inte ladda interaktionsdata:', e);
+      loading = null;
+    });
+  return loading;
 }
 
-// Trigger background load immediately
-loadInteractions();
-
-function _prefixMatches(code: string, idx: Map<string, number[]>): number[] {
-  const matches: number[] = [];
-  for (const [prefix, indices] of idx) {
-    if (code.startsWith(prefix)) matches.push(...indices);
+/** Sätter datan direkt (används av tester). */
+export function setInteractionData(d: InteractionData): void {
+  index.clear();
+  for (const row of d.interactions) {
+    const key = `${row[0]}|${row[1]}`;
+    const list = index.get(key);
+    if (list) list.push(row); else index.set(key, [row]);
   }
-  return matches;
+  data = d;
 }
 
-function _intersect(a: number[], b: number[]): Set<number> {
-  const result = new Set<number>();
-  const shorter = a.length <= b.length ? a : b;
-  const longer  = a.length <= b.length ? b : a;
-  const set = new Set(longer);
-  for (const v of shorter) {
-    if (set.has(v)) result.add(v);
+export function interactionsLoaded(): boolean {
+  return data !== null;
+}
+
+/** När Janusmed senast uppdaterade datan som används (ÅÅÅÅ-MM-DD), om känt. */
+export function interactionsUpdated(): string | null {
+  return data?.janusmedUpdated ?? null;
+}
+
+/** Bokstaven avgör först (D allvarligast), därefter högre dokumentationsgrad. */
+function rank(cls: InteractionClass): number {
+  return 'BCD'.indexOf(cls[0]) * 10 + Number(cls[1]);
+}
+
+export function checkInteractions(entries: readonly InteractionEntry[]): InteractionResult {
+  const d = data;
+  if (!d) return { warnings: [], unchecked: entries.map((e) => e.label) };
+  const known: { label: string; profile: number }[] = [];
+  const unchecked: string[] = [];
+  for (const e of entries) {
+    const profile = e.nplId ? d.products[e.nplId] : undefined;
+    if (profile === undefined) unchecked.push(e.label);
+    else known.push({ label: e.label, profile });
   }
-  return result;
-}
-
-export function CHECK_INTERACTIONS(atcEntries: AtcEntry[]): InteractionWarning[] {
-  if (!_loaded || _INTERACTIONS.length === 0) return [];
-  if (atcEntries.length < 2) return [];
 
   const warnings: InteractionWarning[] = [];
-  const seen = new Set<string>();
-
-  for (let x = 0; x < atcEntries.length; x++) {
-    for (let y = x + 1; y < atcEntries.length; y++) {
-      const codeA = atcEntries[x].a;
-      const codeB = atcEntries[y].a;
-      if (!codeA || !codeB || codeA === codeB) continue;
-
-      const aMatchesA = _prefixMatches(codeA, _idxA);
-      const aMatchesB = _prefixMatches(codeA, _idxB);
-      const bMatchesA = _prefixMatches(codeB, _idxA);
-      const bMatchesB = _prefixMatches(codeB, _idxB);
-
-      const candidateIndices = new Set<number>();
-      for (const v of _intersect(aMatchesA, bMatchesB)) candidateIndices.add(v);
-      for (const v of _intersect(bMatchesA, aMatchesB)) candidateIndices.add(v);
-
-      for (const ruleIdx of candidateIndices) {
-        const ix = _INTERACTIONS[ruleIdx];
-        const key = `${ruleIdx}|${ix.title}|${atcEntries[x].i}|${atcEntries[y].i}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
-        warnings.push({
-          severity: ix.severity, title: ix.title, description: ix.description, recommendation: ix.recommendation,
-          drugs: [atcEntries[x].i, atcEntries[y].i],
-          nplIds: [atcEntries[x].p ?? null, atcEntries[y].p ?? null],
-        });
-      }
+  for (let x = 0; x < known.length; x++) {
+    for (let y = x + 1; y < known.length; y++) {
+      const p = known[x], q = known[y];
+      if (p.profile === q.profile) continue;
+      const flipped = p.profile > q.profile;
+      const rows = index.get(flipped ? `${q.profile}|${p.profile}` : `${p.profile}|${q.profile}`);
+      if (!rows) continue;
+      const pairs = rows
+        .map(([, , sa, sb, cls]): SubstancePair => {
+          const [a, b] = flipped ? [sb, sa] : [sa, sb];
+          return { a: d.substances[a], b: d.substances[b], cls };
+        })
+        .sort((m, n) => rank(n.cls) - rank(m.cls));
+      const cls = pairs[0].cls;
+      warnings.push({ drugs: [p.label, q.label], cls, severity: cls[0] === 'D' ? 'danger' : 'warn', pairs });
     }
   }
-  return warnings;
+  warnings.sort((m, n) => rank(n.cls) - rank(m.cls));
+  return { warnings, unchecked };
 }

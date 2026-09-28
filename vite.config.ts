@@ -18,12 +18,21 @@ export default defineConfig({
     svelte(),
     VitePWA({
       registerType: 'autoUpdate',
+      manifest: {
+        name: 'Recept – beräkningshjälpmedel vid receptförnyelse',
+        short_name: 'Recept',
+        lang: 'sv',
+        theme_color: '#0e5a73',
+        background_color: '#f4f3ef',
+        display: 'standalone',
+      },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}', 'data/drugs-version.json'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}', 'data/drugs-version.json'],
         runtimeCaching: [{
           urlPattern: /\/data\/drugs\.json/,
           handler: 'StaleWhileRevalidate',
-          options: { cacheName: 'drugs-data' }
+          // Adressen innehåller versionen (?v=…); bara den senaste behöver sparas.
+          options: { cacheName: 'drugs-data', expiration: { maxEntries: 2 } }
         }]
       }
     }),
@@ -44,7 +53,9 @@ export default defineConfig({
     }
   ],
   build: {
-    target: 'es2022'
+    target: 'es2022',
+    // Interaktionsdatan (~1 MB, ~230 kB komprimerad) är en egen chunk som laddas i bakgrunden.
+    chunkSizeWarningLimit: 1500,
   },
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),

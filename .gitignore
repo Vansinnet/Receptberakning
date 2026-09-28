@@ -2,10 +2,10 @@ node_modules/
 dist/
 .vite/
 test-results/
+playwright-report/
 *.tsbuildinfo
-data/product-db.json
-data/_crawl-progress.json
-data/_interactions-progress.json
+# Rapporter och mellanresultat från datakedjan (scripts/data)
+/data/
 .DS_Store
 Thumbs.db
 AGENTS.md

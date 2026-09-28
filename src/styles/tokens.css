@@ -1,0 +1,67 @@
+/* === DESIGN TOKENS ===
+   Alla färger, typsnitt, avstånd och hörn. Komponenterna använder bara dessa.
+   Ljust tema är standard; mörkt tema sätts via html[data-theme="dark"].
+   All text når minst 4,5:1 i kontrast mot sin bakgrund i båda teman. */
+
+:root {
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'IBM Plex Serif', Georgia, serif;
+
+  --bg: #f4f3ef;
+  --surface: #ffffff;
+  --surface-2: #faf9f6;
+  --ink: #16191d;
+  --ink-2: #454c54;
+  --ink-3: #626a72;
+  --line: #e2dfd8;
+  --line-2: #cbc7bd;
+  --accent: #0e5a73;
+  --accent-ink: #ffffff;
+  --accent-soft: #e2eef2;
+  --ok: #1d6a44;
+  --ok-bg: #e5f1e9;
+  --warn: #855000;
+  --warn-bg: #faefd9;
+  --bad: #a3271b;
+  --bad-bg: #fbe6e2;
+  --muted: #555c63;
+  --muted-bg: #eceae5;
+  --on-strong: #ffffff;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --focus: 2px solid var(--accent);
+
+  --r-sm: 5px;
+  --r-md: 6px;
+  --r-lg: 10px;
+
+  --topbar-h: 48px;
+  --aside-w: 236px;
+  --texts-w: 420px;
+
+  color-scheme: light;
+}
+
+html[data-theme='dark'] {
+  --bg: #111417;
+  --surface: #181c20;
+  --surface-2: #1d2226;
+  --ink: #e8eaec;
+  --ink-2: #b9bfc5;
+  --ink-3: #959ca3;
+  --line: #2a3036;
+  --line-2: #3b434a;
+  --accent: #79bfd6;
+  --accent-ink: #0b1216;
+  --accent-soft: #17323c;
+  --ok: #74d09b;
+  --ok-bg: #12291d;
+  --warn: #f0b457;
+  --warn-bg: #2e220e;
+  --bad: #ff8f80;
+  --bad-bg: #351814;
+  --muted: #a3aab1;
+  --muted-bg: #23282d;
+  --on-strong: #0b1216;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  color-scheme: dark;
+}

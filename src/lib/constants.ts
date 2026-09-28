@@ -1,131 +1,114 @@
 // === KONFIGURATIONSKONSTANTER — enda källan för alla trösklar, gränsvärden och mappningar ===
 // STYRNING: Alla kliniska och tekniska konstanter samlas här. Ändra ALDRIG ett värde
-// direkt i en funktion — uppdatera denna fil och använd AKTIVT VAL-kommentarer för
-// att dokumentera kliniska beslut. Framtida utvecklare ska kunna förstå varför varje
-// tröskel är satt som den är.
+// direkt i en funktion — uppdatera denna fil och dokumentera kliniska beslut med
+// AKTIVT VAL-kommentarer. Värdena i avsnitt 1–3 är godkända i "Recept 5.0 — planering",
+// fliken Kliniska testfall (2026-09-27).
 
 // ============================================================================
 // 1. KLINISKA TRÖSKLAR — RECEPTFÖRNYELSE
 // ============================================================================
 
-// AKTIVT VAL: 80% — undre gräns för normal förbrukning. Vid 80–110% av
-// ordinerad dos visas snittförbrukningen grönt. Under 80% visas gul.
-export const CONSUMPTION_NORMAL_LOW = 80;
-
-// AKTIVT VAL: 110% — övre gräns för normal förbrukning. Vid 80–110% av
-// ordinerad dos visas snittförbrukningen grönt. Över 110% visas gul.
-export const CONSUMPTION_NORMAL_HIGH = 110;
-
-// AKTIVT VAL: 14 dagar — tröskel för "Räcker t.o.m."-radens färg.
-// Vid 14 dagar eller mer kvar av receptperioden blir raden gul.
-// Under 14 dagar kvar visas raden grön.
+// AKTIVT VAL: 14 dagar — vid 14 dagar kvar eller fler är statusen "Räcker".
+// 0–13 dagar kvar ger "Tar snart slut". Används även för påminnelse i patienttexten
+// och för frågan om nyförskrivningen ska räknas från dagens datum.
 export const DAYS_REMAINING_WARN = 14;
 
-// AKTIVT VAL: 14 dagar — tröskel för påminnelse om att kontakta
-// patienten för receptförnyelse (används i textgenerering).
-export const CONTACT_REMINDER_DAYS = 14;
+// AKTIVT VAL: 90 dagar — slut sedan mer än 90 dagar ger statusen "Slut sedan länge".
+// Godkänt som fråga 2 i Kliniska testfall (T06).
+export const LONG_OVERDUE_DAYS = 90;
 
-// AKTIVT VAL: 2.5x — vid denna multiplikator av ordinerad dos triggas en
-// datakontrollsvarning. Fångar orimlig inmatning (t.ex. fel enhet) utan att
-// blockera legitima fall (t.ex. titrering).
-export const VERY_HIGH_CONSUMPTION_MULTIPLIER = 2.5;
+// AKTIVT VAL: 80–110 % — förbrukning "om patienten har slut nu" inom detta intervall
+// visas grön, annars gul. Samma gränser gäller i långtidsanalysen.
+export const CONSUMPTION_NORMAL_LOW = 80;
+export const CONSUMPTION_NORMAL_HIGH = 110;
 
-// AKTIVT VAL: 10 år (3650 dagar) — maximal rimlig recepttid. Överstiger
-// förskrivningen 10 år är indata med hög sannolikhet felaktig.
+/**
+ * Är procenten inom 80–110 %? Avgörs på värdet avrundat till en decimal — samma värde
+ * som visas — så att färgen alltid stämmer med siffran. Utan avrundning blir t.ex.
+ * 1100 ÷ 1000 × 100 = 110,00000000000001 och visas gult trots texten "110 %".
+ */
+export function isWithinNormal(pct: number): boolean {
+  const shown = Math.round(pct * 10) / 10;
+  return shown >= CONSUMPTION_NORMAL_LOW && shown <= CONSUMPTION_NORMAL_HIGH;
+}
+
+// AKTIVT VAL: 7 dagar — i patienttexten vid avslag ombeds patienten höra av sig
+// denna tid före beräknat slutdatum.
+export const CONTACT_BEFORE_END_DAYS = 7;
+
+// AKTIVT VAL: 10 år (3650 dagar) — ett recept som skulle räcka längre än så beror
+// med hög sannolikhet på felinmatning och ger "Orimliga värden".
 export const MAX_TOTAL_DAYS = 3650;
 
+// AKTIVT VAL: Ingen separat datakontrollsvarning vid hög förbrukning (4.0 varnade
+// vid 2,5 × dosen). Godkänt som fråga 3 i Kliniska testfall — procenten och färgen räcker.
+
 // ============================================================================
-// 2. KLINISKA TRÖSKLAR — LÅNGVARIG FÖRBRUKNING
+// 2. RIMLIGHETSGRÄNSER FÖR INMATNING
 // ============================================================================
 
-// AKTIVT VAL: Samma 10%-marginal som receptförnyelse — konsekvent klinisk
-// bedömning över hela verktyget.
-export const LT_OVER = 1.10;
+// AKTIVT VAL: Dosen begränsas per dygn och enhet i stället för det fasta taket 50
+// i 4.0, så att t.ex. 60 st per månad eller 60 ml per dag går att ange.
+export const MAX_DAILY_DOSE: Record<DoseUnit, number> = { st: 50, ml: 1000, dos: 100 };
 
-// AKTIVT VAL: 80% — symmetriskt med receptförnyelsens lågförbrukningströskel.
-export const LT_UNDER = 0.80;
+export const MAX_PACKAGE_SIZE = 10000;
+export const MIN_REFILLS = 1;
+export const MAX_REFILLS = 12;
+export const MAX_MED_NAME_LENGTH = 100;
+export const MIN_VALID_YEAR = 1950;
+export const MAX_VALID_YEAR = 2100;
 
-// AKTIVT VAL: 50 år (18250 dagar) — maximal rimlig periodlängd för
-// långvarig förbrukningsanalys.
+// ============================================================================
+// 3. LÅNGTIDSANALYS
+// ============================================================================
+
+export const MAX_LT_PERIODS = 10;
+// AKTIVT VAL: 50 år — längre perioder är med hög sannolikhet felinmatning.
 export const MAX_PERIOD_SPAN_DAYS = 365 * 50 + 13;
-
-// AKTIVT VAL: 150% — maxgräns för förbrukningsstapeln i UI:t. Värden över
-// 150% av ordination är extrema och klampas visuellt.
-export const LT_BAR_MAX_PCT = 150;
-
-// AKTIVT VAL: 20% — tröskel under vilken procenttexten i förbrukningsstapeln
-// döljs (för liten för att vara läsbar).
-export const LT_BAR_TEXT_THRESHOLD_PCT = 20;
-
-// AKTIVT VAL: 5 procentenheter — stegstorlek för CSP-säkra breddklasser
-// (w0, w5, w10...w100) som används av progressbars istället för inline style:width.
-export const PROGRESS_BAR_STEP_PCT = 5;
+// Diagrammets skala går till 160 % av ordinerad dos; högre värden klampas visuellt.
+export const LT_CHART_MAX_PCT = 160;
 
 // ============================================================================
-// 3. GRÄNSVÄRDEN — ANTAL / MÄNGDER
+// 4. ÄRENDE OCH NYFÖRSKRIVNING
 // ============================================================================
 
 export const MAX_MED_CARDS = 8;
-export const MAX_LT_PERIODS = 10;
-export const MIN_LT_PERIODS = 1;
 export const MAX_PRESCRIBE_MONTHS = 12;
-export const DEFAULT_PRESCRIBE_MONTHS = 7;
+export const DEFAULT_PRESCRIBE_MONTHS = 6;
 
 // ============================================================================
-// 4. VALIDERING — DIMENSIONER
+// 5. DATUM
 // ============================================================================
 
-export const MAX_MED_NAME_LENGTH = 100;
-export const MAX_DATE_LENGTH = 10;
-export const MAX_AMT_VALUE = 10000;
-export const MIN_DOSE_VALUE = 0.1;
-export const MAX_DOSE_VALUE = 50;
-export const MIN_REF_VALUE = 1;
-export const MAX_REF_VALUE = 12;
-
-// ============================================================================
-// 5. DATUM — INTERVALL
-// ============================================================================
-
-export const VALID_INTERVALS: number[] = [1, 7, 30];
-export const MIN_VALID_YEAR = 1950;
-export const MAX_VALID_YEAR = 2100;
+export const VALID_INTERVALS = [1, 7, 30] as const;
+export type DoseInterval = (typeof VALID_INTERVALS)[number];
 export const MS_PER_DAY = 86400000;
 
 // ============================================================================
-// 6. TIMER / DEBOUNCE
+// 6. TIMER
 // ============================================================================
 
 export const ACTIVITY_RESET_DEBOUNCE_MS = 2000;
-
-// AKTIVT VAL: 22 minuter — användaren varnas om inaktivitet efter denna tid.
-// Tillräckligt långt för att inte avbryta arbetsflöden, tillräckligt kort
-// för att skydda patientdata vid bortglömd session.
+// AKTIVT VAL: 22 minuter + 60 sekunders nedräkning innan allt rensas. Skyddar
+// patientdata på delade kliniska datorer utan att avbryta pågående arbete.
 export const INACTIVITY_WARN_MS = 22 * 60 * 1000;
-
-// AKTIVT VAL: 60 sekunder — nedräkning som visas i toasten före rensning.
 export const INACTIVITY_COUNTDOWN_SEC = 60;
-
-// 1 sekund mellan varje nedräkningssteg.
 export const COUNTDOWN_TICK_MS = 1000;
+export const COPY_CONFIRM_MS = 2000;
 
 // ============================================================================
-// 7. ENHETER / DISPLAY-MAPPNINGAR
+// 7. ENHETER
 // ============================================================================
 
-export const VALID_THEMES: ReadonlySet<string> = new Set(['dark', 'klinisk', 'sakura']);
+export type DoseUnit = 'st' | 'ml' | 'dos';
 
-export const UNIT_DISPLAY = {
-  st:  { short: 'st',  long: 'tabletter' },
-  ml:  { short: 'ml',  long: 'ml' },
-  dos: { short: 'dos', long: 'doser' },
-} as const;
+export const UNIT_DISPLAY: Record<DoseUnit, { short: string; long: string; en: string }> = {
+  st: { short: 'st', long: 'tabletter', en: 'tablets' },
+  ml: { short: 'ml', long: 'ml', en: 'ml' },
+  dos: { short: 'doser', long: 'doser', en: 'doses' },
+};
 
-export type UnitDisplayKey = keyof typeof UNIT_DISPLAY;
-
-export function getUnitDisplay(unit: string): { short: string; long: string } {
-  return (UNIT_DISPLAY as Record<string, { short: string; long: string }>)[unit] ?? UNIT_DISPLAY.st;
-}
+export const INTERVAL_LABEL: Record<DoseInterval, string> = { 1: 'dag', 7: 'vecka', 30: 'månad' };
 
 // Dos-enhetsnormalisering: rå enhet → kanonisk enhet.
 export const DOSE_UNIT_NORMALIZE: Record<string, string> = {
@@ -134,25 +117,19 @@ export const DOSE_UNIT_NORMALIZE: Record<string, string> = {
   mmol: 'mmol',
 };
 
-// ============================================================================
-// 8. DEFAULT-VÄRDEN — PANELER / FORMULÄR
-// ============================================================================
-
-export const DEFAULT_PRESCRIBE_MODE = 'months';
-export const DEFAULT_PRESCRIBE_END_DATE = '';
+export const THEMES = ['light', 'dark'] as const;
+export type Theme = (typeof THEMES)[number];
+export const THEME_STORAGE_KEY = 'recept5-theme';
 
 // ============================================================================
-// 9. LÄKEMEDELSTILLVERKARE — används av stripManufacturer() för att
-//     rensa bort tillverkarnamn ur läkemedelssträngar.
+// 8. LÄKEMEDELSTILLVERKARE — används av stripManufacturer()
 // ============================================================================
 
-// Flerordiga tillverkarnamn — kräver matchning av hela frasen.
 export const COMPOUND_MFR_NAMES: string[] = [
   "Medical Valley", "Abacus Medicine", "EQL Pharma",
   "G\\.L\\.\\s*Pharma", "1A Farma", "Omet Pharma", "Nordic Drugs",
 ];
 
-// Enordiga tillverkarnamn.
 export const SINGLE_MFR_NAMES: string[] = [
   "STADA", "Sandoz", "Accord(?:pharma)?", "Teva", "Krka", "Ebb",
   "Viatris", "Orion", "Actavis", "Zentiva", "Orifarm", "Bluefish",
@@ -165,7 +142,7 @@ export const SINGLE_MFR_NAMES: string[] = [
 ];
 
 // ============================================================================
-// 10. LÄKEMEDELSSÖKNING / AUTOCOMPLETE
+// 9. LÄKEMEDELSSÖKNING
 // ============================================================================
 
 export const MIN_SEARCH_QUERY_LENGTH = 2;

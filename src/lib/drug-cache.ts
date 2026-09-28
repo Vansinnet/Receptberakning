@@ -13,8 +13,11 @@ export interface RawDrugEntry {
   c?: boolean;
 }
 
+/** Innehållshash från drugs-version.json (äldre filer: heltal). */
+export type DrugsVersionId = string | number;
+
 export interface CacheData {
-  version: number;
+  version: DrugsVersionId;
   entries: RawDrugEntry[];
 }
 
@@ -78,9 +81,13 @@ export async function loadFromCache(): Promise<CacheData | null> {
   }
 }
 
-/** Hämtar drugs.json från nätverk, validerar och cachrar i IndexedDB. */
-export async function fetchAndCache(serverVersion: number): Promise<RawDrugEntry[]> {
-  const resp = await _fetchWithRetry('/data/drugs.json');
+/**
+ * Hämtar drugs.json från nätverk, validerar och cachrar i IndexedDB.
+ * Versionen läggs i adressen så att varken webbläsarens eller service workerns
+ * cache kan ge en äldre lista under den nya versionen.
+ */
+export async function fetchAndCache(serverVersion: DrugsVersionId): Promise<RawDrugEntry[]> {
+  const resp = await _fetchWithRetry(`/data/drugs.json?v=${encodeURIComponent(String(serverVersion))}`);
   if (!resp.ok) throw new Error(`drugs.json: ${resp.status}`);
   const text = await resp.text();
   const entries = JSON.parse(text, (key, val) => {

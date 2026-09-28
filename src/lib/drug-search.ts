@@ -1,5 +1,5 @@
 import { MIN_SEARCH_QUERY_LENGTH, MAX_AUTOCOMPLETE_RESULTS, DEDUP_THRESHOLD, MAX_SEARCH_QUERY_LENGTH, STRENGTH_UNIT_PATTERN } from './constants';
-import { loadFromCache, fetchAndCache, type RawDrugEntry } from './drug-cache';
+import { loadFromCache, fetchAndCache, type DrugsVersionId, type RawDrugEntry } from './drug-cache';
 import { stripManufacturer } from './utils';
 
 export interface DrugEntry {
@@ -29,9 +29,9 @@ export async function loadDrugs(): Promise<void> {
   if (_loadPromise) return _loadPromise;
   _loadPromise = (async () => {
     try {
-      let serverVersion = 0;
+      let serverVersion: DrugsVersionId = 0;
       try {
-        const vResp = await fetch('/data/drugs-version.json');
+        const vResp = await fetch('/data/drugs-version.json', { cache: 'no-cache' });
         if (vResp.ok) {
           const vData = await vResp.json();
           serverVersion = vData.version || 0;
@@ -114,11 +114,13 @@ export function searchDrugs(query: string): DrugEntry[] {
   if (!_drugList || !_drugListLower) return [];
   if (!query || query.length < MIN_SEARCH_QUERY_LENGTH || query.length > MAX_SEARCH_QUERY_LENGTH) return [];
   const q = query.toLowerCase().trim();
+  // Alla ord i sökningen ska finnas med, i valfri ordning: "sertralin 50" hittar "Sertralin Accord 50 mg".
+  const tokens = q.split(/\s+/).filter(Boolean);
   const results: Array<{ entry: DrugEntry; idx: number }> = [];
   const lower = _drugListLower;
   const rawLimit = MAX_AUTOCOMPLETE_RESULTS * 3;
   for (let i = 0; i < _drugList.length; i++) {
-    if (lower[i].includes(q)) {
+    if (tokens.every((t) => lower[i].includes(t))) {
       results.push({ entry: _drugList[i], idx: i });
       if (results.length >= rawLimit) break;
     }
