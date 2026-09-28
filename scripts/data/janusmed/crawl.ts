@@ -11,6 +11,7 @@
 
 import { HttpError, type HttpClient } from '../lib/http.ts';
 import { log, progress } from '../lib/log.ts';
+import type { InteractionData } from '../../../src/lib/interaction-data.ts';
 import { InteractionCollector } from './collect.ts';
 import { janusmedUrl, parseJanusPage } from './page.ts';
 import { chunk, planPairCoverage, sample, seededRandom } from './plan.ts';
@@ -47,17 +48,19 @@ async function fetchPage(http: HttpClient, nplIds: readonly string[]) {
 }
 
 /**
- * Janusmed visar högst 1000 interaktioner per sida och kapar resten utan att säga till.
- * En sida med så många interaktioner kan alltså vara ofullständig och delas upp.
+ * Janusmed kapar sidor med många interaktioner utan att säga till. Taket ligger kring 1000
+ * rader före sammanslagning, så en kapad sida kan visa färre: en sida med 991 interaktioner
+ * saknade 301 (2026-09-28). Sidor med minst så här många interaktioner räknas därför som
+ * möjligen kapade och delas upp — med god marginal till taket.
  */
-export const JANUSMED_PAGE_CAP = 1000;
+export const JANUSMED_SPLIT_AT = 500;
 
 /** Serverfel som beror på att sidan blir för stor, inte på en enskild produkt. */
 const isServerError = (e: unknown) => e instanceof HttpError && e.status >= 500;
 
 /**
  * Hämtar en sida och registrerar den. Om sidan blir för stor — Janusmed ger serverfel
- * (HTTP 500) eller når taket på 1000 interaktioner — delas anropet i tre delar med 2/3
+ * (HTTP 500) eller visar så många interaktioner att den kan vara kapad — delas anropet i tre delar med 2/3
  * av produkterna vardera, så att varje par fortfarande finns med i minst en del.
  * Returnerar antalet anrop och antalet par som inte gick att kontrollera.
  */
@@ -66,7 +69,7 @@ export async function collectPage(http: HttpClient, collector: InteractionCollec
   try {
     const page = await fetchPage(http, nplIds);
     collector.addPage(page); // även en kapad sida innehåller korrekta interaktioner
-    complete = page.interactions.length < JANUSMED_PAGE_CAP;
+    complete = page.interactions.length < JANUSMED_SPLIT_AT;
   } catch (e) {
     if (!isServerError(e)) throw e;
   }
@@ -157,4 +160,48 @@ export async function crawlJanusmed(http: HttpClient, nplIds: readonly string[],
       verifyMismatches: mismatches,
     },
   };
+}
+
+export interface RecheckResult {
+  /** Par som fanns i förra datan men saknades i den nya insamlingen. */
+  disappeared: number;
+  /** Av dessa: par som Janusmed fortfarande visar när de kontrolleras var för sig (återställda). */
+  restored: number;
+  /** Par som inte kontrollerades eftersom de var fler än gränsen. */
+  skipped: number;
+}
+
+/**
+ * Kontrollerar interaktioner som fanns i förra månadens data men saknas nu, ett par i taget
+ * på en sida med bara de två produkterna. Försvinner en interaktion på riktigt (Janusmed har
+ * ändrat bedömningen) bekräftas det; har den fallit bort i insamlingen (t.ex. en kapad sida)
+ * läggs den tillbaka. Skyddar mot tysta bortfall som ett slumpat stickprov inte fångar.
+ */
+export async function recheckDisappeared(
+  http: HttpClient, collector: InteractionCollector, previous: InteractionData | null, limit = 600,
+): Promise<RecheckResult> {
+  if (!previous) return { disappeared: 0, restored: 0, skipped: 0 };
+  // Förra datans profilindex → en produkt → dagens profil.
+  const productOf = new Map<number, string>();
+  for (const [npl, prof] of Object.entries(previous.products)) if (!productOf.has(prof)) productOf.set(prof, npl);
+  const toCheck = new Map<string, [string, string]>();
+  for (const [pa, pb] of previous.interactions) {
+    const a = collector.productProfile.get(productOf.get(pa) ?? ''), b = collector.productProfile.get(productOf.get(pb) ?? '');
+    if (!a || !b || a === b) continue; // produkten finns inte kvar eller har bytt profil
+    const key = a < b ? `${a}\u0000${b}` : `${b}\u0000${a}`;
+    const hits = collector.pairs.get(key);
+    if (hits && [...hits.values()].some((h) => h.severity !== 'A')) continue;
+    toCheck.set(key, [collector.representative.get(a)!, collector.representative.get(b)!]);
+  }
+  const all = [...toCheck.entries()].sort(([x], [y]) => (x < y ? -1 : 1));
+  const checks = all.slice(0, limit);
+  let restored = 0;
+  const tick = progress('Janusmed kontroll av försvunna par', checks.length);
+  await Promise.all(checks.map(async ([key, ids]) => {
+    collector.addPage(await fetchPage(http, ids));
+    if ([...(collector.pairs.get(key)?.values() ?? [])].some((h) => h.severity !== 'A')) restored++;
+    tick();
+  }));
+  if (restored) log.warn(`Janusmed: ${restored} av ${checks.length} försvunna par fanns kvar hos Janusmed och återställdes`);
+  return { disappeared: all.length, restored, skipped: all.length - checks.length };
 }

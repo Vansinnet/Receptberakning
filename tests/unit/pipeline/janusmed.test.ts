@@ -9,7 +9,7 @@ import { adminMatches, InteractionCollector, profileKey } from '../../../scripts
 import { chunk, planPairCoverage, sample, seededRandom } from '../../../scripts/data/janusmed/plan';
 import { buildInteractionData } from '../../../scripts/data/janusmed/build';
 import { validateInteractionData } from '../../../src/lib/interaction-data';
-import { collectPage, JANUSMED_PAGE_CAP } from '../../../scripts/data/janusmed/crawl';
+import { collectPage, JANUSMED_SPLIT_AT, recheckDisappeared } from '../../../scripts/data/janusmed/crawl';
 import { HttpError, type HttpClient } from '../../../scripts/data/lib/http';
 
 const fixture = (name: string) => readFileSync(`tests/fixtures/pipeline/${name}`, 'utf8');
@@ -246,11 +246,12 @@ describe('collectPage — sidor som blir för stora', () => {
   }
   const ids = Array.from({ length: 30 }, (_, i) => String(i + 10));
 
-  it('taket på 1000 interaktioner gäller Janusmed', () => expect(JANUSMED_PAGE_CAP).toBe(1000));
+  // Janusmed kapar kring 1000 rader, men en kapad sida kan visa färre (991 observerat).
+  it('sidor delas med god marginal till Janusmeds tak', () => expect(JANUSMED_SPLIT_AT).toBeLessThanOrEqual(500));
 
-  it('en sida som når taket delas tills alla par är med', async () => {
-    const big = Array.from({ length: 50 }, (_, i) => String(i + 100)); // 1225 par > 1000
-    const fake = fakeJanusmed(JANUSMED_PAGE_CAP);
+  it('en kapad sida (991 av 1225 interaktioner) delas tills alla par är med', async () => {
+    const big = Array.from({ length: 50 }, (_, i) => String(i + 100)); // 1225 par
+    const fake = fakeJanusmed(991); // kapad under 1000, som den riktiga sidan
     const c = new InteractionCollector();
     const r = await collectPage(fake.http, c, big);
     expect(c.pairs.size).toBe((50 * 49) / 2);
@@ -259,7 +260,7 @@ describe('collectPage — sidor som blir för stora', () => {
   });
 
   it('serverfel för stora sidor delas också', async () => {
-    const fake = fakeJanusmed(JANUSMED_PAGE_CAP, 12);
+    const fake = fakeJanusmed(991, 12);
     const c = new InteractionCollector();
     const r = await collectPage(fake.http, c, ids);
     expect(c.pairs.size).toBe((30 * 29) / 2);
@@ -271,3 +272,44 @@ describe('collectPage — sidor som blir för stora', () => {
     await expect(collectPage(http, new InteractionCollector(), ids)).rejects.toMatchObject({ status: 403 });
   });
 });
+
+describe('recheckDisappeared — interaktioner som försvunnit sedan förra datan', () => {
+  // Två produkter som interagerar hos Janusmed; insamlingen har (felaktigt) missat paret.
+  const http: HttpClient = {
+    stats: { requests: 0, retries: 0, failures: 0, bytes: 0 },
+    async getText(url: string) {
+      const ids = new URL(url).searchParams.getAll('nplIds');
+      return nuxtPage({ search: ids.map((id) => product(id, [sub(`s${id}`)])), interactions: { interactions: ids.length === 2 ? [ixRow(`s${ids[0]}`, `s${ids[1]}`)] : [] } });
+    },
+  };
+  const previous = {
+    format: 1 as const, janusmedUpdated: null, substances: ['s1', 's2'], profiles: 2,
+    products: { '20000000000001': 0, '20000000000002': 1 }, interactions: [[0, 1, 0, 1, 'D0']] as [number, number, number, number, 'D0'][],
+  };
+
+  it('kontrollerar paret för sig och lägger tillbaka det om Janusmed fortfarande visar det', async () => {
+    const c = new InteractionCollector();
+    c.addProducts([
+      { nplId: '20000000000001', admin: 'Enteral (peroral)', substanceIds: ['s20000000000001'], lowDoseIds: [] },
+      { nplId: '20000000000002', admin: 'Enteral (peroral)', substanceIds: ['s20000000000002'], lowDoseIds: [] },
+    ]);
+    expect(c.pairs.size).toBe(0);
+    expect(await recheckDisappeared(http, c, previous)).toEqual({ disappeared: 1, restored: 1, skipped: 0 });
+    expect(c.pairs.size).toBe(1);
+  });
+
+  it('ingen förra data eller inget försvunnet → inga anrop', async () => {
+    const c = new InteractionCollector();
+    expect(await recheckDisappeared(http, c, null)).toEqual({ disappeared: 0, restored: 0, skipped: 0 });
+  });
+
+  it('fler försvunna par än gränsen rapporteras som okontrollerade', async () => {
+    const c = new InteractionCollector();
+    c.addProducts([
+      { nplId: '20000000000001', admin: 'Enteral (peroral)', substanceIds: ['a'], lowDoseIds: [] },
+      { nplId: '20000000000002', admin: 'Enteral (peroral)', substanceIds: ['b'], lowDoseIds: [] },
+    ]);
+    expect(await recheckDisappeared(http, c, previous, 0)).toEqual({ disappeared: 1, restored: 0, skipped: 1 });
+  });
+});
+

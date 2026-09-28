@@ -19,7 +19,7 @@ import { crawlFass, type FassCrawlResult } from './fass/crawl.ts';
 import { buildDrugEntries } from './fass/products.ts';
 import { checkShrink, drugMetrics, formatGuardTable, interactionMetrics, type GuardResult } from './guard.ts';
 import { buildInteractionData } from './janusmed/build.ts';
-import { crawlJanusmed, type JanusCrawlResult } from './janusmed/crawl.ts';
+import { crawlJanusmed, recheckDisappeared, type JanusCrawlResult } from './janusmed/crawl.ts';
 import { jsonLines, readJsonIfExists, sha256, writeFileAtomic } from './lib/files.ts';
 import { createHttpClient } from './lib/http.ts';
 import { log } from './lib/log.ts';
@@ -91,7 +91,14 @@ async function main(): Promise<number> {
     const http = createHttpClient({ rps: 1, concurrency: 2, retries: 3, timeoutMs: 120_000, retryStatuses: [408, 425, 429, 502, 503, 504] });
     const nplIds = drugs.map((d) => d.i);
     janus = await log.group('Janusmed', () => crawlJanusmed(http, nplIds, { seed: Number(today.replaceAll('-', '')) }));
-    const data = buildInteractionData(janus.collector, nplIds);
+    const current = await readJsonIfExists<InteractionData>(PATHS.interactions);
+    const previousValid = current && validateInteractionData(current).length === 0 ? current : null;
+    const collector = janus.collector;
+    const recheck = await log.group('Janusmed: försvunna interaktioner', () => recheckDisappeared(http, collector, previousValid));
+    if (recheck.skipped > 0) {
+      throw new Error(`${recheck.disappeared} interaktionspar har försvunnit sedan förra datan — för många för att kontrollera (${recheck.skipped} okontrollerade). Granska innan publicering.`);
+    }
+    const data = buildInteractionData(collector, nplIds);
     const errors = validateInteractionData(data);
     if (errors.length) throw new Error(`Den nya interaktionsdatan är ogiltig:\n${errors.join('\n')}`);
     const s = janus.stats;
@@ -99,8 +106,7 @@ async function main(): Promise<number> {
     if (s.verifyMismatches.length > allowedMismatches) {
       throw new Error(`Stickprovet avvek i ${s.verifyMismatches.length} av ${s.verified} fall:\n${s.verifyMismatches.join('\n')}`);
     }
-    const current = await readJsonIfExists<InteractionData>(PATHS.interactions);
-    guards.push(checkShrink(current && validateInteractionData(current).length === 0 ? interactionMetrics(current) : null, interactionMetrics(data)));
+    guards.push(checkShrink(previousValid ? interactionMetrics(previousValid) : null, interactionMetrics(data)));
     const content = jsonLines(data as unknown as Record<string, unknown>, ['products', 'interactions']);
     const previous = await readText(PATHS.interactions);
     // Om bara Janusmeds datumstämpel har ändrats finns inget nytt att publicera.
@@ -113,6 +119,7 @@ async function main(): Promise<number> {
       `- Interaktionsrader (klass B–D): ${data.interactions.length}`,
       `- Anrop: ${s.requests}, ${(http.stats.bytes / 1e6).toFixed(0)} MB`,
       `- Stickprov mot enskilda sidor: ${s.verified} kontrollerade, ${s.verifyMismatches.length} avvikelser`,
+      `- Interaktionspar som fanns förra gången men saknades nu: ${recheck.disappeared}, kontrollerade var för sig — ${recheck.restored} fanns kvar hos Janusmed och återställdes`,
       ...(s.failedPairs ? [`- Par som Janusmed inte kunde visa fullständigt: ${s.failedPairs}`] : []),
       ...s.verifyMismatches.map((m) => `  - ${m}`), '');
   }
