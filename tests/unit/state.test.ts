@@ -17,6 +17,8 @@ function fillSlutRecept(id: number) {
   m.form.dateRaw = '2025-06-01';
   m.form.doseRaw = '1';
   m.form.refillsRaw = '3';
+  // T28 och T29 godkändes med 6 månader; förvalet är 7 sedan 2026-10-05.
+  m.prescribe.period = 6;
 }
 
 beforeEach(() => { clearCase(); refreshToday(); flushSync(); });
@@ -59,6 +61,11 @@ describe('T29 läkemedel inskrivet för hand', () => {
 });
 
 describe('Ärendet', () => {
+  it('nyförskrivningen är förvald till 7 månader', () => {
+    expect(caseState.meds[0].prescribe.period).toBe(7);
+    addMed();
+    expect(caseState.meds[1].prescribe.period).toBe(7);
+  });
   it('max 8 läkemedel', () => {
     for (let i = 0; i < 10; i++) addMed();
     expect(caseState.meds.length).toBe(8);

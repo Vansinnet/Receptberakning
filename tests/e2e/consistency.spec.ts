@@ -5,6 +5,7 @@ import { test, expect } from '@playwright/test';
 import { calcRenewal, daysLeftText, isRenewalOk, STATUS_LABEL } from '../../src/lib/domain/renewal';
 import { calcPrescription } from '../../src/lib/domain/prescribe';
 import { addDays, fmtDate, fmtPct, fmtQty } from '../../src/lib/utils';
+import { DEFAULT_PRESCRIBE_MONTHS } from '../../src/lib/constants';
 import type { DoseInterval, DoseUnit, MedForm } from '../../src/lib/types';
 
 const TODAY = new Date(Date.UTC(2026, 9, 1));
@@ -71,7 +72,7 @@ test('skärmen visar samma siffror som beräkningen, 25 slumpade fall', async ({
     if (r.consumption) await expect(tiles.nth(2).locator('.tile__v'), label).toHaveClass(new RegExp(`fg-${r.consumption.tone}`));
 
     await page.getByRole('button', { name: 'Förnya', exact: true }).click();
-    const p = calcPrescription(r, { period: 6, endDateRaw: '', packageRaw: null, fromToday: false }, TODAY);
+    const p = calcPrescription(r, { period: DEFAULT_PRESCRIBE_MONTHS, endDateRaw: '', packageRaw: null, fromToday: false }, TODAY);
     const panel = page.getByLabel('Nyförskrivning');
     if (p.kind === 'ok') await expect(panel.locator('.presc-result__big'), label).toHaveText(`${p.packages} förp. à ${fmtQty(p.packageSize)} ${u}`);
     else if (p.kind === 'covered') await expect(panel, label).toContainText('täcker redan hela perioden');

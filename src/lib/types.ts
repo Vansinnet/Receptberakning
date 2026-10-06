@@ -52,5 +52,11 @@ export interface MedCard {
 export interface LtPeriodInput {
   startRaw: string;
   endRaw: string;
+  /** Uttaget i enhetsläget: antal enheter under perioden. */
   totalRaw: string;
+  /** Uttaget i mg-läget: antal enheter per styrka, i samma ordning som styrkorna. */
+  countsRaw?: string[];
 }
+
+/** Långtidsanalysen räknar i enheter (som tidigare) eller i mg, med en eller flera styrkor. */
+export type LtMode = 'units' | 'mg';

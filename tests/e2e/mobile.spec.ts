@@ -34,7 +34,7 @@ test('förnyelse på mobil: roll, resultat och texter utan sidledes scroll', asy
   await fillSertralin(page);
   await expect(page.getByRole('region', { name: 'Resultat' })).toContainText('2026-10-05');
   await page.getByRole('button', { name: 'Förnya', exact: true }).click();
-  await expect(page.getByLabel('Svar till patient')).toHaveValue(/räcker till 2027-04-01/);
+  await expect(page.getByLabel('Svar till patient')).toHaveValue(/räcker till 2027-05-01/);
   // "Ny patient" ligger sist, efter texterna.
   const copy = await page.getByRole('button', { name: 'Kopiera' }).boundingBox();
   const newPatient = await page.getByRole('button', { name: 'Ny patient' }).boundingBox();
@@ -56,6 +56,21 @@ test('långtidsanalys på mobil: alla fält får plats', async ({ page }) => {
     expect(box.x + box.width, name).toBeLessThanOrEqual(390);
   }
   await expect(page.getByRole('region', { name: 'Resultat' })).toContainText('100 %');
+  await noSideScroll(page);
+  await axe(page);
+
+  // mg-läget med tre styrkor får också plats.
+  await page.getByRole('radio', { name: 'mg, flera styrkor' }).click();
+  // Dosen töms vid byte av räknesätt, eftersom den anges i en annan enhet.
+  await expect(page.getByLabel('Dos (mg/dag)')).toHaveValue('');
+  await page.getByLabel('Dos (mg/dag)').fill('7,5');
+  await page.getByLabel('Styrka 1 (mg)').fill('7,5');
+  await page.getByRole('button', { name: 'Styrka', exact: true }).click();
+  await page.getByLabel('Styrka 2 (mg)').fill('5');
+  await page.getByRole('button', { name: 'Styrka', exact: true }).click();
+  await page.getByLabel('Styrka 3 (mg)').fill('3,75');
+  await page.getByLabel('Antal 3,75 mg, period 1').fill('30');
+  await expect(page.locator('.lt-counts__sum').first()).toHaveText('= 112,5 mg');
   await noSideScroll(page);
   await axe(page);
 });

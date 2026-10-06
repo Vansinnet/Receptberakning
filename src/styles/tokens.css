@@ -35,6 +35,14 @@
   --r-md: 8px;
   --r-lg: 12px;
 
+  /* Graf i utskriften av långtidsanalysen (alltid på vitt papper). Ljushetsskillnaden mellan
+     ok och varning håller även i svartvit utskrift. */
+  --chart-band: #dff0e5;
+  --chart-grid: #dddddd;
+  --chart-ok: #2f6f4f;
+  --chart-warn: #e3a04a;
+  --chart-avg: #1f4e79;
+
   --topbar-h: 52px;
   --aside-w: 236px;
   --texts-w: 420px;

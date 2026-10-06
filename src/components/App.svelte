@@ -9,7 +9,7 @@
   import LongtermView from './LongtermView.svelte';
   import InactivityToast from './InactivityToast.svelte';
   import { caseState, clearCase, getActiveMed, getResult, hasCaseData, refreshToday } from '$lib/state/case.svelte';
-  import { clearLongterm, ltState } from '$lib/state/longterm.svelte';
+  import { clearLongterm, hasLtData } from '$lib/state/longterm.svelte';
   import { getTheme, uiState } from '$lib/state/ui.svelte';
   import { checkInteractions, loadInteractions, type InteractionResult } from '$lib/interactions';
   import { setDrugsLoadErrorHandler } from '$lib/drug-cache';
@@ -29,7 +29,7 @@
 
   const inactivity = createInactivityTimer(
     clearAll,
-    () => hasCaseData() || !!ltState.medName || ltState.periods.some((p) => p.startRaw || p.totalRaw),
+    () => hasCaseData() || hasLtData(),
   );
 
   let med = $derived(getActiveMed());

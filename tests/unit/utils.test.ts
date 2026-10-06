@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { extractDoseUnit, stripManufacturer, fmtDate, parseDateUTC, getDaysDiff } from '../../src/lib/utils';
+import {
+  extractDoseUnit, stripManufacturer, fmtDate, parseDateUTC, getDaysDiff,
+  formatDateInput, normalizeDateInput, parseDose, normalizeDoseInput, isDoseExpression, fmtMg,
+} from '../../src/lib/utils';
 import { setMockNow } from '../../src/lib/clock';
 
 const MOCK_NOW = new Date('2025-05-20T00:00:00Z').getTime();
@@ -221,5 +224,137 @@ describe('getDaysDiff', () => {
     const d1 = new Date(Date.UTC(2025, 1, 1));
     const d2 = new Date(Date.UTC(2025, 0, 31));
     expect(getDaysDiff(d1, d2)).toBe(1);
+  });
+});
+
+// =====================================================
+describe('formatDateInput (medan man skriver)', () => {
+  it.each([
+    ['2026', '2026'],
+    ['20260', '2026-0'],
+    ['20260620', '2026-06-20'],
+    ['2026-06-20', '2026-06-20'],
+    ['2026-', '2026-'],
+    ['2026-6', '2026-6'],
+    ['2026-6-', '2026-6-'],
+    ['2026-6-20', '2026-6-20'],
+    ['2026/6/20', '2026-6-20'],
+    ['2026.06.20', '2026-06-20'],
+    ['2026 6 20', '2026-6-20'],
+    ['260620', '2606-20'],
+    ['26-6-20', '26-6-20'],
+    ['2026--06', '2026-06'],
+    ['-2026', '2026'],
+    ['2026-06-200', '2026-06-20'],
+    ['202606201', '2026-06-20'],
+    ['abc', ''],
+    ['', ''],
+  ])('"%s" → "%s"', (raw, want) => {
+    expect(formatDateInput(raw)).toBe(want);
+  });
+  it('skrivet tecken för tecken ger samma resultat som inklistrat', () => {
+    let v = '';
+    for (const ch of '2026-6-20') v = formatDateInput(v + ch);
+    expect(v).toBe('2026-6-20');
+    v = '';
+    for (const ch of '20260620') v = formatDateInput(v + ch);
+    expect(v).toBe('2026-06-20');
+  });
+});
+
+describe('normalizeDateInput (när fältet lämnas)', () => {
+  it.each([
+    ['2026-6-20', '2026-06-20'],
+    ['2026-6-2', '2026-06-02'],
+    ['2606-20', '2026-06-20'],
+    ['260620', '2026-06-20'],
+    ['251231', '2025-12-31'],
+    ['20-06-2026', '2026-06-20'],
+    ['5-6-2026', '2026-06-05'],
+    ['2026-06-20', '2026-06-20'],
+  ])('"%s" → "%s"', (raw, want) => {
+    expect(normalizeDateInput(raw)).toBe(want);
+  });
+  it.each([
+    '2026-06',   // år och månad: blir inte ÅÅMMDD (månad 26 finns inte)
+    '2025-10',   // dito
+    '2613-01',   // ÅÅMMDD med månad 13
+    '260230',    // 30 februari
+    '2026-0',
+    '2026-09-1', // kan vara ofullständigt
+    '26-6-20',   // ÅÅ-M-D tolkas inte
+    '20-6-26',   // "20/6-26" = 20 juni 2026 i vardagsspråk; avvisas hellre än blir 2020-06-26
+    '2026-06-2',
+    '31-02-2026',
+    '2026',
+    '',
+    'abc',
+  ])('"%s" lämnas orört', (raw) => {
+    expect(normalizeDateInput(raw)).toBe(raw);
+  });
+  it('månad eller dag utanför kalendern fylls ut men avvisas sedan av parseDateUTC', () => {
+    expect(normalizeDateInput('2026-13-11')).toBe('2026-13-11');
+    expect(parseDateUTC(normalizeDateInput('2026-13-11'))).toBeNull();
+  });
+  it('DD-MM-ÅÅÅÅ kortas inte av till ett annat giltigt datum', () => {
+    expect(formatDateInput('20-06-2026')).toBe('20-06-2026');
+    expect(formatDateInput('05.06.2026')).toBe('05-06-2026');
+    expect(normalizeDateInput(formatDateInput('05.06.2026'))).toBe('2026-06-05');
+  });
+});
+
+describe('parseDose', () => {
+  it.each([
+    ['1', 1], ['1,5', 1.5], ['0.5', 0.5], [' 2 ', 2],
+    ['1x2', 2], ['1 x 2', 2], ['1X2', 2], ['1×2', 2], ['1*2', 2], ['0,5x2', 1], ['2x3', 6],
+    ['1+0+1', 2], ['1 + 1 + 1 + 1', 4], ['0,5+0+0,5', 1], ['0+0+1', 1],
+    ['½', 0.5], ['1½', 1.5], ['½x2', 1], ['½+½', 1],
+    ['2 st', 2], ['1x2 st', 2], ['1x2 tabl.', 2], ['2 tabletter', 2], ['1 kapsel', 1], ['2st', 2],
+    ['0,1x3', 0.3],
+  ])('"%s" → %s (st)', (raw, want) => {
+    expect(parseDose(raw as string, 'st')).toBe(want);
+  });
+  it('enhetsordet måste höra till vald enhet', () => {
+    expect(parseDose('5 ml', 'ml')).toBe(5);
+    expect(parseDose('2 doser', 'dos')).toBe(2);
+    expect(parseDose('1x2 dos', 'dos')).toBe(2);
+    expect(parseDose('5 ml', 'st')).toBeNaN();
+    expect(parseDose('2 st', 'ml')).toBeNaN();
+    expect(parseDose('2 st', 'dos')).toBeNaN();
+  });
+  it.each(['1-2', '1,2,3', 'abc', '1x', 'x2', '1x2x3', '1++1', '1 2', '1x2 mg', '2 vid behov', ''])('"%s" → NaN', (raw) => {
+    expect(parseDose(raw, 'st')).toBeNaN();
+  });
+  it('"0x10" är 0 × 10, inte hexadecimalt 16', () => {
+    expect(parseDose('0x10', 'st')).toBe(0);
+  });
+  it('vanliga tal parsas exakt som parseNum', () => {
+    for (const raw of ['1', '1.0', '1,50', '-1', '0', ' 3 ', '.5']) {
+      expect(parseDose(raw, 'st')).toBe(Number(raw.trim().replace(',', '.')));
+    }
+  });
+});
+
+describe('normalizeDoseInput och isDoseExpression', () => {
+  it.each([
+    ['1x2', '2'], ['1+0+1', '2'], ['½', '0,5'], ['1½', '1,5'], ['0,5x3', '1,5'], ['2 st', '2'], ['0,1x3', '0,3'],
+  ])('"%s" → "%s"', (raw, want) => {
+    expect(normalizeDoseInput(raw, 'st')).toBe(want);
+  });
+  it.each(['1', '1,5', '1.5', '', 'abc', '5 ml', '0+0', '1-2'])('"%s" lämnas orört', (raw) => {
+    expect(normalizeDoseInput(raw, 'st')).toBe(raw);
+  });
+  it('känner igen uttryck men inte vanliga tal', () => {
+    expect(isDoseExpression('1x2')).toBe(true);
+    expect(isDoseExpression('1+0+1')).toBe(true);
+    expect(isDoseExpression('2 st')).toBe(true);
+    expect(isDoseExpression('1,5')).toBe(false);
+    expect(isDoseExpression('')).toBe(false);
+  });
+});
+
+describe('fmtMg', () => {
+  it.each([[3.75, '3,75'], [7.5, '7,5'], [375, '375'], [56.25, '56,25'], [0.125, '0,125'], [1 / 3, '0,3333'], [0.0625, '0,0625'], [15 * 0.1, '1,5']])('%s → "%s"', (n, want) => {
+    expect(fmtMg(n)).toBe(want);
   });
 });

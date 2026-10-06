@@ -32,7 +32,8 @@ Status: **Räcker** (14 dagar eller mer kvar), **Tar snart slut** (0–13 dagar)
 - **Nyförskrivning** i 1–12 månader eller till ett datum, med antal förpackningar. Vid minst 14 dagar kvar väljer läkaren om den nya perioden räknas från idag eller från beräknat slut.
 - **Texter för hela ärendet:** svar till patient på svenska eller engelska och journalanteckning. Texterna kan justeras innan de kopieras.
 - **Sjuksköterskeläge:** samma underlag utan beslutsknappar, bedömning av vitalparametrar och uppföljning i tre lägen (normal, avvikande, ej bedömd) och journaltext som lämnar ärendet till läkare.
-- **Långtidsanalys** över upp till 10 perioder, med diagram, tabell och journaltext. Överlappande dagar räknas en gång.
+- **Långtidsanalys** över upp till 10 perioder, med diagram, tabell och journaltext. Överlappande dagar räknas en gång. Räknas i enheter eller i mg, där flera styrkor av samma substans (t.ex. 5 mg och 7,5 mg) räknas ihop.
+- **Utskrift av långtidsanalysen** (Ctrl+P): graf över tid, tabell, analystext och plats för bedömning och signatur.
 - **Ljust och mörkt tema** som följer datorns inställning.
 - **Utskriftsvy.**
 
@@ -60,7 +61,7 @@ Webbläsartester kontrollerar dessutom att siffrorna på skärmen är exakt desa
 ```bash
 npm install
 npm run dev          # utvecklingsserver
-npm test             # 359 enhetstester
+npm test             # 505 enhetstester
 npm run test:e2e     # webbläsartester
 npm run build        # production-build → dist/
 ```

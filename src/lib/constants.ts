@@ -63,6 +63,9 @@ export const MAX_VALID_YEAR = 2100;
 // ============================================================================
 
 export const MAX_LT_PERIODS = 10;
+// AKTIVT VAL: mg-läget — samma substans i olika styrkor (t.ex. Imovane 5 mg och 7,5 mg) räknas
+// ihop som antal × styrka. Högst 4 styrkor. Godkänt 2026-10-05.
+export const MAX_LT_STRENGTHS = 4;
 // AKTIVT VAL: 50 år — längre perioder är med hög sannolikhet felinmatning.
 export const MAX_PERIOD_SPAN_DAYS = 365 * 50 + 13;
 // Diagrammets skala går till 160 % av ordinerad dos; högre värden klampas visuellt.
@@ -74,7 +77,8 @@ export const LT_CHART_MAX_PCT = 160;
 
 export const MAX_MED_CARDS = 8;
 export const MAX_PRESCRIBE_MONTHS = 12;
-export const DEFAULT_PRESCRIBE_MONTHS = 6;
+// AKTIVT VAL: 7 månader — förvald period vid nyförskrivning (ändrat från 6 den 2026-10-05).
+export const DEFAULT_PRESCRIBE_MONTHS = 7;
 
 // ============================================================================
 // 5. DATUM
@@ -113,6 +117,18 @@ export const UNIT_DISPLAY: Record<DoseUnit, { short: string; long: string; en: s
 };
 
 export const INTERVAL_LABEL: Record<DoseInterval, string> = { 1: 'dag', 7: 'vecka', 30: 'månad' };
+
+// Enhetsord som får stå efter dosen i dosfältet ("2 st", "1x2 tabl", "5 ml"). Ordet måste
+// höra till den valda enheten — "5 ml" när enheten är st avvisas i stället för att tolkas som 5 st.
+export const DOSE_UNIT_WORDS: Record<DoseUnit, readonly string[]> = {
+  st: ['st', 'styck', 'tabl', 'tablett', 'tabletter', 'kaps', 'kapsel', 'kapslar'],
+  ml: ['ml'],
+  dos: ['dos', 'doser'],
+};
+
+// Dosuttryck räknas om till ett tal med högst så här många decimaler, så att t.ex.
+// 0,1x3 blir 0,3 och inte 0,30000000000000004.
+export const DOSE_EXPR_DECIMALS = 6;
 
 // Dos-enhetsnormalisering: rå enhet → kanonisk enhet.
 export const DOSE_UNIT_NORMALIZE: Record<string, string> = {

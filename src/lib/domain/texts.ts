@@ -5,10 +5,10 @@
 
 import type { Assessment, Decision, DoseInterval, DoseUnit } from '../types';
 import { CONTACT_BEFORE_END_DAYS, DAYS_REMAINING_WARN, INTERVAL_LABEL, UNIT_DISPLAY } from '../constants';
-import { addDays, fmtDate, fmtFixed, fmtPct, fmtQty } from '../utils';
+import { addDays, fmtDate, fmtFixed, fmtMg, fmtPct, fmtQty, normalizeDoseInput } from '../utils';
 import { daysLeftText, type RenewalOk } from './renewal';
 import type { PrescriptionResult } from './prescribe';
-import type { LongtermResult } from './longterm';
+import type { LongtermResult, LtPeriodResult, LtUnit } from './longterm';
 
 export type Lang = 'sv' | 'en';
 
@@ -94,7 +94,7 @@ export function buildPatientText(lang: Lang, items: TextItem[]): string {
 }
 
 function doseText(it: TextItem): string {
-  return `${it.doseRaw.trim().replace('.', ',')} ${UNIT_DISPLAY[it.unit].short}/${INTERVAL_LABEL[it.interval]}`;
+  return `${normalizeDoseInput(it.doseRaw, it.unit).trim().replace('.', ',')} ${UNIT_DISPLAY[it.unit].short}/${INTERVAL_LABEL[it.interval]}`;
 }
 
 /** Läkarens journalanteckning för hela ärendet. */
@@ -141,21 +141,39 @@ export function buildNurseText(items: TextItem[], vital: Assessment, followUp: A
   return lines.join('\n');
 }
 
+/** "5 mg", "5 mg och 7,5 mg", "5 mg, 7,5 mg och 10 mg". */
+export function strengthList(strengths: number[]): string {
+  const s = strengths.map((x) => `${fmtMg(x)} mg`);
+  return s.length <= 1 ? (s[0] ?? '') : `${s.slice(0, -1).join(', ')} och ${s[s.length - 1]}`;
+}
+
+/** Uttaget under en period: "90 enheter", "30 × 5 mg + 30 × 7,5 mg = 375 mg". */
+export function ltPeriodTotalText(unit: LtUnit, p: LtPeriodResult): string {
+  if (unit === 'enheter') return `${p.total} enheter`;
+  const sum = `${fmtMg(p.total)} mg`;
+  return p.parts.length ? `${p.parts.map((x) => `${x.count} × ${fmtMg(x.strength)} mg`).join(' + ')} = ${sum}` : sum;
+}
+
 /** Journaltext för långtidsanalysen. */
 export function buildLongtermText(medName: string, doseRaw: string, r: LongtermResult): string {
   if (r.kind !== 'ok') return '';
   const dose = doseRaw.trim().replace('.', ',');
+  const u = r.unit;
   const lines = [
     `Aktuellt: Förbrukningsanalys av ${medName.trim() || 'läkemedel'}.`,
     '',
-    `Ordinerad dos: ${dose} enheter/dag.`,
-    `Analysperiod: ${r.periods.length} ${r.periods.length === 1 ? 'period' : 'perioder'}, totalt ${r.unionDays} dagar (${fmtDate(r.first)} – ${fmtDate(r.last)}).`,
+    `Ordinerad dos: ${dose} ${u}/dag.`,
   ];
+  if (u === 'mg') {
+    const used = [...new Set(r.periods.flatMap((p) => p.parts.map((x) => x.strength)))].sort((a, b) => a - b);
+    if (used.length) lines.push(`Uttag i ${used.length === 1 ? 'styrkan' : 'styrkorna'} ${strengthList(used)}, räknat i mg.`);
+  }
+  lines.push(`Analysperiod: ${r.periods.length} ${r.periods.length === 1 ? 'period' : 'perioder'}, totalt ${r.unionDays} dagar (${fmtDate(r.first)} – ${fmtDate(r.last)}).`);
   if (r.overlap) lines.push('Perioderna överlappar. Överlappande dagar räknas en gång.');
   lines.push('', 'Perioder:');
   for (const p of r.periods) {
-    lines.push(`  ${fmtDate(p.start)} – ${fmtDate(p.end)} (${p.days} dagar, ${p.total} enheter, snitt ${fmtFixed(p.avgPerDay, 2)} enheter/dag, ${fmtPct(p.pct)})`);
+    lines.push(`  ${fmtDate(p.start)} – ${fmtDate(p.end)} (${p.days} dagar, ${ltPeriodTotalText(u, p)}, snitt ${fmtFixed(p.avgPerDay, 2)} ${u}/dag, ${fmtPct(p.pct)})`);
   }
-  lines.push('', `Sammanlagd snittförbrukning: ${fmtFixed(r.avgPerDay, 2)} enheter/dag (${fmtPct(r.pct)} av ordinerad dos).`, '', 'Bedömning: ');
+  lines.push('', `Sammanlagd snittförbrukning: ${fmtFixed(r.avgPerDay, 2)} ${u}/dag (${fmtPct(r.pct)} av ordinerad dos).`, '', 'Bedömning: ');
   return lines.join('\n');
 }

@@ -326,13 +326,26 @@ textarea.input { height: auto; padding: 12px; line-height: 1.5; resize: none; fo
   display: flex; flex-direction: column; gap: 12px; overflow-y: auto;
 }
 .lt-top { display: flex; gap: 10px; }
-.lt-top__name { flex-grow: 1; }
+.lt-top__name { flex-grow: 1; position: relative; }
 .lt-top__dose { width: 120px; }
 .lt-grid { display: grid; grid-template-columns: 20px minmax(0, 1fr) minmax(0, 1fr) 64px 30px; gap: 6px; align-items: start; }
 .lt-grid__head { font-size: 12px; font-weight: 500; color: var(--ink-2); align-self: end; }
 .lt-grid__no { font-size: 12px; color: var(--ink-3); padding-top: 9px; }
 .lt-grid .input { height: 32px; padding: 0 8px; font-size: 13px; }
 .lt-result { flex-grow: 1; min-width: 0; padding: 16px 22px 24px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+.lt-mode { display: flex; align-items: center; gap: 10px; }
+.lt-mode__label { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); }
+.lt-strengths__row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; }
+.lt-strength__field { display: flex; align-items: center; gap: 4px; }
+.lt-strength .input { width: 64px; height: 32px; padding: 0 8px; font-size: 13px; }
+.lt-strength__unit { font-size: 12px; color: var(--ink-2); }
+.lt-grid--mg { grid-template-columns: 20px minmax(0, 1fr) minmax(0, 1fr) 30px; }
+.lt-counts { grid-column: 2 / 4; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding-bottom: 6px; border-bottom: 1px dashed var(--line); }
+.lt-count { display: inline-flex; align-items: center; gap: 6px; }
+.lt-count__lbl { font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+.lt-grid .lt-count .input { width: 60px; }
+.lt-counts__sum { font-size: 12px; font-weight: 600; color: var(--ink-2); margin-left: auto; }
+.lt-print { display: none; }
 
 .chart { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 14px 16px 10px; }
 .chart__head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 18px; }
@@ -415,7 +428,7 @@ textarea.input { height: auto; padding: 12px; line-height: 1.5; resize: none; fo
 
 /* Pekskärm: 16 px text i fält (annars zoomar iPhone vid tryck) och minst 44 px höga mål. */
 @media (pointer: coarse) {
-  .input, .input--compact, .lt-grid .input { height: 44px; font-size: 16px; }
+  .input, .input--compact, .lt-grid .input, .lt-strength .input { height: 44px; font-size: 16px; }
   .input--name { height: 44px; font-size: 17px; }
   textarea.input { height: auto; font-size: 16px; }
   .date-field__text { padding-right: 46px; }

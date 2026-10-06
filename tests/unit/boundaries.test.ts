@@ -5,7 +5,7 @@ import { describe, it, expect } from 'vitest';
 import { calcRenewal, isRenewalOk, type RenewalOk } from '../../src/lib/domain/renewal';
 import { calcPrescription } from '../../src/lib/domain/prescribe';
 import { calcLongterm } from '../../src/lib/domain/longterm';
-import { addDays, addMonths, fmtDate, parseDateUTC } from '../../src/lib/utils';
+import { addDays, addMonths, fmtDate, fmtFixed, fmtPct, parseDateUTC } from '../../src/lib/utils';
 import type { MedForm, PrescribeSettings } from '../../src/lib/types';
 
 const TODAY = new Date(Date.UTC(2026, 9, 1));
@@ -38,6 +38,22 @@ describe('Dos', () => {
     const r = calc({ doseRaw: d });
     expect(r.kind).toBe('invalid');
     expect(r.errors.dose).toBeTruthy();
+  });
+  it.each([['1x2', '2'], ['1+0+1', '2'], ['½', '0,5'], ['1x2 st', '2'], ['1+1+1+1', '4']])('dosuttrycket "%s" räknas som %s', (expr, num) => {
+    const a = ok({ doseRaw: expr });
+    const b = ok({ doseRaw: num });
+    expect(a.dailyDose).toBe(b.dailyDose);
+    expect(a.endDate).toEqual(b.endDate);
+    expect(a.status).toBe(b.status);
+  });
+  it.each(['1-2', '5 ml', '1x2x3', '2 vid behov'])('dosuttrycket "%s" avvisas med förklaring', (d) => {
+    const r = calc({ doseRaw: d });
+    expect(r.kind).toBe('invalid');
+    expect(r.errors.dose).toBe('Skriv dosen som ett tal, t.ex. 2, 1x2 eller 1+0+1.');
+  });
+  it('uttryck omfattas av samma högsta dos', () => {
+    expect(calc({ doseRaw: '25x2' }).kind).toBe('ok');
+    expect(calc({ doseRaw: '26x2' }).errors.dose).toBe('Högst 50 st per dag.');
   });
   it.each([
     ['st', 1, '50', true], ['st', 1, '50.1', false],
@@ -217,5 +233,69 @@ describe('Långtidsanalys — validering och klassning', () => {
     const r = lt([['2026-01-01', '2026-01-31', '31'], ['2026-02-01', '2026-02-28', '28']]);
     expect(r.kind === 'ok' && r.overlap).toBe(false);
     expect(r.kind === 'ok' && r.unionDays).toBe(59);
+  });
+});
+
+describe('Långtidsanalys i mg med flera styrkor', () => {
+  const mg = (rows: [string, string, string[]][], strengths: string[], dose = '7,5') =>
+    calcLongterm(rows.map(([s, e, c]) => ({ startRaw: s, endRaw: e, totalRaw: '', countsRaw: c })), dose, TODAY, strengths);
+
+  it('Imovane 5 mg och 7,5 mg räknas ihop i mg', () => {
+    const r = mg([['2026-01-01', '2026-03-31', ['30', '30']]], ['5', '7,5']);
+    if (r.kind !== 'ok') throw new Error('förväntade ok');
+    expect(r.unit).toBe('mg');
+    expect(r.total).toBe(375);
+    expect(r.periods[0].parts).toEqual([{ count: 30, strength: 5 }, { count: 30, strength: 7.5 }]);
+    expect(fmtFixed(r.avgPerDay, 2)).toBe('4,17');
+    expect(fmtPct(r.pct)).toBe('55,6 %');
+    expect(r.cls).toBe('under');
+  });
+  it('samma uttag i mg ger samma procent som i enheter när bara en styrka används', () => {
+    const a = mg([['2026-01-01', '2026-03-31', ['90']]], ['7,5']);
+    const b = calcLongterm([{ startRaw: '2026-01-01', endRaw: '2026-03-31', totalRaw: '90' }], '1', TODAY);
+    if (a.kind !== 'ok' || b.kind !== 'ok') throw new Error('förväntade ok');
+    expect(a.pct).toBeCloseTo(b.pct, 10);
+    expect(a.total).toBe(675);
+  });
+  it('tomt antal räknas som inget uttag av den styrkan', () => {
+    const r = mg([['2026-01-01', '2026-03-31', ['', '90']], ['2026-04-01', '2026-06-30', ['60', '']]], ['5', '7,5']);
+    if (r.kind !== 'ok') throw new Error('förväntade ok');
+    expect(r.periods.map((p) => p.total)).toEqual([675, 300]);
+    expect(r.periods[1].parts).toEqual([{ count: 60, strength: 5 }]);
+  });
+  it('antal med decimaler ger fel vid fältet och perioden räknas inte', () => {
+    const r = mg([['2026-01-01', '2026-03-31', ['30,5', '30']]], ['5', '7,5']);
+    expect(r.errors[0].counts?.[0]).toBe('Heltal.');
+    expect(r.kind).toBe('incomplete');
+  });
+  it('antal för en styrka som saknas ger fel vid styrkan och vid antalet', () => {
+    const r = mg([['2026-01-01', '2026-03-31', ['30', '30']]], ['5', '']);
+    expect(r.strengthErrors).toEqual(['', 'Ange styrkan.']);
+    expect(r.errors[0].counts?.[1]).toBe('Styrka saknas.');
+    expect(r.kind).toBe('incomplete');
+  });
+  it('bara nollor ger fel i stället för att perioden tyst hoppas över', () => {
+    const r = mg([['2026-01-01', '2026-01-30', ['30', '']], ['2026-02-01', '2026-03-30', ['0', '0']]], ['5', '7,5'], '5');
+    expect(r.errors[1].total).toBe('Ange ett antal över 0.');
+  });
+  it.each(['0x2', '1e1', '+3', '2,5'])('antal "%s" avvisas', (c) => {
+    expect(mg([['2026-01-01', '2026-03-31', [c]]], ['5']).errors[0].counts?.[0]).toBe('Heltal.');
+  });
+  it.each(['0x5', '1e1', 'abc'])('styrka "%s" avvisas', (st) => {
+    expect(mg([['2026-01-01', '2026-03-31', ['30']]], [st]).strengthErrors[0]).toBe('Ange styrkan i mg.');
+  });
+  it('ogiltig styrka ger fel', () => {
+    const r = mg([['2026-01-01', '2026-03-31', ['30']]], ['0']);
+    expect(r.strengthErrors[0]).toBe('Ange styrkan i mg.');
+    expect(r.kind).toBe('incomplete');
+  });
+  it('perioder utan något antal ignoreras', () => {
+    const r = mg([['2026-01-01', '2026-03-31', ['30', '']], ['2026-04-01', '2026-06-30', ['', '']]], ['5', '7,5']);
+    expect(r.kind === 'ok' && r.periods.length).toBe(1);
+  });
+  it('enhetsläget påverkas inte av countsRaw', () => {
+    const r = calcLongterm([{ startRaw: '2026-01-01', endRaw: '2026-03-31', totalRaw: '90', countsRaw: ['999'] }], '1', TODAY);
+    expect(r.kind === 'ok' && r.total).toBe(90);
+    expect(r.unit).toBe('enheter');
   });
 });

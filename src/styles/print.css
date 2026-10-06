@@ -1,5 +1,6 @@
 /* === UTSKRIFT ===
-   Ärendets läkemedel, resultat och texter på vitt papper. Kontroller döljs. */
+   Förnyelse: ärendets läkemedel, resultat och texter på vitt papper. Kontroller döljs.
+   Långtidsanalys: en egen rapport (LongtermPrint) med graf, tabell, analystext och bedömningsyta. */
 @media print {
   @page { size: A4 portrait; margin: 15mm 18mm; }
 
@@ -18,4 +19,71 @@
   textarea.input { white-space: pre-wrap; }
   .chip, .note { border: 1px solid currentColor; }
   .tile, .panel, .chart, .table { break-inside: avoid; }
+
+  /* ── Långtidsanalysen: en egen rapport i stället för skärmbilden ── */
+  .lt-view { display: block; }
+  .lt-view > .workspace { display: none !important; }
+  .lt-view:not(.is-hidden) .lt-print { display: block; }
+  .app:has(> .lt-view:not(.is-hidden)) > .topbar,
+  .app:has(> .lt-view:not(.is-hidden)) > .banner { display: none !important; }
+
+  .lt-print { font-size: 9.5pt; line-height: 1.4; color: var(--ink); print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .ltp-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16pt; padding-bottom: 8pt; margin-bottom: 10pt; border-bottom: 1.5pt solid var(--ink); }
+  .ltp-kicker { margin: 0; font-size: 8pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  .ltp-title { margin: 2pt 0; font-size: 17pt; font-weight: 700; line-height: 1.2; }
+  .ltp-sub { margin: 0; color: var(--ink-2); }
+  .ltp-meta { margin: 0; display: grid; gap: 7pt; min-width: 58mm; }
+  .ltp-meta div { display: flex; gap: 6pt; align-items: baseline; }
+  .ltp-meta dt { width: 17mm; font-size: 7.5pt; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+  .ltp-meta dd { margin: 0; flex: 1; }
+  .ltp-blank { min-height: 13pt; border-bottom: 0.75pt solid var(--ink-3); }
+
+  .ltp-facts { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8pt; margin-bottom: 10pt; break-inside: avoid; }
+  .ltp-fact { display: flex; flex-direction: column; gap: 1pt; padding: 6pt 8pt; border: 0.75pt solid var(--line-2); border-radius: 4pt; }
+  .ltp-fact__k { font-size: 7.5pt; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+  .ltp-fact__v { font-size: 15pt; font-weight: 700; line-height: 1.2; }
+  .ltp-fact--main .ltp-fact__v { font-size: 20pt; }
+  .ltp-fact__s { font-size: 8.5pt; color: var(--ink-2); }
+  .ltp-note { margin: 0 0 8pt; padding: 3pt 8pt; border-left: 2pt solid var(--warn); }
+
+  .ltp-h2 { margin: 0 0 4pt; font-size: 10pt; font-weight: 700; }
+  .ltp-chart { margin: 0 0 10pt; break-inside: avoid; }
+  .ltp-svg { display: block; width: 100%; height: auto; font-family: var(--font-sans); }
+  .ltp-band { fill: var(--chart-band); }
+  .ltp-grid { stroke: var(--chart-grid); stroke-width: 0.75; }
+  .ltp-ylabel { font-size: 10px; fill: var(--ink-3); text-anchor: end; }
+  .ltp-bar { fill: var(--chart-ok); fill-opacity: 0.92; }
+  .ltp-bar--warn { fill: var(--chart-warn); }
+  .ltp-val { font-size: 10px; font-weight: 700; text-anchor: middle; fill: var(--ink); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; }
+  .ltp-pno { font-size: 9.5px; text-anchor: middle; fill: var(--ink-2); }
+  .ltp-ref { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 5 3; }
+  .ltp-avg { stroke: var(--chart-avg); stroke-width: 1.5; stroke-dasharray: 1.5 2.5; }
+  .ltp-axis { stroke: var(--ink); stroke-width: 1; }
+  .ltp-tick { stroke: var(--ink-3); stroke-width: 0.75; }
+  .ltp-xlabel { font-size: 10px; text-anchor: middle; fill: var(--ink-2); }
+  .ltp-xlabel--year { font-weight: 700; fill: var(--ink); }
+  .ltp-xlabel--start { text-anchor: start; }
+  .ltp-xlabel--end { text-anchor: end; }
+  .ltp-legend { margin: 3pt 0 0; font-size: 8pt; color: var(--ink-2); }
+  .ltp-key { display: inline-block; width: 12pt; height: 7pt; margin: 0 3pt 0 9pt; vertical-align: middle; }
+  .ltp-key:first-child { margin-left: 0; }
+  .ltp-key--band { background: var(--chart-band); border: 0.5pt solid var(--line-2); }
+  .ltp-key--ref { height: 0; border-top: 1pt dashed var(--ink); }
+  .ltp-key--avg { height: 0; border-top: 1.5pt dotted var(--chart-avg); }
+  .ltp-key--ok { background: var(--chart-ok); }
+  .ltp-key--warn { background: var(--chart-warn); }
+
+  .ltp-table { width: 100%; margin-bottom: 10pt; border-collapse: collapse; font-size: 8.5pt; break-inside: avoid; }
+  .ltp-table th { padding: 2.5pt 4pt; text-align: left; font-size: 7.5pt; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); border-bottom: 1pt solid var(--ink); }
+  .ltp-table td { padding: 2.5pt 4pt; border-bottom: 0.5pt solid var(--line-2); }
+  .ltp-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .ltp-table .nowrap { white-space: nowrap; }
+  .ltp-tail { break-inside: avoid; }
+  .ltp-text { margin-bottom: 10pt; }
+  .ltp-pre { margin: 0; padding: 5pt 8pt; white-space: pre-wrap; font-family: var(--font-sans); font-size: 8.5pt; line-height: 1.35; border: 0.75pt solid var(--line-2); border-radius: 4pt; }
+  .ltp-assess { break-inside: avoid; }
+  .ltp-lines span { display: block; height: 18pt; border-bottom: 0.75pt solid var(--ink-3); }
+  .ltp-sign { display: grid; grid-template-columns: 1fr 1.4fr 1.4fr; gap: 14pt; margin-top: 20pt; }
+  .ltp-sign span { padding-top: 2pt; font-size: 8pt; color: var(--ink-3); border-top: 0.75pt solid var(--ink); }
+  .ltp-foot { margin-top: 12pt; padding-top: 4pt; font-size: 7.5pt; color: var(--ink-3); border-top: 0.5pt solid var(--line-2); }
 }

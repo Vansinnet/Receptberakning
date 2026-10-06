@@ -67,6 +67,18 @@ describe('Sjuksköterskans text', () => {
 });
 
 describe('Långtidsanalysens text', () => {
+  it('mg-läget: styrkorna räknas ihop och uttaget visas per styrka', () => {
+    const r = calcLongterm([
+      { startRaw: '2026-01-01', endRaw: '2026-03-31', totalRaw: '', countsRaw: ['30', '30'] },
+      { startRaw: '2026-04-01', endRaw: '2026-06-30', totalRaw: '', countsRaw: ['', '90'] },
+    ], '7,5', TODAY, ['5', '7,5']);
+    const t = buildLongtermText('Imovane', '7,5', r);
+    expect(t).toContain('Ordinerad dos: 7,5 mg/dag.');
+    expect(t).toContain('Uttag i styrkorna 5 mg och 7,5 mg, räknat i mg.');
+    expect(t).toContain('  2026-01-01 – 2026-03-31 (90 dagar, 30 × 5 mg + 30 × 7,5 mg = 375 mg, snitt 4,17 mg/dag, 55,6 %)');
+    expect(t).toContain('  2026-04-01 – 2026-06-30 (91 dagar, 90 × 7,5 mg = 675 mg, snitt 7,42 mg/dag, 98,9 %)');
+    expect(t).toContain('Sammanlagd snittförbrukning: 5,80 mg/dag (77,3 % av ordinerad dos).');
+  });
   it('sammanfattar perioderna', () => {
     const r = calcLongterm([{ startRaw: '2026-01-01', endRaw: '2026-03-31', totalRaw: '90' }], '1', TODAY);
     const t = buildLongtermText('Metylfenidat 36 mg', '1', r);
@@ -104,5 +116,13 @@ describe('Texter — fler kombinationer (porterat från 4.0)', () => {
   it('sjuksköterska: avvikande i båda', () => {
     const t = buildNurseText([item('A 1 mg', {}, null)], 'deviating', 'deviating');
     expect(t).toContain('Vitalparametrar bedöms avvikande. Medicinsk uppföljning bedöms avvikande.');
+  });
+});
+
+describe('Dosuttryck i texterna', () => {
+  it('journalen visar talet, inte uttrycket', () => {
+    const t = buildJournalText([item('Sertralin 50 mg', { doseRaw: '1x2', packageRaw: '100', refillsRaw: '3' }, null)]);
+    expect(t).toContain('ordination 2 st/dag');
+    expect(t).not.toContain('1x2');
   });
 });

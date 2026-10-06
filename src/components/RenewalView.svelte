@@ -4,7 +4,7 @@
   import StatusChip from './StatusChip.svelte';
   import { INTERVAL_LABEL, UNIT_DISPLAY } from '$lib/constants';
   import type { MedForm } from '$lib/types';
-  import { fmtDate, fmtFixed, fmtPct, fmtQty } from '$lib/utils';
+  import { fmtDate, fmtFixed, fmtPct, fmtQty, normalizeDoseInput } from '$lib/utils';
 
   let { form, renewal }: { form: MedForm; renewal: RenewalResult } = $props();
 
@@ -31,7 +31,7 @@
         <span class="tile__k">Förbrukning om patienten har slut nu</span>
         {#if renewal.consumption}
           <span class="tile__v fg-{renewal.consumption.tone}">{fmtPct(renewal.consumption.pct)}</span>
-          <span class="tile__s">{fmtFixed(renewal.consumption.perInterval, 2)} {u}/{per} mot ordinerat {form.doseRaw.trim().replace('.', ',')} {u}/{per}</span>
+          <span class="tile__s">{fmtFixed(renewal.consumption.perInterval, 2)} {u}/{per} mot ordinerat {normalizeDoseInput(form.doseRaw, form.unit).trim().replace('.', ',')} {u}/{per}</span>
         {:else}
           <span class="tile__v">–</span>
           <span class="tile__s">Receptet utfärdades idag</span>

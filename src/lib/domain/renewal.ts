@@ -16,7 +16,7 @@ import {
   MAX_DAILY_DOSE, MAX_PACKAGE_SIZE, MAX_REFILLS, MAX_TOTAL_DAYS, MIN_REFILLS, MAX_MED_NAME_LENGTH,
   UNIT_DISPLAY,
 } from '../constants';
-import { addDays, fmtQty, getDaysDiff, parseDateUTC, parseNum } from '../utils';
+import { addDays, fmtQty, getDaysDiff, parseDateUTC, parseDose, parseNum } from '../utils';
 
 export type FieldKey = 'name' | 'date' | 'dose' | 'package' | 'refills';
 export type FieldErrors = Partial<Record<FieldKey, string>>;
@@ -96,10 +96,11 @@ export function calcRenewal(f: MedForm, today: Date): RenewalResult {
   else if (!date) errors.date = 'Ange datum som ÅÅÅÅ-MM-DD.';
   else if (date > today) errors.date = 'Datumet är satt i framtiden.';
 
-  // Dos
-  const dose = parseNum(f.doseRaw);
+  // Dos — ett tal eller ett vanligt dosuttryck som 1x2 eller 1+0+1 (se parseDose).
+  const dose = parseDose(f.doseRaw, f.unit);
   const maxDose = MAX_DAILY_DOSE[f.unit] * f.interval;
   if (!f.doseRaw.trim()) missing.push('dos');
+  else if (Number.isNaN(dose)) errors.dose = 'Skriv dosen som ett tal, t.ex. 2, 1x2 eller 1+0+1.';
   else if (!(dose > 0)) errors.dose = 'Ange en dos större än 0.';
   else if (dose > maxDose) errors.dose = `Högst ${fmtQty(maxDose)} ${unitShort} per ${f.interval === 1 ? 'dag' : f.interval === 7 ? 'vecka' : 'månad'}.`;
 
