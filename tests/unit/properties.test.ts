@@ -81,18 +81,40 @@ describe('Egenskaper — nyförskrivning', () => {
 });
 
 describe('Egenskaper — långtidsanalys', () => {
-  it('ordningen på perioderna påverkar inte resultatet', () => {
-    const arbPeriod = fc.record({ start: fc.integer({ min: 30, max: 600 }), len: fc.integer({ min: 1, max: 120 }), total: fc.integer({ min: 1, max: 300 }) });
-    fc.assert(fc.property(fc.array(arbPeriod, { minLength: 1, maxLength: 6 }), (ps) => {
-      const rows = ps.map((p) => ({
-        startRaw: fmtDate(addDays(TODAY, -p.start)),
-        endRaw: fmtDate(addDays(TODAY, -p.start + p.len - 1)),
-        totalRaw: String(p.total),
-      }));
-      const a = calcLongterm(rows, '1', TODAY);
-      const b = calcLongterm([...rows].reverse(), '1', TODAY);
+  const arbFill = fc.record({ ago: fc.integer({ min: 0, max: 600 }), count: fc.integer({ min: 1, max: 300 }), s: fc.constantFrom('5', '7,5', '10') });
+  const rows = (fs: { ago: number; count: number; s: string }[], k = 1) =>
+    fs.map((f) => ({ dateRaw: fmtDate(addDays(TODAY, -f.ago)), countRaw: String(f.count * k), strengthRaw: f.s }));
+  const max = (mg: number) => [{ fromRaw: '', doseRaw: String(mg).replace('.', ',') }];
+
+  it('ordningen på uttagen påverkar inte resultatet', () => {
+    fc.assert(fc.property(fc.array(arbFill, { minLength: 1, maxLength: 8 }), (fs) => {
+      const a = calcLongterm(rows(fs), max(7.5), 'mg', 1, TODAY);
+      const b = calcLongterm(rows(fs).reverse(), max(7.5), 'mg', 1, TODAY);
       if (a.kind !== 'ok' || b.kind !== 'ok') return a.kind === b.kind;
-      return a.unionDays === b.unionDays && a.total === b.total && Math.abs(a.pct - b.pct) < 1e-9 && a.overlap === b.overlap;
+      return a.fills.length === b.fills.length && a.total === b.total
+        && a.fills.every((f, i) => f.amount === b.fills[i].amount && f.pct === b.fills[i].pct)
+        && a.average?.pct === b.average?.pct && a.shouldRemain === b.shouldRemain;
+    }), { numRuns: 1000 });
+  });
+
+  it('skalas alla uttag och maxdosen lika blir procenten densamma', () => {
+    fc.assert(fc.property(fc.array(arbFill, { minLength: 2, maxLength: 8 }), fc.integer({ min: 2, max: 5 }), (fs, k) => {
+      const a = calcLongterm(rows(fs), max(7.5), 'mg', 1, TODAY);
+      const b = calcLongterm(rows(fs, k), max(7.5 * k), 'mg', 1, TODAY);
+      if (a.kind !== 'ok' || b.kind !== 'ok') return false;
+      const close = (x: number | null | undefined, y: number | null | undefined) => (x == null ? y == null : Math.abs(x - y!) < 1e-9 * Math.max(1, x));
+      return a.fills.every((f, i) => close(f.pct, b.fills[i].pct)) && close(a.average?.pct, b.average?.pct)
+        && close(a.ifOutToday?.pct, b.ifOutToday?.pct) && close((a.shouldRemain ?? 0) * k, b.shouldRemain ?? 0);
+    }), { numRuns: 1000 });
+  });
+
+  it('ett uttag delat på två rader samma dag ger samma resultat', () => {
+    fc.assert(fc.property(fc.array(arbFill, { minLength: 1, maxLength: 6 }), (fs) => {
+      const split = fs.flatMap((f) => (f.count > 1 ? [{ ...f, count: Math.floor(f.count / 2) }, { ...f, count: f.count - Math.floor(f.count / 2) }] : [f]));
+      const a = calcLongterm(rows(fs), max(7.5), 'mg', 1, TODAY);
+      const b = calcLongterm(rows(split), max(7.5), 'mg', 1, TODAY);
+      if (a.kind !== 'ok' || b.kind !== 'ok') return false;
+      return a.fills.length === b.fills.length && a.fills.every((f, i) => Math.abs(f.amount - b.fills[i].amount) < 1e-9);
     }), { numRuns: 1000 });
   });
 });

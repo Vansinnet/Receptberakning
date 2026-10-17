@@ -18,7 +18,7 @@ export const DAYS_REMAINING_WARN = 14;
 export const LONG_OVERDUE_DAYS = 90;
 
 // AKTIVT VAL: 80–110 % — förbrukning "om patienten har slut nu" inom detta intervall
-// visas grön, annars gul. Samma gränser gäller i långtidsanalysen.
+// visas grön, annars gul. Gäller förnyelsen; långtidsanalysen klassar inte (2026-10-18).
 export const CONSUMPTION_NORMAL_LOW = 80;
 export const CONSUMPTION_NORMAL_HIGH = 110;
 
@@ -62,11 +62,11 @@ export const MAX_VALID_YEAR = 2100;
 // 3. LÅNGTIDSANALYS
 // ============================================================================
 
-export const MAX_LT_PERIODS = 10;
-// AKTIVT VAL: 50 år — längre perioder är med hög sannolikhet felinmatning.
-export const MAX_PERIOD_SPAN_DAYS = 365 * 50 + 13;
-// Diagrammets skala går till 160 % av ordinerad dos; högre värden klampas visuellt.
-export const LT_CHART_MAX_PCT = 160;
+// AKTIVT VAL: uttag i stället för perioder, mg per dag mellan uttagen och procent av receptets
+// maxdos utan tolkning (inga ord som Över/Under, inga färger). Godkänt 2026-10-18, T33–T41.
+// Högst 60 uttag (fem års månadsuttag) och 5 maxdoser (den första och fyra ändringar).
+export const MAX_LT_FILLS = 60;
+export const MAX_LT_MAX_DOSES = 5;
 
 // ============================================================================
 // 4. ÄRENDE OCH NYFÖRSKRIVNING
@@ -74,7 +74,8 @@ export const LT_CHART_MAX_PCT = 160;
 
 export const MAX_MED_CARDS = 8;
 export const MAX_PRESCRIBE_MONTHS = 12;
-export const DEFAULT_PRESCRIBE_MONTHS = 6;
+// AKTIVT VAL: 7 månader — förvald period vid nyförskrivning (ändrat från 6 den 2026-10-05).
+export const DEFAULT_PRESCRIBE_MONTHS = 7;
 
 // ============================================================================
 // 5. DATUM
@@ -113,6 +114,18 @@ export const UNIT_DISPLAY: Record<DoseUnit, { short: string; long: string; en: s
 };
 
 export const INTERVAL_LABEL: Record<DoseInterval, string> = { 1: 'dag', 7: 'vecka', 30: 'månad' };
+
+// Enhetsord som får stå efter dosen i dosfältet ("2 st", "1x2 tabl", "5 ml"). Ordet måste
+// höra till den valda enheten — "5 ml" när enheten är st avvisas i stället för att tolkas som 5 st.
+export const DOSE_UNIT_WORDS: Record<DoseUnit, readonly string[]> = {
+  st: ['st', 'styck', 'tabl', 'tablett', 'tabletter', 'kaps', 'kapsel', 'kapslar'],
+  ml: ['ml'],
+  dos: ['dos', 'doser'],
+};
+
+// Dosuttryck räknas om till ett tal med högst så här många decimaler, så att t.ex.
+// 0,1x3 blir 0,3 och inte 0,30000000000000004.
+export const DOSE_EXPR_DECIMALS = 6;
 
 // Dos-enhetsnormalisering: rå enhet → kanonisk enhet.
 export const DOSE_UNIT_NORMALIZE: Record<string, string> = {

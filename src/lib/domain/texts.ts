@@ -3,12 +3,12 @@
 // sjuksköterskans journaltext och långtidsanalysens journaltext.
 // Texterna är förslag: läkaren anpassar dem innan de kopieras.
 
-import type { Assessment, Decision, DoseInterval, DoseUnit } from '../types';
+import type { Assessment, Decision, DoseInterval, DoseUnit, LtDoseUnit, LtInterval } from '../types';
 import { CONTACT_BEFORE_END_DAYS, DAYS_REMAINING_WARN, INTERVAL_LABEL, UNIT_DISPLAY } from '../constants';
-import { addDays, fmtDate, fmtFixed, fmtPct, fmtQty } from '../utils';
+import { addDays, fmtDate, fmtFixed, fmtMg, fmtPct, fmtQty, normalizeDoseInput } from '../utils';
 import { daysLeftText, type RenewalOk } from './renewal';
 import type { PrescriptionResult } from './prescribe';
-import type { LongtermResult } from './longterm';
+import type { LongtermResult, LtFillResult, LtUnit } from './longterm';
 
 export type Lang = 'sv' | 'en';
 
@@ -94,7 +94,7 @@ export function buildPatientText(lang: Lang, items: TextItem[]): string {
 }
 
 function doseText(it: TextItem): string {
-  return `${it.doseRaw.trim().replace('.', ',')} ${UNIT_DISPLAY[it.unit].short}/${INTERVAL_LABEL[it.interval]}`;
+  return `${normalizeDoseInput(it.doseRaw, it.unit).trim().replace('.', ',')} ${UNIT_DISPLAY[it.unit].short}/${INTERVAL_LABEL[it.interval]}`;
 }
 
 /** Läkarens journalanteckning för hela ärendet. */
@@ -141,21 +141,93 @@ export function buildNurseText(items: TextItem[], vital: Assessment, followUp: A
   return lines.join('\n');
 }
 
-/** Journaltext för långtidsanalysen. */
-export function buildLongtermText(medName: string, doseRaw: string, r: LongtermResult): string {
-  if (r.kind !== 'ok') return '';
-  const dose = doseRaw.trim().replace('.', ',');
-  const lines = [
-    `Aktuellt: Förbrukningsanalys av ${medName.trim() || 'läkemedel'}.`,
-    '',
-    `Ordinerad dos: ${dose} enheter/dag.`,
-    `Analysperiod: ${r.periods.length} ${r.periods.length === 1 ? 'period' : 'perioder'}, totalt ${r.unionDays} dagar (${fmtDate(r.first)} – ${fmtDate(r.last)}).`,
-  ];
-  if (r.overlap) lines.push('Perioderna överlappar. Överlappande dagar räknas en gång.');
-  lines.push('', 'Perioder:');
-  for (const p of r.periods) {
-    lines.push(`  ${fmtDate(p.start)} – ${fmtDate(p.end)} (${p.days} dagar, ${p.total} enheter, snitt ${fmtFixed(p.avgPerDay, 2)} enheter/dag, ${fmtPct(p.pct)})`);
+/** "5 mg", "5 mg och 7,5 mg", "5 mg, 7,5 mg och 10 mg". */
+export function strengthList(strengths: number[]): string {
+  const s = strengths.map((x) => `${fmtMg(x)} mg`);
+  return s.length <= 1 ? (s[0] ?? '') : `${s.slice(0, -1).join(', ')} och ${s[s.length - 1]}`;
+}
+
+/** Takten anges per dag eller vecka, som maxdosen. */
+const LT_PER: Record<LtInterval, string> = { 1: 'dag', 7: 'vecka' };
+
+/** Långtidsanalysen som sammanhang för texterna: läkemedlet och hur maxdosen angavs. */
+export interface LtTextContext {
+  medName: string;
+  /** Narkotikaklass (II–V) om preparatet är narkotikaklassat. */
+  regulation: string | null;
+  /** Enhetsordet för antal: st, ml, plåster eller doser. */
+  noun: string;
+  doseUnit: LtDoseUnit;
+  interval: LtInterval;
+}
+
+type LongtermOk = Extract<LongtermResult, { kind: 'ok' }>;
+
+/** Takten som enhet: "mg/dag", "plåster/vecka". */
+export function ltRateUnit(unit: LtUnit, noun: string, interval: LtInterval): string {
+  return `${unit === 'mg' ? 'mg' : noun}/${LT_PER[interval]}`;
+}
+
+/** Takt per dag visad per intervall med två decimaler: 1/7 per dag → "1,00" per vecka. */
+export function ltRate(ratePerDay: number, interval: LtInterval): string {
+  return fmtFixed(ratePerDay * interval, 2);
+}
+
+/** Ett uttag: "30 × 7,5 mg", "30 × 5 mg + 30 × 7,5 mg" (samma dag) eller "4 plåster". */
+export function ltFillText(f: LtFillResult, noun: string): string {
+  return f.parts.map((p) => (p.strength === null ? `${p.count} ${noun}` : `${p.count} × ${fmtMg(p.strength)} mg`)).join(' + ');
+}
+
+/** En mängd i uttagens enhet: "225 mg", "4 plåster". */
+export function ltAmountText(unit: LtUnit, amount: number, noun: string): string {
+  return unit === 'mg' ? `${fmtMg(amount)} mg` : `${fmtQty(amount)} ${noun}`;
+}
+
+/** Borde finnas kvar: i st när alla uttag har samma styrka, annars i mg; i antal utan styrka. */
+export function ltRemainText(r: LongtermOk, noun: string): string {
+  const rem = r.shouldRemain ?? 0;
+  if (r.unit === 'mg' && r.strengths.length === 1) return `${fmtQty(rem / r.strengths[0])} ${noun}`;
+  return ltAmountText(r.unit, rem, noun);
+}
+
+/** Maxdosen enligt receptet: "1 st/dag (7,5 mg/dag), från 2026-07-01 2 st/dag (15 mg/dag)". */
+export function ltMaxDoseText(r: LongtermOk, c: LtTextContext): string {
+  const per = LT_PER[c.interval];
+  const one = r.strengths.length === 1 ? r.strengths[0] : null;
+  return (r.maxDose ?? []).map((seg) => {
+    let s: string;
+    if (r.unit === 'antal') s = `${fmtMg(seg.dose)} ${c.noun}/${per}`;
+    else if (c.doseUnit === 'st' && one) s = `${fmtMg(seg.dose / one)} ${c.noun}/${per} (${fmtMg(seg.dose)} mg/${per})`;
+    else s = `${fmtMg(seg.dose)} mg/${per}`;
+    return seg.from ? `från ${fmtDate(seg.from)} ${s}` : s;
+  }).join(', ');
+}
+
+/**
+ * Journaltext för långtidsanalysen. Tom så länge någon rad inte räknas (ofullständig eller fel)
+ * eller maxdosen är fel, så att en ofullständig analys inte kopieras in i journalen.
+ */
+export function buildLongtermText(c: LtTextContext, r: LongtermResult): string {
+  if (r.kind !== 'ok' || r.skipped.length || r.doseErrors.some((e) => e.from || e.dose)) return '';
+  const ru = ltRateUnit(r.unit, c.noun, c.interval);
+  const pct = (p: number | null) => (p === null ? '' : ` (${fmtPct(p)} av maxdos)`);
+  const n = r.fills.length;
+  const lines = [`Aktuellt: Förbrukningsanalys av ${c.medName.trim() || 'läkemedel'}${c.regulation ? ` (narkotika klass ${c.regulation})` : ''}.`];
+  if (r.maxDose) lines.push(`Maxdos enligt receptet: ${ltMaxDoseText(r, c)}.`);
+  if (r.strengths.length > 1) lines.push(`Uttag i styrkorna ${strengthList(r.strengths)}, räknat i mg.`);
+  lines.push(`Underlag: ${n} uttag ${n === 1 ? fmtDate(r.first) : `${fmtDate(r.first)} – ${fmtDate(r.last)}`} enligt uttagshistoriken, inmatade för hand.`);
+  if (r.average) lines.push(`Mellan första och sista uttaget hämtades i snitt ${ltRate(r.average.rate, c.interval)} ${ru} ut${pct(r.average.pct)}.`);
+  if (n >= 2) {
+    const head = ru.split('/')[0];
+    const rates = r.fills.filter((f) => !f.last).map((f) => ltRate(f.rate!, c.interval));
+    lines.push(`${head[0].toUpperCase()}${head.slice(1)} per ${LT_PER[c.interval]} mellan uttagen: ${rates.join(' – ')}.`);
   }
-  lines.push('', `Sammanlagd snittförbrukning: ${fmtFixed(r.avgPerDay, 2)} enheter/dag (${fmtPct(r.pct)} av ordinerad dos).`, '', 'Bedömning: ');
+  if (r.ifOutToday) lines.push(`Om patienten har slut idag: ${ltRate(r.ifOutToday.rate, c.interval)} ${ru}${pct(r.ifOutToday.pct)}.`);
+  if (r.shouldRemain !== null) {
+    lines.push(r.shouldRemain > 0
+      ? `Vid senaste uttaget borde minst ${ltRemainText(r, c.noun)} ha funnits kvar, räknat med maxdos.`
+      : 'Vid senaste uttaget borde inget ha funnits kvar, räknat med maxdos.');
+  }
+  lines.push('Bedömning: ');
   return lines.join('\n');
 }

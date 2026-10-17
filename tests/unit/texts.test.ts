@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { calcRenewal, isRenewalOk } from '../../src/lib/domain/renewal';
 import { calcPrescription } from '../../src/lib/domain/prescribe';
 import { calcLongterm } from '../../src/lib/domain/longterm';
-import { buildJournalText, buildLongtermText, buildNurseText, buildPatientText, type TextItem } from '../../src/lib/domain/texts';
+import { buildJournalText, buildLongtermText, buildNurseText, buildPatientText, type LtTextContext, type TextItem } from '../../src/lib/domain/texts';
 import type { Decision, MedForm } from '../../src/lib/types';
 
 const TODAY = new Date(Date.UTC(2026, 9, 1));
@@ -67,11 +67,61 @@ describe('Sjuksköterskans text', () => {
 });
 
 describe('Långtidsanalysens text', () => {
-  it('sammanfattar perioderna', () => {
-    const r = calcLongterm([{ startRaw: '2026-01-01', endRaw: '2026-03-31', totalRaw: '90' }], '1', TODAY);
-    const t = buildLongtermText('Metylfenidat 36 mg', '1', r);
-    expect(t).toContain('Analysperiod: 1 period, totalt 90 dagar (2026-01-01 – 2026-03-31).');
-    expect(t).toContain('Sammanlagd snittförbrukning: 1,00 enheter/dag (100 % av ordinerad dos).');
+  const ctx = (o: Partial<LtTextContext> = {}): LtTextContext => ({
+    medName: 'Imovane 7,5 mg', regulation: 'V', noun: 'st', doseUnit: 'st', interval: 1, ...o,
+  });
+  const fills = (rows: [string, string, string?][]) => rows.map(([dateRaw, countRaw, strengthRaw = '7,5']) => ({ dateRaw, countRaw, strengthRaw }));
+  const max = (...m: [string, string][]) => m.map(([fromRaw, doseRaw]) => ({ fromRaw, doseRaw }));
+  const T34 = fills([['2026-06-01', '30'], ['2026-07-01', '30'], ['2026-07-26', '30'], ['2026-08-15', '30'], ['2026-08-30', '30']]);
+
+  it('T34: maxdos, snitt, takten mellan uttagen, om slut idag och borde finnas kvar', () => {
+    const t = buildLongtermText(ctx(), calcLongterm(T34, max(['', '1']), 'st', 1, TODAY));
+    expect(t).toBe([
+      'Aktuellt: Förbrukningsanalys av Imovane 7,5 mg (narkotika klass V).',
+      'Maxdos enligt receptet: 1 st/dag (7,5 mg/dag).',
+      'Underlag: 5 uttag 2026-06-01 – 2026-08-30 enligt uttagshistoriken, inmatade för hand.',
+      'Mellan första och sista uttaget hämtades i snitt 10,00 mg/dag ut (133,3 % av maxdos).',
+      'Mg per dag mellan uttagen: 7,50 – 9,00 – 11,25 – 15,00.',
+      'Om patienten har slut idag: 9,22 mg/dag (123 % av maxdos).',
+      'Vid senaste uttaget borde minst 30 st ha funnits kvar, räknat med maxdos.',
+      'Bedömning: ',
+    ].join('\n'));
+  });
+  it('utan maxdos: bara mg per dag, ingen procent och inget "borde finnas kvar"', () => {
+    const t = buildLongtermText(ctx({ regulation: null }), calcLongterm(T34, max(['', '']), 'st', 1, TODAY));
+    expect(t).toContain('Aktuellt: Förbrukningsanalys av Imovane 7,5 mg.');
+    expect(t).toContain('Mellan första och sista uttaget hämtades i snitt 10,00 mg/dag ut.');
+    expect(t).not.toContain('maxdos');
+  });
+  it('två styrkor och maxdos i mg', () => {
+    const r = calcLongterm(fills([['2026-08-01', '30', '7,5'], ['2026-08-31', '30', '5'], ['2026-09-20', '30', '7,5']]), max(['', '7,5']), 'mg', 1, TODAY);
+    const t = buildLongtermText(ctx({ medName: 'Imovane', doseUnit: 'mg' }), r);
+    expect(t).toContain('Maxdos enligt receptet: 7,5 mg/dag.');
+    expect(t).toContain('Uttag i styrkorna 5 mg och 7,5 mg, räknat i mg.');
+    expect(t).toContain('Vid senaste uttaget borde inget ha funnits kvar, räknat med maxdos.');
+  });
+  it('ändrad maxdos (T39)', () => {
+    const r = calcLongterm(fills([['2026-06-01', '30'], ['2026-07-01', '60'], ['2026-07-31', '60']]), max(['', '1'], ['2026-07-01', '2']), 'st', 1, TODAY);
+    expect(buildLongtermText(ctx(), r)).toContain('Maxdos enligt receptet: 1 st/dag (7,5 mg/dag), från 2026-07-01 2 st/dag (15 mg/dag).');
+  });
+  it('plåster per vecka (T41)', () => {
+    const r = calcLongterm(fills([['2026-08-01', '4', ''], ['2026-08-29', '4', '']]), max(['', '1']), 'st', 7, TODAY);
+    const t = buildLongtermText(ctx({ medName: 'Norspan 10 mikrog/timme', regulation: 'IV', noun: 'plåster', interval: 7 }), r);
+    expect(t).toContain('Maxdos enligt receptet: 1 plåster/vecka.');
+    expect(t).toContain('Mellan första och sista uttaget hämtades i snitt 1,00 plåster/vecka ut (100 % av maxdos).');
+    expect(t).toContain('Plåster per vecka mellan uttagen: 1,00.');
+    expect(t).toContain('Om patienten har slut idag: 0,92 plåster/vecka (91,8 % av maxdos).');
+  });
+  it('ett uttag: inget snitt och ingen takt mellan uttagen', () => {
+    const t = buildLongtermText(ctx(), calcLongterm(fills([['2026-09-01', '30']]), max(['', '1']), 'st', 1, TODAY));
+    expect(t).toContain('Underlag: 1 uttag 2026-09-01 enligt uttagshistoriken, inmatade för hand.');
+    expect(t).not.toContain('Mellan första');
+    expect(t).not.toContain('mellan uttagen');
+    expect(t).toContain('Om patienten har slut idag: 7,50 mg/dag (100 % av maxdos).');
+  });
+  it('ingen text så länge en rad inte räknas eller maxdosen är fel', () => {
+    expect(buildLongtermText(ctx(), calcLongterm(fills([['2026-09-01', '30'], ['2026-09-20', '']]), max(['', '1']), 'st', 1, TODAY))).toBe('');
+    expect(buildLongtermText(ctx(), calcLongterm(fills([['2026-09-01', '30']]), max(['', '0']), 'st', 1, TODAY))).toBe('');
   });
 });
 
@@ -104,5 +154,13 @@ describe('Texter — fler kombinationer (porterat från 4.0)', () => {
   it('sjuksköterska: avvikande i båda', () => {
     const t = buildNurseText([item('A 1 mg', {}, null)], 'deviating', 'deviating');
     expect(t).toContain('Vitalparametrar bedöms avvikande. Medicinsk uppföljning bedöms avvikande.');
+  });
+});
+
+describe('Dosuttryck i texterna', () => {
+  it('journalen visar talet, inte uttrycket', () => {
+    const t = buildJournalText([item('Sertralin 50 mg', { doseRaw: '1x2', packageRaw: '100', refillsRaw: '3' }, null)]);
+    expect(t).toContain('ordination 2 st/dag');
+    expect(t).not.toContain('1x2');
   });
 });

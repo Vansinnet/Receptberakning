@@ -1,10 +1,14 @@
 // Skärmen visar exakt det som beräkningsfunktionen räknar ut.
-// Slumpade fall matas in i gränssnittet; varje siffra på skärmen jämförs med calcRenewal.
+// Slumpade fall matas in i gränssnittet; varje siffra på skärmen jämförs med calcRenewal
+// och calcLongterm.
 // Fångar fel i visningen (avrundning, fel fält, fel enhet) som enhetstesterna inte ser.
 import { test, expect } from '@playwright/test';
 import { calcRenewal, daysLeftText, isRenewalOk, STATUS_LABEL } from '../../src/lib/domain/renewal';
 import { calcPrescription } from '../../src/lib/domain/prescribe';
-import { addDays, fmtDate, fmtPct, fmtQty } from '../../src/lib/utils';
+import { calcLongterm } from '../../src/lib/domain/longterm';
+import { ltRate } from '../../src/lib/domain/texts';
+import { addDays, fmtDate, fmtMg, fmtPct, fmtQty } from '../../src/lib/utils';
+import { DEFAULT_PRESCRIBE_MONTHS } from '../../src/lib/constants';
 import type { DoseInterval, DoseUnit, MedForm } from '../../src/lib/types';
 
 const TODAY = new Date(Date.UTC(2026, 9, 1));
@@ -71,7 +75,7 @@ test('skärmen visar samma siffror som beräkningen, 25 slumpade fall', async ({
     if (r.consumption) await expect(tiles.nth(2).locator('.tile__v'), label).toHaveClass(new RegExp(`fg-${r.consumption.tone}`));
 
     await page.getByRole('button', { name: 'Förnya', exact: true }).click();
-    const p = calcPrescription(r, { period: 6, endDateRaw: '', packageRaw: null, fromToday: false }, TODAY);
+    const p = calcPrescription(r, { period: DEFAULT_PRESCRIBE_MONTHS, endDateRaw: '', packageRaw: null, fromToday: false }, TODAY);
     const panel = page.getByLabel('Nyförskrivning');
     if (p.kind === 'ok') await expect(panel.locator('.presc-result__big'), label).toHaveText(`${p.packages} förp. à ${fmtQty(p.packageSize)} ${u}`);
     else if (p.kind === 'covered') await expect(panel, label).toContainText('täcker redan hela perioden');
@@ -93,4 +97,50 @@ test('siffrorna räknas om när fliken står öppen över midnatt', async ({ pag
   await page.clock.runFor('03:00');
   await expect(page.locator('.topbar__date')).toContainText('2026-10-02');
   await expect(results).toContainText('248 dagar kvar');
+});
+
+test('långtidsanalys: skärmen visar samma siffror som beräkningen, 12 slumpade fall', async ({ page }) => {
+  test.setTimeout(120_000);
+  const r = rng(20261018);
+  const int = (lo: number, hi: number) => lo + Math.floor(r() * (hi - lo + 1));
+  const pick = <T,>(xs: readonly T[]) => xs[Math.floor(r() * xs.length)];
+  await page.getByRole('tab', { name: 'Långtidsanalys' }).click();
+  const res = page.getByRole('region', { name: 'Resultat' });
+  for (let k = 0; k < 12; k++) {
+    await page.getByRole('button', { name: 'Rensa' }).click();
+    const fills = Array.from({ length: int(1, 5) }, () => ({
+      dateRaw: fmtDate(addDays(TODAY, -int(0, 400))), countRaw: String(pick([10, 28, 30, 50, 100])), strengthRaw: pick(['5', '7,5', '10']),
+    }));
+    const dose = pick(['', '5', '7,5', '15']);
+    for (const [i, f] of fills.entries()) {
+      if (i > 0) await page.getByRole('button', { name: 'Lägg till uttag' }).click();
+      await page.getByLabel(`Datum, uttag ${i + 1}`, { exact: true }).fill(f.dateRaw);
+      await page.getByLabel(`Antal, uttag ${i + 1}`, { exact: true }).fill(f.countRaw);
+      await page.getByLabel(`Styrka i mg, uttag ${i + 1}`, { exact: true }).fill(f.strengthRaw);
+    }
+    await page.getByLabel('Enhet för maxdos').selectOption('mg');
+    await page.getByLabel('Maxdos', { exact: true }).fill(dose);
+
+    const exp = calcLongterm(fills, [{ fromRaw: '', doseRaw: dose }], 'mg', 1, TODAY);
+    if (exp.kind !== 'ok') throw new Error('förväntade ok');
+    const label = fills.map((f) => `${f.dateRaw}:${f.countRaw}×${f.strengthRaw}`).join(' ') + ` max ${dose || '–'}`;
+    const main = res.locator('.tile').first();
+    if (exp.average) {
+      await expect(main.locator('.tile__v'), label).toHaveText(`${ltRate(exp.average.rate, 1)} mg/dag`);
+      if (exp.average.pct !== null) await expect(main, label).toContainText(`${fmtPct(exp.average.pct)} av maxdos`);
+    } else {
+      await expect(main.locator('.tile__v'), label).toHaveText('–');
+    }
+    const rows = res.locator('tbody tr');
+    await expect(rows, label).toHaveCount(exp.fills.length);
+    for (const [i, f] of exp.fills.entries()) {
+      const cells = [
+        fmtDate(f.date), null, fmtMg(f.amount), f.last ? `${f.days} till idag` : String(f.days),
+        f.rate === null ? '–' : ltRate(f.rate, 1), ...(exp.maxDose ? [f.pct === null ? '–' : fmtPct(f.pct)] : []),
+      ];
+      for (const [j, c] of cells.entries()) {
+        if (c !== null) await expect(rows.nth(i).locator('td').nth(j), `${label} rad ${i + 1}`).toHaveText(c);
+      }
+    }
+  }
 });

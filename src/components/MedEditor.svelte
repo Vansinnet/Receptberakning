@@ -1,9 +1,10 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import { applyDrug, caseState, getActiveMed, getResult, removeMed, setNameManually } from '$lib/state/case.svelte';
   import { loadDrugs, searchDrugs, type DrugEntry } from '$lib/drug-search';
   import { createAutocomplete } from '$lib/autocomplete.svelte';
-  import { MAX_MED_NAME_LENGTH, UNIT_DISPLAY } from '$lib/constants';
-  import { getFassUrl, stripManufacturer } from '$lib/utils';
+  import { INTERVAL_LABEL, MAX_MED_NAME_LENGTH, UNIT_DISPLAY } from '$lib/constants';
+  import { getFassUrl, isDoseExpression, normalizeDoseInput, parseDose, stripManufacturer } from '$lib/utils';
   import DateField from './DateField.svelte';
   import Icon from './Icon.svelte';
 
@@ -11,9 +12,27 @@
   let result = $derived(med ? getResult(med.id) : undefined);
   let errors = $derived(result?.renewal.errors ?? {});
 
+  // Dosuttryck (1x2, 1+0+1) visas omräknat under fältet och ersätts med talet när fältet lämnas.
+  let doseHint = $derived.by(() => {
+    if (!med || !isDoseExpression(med.form.doseRaw)) return '';
+    const v = parseDose(med.form.doseRaw, med.form.unit);
+    if (!(v > 0)) return '';
+    return `= ${normalizeDoseInput(med.form.doseRaw, med.form.unit)} ${UNIT_DISPLAY[med.form.unit].short} per ${INTERVAL_LABEL[med.form.interval]}`;
+  });
+
+  function completeDose() {
+    if (med) med.form.doseRaw = normalizeDoseInput(med.form.doseRaw, med.form.unit);
+  }
+
   const ac = createAutocomplete<DrugEntry>({
     searchFn: async (q) => { await loadDrugs(); return searchDrugs(q); },
-    onSelect: (d) => { if (med) applyDrug(med.id, d); },
+    onSelect: async (d) => {
+      if (!med) return;
+      applyDrug(med.id, d);
+      // Nästa sak att fylla i är receptdatum. Saknas fältet (ej beräkningsbar beredning) står fokus kvar.
+      await tick();
+      document.getElementById('f-date')?.focus();
+    },
   });
 
   function onNameInput(e: Event) {
@@ -81,7 +100,8 @@
           <label class="lbl" for="f-dose">Ordinerad dos ({UNIT_DISPLAY[med.form.unit].short})</label>
           <div class="dose-row">
             <input id="f-dose" class="input input--dose" type="text" inputmode="decimal" autocomplete="off"
-              bind:value={med.form.doseRaw} aria-invalid={!!errors.dose} aria-describedby="err-dose" />
+              bind:value={med.form.doseRaw} onblur={completeDose} onkeydown={(e) => { if (e.key === 'Enter') completeDose(); }}
+              aria-invalid={!!errors.dose} aria-describedby="err-dose hint-dose" />
             <select class="input" aria-label="Doseringsintervall" bind:value={med.form.interval}>
               <option value={1}>per dag</option>
               <option value={7}>per vecka</option>
@@ -89,6 +109,7 @@
             </select>
           </div>
           {#if errors.dose}<div class="field-error" id="err-dose">{errors.dose}</div>{/if}
+          {#if doseHint}<div class="hint" id="hint-dose">{doseHint}</div>{/if}
         </div>
         <div>
           <label class="lbl" for="f-pkg">Förpackningsstorlek</label>

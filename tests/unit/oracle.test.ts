@@ -7,6 +7,7 @@ import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
 import { calcRenewal, isRenewalOk } from '../../src/lib/domain/renewal';
 import { calcPrescription } from '../../src/lib/domain/prescribe';
+import { calcLongterm } from '../../src/lib/domain/longterm';
 import type { MedForm } from '../../src/lib/types';
 
 // ── Referensimplementation ──────────────────────────────────────────────────
@@ -127,5 +128,101 @@ describe('Appen räknar som referensen', () => {
       expect(p).toMatchObject({ kind: 'ok', days: ref.days, units: ref.units, packages: ref.packages });
       return true;
     }), { numRuns: 5000 });
+  });
+});
+
+// ── Långtidsanalys (T33–T41) ────────────────────────────────────────────────
+// Referensen simulerar lagret dag för dag med heltal: mängder i tiondelar (mg eller antal) och
+// maxdosen som täljare över nämnaren 10 × intervall, så att 0,5 st × 7,5 mg per vecka blir exakt.
+interface LtRefCase {
+  fills: { ago: number; count: number; s10: number | null }[];
+  doses: { fromAgo: number | null; tenths: number }[] | null;
+  unit: 'st' | 'mg';
+  interval: 1 | 7;
+}
+
+function refLongterm(c: LtRefCase) {
+  const byDay = new Map<number, number>();
+  for (const f of c.fills) {
+    const day = TODAY_DAY - f.ago;
+    byDay.set(day, (byDay.get(day) ?? 0) + f.count * (f.s10 ?? 10));
+  }
+  const days = [...byDay.keys()].sort((a, b) => a - b);
+  const s10 = c.fills[0].s10;
+  const den = 10 * c.interval;
+  const doses = c.doses && [...c.doses].sort((a, b) => (a.fromAgo === null ? -Infinity : -a.fromAgo) - (b.fromAgo === null ? -Infinity : -b.fromAgo));
+  const doseNumAt = (day: number) => {
+    let t = 0;
+    for (const d of doses!) if (d.fromAgo === null || TODAY_DAY - d.fromAgo <= day) t = d.tenths;
+    return t * (c.unit === 'st' && s10 !== null ? s10 : 10);
+  };
+  const sumNum = (a: number, b: number) => { let s = 0; for (let d = a; d < b; d++) s += doseNumAt(d); return s; };
+  const pctOf = (a10: number, a: number, b: number) => (doses ? (a10 * den * 100) / sumNum(a, b) : null);
+  const fills = days.map((day, i) => {
+    const end = i + 1 < days.length ? days[i + 1] : TODAY_DAY;
+    const n = end - day, a10 = byDay.get(day)!;
+    return { days: n, amount: a10 / 10, rate: n > 0 ? a10 / 10 / n : null, pct: n > 0 ? pctOf(a10, day, end) : null };
+  });
+  const first = days[0], last = days[days.length - 1];
+  const total10 = [...byDay.values()].reduce((s, x) => s + x, 0);
+  const average = days.length >= 2
+    ? { rate: (total10 - byDay.get(last)!) / 10 / (last - first), pct: pctOf(total10 - byDay.get(last)!, first, last) }
+    : null;
+  const ifOutToday = TODAY_DAY > first ? { rate: total10 / 10 / (TODAY_DAY - first), pct: pctOf(total10, first, TODAY_DAY) } : null;
+  let shouldRemain: number | null = null;
+  if (doses && days.length >= 2) {
+    let stock = 0, before = 0;
+    for (let d = first; d <= last; d++) {
+      if (d === last) before = stock;
+      stock += (byDay.get(d) ?? 0) * den;
+      stock = Math.max(0, stock - doseNumAt(d));
+    }
+    shouldRemain = before / den / 10;
+  }
+  return { unit: s10 === null ? 'antal' : 'mg', fills, average, ifOutToday, shouldRemain };
+}
+
+const arbLt = fc.record({
+  mode: fc.constantFrom('single' as const, 'multi' as const, 'antal' as const),
+  fills: fc.array(fc.record({ ago: fc.integer({ min: 0, max: 700 }), count: fc.integer({ min: 1, max: 300 }), sIdx: fc.integer({ min: 0, max: 2 }) }), { minLength: 1, maxLength: 10 }),
+  withMax: fc.boolean(),
+  tenths: fc.integer({ min: 1, max: 200 }),
+  changes: fc.uniqueArray(fc.record({ fromAgo: fc.integer({ min: 0, max: 800 }), tenths: fc.integer({ min: 1, max: 200 }) }), { maxLength: 3, selector: (x) => x.fromAgo }),
+  interval: fc.constantFrom(1 as const, 7 as const),
+}).map((g): LtRefCase => ({
+  fills: g.fills.map((f) => ({ ago: f.ago, count: f.count, s10: g.mode === 'antal' ? null : g.mode === 'single' ? 75 : [50, 75, 100][f.sIdx] })),
+  doses: g.withMax ? [{ fromAgo: null, tenths: g.tenths }, ...g.changes] : null,
+  unit: g.mode === 'multi' ? 'mg' : 'st',
+  interval: g.interval,
+}));
+
+const tenthsRaw = (t: number) => (t / 10).toString().replace('.', ',');
+const near = (a: number | null | undefined, b: number | null) =>
+  (a == null || b === null ? a == null && b === null : Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(b)));
+
+describe('Långtidsanalysen räknar som referensen', () => {
+  it('takt, procent av maxdos, snitt, om slut idag och borde finnas kvar', () => {
+    fc.assert(fc.property(arbLt, (c) => {
+      const ref = refLongterm(c);
+      const app = calcLongterm(
+        c.fills.map((f) => ({ dateRaw: isoFromDay(TODAY_DAY - f.ago), countRaw: String(f.count), strengthRaw: f.s10 === null ? '' : tenthsRaw(f.s10) })),
+        c.doses ? c.doses.map((d) => ({ fromRaw: d.fromAgo === null ? '' : isoFromDay(TODAY_DAY - d.fromAgo), doseRaw: tenthsRaw(d.tenths) })) : [{ fromRaw: '', doseRaw: '' }],
+        c.unit, c.interval, TODAY,
+      );
+      if (app.kind !== 'ok') return false;
+      expect(app.unit).toBe(ref.unit);
+      expect(app.fills.map((f) => f.days)).toEqual(ref.fills.map((f) => f.days));
+      app.fills.forEach((f, i) => {
+        expect(near(f.amount, ref.fills[i].amount), `uttag ${i}`).toBe(true);
+        expect(near(f.rate, ref.fills[i].rate), `takt ${i}`).toBe(true);
+        expect(near(f.pct, ref.fills[i].pct), `procent ${i}`).toBe(true);
+      });
+      expect(near(app.average?.rate, ref.average?.rate ?? null), 'snitt').toBe(true);
+      expect(near(app.average?.pct, ref.average?.pct ?? null), 'snitt %').toBe(true);
+      expect(near(app.ifOutToday?.rate, ref.ifOutToday?.rate ?? null), 'om slut idag').toBe(true);
+      expect(near(app.ifOutToday?.pct, ref.ifOutToday?.pct ?? null), 'om slut idag %').toBe(true);
+      expect(near(app.shouldRemain, ref.shouldRemain), 'borde finnas kvar').toBe(true);
+      return true;
+    }), { numRuns: 3000 });
   });
 });

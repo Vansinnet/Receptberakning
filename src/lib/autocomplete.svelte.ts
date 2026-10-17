@@ -36,6 +36,8 @@ export function createAutocomplete<T>(config: AutocompleteConfig<T>) {
     config.onSelect(item);
     visible = false;
     results = [];
+    // Annars pekar aria-activedescendant kvar på ett förslag som inte längre finns.
+    highlight = -1;
   }
 
   function handleKeydown(e: KeyboardEvent) {

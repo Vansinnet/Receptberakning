@@ -35,6 +35,13 @@
   --r-md: 8px;
   --r-lg: 12px;
 
+  /* Långtidsanalysens diagram: staplar, sista uttaget (ljus), maxdoslinje och rutnät.
+     En neutral färg; diagrammet tolkar inte. Utskriften har egna värden i print.css. */
+  --chart-bar: #0f766e;
+  --chart-bar-soft: #c9ece6;
+  --chart-max: #1f2937;
+  --chart-grid: #d5efe9;
+
   --topbar-h: 52px;
   --aside-w: 236px;
   --texts-w: 420px;
@@ -64,5 +71,9 @@ html[data-theme='dark'] {
   --muted-bg: #21262d;
   --on-strong: #0d1117;
   --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --chart-bar: #58a6ff;
+  --chart-bar-soft: #1c2d3f;
+  --chart-max: #e6edf3;
+  --chart-grid: #30363d;
   color-scheme: dark;
 }

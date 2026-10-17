@@ -321,37 +321,90 @@ textarea.input { height: auto; padding: 12px; line-height: 1.5; resize: none; fo
 
 /* ── Långtidsanalys ───────────────────────────────────────────────────── */
 
-.lt-form {
-  width: 440px; flex-shrink: 0; padding: 16px 20px; border-right: 1px solid var(--line);
-  display: flex; flex-direction: column; gap: 12px; overflow-y: auto;
+/* Underlag, resultat och journaltext i tre kolumner. Under 1280 px hamnar journaltexten under
+   resultatet och ytan rullar som en sida; under 980 px blir allt en kolumn. */
+.workspace--lt {
+  display: grid; grid-template-columns: 400px minmax(0, 1fr) 320px;
+  grid-template-areas: 'form result text';
 }
-.lt-top { display: flex; gap: 10px; }
-.lt-top__name { flex-grow: 1; }
-.lt-top__dose { width: 120px; }
-.lt-grid { display: grid; grid-template-columns: 20px minmax(0, 1fr) minmax(0, 1fr) 64px 30px; gap: 6px; align-items: start; }
-.lt-grid__head { font-size: 12px; font-weight: 500; color: var(--ink-2); align-self: end; }
-.lt-grid__no { font-size: 12px; color: var(--ink-3); padding-top: 9px; }
-.lt-grid .input { height: 32px; padding: 0 8px; font-size: 13px; }
+.workspace--lt .lt-form { grid-area: form; }
+.workspace--lt .lt-result { grid-area: result; }
+.workspace--lt .texts-aside { grid-area: text; width: auto; }
+@media (max-width: 1280px) {
+  .workspace--lt {
+    grid-template-columns: 400px minmax(0, 1fr); grid-template-rows: auto 1fr;
+    grid-template-areas: 'form result' 'form text'; overflow-y: auto;
+  }
+  .workspace--lt .lt-form, .workspace--lt .lt-result { overflow: visible; }
+  .workspace--lt .texts-aside { border-left: 0; border-top: 1px solid var(--line); min-height: 380px; }
+}
+@media (max-width: 980px) {
+  .workspace--lt {
+    grid-template-columns: minmax(0, 1fr); grid-template-rows: none;
+    grid-template-areas: 'form' 'result' 'text'; overflow: visible;
+  }
+}
+
+.lt-form {
+  min-width: 0; padding: 16px 20px; border-right: 1px solid var(--line);
+  display: flex; flex-direction: column; gap: 16px; overflow-y: auto;
+}
+.lt-drug { position: relative; display: flex; flex-direction: column; gap: 6px; }
+.lt-drug .lbl { margin-bottom: 0; }
+.lt-drug__chip { align-self: flex-start; }
+.lt-fills, .lt-max { display: flex; flex-direction: column; gap: 8px; }
+.lt-fills h3.lbl, .lt-max h3.lbl { margin: 0; }
+.lt-block__head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.lt-rows {
+  display: grid; grid-template-columns: 20px minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 0.8fr) 30px;
+  gap: 6px; align-items: start;
+}
+.lt-rows__h { font-size: 12px; font-weight: 500; color: var(--ink-2); align-self: end; }
+.lt-rows__no { font-size: 12px; color: var(--ink-3); padding-top: 7px; text-align: right; }
+.lt-max__row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.lt-max__select { width: auto; }
+.lt-max__per { font-size: 13px; color: var(--ink-2); }
+.lt-max__date { width: 150px; }
 .lt-result { flex-grow: 1; min-width: 0; padding: 16px 22px 24px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+.lt-tiles { flex-wrap: wrap; }
+.lt-tiles .tile { flex: 1 1 170px; }
+.lt-tiles .tile--main { flex: 1.6 1 240px; }
+.lt-tiles .tile--main .tile__v { font-size: 26px; }
+.tile__u { font-size: 13px; font-weight: 500; letter-spacing: 0; color: var(--ink-2); }
+.lt-print { display: none; }
 
 .chart { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 14px 16px 10px; }
-.chart__head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 18px; }
+.chart__head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 8px; }
 .chart__title { font-size: 13px; font-weight: 600; margin: 0; }
-.chart__plot { position: relative; height: 150px; display: flex; align-items: flex-end; gap: 16px; padding-left: 44px; border-bottom: 1px solid var(--line-2); }
-.chart__band { position: absolute; left: 44px; right: 0; background: var(--ok-bg); }
-.chart__ref { position: absolute; left: 44px; right: 0; border-top: 1px dashed var(--ink-3); }
-.chart__reflabel { position: absolute; left: 0; font-size: 11px; color: var(--ink-3); transform: translateY(50%); }
-.chart__col { flex: 1 1 0; position: relative; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
-.chart__val { font-size: 12px; font-weight: 600; margin-bottom: 3px; }
-.chart__bar { width: 56%; max-width: 64px; border-radius: 4px 4px 0 0; background: var(--ok); }
-.chart__bar--warn { background: var(--warn); }
-.chart__labels { display: flex; gap: 16px; padding-left: 44px; margin-top: 6px; }
-.chart__label { flex: 1 1 0; text-align: center; font-size: 11px; color: var(--ink-2); }
+
+/* Diagrammet (LtChart) — på skärmen och i utskriften. Färger från tokens. */
+.ltc { margin: 0; }
+.ltc-svg { display: block; width: 100%; height: auto; font-family: var(--font-sans); }
+.ltc-grid { stroke: var(--chart-grid); stroke-width: 1; }
+.ltc-ylabel { font-size: 11px; fill: var(--ink-3); text-anchor: end; }
+.ltc-bar { fill: var(--chart-bar); }
+.ltc-bar--last { fill: var(--chart-bar-soft); stroke: var(--chart-bar); stroke-width: 1; stroke-dasharray: 3 2; }
+.ltc-val {
+  font-size: 11px; font-weight: 600; text-anchor: middle; fill: var(--ink);
+  paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round;
+}
+.ltc-max { stroke: var(--chart-max); stroke-width: 2; stroke-dasharray: 6 4; }
+.ltc-axis, .ltc-tick { stroke: var(--ink-3); stroke-width: 1; }
+.ltc-xlabel { font-size: 11px; fill: var(--ink-2); text-anchor: middle; }
+.ltc-xlabel--year { font-weight: 700; fill: var(--ink); }
+.ltc-xlabel--start { text-anchor: start; }
+.ltc-xlabel--end { text-anchor: end; }
+.ltc-legend { margin-top: 4px; font-size: 12px; line-height: 1.9; color: var(--ink-2); }
+.ltc-key { display: inline-block; width: 14px; height: 9px; margin: 0 5px 0 14px; vertical-align: middle; }
+.ltc-key:first-child { margin-left: 0; }
+.ltc-key--bar { background: var(--chart-bar); }
+.ltc-key--last { background: var(--chart-bar-soft); border: 1px dashed var(--chart-bar); }
+.ltc-key--max { height: 0; border-top: 2px dashed var(--chart-max); }
 
 .table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); }
 .table th { font-size: 12px; font-weight: 500; color: var(--ink-2); text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); }
 .table td { font-size: 13px; padding: 7px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-.lt-view .texts-aside { width: 320px; }
+.table .num { text-align: right; }
 .lt-view .tile__v { font-size: 20px; }
 .table tr:last-child td { border-bottom: 0; }
 
@@ -374,7 +427,10 @@ textarea.input { height: auto; padding: 12px; line-height: 1.5; resize: none; fo
 
 @media (forced-colors: active) {
   .chip, .note { border: 1px solid CanvasText; }
-  .timeline__fill, .chart__bar { background: Highlight; forced-color-adjust: none; }
+  .timeline__fill { background: Highlight; forced-color-adjust: none; }
+  .ltc-bar { fill: Highlight; }
+  .ltc-bar--last { fill: Canvas; stroke: Highlight; }
+  .ltc-max { stroke: CanvasText; }
   .seg[aria-pressed='true'], .seg[aria-checked='true'], .med-item[aria-current='true'] { outline: 2px solid Highlight; }
 }
 
@@ -409,13 +465,12 @@ textarea.input { height: auto; padding: 12px; line-height: 1.5; resize: none; fo
 
 /* Smal skärm: långtidsanalysens formulär och texter i full bredd (efter deras grundregler ovan). */
 @media (max-width: 980px) {
-  .lt-form { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
-  .lt-view .texts-aside { width: auto; }
+  .lt-form { border-right: 0; border-bottom: 1px solid var(--line); }
 }
 
 /* Pekskärm: 16 px text i fält (annars zoomar iPhone vid tryck) och minst 44 px höga mål. */
 @media (pointer: coarse) {
-  .input, .input--compact, .lt-grid .input { height: 44px; font-size: 16px; }
+  .input, .input--compact { height: 44px; font-size: 16px; }
   .input--name { height: 44px; font-size: 17px; }
   textarea.input { height: auto; font-size: 16px; }
   .date-field__text { padding-right: 46px; }
@@ -448,15 +503,15 @@ textarea.input { height: auto; padding: 12px; line-height: 1.5; resize: none; fo
 
   .lt-form { padding: 14px 16px; }
   .lt-result { padding: 14px 16px 20px; }
-  .lt-top { flex-wrap: wrap; }
-  .lt-top__dose { width: 100%; }
-  .lt-grid { grid-template-columns: 16px minmax(0, 1fr) minmax(0, 1fr) 44px; row-gap: 8px; }
-  .lt-grid__head--total { display: none; }
-  .lt-grid__total { grid-column: 2 / 4; display: flex; flex-wrap: wrap; align-items: center; column-gap: 8px; }
-  .lt-grid__total::before { content: 'Uttaget'; font-size: 12px; font-weight: 700; color: var(--ink-2); }
-  .lt-grid__total .input { flex: 1 1 0; min-width: 0; }
-  .lt-grid__total .field-error { flex-basis: 100%; }
-  .lt-grid__del { grid-column: 4; }
+  /* Uttag på två rader: datum överst, antal och styrka under. Fälten har platshållare i stället för rubriker. */
+  .lt-rows { grid-template-columns: 16px minmax(0, 1fr) minmax(0, 1fr) 44px; row-gap: 6px; }
+  .lt-rows__h { display: none; }
+  .lt-rows__no { grid-column: 1; padding-top: 12px; }
+  .lt-rows__date { grid-column: 2 / 5; }
+  .lt-rows__del { grid-column: 4; }
+  .lt-rows__count { grid-column: 2; }
+  .lt-rows__strength { grid-column: 3; padding-bottom: 6px; }
+  .lt-max__date { width: 100%; }
   .tiles { flex-wrap: wrap; }
   .tile { flex: 1 1 140px; }
   .table th, .table td { white-space: normal; padding: 6px; }

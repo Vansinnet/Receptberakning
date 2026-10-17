@@ -6,6 +6,7 @@ import {
   caseState, addMed, applyDrug, clearCase, editText, getResult, getText, isTextEdited, refreshToday,
   removeMed, resetText, selectMed, setDecision, setNameManually, setPrescribePackage,
 } from '../../src/lib/state/case.svelte';
+import { addFill, addMaxDose, applyLtDrug, clearLongterm, getLtText, hasLtData, ltState } from '../../src/lib/state/longterm.svelte';
 import type { DrugEntry } from '../../src/lib/drug-search';
 
 setMockNow(new Date(2026, 9, 1, 10, 0, 0).getTime());
@@ -17,6 +18,8 @@ function fillSlutRecept(id: number) {
   m.form.dateRaw = '2025-06-01';
   m.form.doseRaw = '1';
   m.form.refillsRaw = '3';
+  // T28 och T29 godkändes med 6 månader; förvalet är 7 sedan 2026-10-05.
+  m.prescribe.period = 6;
 }
 
 beforeEach(() => { clearCase(); refreshToday(); flushSync(); });
@@ -59,6 +62,11 @@ describe('T29 läkemedel inskrivet för hand', () => {
 });
 
 describe('Ärendet', () => {
+  it('nyförskrivningen är förvald till 7 månader', () => {
+    expect(caseState.meds[0].prescribe.period).toBe(7);
+    addMed();
+    expect(caseState.meds[1].prescribe.period).toBe(7);
+  });
   it('max 8 läkemedel', () => {
     for (let i = 0; i < 10; i++) addMed();
     expect(caseState.meds.length).toBe(8);
@@ -153,5 +161,57 @@ describe('Midnattsbyte', () => {
     expect(after.kind === 'ok' && after.daysLeft).toBe(248);
     setMockNow(new Date(2026, 9, 1, 10, 0, 0).getTime());
     refreshToday();
+  });
+});
+
+describe('Långtidsanalysens state', () => {
+  const imovane: DrugEntry = { name: 'Imovane 7,5 mg', nplId: '1', atcCode: 'N05CF01', packageSize: 30, unit: 'st', form: 'Tablett', regulation: 'V' };
+  const norspan: DrugEntry = { name: 'Norspan 10 mikrog/timme', nplId: '2', atcCode: 'N02AE01', packageSize: 4, form: 'Plåster', regulation: 'IV' };
+  beforeEach(() => { clearLongterm(); flushSync(); });
+
+  it('valt läkemedel ger styrka på raderna, narkotikaklass och journaltext', () => {
+    applyLtDrug(imovane);
+    expect(ltState.fills[0].strengthRaw).toBe('7,5');
+    expect(ltState.regulation).toBe('V');
+    ltState.fills[0].dateRaw = '2026-09-01';
+    ltState.fills[0].countRaw = '30';
+    ltState.maxDoses[0].doseRaw = '1';
+    flushSync();
+    expect(getLtText()).toContain('Aktuellt: Förbrukningsanalys av Imovane 7,5 mg (narkotika klass V).');
+    expect(getLtText()).toContain('Om patienten har slut idag: 7,50 mg/dag (100 % av maxdos).');
+  });
+  it('plåster räknas i antal, med plåster som enhet', () => {
+    applyLtDrug(norspan);
+    expect(ltState.noun).toBe('plåster');
+    expect(ltState.fills[0].strengthRaw).toBe('');
+  });
+  it('ny rad sorterar raderna efter datum och får styrkan från raden ovanför', () => {
+    applyLtDrug(imovane);
+    Object.assign(ltState.fills[0], { dateRaw: '2026-09-01', countRaw: '30' });
+    expect(addFill()).toBe(1);
+    Object.assign(ltState.fills[1], { dateRaw: '2026-08-01', countRaw: '30', strengthRaw: '5' });
+    expect(addFill()).toBe(2);
+    expect(ltState.fills.map((f) => f.dateRaw)).toEqual(['2026-08-01', '2026-09-01', '']);
+    expect(ltState.fills[2].strengthRaw).toBe('7,5');
+    // En tom rad finns redan: ingen ny läggs till.
+    expect(addFill()).toBe(2);
+    expect(ltState.fills).toHaveLength(3);
+  });
+  it('högst 60 uttag', () => {
+    for (let i = 0; i < 70; i++) {
+      Object.assign(ltState.fills[ltState.fills.length - 1], { dateRaw: '2026-09-01', countRaw: '1' });
+      addFill();
+    }
+    expect(ltState.fills).toHaveLength(60);
+    expect(addFill()).toBe(-1);
+  });
+  it('rensning tömmer allt', () => {
+    applyLtDrug(imovane);
+    Object.assign(ltState.fills[0], { dateRaw: '2026-09-01', countRaw: '30' });
+    addMaxDose();
+    expect(hasLtData()).toBe(true);
+    clearLongterm();
+    expect(hasLtData()).toBe(false);
+    expect(ltState.maxDoses).toHaveLength(1);
   });
 });

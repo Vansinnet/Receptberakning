@@ -1,12 +1,13 @@
-// Kliniska testfall T01–T32, godkända 2026-09-27 i "Recept 5.0 — planering",
-// fliken Kliniska testfall. Idag = 2026-10-01 i alla fall.
+// Kliniska testfall T01–T41. T01–T32 godkända 2026-09-27 i "Recept 5.0 — planering", fliken
+// Kliniska testfall; T33–T41 godkända 2026-10-18 i fliken Långtidsanalys 2.0. Idag = 2026-10-01.
 // Ändra ALDRIG ett förväntat värde här utan att fallet först ändrats och godkänts i dokumentet.
 import { describe, it, expect } from 'vitest';
 import { calcRenewal, daysLeftText, isRenewalOk, STATUS_LABEL, type RenewalOk } from '../../src/lib/domain/renewal';
 import { calcPrescription } from '../../src/lib/domain/prescribe';
 import { calcLongterm } from '../../src/lib/domain/longterm';
+import { ltRemainText } from '../../src/lib/domain/texts';
 import { fmtDate, fmtFixed, fmtPct, fmtQty } from '../../src/lib/utils';
-import type { MedForm, PrescribeSettings } from '../../src/lib/types';
+import type { LtDoseUnit, LtInterval, MedForm, PrescribeSettings } from '../../src/lib/types';
 
 const TODAY = new Date(Date.UTC(2026, 9, 1));
 
@@ -182,42 +183,99 @@ describe('E. Nyförskrivning', () => {
   });
 });
 
+// Långtidsanalys 2.0: uttag i stället för perioder. T30–T32 utgick 2026-10-18 och ersattes av
+// T33–T41, godkända samma dag i fliken "Långtidsanalys 2.0". Zopiklon 7,5 mg och maxdos 1 st/dag
+// om inget annat anges.
+type Fill = [date: string, count: string, strength?: string];
+function lt(fills: Fill[], max: string | [string, string][] | null = '1', unit: LtDoseUnit = 'st', interval: LtInterval = 1) {
+  const maxDoses = max === null ? [{ fromRaw: '', doseRaw: '' }]
+    : typeof max === 'string' ? [{ fromRaw: '', doseRaw: max }]
+    : max.map(([fromRaw, doseRaw]) => ({ fromRaw, doseRaw }));
+  const r = calcLongterm(fills.map(([dateRaw, countRaw, strengthRaw = '7,5']) => ({ dateRaw, countRaw, strengthRaw })), maxDoses, unit, interval, TODAY);
+  if (r.kind !== 'ok') throw new Error(`förväntade ok, fick ${r.kind}`);
+  return r;
+}
+type LtOk = ReturnType<typeof lt>;
+const per = (r: LtOk, interval: LtInterval = 1) => ({
+  rates: r.fills.map((f) => (f.rate === null ? null : fmtFixed(f.rate * interval, 2))),
+  pcts: r.fills.map((f) => (f.pct === null ? null : fmtPct(f.pct))),
+  average: r.average && [fmtFixed(r.average.rate * interval, 2), r.average.pct === null ? null : fmtPct(r.average.pct)],
+  ifOutToday: r.ifOutToday && [fmtFixed(r.ifOutToday.rate * interval, 2), r.ifOutToday.pct === null ? null : fmtPct(r.ifOutToday.pct)],
+});
+const T34_FILLS: Fill[] = [['2026-06-01', '30'], ['2026-07-01', '30'], ['2026-07-26', '30'], ['2026-08-15', '30'], ['2026-08-30', '30']];
+
 describe('F. Långtidsanalys', () => {
-  it('T30 två perioder i nivå', () => {
-    const r = calcLongterm([
-      { startRaw: '2026-01-01', endRaw: '2026-03-31', totalRaw: '90' },
-      { startRaw: '2026-04-01', endRaw: '2026-06-30', totalRaw: '91' },
-    ], '1', TODAY);
-    expect(r.kind).toBe('ok');
-    if (r.kind !== 'ok') return;
-    expect(r.periods.map((p) => p.days)).toEqual([90, 91]);
-    expect(r.unionDays).toBe(181);
-    expect(r.total).toBe(181);
-    expect(fmtPct(r.pct)).toBe('100 %');
-    expect(r.periods.every((p) => p.cls === 'ok')).toBe(true);
-    expect(r.overlap).toBe(false);
+  it('T33 jämn förbrukning', () => {
+    const r = lt([['2026-07-03', '30'], ['2026-08-02', '30'], ['2026-09-01', '30']]);
+    expect(per(r)).toEqual({
+      rates: ['7,50', '7,50', '7,50'], pcts: ['100 %', '100 %', '100 %'],
+      average: ['7,50', '100 %'], ifOutToday: ['7,50', '100 %'],
+    });
+    expect(r.fills.map((f) => f.last)).toEqual([false, false, true]);
+    expect(ltRemainText(r, 'st')).toBe('0 st');
   });
-  it('T31 överlappande perioder', () => {
-    const r = calcLongterm([
-      { startRaw: '2026-01-01', endRaw: '2026-04-15', totalRaw: '105' },
-      { startRaw: '2026-04-01', endRaw: '2026-06-30', totalRaw: '91' },
-    ], '1', TODAY);
-    if (r.kind !== 'ok') throw new Error('förväntade ok');
-    expect(r.overlap).toBe(true);
-    expect(r.unionDays).toBe(181);
-    expect(r.total).toBe(196);
-    expect(fmtPct(r.pct)).toBe('108,3 %');
-    expect(r.cls).toBe('ok');
+  it('T34 ökande förbrukning', () => {
+    const r = lt(T34_FILLS);
+    expect(per(r)).toEqual({
+      rates: ['7,50', '9,00', '11,25', '15,00', '7,03'], pcts: ['100 %', '120 %', '150 %', '200 %', '93,8 %'],
+      average: ['10,00', '133,3 %'], ifOutToday: ['9,22', '123 %'],
+    });
+    expect(ltRemainText(r, 'st')).toBe('30 st');
   });
-  it('T32 två identiska perioder', () => {
-    const r = calcLongterm([
-      { startRaw: '2026-01-01', endRaw: '2026-03-31', totalRaw: '90' },
-      { startRaw: '2026-01-01', endRaw: '2026-03-31', totalRaw: '90' },
-    ], '1', TODAY);
-    if (r.kind !== 'ok') throw new Error('förväntade ok');
-    expect(r.overlap).toBe(true);
-    expect(r.unionDays).toBe(90);
-    expect(r.periods.map((p) => p.index)).toEqual([0, 1]);
+  it('T35 två styrkor räknas ihop i mg', () => {
+    const r = lt([['2026-08-01', '30', '7,5'], ['2026-08-31', '30', '5'], ['2026-09-20', '30', '7,5']], '7,5', 'mg');
+    expect(per(r)).toEqual({
+      rates: ['7,50', '7,50', '20,45'], pcts: ['100 %', '100 %', '272,7 %'],
+      average: ['7,50', '100 %'], ifOutToday: ['9,84', '131,1 %'],
+    });
+    expect(r.strengths).toEqual([5, 7.5]);
+    expect(ltRemainText(r, 'st')).toBe('0 mg');
+  });
+  it('T36 uttag samma dag räknas som ett uttag', () => {
+    const r = lt([['2026-09-01', '30'], ['2026-09-01', '30'], ['2026-09-21', '30']]);
+    expect(r.fills.map((f) => f.rows)).toEqual([[0, 1], [2]]);
+    expect(r.fills[0].amount).toBe(450);
+    expect(per(r)).toEqual({
+      rates: ['22,50', '22,50'], pcts: ['300 %', '300 %'], average: ['22,50', '300 %'], ifOutToday: ['22,50', '300 %'],
+    });
+    expect(ltRemainText(r, 'st')).toBe('40 st');
+  });
+  it('T37 ett uttag', () => {
+    const r = lt([['2026-09-01', '30']]);
+    expect(per(r)).toEqual({ rates: ['7,50'], pcts: ['100 %'], average: null, ifOutToday: ['7,50', '100 %'] });
+    expect(r.shouldRemain).toBeNull();
+  });
+  it('T38 utan maxdos', () => {
+    const r = lt(T34_FILLS, null);
+    expect(per(r)).toEqual({
+      rates: ['7,50', '9,00', '11,25', '15,00', '7,03'], pcts: [null, null, null, null, null],
+      average: ['10,00', null], ifOutToday: ['9,22', null],
+    });
+    expect(r.shouldRemain).toBeNull();
+  });
+  it('T39 ändrad maxdos', () => {
+    const r = lt([['2026-06-01', '30'], ['2026-07-01', '60'], ['2026-07-31', '60']], [['', '1'], ['2026-07-01', '2']]);
+    expect(per(r)).toEqual({
+      rates: ['7,50', '15,00', '7,26'], pcts: ['100 %', '100 %', '48,4 %'],
+      average: ['11,25', '100 %'], ifOutToday: ['9,22', '70,1 %'],
+    });
+    expect(ltRemainText(r, 'st')).toBe('0 st');
+  });
+  it('T40 uppehåll sparar inga tabletter', () => {
+    const r = lt([['2026-03-01', '30'], ['2026-05-30', '30'], ['2026-06-14', '30']]);
+    expect(per(r)).toEqual({
+      rates: ['2,50', '15,00', '2,06'], pcts: ['33,3 %', '200 %', '27,5 %'],
+      average: ['4,29', '57,1 %'], ifOutToday: ['3,15', '42,1 %'],
+    });
+    expect(ltRemainText(r, 'st')).toBe('15 st');
+  });
+  it('T41 plåster räknas i antal, maxdos per vecka', () => {
+    const r = lt([['2026-08-01', '4', ''], ['2026-08-29', '4', '']], '1', 'st', 7);
+    expect(r.unit).toBe('antal');
+    expect(per(r, 7)).toEqual({
+      rates: ['1,00', '0,85'], pcts: ['100 %', '84,8 %'], average: ['1,00', '100 %'], ifOutToday: ['0,92', '91,8 %'],
+    });
+    expect(ltRemainText(r, 'plåster')).toBe('0 plåster');
   });
 });
 
@@ -237,12 +295,8 @@ describe('Rättelser efter oberoende granskning', () => {
     const p = calcPrescription(r, settings({ period: 'date', endDateRaw: '2026-09-30' }), TODAY);
     expect(p).toMatchObject({ kind: 'badDate', message: 'Slutdatumet har redan passerat.' });
   });
-  it('långtidsanalysen behåller radnumret när perioderna sorteras', () => {
-    const r = calcLongterm([
-      { startRaw: '2026-03-01', endRaw: '2026-03-31', totalRaw: '31' },
-      { startRaw: '2026-01-01', endRaw: '2026-01-31', totalRaw: '10' },
-    ], '1', TODAY);
-    if (r.kind !== 'ok') throw new Error('förväntade ok');
-    expect(r.periods.map((p) => p.index)).toEqual([1, 0]);
+  it('långtidsanalysen behåller radnumret när uttagen sorteras', () => {
+    const r = lt([['2026-03-01', '30'], ['2026-01-01', '10']]);
+    expect(r.fills.map((f) => f.rows)).toEqual([[1], [0]]);
   });
 });

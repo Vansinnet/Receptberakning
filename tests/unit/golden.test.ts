@@ -61,17 +61,31 @@ function renewalCases() {
 function longtermCases() {
   const out = [];
   for (let i = 0; i < 60; i++) {
-    const n = int(1, 5);
-    const rows = Array.from({ length: n }, () => {
-      const start = int(20, 700), len = int(1, 120);
-      return { startRaw: fmtDate(addDays(TODAY, -start)), endRaw: fmtDate(addDays(TODAY, -start + len - 1)), totalRaw: String(int(1, 200)) };
-    });
-    const dose = pick(['0,5', '1', '2', '3']);
-    const res = calcLongterm(rows, dose, TODAY);
+    const mode = pick(['st', 'st', 'mg', 'antal'] as const);
+    const n = int(1, 8);
+    const fills = Array.from({ length: n }, () => ({
+      dateRaw: fmtDate(addDays(TODAY, -int(0, 700))),
+      countRaw: String(pick([10, 20, 28, 30, 50, 60, 98, 100])),
+      strengthRaw: mode === 'antal' ? '' : mode === 'st' ? '7,5' : pick(['5', '7,5', '10']),
+    }));
+    const maxDoses = r() < 0.2 ? [{ fromRaw: '', doseRaw: '' }] : [
+      { fromRaw: '', doseRaw: mode === 'mg' ? pick(['5', '7,5', '10', '15']) : pick(['0,5', '1', '2', '3']) },
+      ...(r() < 0.3 ? [{ fromRaw: fmtDate(addDays(TODAY, -int(0, 700))), doseRaw: mode === 'mg' ? pick(['5', '15']) : pick(['1', '2']) }] : []),
+    ];
+    const interval = pick([1, 1, 1, 7] as const);
+    const res = calcLongterm(fills, maxDoses, mode === 'mg' ? 'mg' : 'st', interval, TODAY);
+    const pct = (p: number | null | undefined) => (p == null ? null : round(p));
     out.push({
-      input: rows.map((x) => `${x.startRaw}–${x.endRaw}:${x.totalRaw}`).join(' ') + ` dos ${dose}`,
+      input: fills.map((f) => `${f.dateRaw}:${f.countRaw}${f.strengthRaw ? '×' + f.strengthRaw : ''}`).join(' ')
+        + ` max ${maxDoses.map((m) => (m.fromRaw ? m.fromRaw + ':' : '') + (m.doseRaw || '–')).join(',')} ${mode === 'mg' ? 'mg' : 'st'}/${interval}d`,
       ...(res.kind === 'ok'
-        ? { unionDays: res.unionDays, total: res.total, pct: round(res.pct), cls: res.cls, overlap: res.overlap, periods: res.periods.map((p) => p.cls) }
+        ? {
+            unit: res.unit,
+            fills: res.fills.map((f) => [fmtDate(f.date), f.days, round(f.amount), f.rate === null ? null : round(f.rate), pct(f.pct)]),
+            average: res.average && [round(res.average.rate), pct(res.average.pct)],
+            ifOutToday: res.ifOutToday && [round(res.ifOutToday.rate), pct(res.ifOutToday.pct)],
+            shouldRemain: res.shouldRemain === null ? null : round(res.shouldRemain),
+          }
         : { kind: res.kind }),
     });
   }

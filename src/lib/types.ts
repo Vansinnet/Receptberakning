@@ -49,8 +49,23 @@ export interface MedCard {
   prescribe: PrescribeSettings;
 }
 
-export interface LtPeriodInput {
-  startRaw: string;
-  endRaw: string;
-  totalRaw: string;
+/** Ett uttag ur uttagshistoriken, som det skrivs in. */
+export interface LtFillInput {
+  dateRaw: string;
+  /** Antal enheter: "30", eller förpackningar × storlek, "2x30". */
+  countRaw: string;
+  /** Styrka i mg. Tom när preparatet saknar styrka i mg (t.ex. plåster); då räknas antal. */
+  strengthRaw: string;
 }
+
+/** Maxdos enligt receptet. Första raden gäller från början; följande från och med fromRaw. */
+export interface LtMaxDoseInput {
+  fromRaw: string;
+  doseRaw: string;
+}
+
+/** Maxdosen anges i st (räknas om med styrkan) eller i mg. */
+export type LtDoseUnit = 'st' | 'mg';
+
+/** Maxdosen anges per dag eller per vecka; takten visas per samma intervall. */
+export type LtInterval = 1 | 7;
