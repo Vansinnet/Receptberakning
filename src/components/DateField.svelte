@@ -3,6 +3,8 @@
   // Kalendern är ett dolt <input type="date"> som öppnas med showPicker(). Båda vägarna ger
   // samma ÅÅÅÅ-MM-DD-sträng, så validering och beräkning är oförändrade.
   // Kortare skrivsätt (ÅÅMMDD, 2026-6-20) kompletteras när fältet lämnas eller vid Enter.
+  // Kalenderknappen ligger utanför tabbordningen, så att Tab går direkt till nästa fält.
+  // Med tangentbordet öppnas kalendern med Alt+Pil ned i fältet.
   import { applyDateMask, normalizeDateInput } from '$lib/utils';
   import Icon from './Icon.svelte';
 
@@ -34,6 +36,11 @@
     if (v !== value) onchange(v);
   }
 
+  function onKey(e: KeyboardEvent) {
+    if (e.key === 'Enter') complete();
+    else if (e.key === 'ArrowDown' && e.altKey) { e.preventDefault(); openPicker(); }
+  }
+
   function openPicker() {
     if (!picker) return;
     try {
@@ -48,9 +55,9 @@
 <div class="date-field">
   <input {id} class="input date-field__text" class:input--compact={compact} type="text" inputmode="numeric"
     autocomplete="off" maxlength="10" placeholder="ÅÅÅÅ-MM-DD" {value} oninput={onText}
-    onblur={complete} onkeydown={(e) => { if (e.key === 'Enter') complete(); }}
+    onblur={complete} onkeydown={onKey} aria-keyshortcuts="Alt+ArrowDown"
     aria-label={label} aria-invalid={invalid} aria-describedby={describedby} />
-  <button type="button" class="date-field__btn" onclick={openPicker}
+  <button type="button" class="date-field__btn" tabindex="-1" onclick={openPicker}
     aria-label={label ? `Välj ${label.toLowerCase()} i kalender` : 'Välj datum i kalender'}>
     <Icon name="calendar" size={16} />
   </button>

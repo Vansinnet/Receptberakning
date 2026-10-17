@@ -96,6 +96,10 @@ test('långtidsanalys: uttag med Enter, maxdos och mörkt tema (T34)', async ({ 
   await page.getByRole('tab', { name: 'Långtidsanalys' }).click();
   await pickLtDrug(page, 'imovane 7,5', 'Imovane 7,5 mg');
   await expect(page.getByText('Narkotika klass V', { exact: true })).toBeVisible();
+  // Tab från datumet går direkt till antal (kalenderknappen ligger utanför tabbordningen).
+  await page.getByLabel('Datum, uttag 1', { exact: true }).focus();
+  await page.keyboard.press('Tab');
+  await expect(page.getByLabel('Antal, uttag 1', { exact: true })).toBeFocused();
   // Styrkan hämtas från läkemedlet; Enter i antal ger en ny rad och flyttar fokus till dess datum.
   const dates = ['2026-06-01', '2026-07-01', '2026-07-26', '2026-08-15', '2026-08-30'];
   for (const [i, d] of dates.entries()) {
@@ -137,6 +141,8 @@ test('snabbare inmatning: fokus till receptdatum, ÅÅMMDD och dosuttryck', asyn
   await expect(date).toHaveValue('2512-10');
   await page.keyboard.press('Tab');
   await expect(date).toHaveValue('2025-12-10');
+  // Tab hoppar över kalenderknappen, direkt till nästa fält.
+  await expect(page.locator('#f-dose')).toBeFocused();
 
   // Ensiffrig månad med bindestreck.
   await date.fill('');
