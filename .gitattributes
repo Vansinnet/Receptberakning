@@ -1,0 +1,5 @@
+# Datafilerna ska alltid ha LF, även på Windows med core.autocrlf=true. drugs-version.json
+# innehåller en hash av drugs.json som den ligger i git; med CRLF stämmer den inte och
+# tests/unit/data.test.ts faller.
+public/data/*.json text eol=lf
+src/lib/data/*.json text eol=lf

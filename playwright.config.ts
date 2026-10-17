@@ -15,6 +15,9 @@ export default defineConfig({
     baseURL: 'http://127.0.0.1:5173',
     viewport: { width: 1280, height: 720 },
     permissions: ['clipboard-read', 'clipboard-write'],
+    // Utan övergångar (app.css har dem bara vid prefers-reduced-motion: no-preference), så att
+    // axe aldrig mäter kontrasten mitt i en färgövergång, t.ex. när Förnya just tryckts.
+    reducedMotion: 'reduce',
     launchOptions: { executablePath },
   },
 });
